@@ -12,7 +12,7 @@ import disbursementMethodReducer from '../reducers/disbursementMethodReducer';
 import employersManagerReducer from '../reducers/employersManagerReducer';
 import adminUserReducer from '../reducers/adminUserReducer';
 import authReducer from '../reducers/adminAuthReducer';
-
+import loanStartDataReducer from '../reducers/loanStartDataReducer';
 // create a store
 const store = configureStore({
     reducer: {
@@ -30,6 +30,7 @@ const store = configureStore({
         employersManagerReducer,
         user: userSlice,
         adminAuth: authReducer,
+        startData: loanStartDataReducer,
     }
 });
 

@@ -23,10 +23,11 @@ import initialValues from "./formInitialValue";
 import convertFile from "../../../../utilities/convertFile";
 import dataURItoBlob from "../../../../utilities/dataURItoBlob";
 import generateCustomerId from "../../dashboard/admindashboard/customers/generateCustomerId";
-import idpRedirect from "./bvnIDPAuth"
+// import idpRedirect from "./bvnIDPAuth"
+import bvnVerification from "./bvnVerification";
 
 // loan form component
-const LoanForm = ({ data }) => {
+const LoanForm = () => {
   // fetch loan product
   const dispatch = useDispatch();
   useEffect(() => {
@@ -34,6 +35,7 @@ const LoanForm = ({ data }) => {
     dispatch(fetchEmployers());
   }, [dispatch]);
 
+ 
   const loanProducts = useSelector(
     (state) => state.productReducer.products.products
   );
@@ -41,12 +43,18 @@ const LoanForm = ({ data }) => {
     (state) => state.employersManagerReducer.employers.employers
   );
 
+  // start form data
+  const loanStartData = useSelector((state) => state.startData);
+  console.log(loanStartData)
+
+  const careertype = "government employee";
+  const loanamount  = 10000;
+
+
   // data from loan home
-  const { loanamount, careertype } = data;
+  // const { loanamount, careertype } = data;
   const [noofmonth, setNoofmonth] = useState(1);
-  const [currentLoanAmount, setCurrentLoanAmount] = useState(
-    parseInt(loanamount)
-  );
+  const [currentLoanAmount, setCurrentLoanAmount] = useState(0);
   const [interestResult, setInterestResult] = useState(0);
 
   const [step, setStep] = useState(1);
@@ -133,8 +141,9 @@ const LoanForm = ({ data }) => {
 
   // handle bvn varification
   const handleBvnVarification = () => {
-    idpRedirect();
-    setIsBvnVarified(true);
+    // idpRedirect(); 
+    bvnVerification();
+    // setIsBvnVarified(true);
   };
 
   // handle form submit/move to next step
@@ -305,7 +314,7 @@ const LoanForm = ({ data }) => {
         {/* formik form */}
         <div>
           <Formik
-            initialValues={initialValues(loanamount, careertype, captureImg)}
+            initialValues={initialValues(captureImg)}
             validationSchema={validationSchema}
             onSubmit={handleSubmit}
             innerRef={ref}
@@ -999,7 +1008,6 @@ const LoanForm = ({ data }) => {
                                     />
                                   </div>
                                 ) : null}
-                               
                               </div>
 
                               <div className="ButtonContainer">
@@ -1058,46 +1066,46 @@ const LoanForm = ({ data }) => {
                                 </div>
 
                                 <div className="InputRow">
-                                     <div id="Disbursement">
-                                  <Headline
-                                    align="left"
-                                    fontSize="18px"
-                                    spacer="35px 128px -16px 0"
-                                    color="#000"
-                                    text="Disbursement Account Details"
-                                  />
-                                  <div className="CheckboxContainer">
-                                    <label className="CheckboxGroup">
-                                      <Field
-                                        type="checkbox"
-                                        name="sameasaboveaccount"
-                                      />
-                                      Same as above Account
-                                    </label>
+                                  <div id="Disbursement">
+                                    <Headline
+                                      align="left"
+                                      fontSize="18px"
+                                      spacer="35px 128px -16px 0"
+                                      color="#000"
+                                      text="Disbursement Account Details"
+                                    />
+                                    <div className="CheckboxContainer">
+                                      <label className="CheckboxGroup">
+                                        <Field
+                                          type="checkbox"
+                                          name="sameasaboveaccount"
+                                        />
+                                        Same as above Account
+                                      </label>
+                                    </div>
                                   </div>
+                                  <TextInput
+                                    label="Bank Code"
+                                    name="bankcode"
+                                    type="text"
+                                  />
                                 </div>
-                                 <TextInput
-                                      label="Bank Code"
-                                      name="bankcode"
+
+                                {!values.sameasaboveaccount && (
+                                  <div className="InputRow">
+                                    <TextInput
+                                      label="Bank Name"
+                                      name="disbursementbankname"
                                       type="text"
                                     />
-                                </div>
-                               
-                                  {!values.sameasaboveaccount && (
-                                    <div className="InputRow">
-                                      <TextInput
-                                        label="Bank Name"
-                                        name="disbursementbankname"
-                                        type="text"
-                                      />
-                                      <div className="Space"></div>
-                                      <TextInput
-                                        label="Account Number"
-                                        name="disbursementaccountnumber"
-                                        type="text"
-                                      />
-                                    </div>
-                                  )}
+                                    <div className="Space"></div>
+                                    <TextInput
+                                      label="Account Number"
+                                      name="disbursementaccountnumber"
+                                      type="text"
+                                    />
+                                  </div>
+                                )}
 
                                 <div id="ExistingLoan">
                                   <Headline
@@ -1549,7 +1557,7 @@ const LoanForm = ({ data }) => {
 
                       {/* right loan step section */}
                       <div className="col-sm-12 col-md-4 Step">
-                        <img src={stepImg} alt={step} />
+                        <img src="images/step1.png" alt={step} />
                       </div>
                     </div>
                   </div>

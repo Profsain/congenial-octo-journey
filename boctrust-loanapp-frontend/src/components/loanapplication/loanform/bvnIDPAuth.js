@@ -5,7 +5,7 @@ const idpRedirect = () => {
     '?scope=contact_info' +
     '&acr_values=otp' +
     '&response_type=code' +
-    '&redirect_uri=https://openaccount.chanellemicrofinancebank.com/' +
+    '&redirect_uri=https://www.boctrustmfb.com/app/nibbs-login' +
     '&client_id=8e7cd2fe-35b5-4e25-9a98-0a555f1c23cd';
 
     // Redirect the user to the IDP authorization page

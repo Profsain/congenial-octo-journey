@@ -42,7 +42,7 @@ mongoose
         // create new instance of express
         const app = express();
 
-             // use cors
+        // use cors
         app.use(cors());
 
         // use express json

@@ -13,7 +13,7 @@ import LoanStep from "./LoanStep";
 import BocTrustMsg from "./BocTrustMsg";
 import Testimonial from "./Testimonial";
 import EmailSection from "./EmailSection";
-import LoanForm from "../loanform/LoanForm";
+import LoanFirstStep from "../loanform/LoanFirstStep";
 
 const LoanHome = () => {
   const [isOpened, setIsOpened] = useState(false);
@@ -34,7 +34,7 @@ const LoanHome = () => {
   return (
     <>
       {isOpened ? (
-        <LoanForm data={startObject} />
+        <LoanFirstStep data={startObject} />
       ) : (
         <div className="LoanHome">
           <Header imgurl="images/boctrustformheader.jpg" />
