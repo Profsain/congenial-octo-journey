@@ -5,7 +5,6 @@ import axios from 'axios';
 const apiUrl = import.meta.env.VITE_BASE_URL;
   
 const API_ENDPOINT = `${apiUrl}/api/product/products`;
-console.log(API_ENDPOINT);
 
 // Thunk to fetch product from the API
 export const fetchProduct = createAsyncThunk('product/fetchProduct', async () => {

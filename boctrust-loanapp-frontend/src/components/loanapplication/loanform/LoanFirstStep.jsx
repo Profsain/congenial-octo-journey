@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 import PropTypes from "prop-types";
 import { useState, useEffect, useRef } from "react";
 // formik and yup for form data management
@@ -45,6 +46,7 @@ const LoanFirstStep = ({ data }) => {
   // get current formik value
   const ref = useRef();
 
+    
   // scroll to the top of the page
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -61,7 +63,8 @@ const LoanFirstStep = ({ data }) => {
     setNoofmonth(noOfMonths);
 
     // find product
-    const product = loanProducts?.find((product) => product._id === productId);
+      const product = loanProducts?.find((product) => product._id === productId);
+      
     // get interest rate
     const loanRate = product?.interestRate;
 
@@ -94,26 +97,30 @@ const LoanFirstStep = ({ data }) => {
     }
   };
 
-  // send data to redux store
-  const startData = {
-    loanamount,
-    careertype,
-    noofmonth,
-    loanRepaymentTotal,
-    monthlyRepayment,
-    loanProducts: loanProducts?.find(
-      (product) => product._id === ref.current?.values.loanproduct
-    ),
+    // send data to redux store
+    const productId = ref.current?.values.loanproduct;
+    const product = loanProducts?.find((product) => product._id === productId);
+    console.log(product)
+    const startData = {
+        loanamount,
+        careertype,
+        noofmonth,
+        loanRepaymentTotal,
+        monthlyRepayment,
+        product
   };
   // handle bvn verification
     const handleBvnVerification = () => {
+        // store startData to local storage
+  
+    localStorage.setItem("startData", JSON.stringify(startData));
     dispatch(addData(startData));
     // idpRedirect();
     bvnVerification();
   };
 
-      const loanStartData = useSelector((state) => state.startData);
-      console.log(loanStartData);
+  const loanStartData = useSelector((state) => state.startData);
+  console.log(loanStartData);
   return (
     <div className="container-fluid FormContainer">
       <div>

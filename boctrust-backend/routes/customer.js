@@ -1,10 +1,15 @@
 const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcrypt');
+const dotenv = require('dotenv');
 const jwt = require('jsonwebtoken');
 const multer = require('multer');
 const path = require('path');
 const CustomerModel = require('../models/Customer'); // Import customer model
+
+// configure dotenv
+dotenv.config();
+
 
 // Set up Multer storage to define where to save the uploaded images
 const storage = multer.diskStorage({
@@ -26,7 +31,7 @@ const multipleUpload = upload.fields([{ name: 'valididcard' }, { name: 'uploadpa
 
 // Create a new customer
 router.post('/customer', multipleUpload, async (req, res) => {
-
+  console.log("req.body", req.body)
   if (req.files.valididcard) {
     req.body.valididcard = req.files.valididcard[0].filename;
   }
@@ -70,6 +75,7 @@ router.post('/customer', multipleUpload, async (req, res) => {
 
 // Read all customer
 const baseUrl = process.env.BASE_URL;
+console.log(baseUrl)
 
 router.get('/customers', async (req, res) => {
   try {

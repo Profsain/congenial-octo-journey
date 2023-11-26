@@ -34,7 +34,10 @@ const customerSchema = new mongoose.Schema({
     loanamount: String,
     numberofmonth: String,
     loantotalrepayment: Number,
-    loanproduct: String,
+    loanproduct: {
+    type: Object,
+    default: {}
+    },
     monthlyrepayment: String,
     careertype: String,
     numberofmonth: {

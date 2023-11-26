@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 import { useState, useEffect, useRef } from "react";
 import PropTypes from "prop-types";
 // fetch data from api
@@ -10,7 +11,6 @@ import { Formik, Form, Field } from "formik";
 import validationSchema from "./formvalidation";
 // state and lga
 import NaijaStates from "naija-state-local-government";
-import calculatorfunc from "../../shared/calculatorfunc";
 import Headline from "../../shared/Headline";
 import TextInput from "./formcomponents/TextInput";
 import SelectField from "./formcomponents/SelectField";
@@ -23,8 +23,6 @@ import initialValues from "./formInitialValue";
 import convertFile from "../../../../utilities/convertFile";
 import dataURItoBlob from "../../../../utilities/dataURItoBlob";
 import generateCustomerId from "../../dashboard/admindashboard/customers/generateCustomerId";
-// import idpRedirect from "./bvnIDPAuth"
-import bvnVerification from "./bvnVerification";
 
 // loan form component
 const LoanForm = () => {
@@ -35,33 +33,38 @@ const LoanForm = () => {
     dispatch(fetchEmployers());
   }, [dispatch]);
 
- 
-  const loanProducts = useSelector(
-    (state) => state.productReducer.products.products
-  );
   const employers = useSelector(
     (state) => state.employersManagerReducer.employers.employers
   );
 
-  // start form data
-  const loanStartData = useSelector((state) => state.startData);
-  console.log(loanStartData)
+  // get start data from local storage
+  const [loanamount, setLoanAmount] = useState("");
+  const [careertype, setCareerType] = useState("");
+  const [noofmonth, setNoOfMonth] = useState("");
+  const [loanRepaymentTotal, setLoanRepaymentTotal] = useState("");
+  const [monthlyRepayment, setMonthlyRepayment] = useState("");
 
-  const careertype = "government employee";
-  const loanamount  = 10000;
+  useEffect(() => {
+    const storedStartData = localStorage.getItem("startData");
+    if (storedStartData) {
+      // Parse the JSON data retrieved from local storage
+      const parsedStartData = JSON.parse(storedStartData);
 
-
-  // data from loan home
-  // const { loanamount, careertype } = data;
-  const [noofmonth, setNoofmonth] = useState(1);
-  const [currentLoanAmount, setCurrentLoanAmount] = useState(0);
-  const [interestResult, setInterestResult] = useState(0);
+      // Set the state with the retrieved data
+      setLoanAmount(parsedStartData.loanamount);
+      setCareerType(parsedStartData.careertype);
+      setNoOfMonth(parsedStartData.noofmonth);
+      setLoanRepaymentTotal(parsedStartData.loanRepaymentTotal);
+      setMonthlyRepayment(parsedStartData.monthlyRepayment);
+    }
+  }, []);
 
   const [step, setStep] = useState(1);
   const [showForm, setShowForm] = useState(true);
-  const [stepImg, setStepImg] = useState("images/step1.png");
+  const [stepImg, setStepImg] = useState("https://i.imgur.com/DPMDjLy.png");
   const [state, setState] = useState("");
   const [lga, setLga] = useState([]);
+
   // file upload
   const [captureImg, setCaptureImg] = useState("");
   const [idCard, setIdCard] = useState("");
@@ -89,41 +92,6 @@ const LoanForm = () => {
   // get current formik value
   const ref = useRef();
 
-  // calculate interest rate
-  const [loanRepaymentTotal, setLoanRepaymentTotal] = useState(0);
-  const [monthlyRepayment, setMonthlyRepayment] = useState(0);
-  const calculateRepayment = () => {
-    // get product id from formik values
-    const productId = ref.current?.values.loanproduct;
-    const noOfMonths = ref.current?.values.numberofmonth;
-    setNoofmonth(noOfMonths);
-
-    // find product
-    const product = loanProducts?.find((product) => product._id === productId);
-    // get interest rate
-    const loanRate = product?.interestRate;
-
-    // calculator loan amount
-    const loanCal = calculatorfunc(
-      parseInt(currentLoanAmount),
-      noofmonth * 30,
-      loanRate
-    );
-    setInterestResult(loanCal);
-  };
-
-  useEffect(() => {
-    calculateRepayment();
-  }, [noofmonth, currentLoanAmount]);
-
-  const loanTotal = parseInt(currentLoanAmount) + interestResult;
-  const monthlyPay = (loanTotal / parseInt(noofmonth)).toFixed();
-  // update repayment
-  useEffect(() => {
-    setLoanRepaymentTotal((loanTotal));
-    setMonthlyRepayment((monthlyPay));
-  }, [loanTotal, monthlyPay])
-
   // state and lgas
   const ngState = NaijaStates.states();
   const lgas = lga.lgas;
@@ -136,126 +104,128 @@ const LoanForm = () => {
     ref.current?.setFieldValue("stateofresidence", state);
   };
 
-  // BVN Varification
-  const [isBvnVarified, setIsBvnVarified] = useState(false);
-
-  // handle bvn varification
-  const handleBvnVarification = () => {
-    // idpRedirect(); 
-    bvnVerification();
-    // setIsBvnVarified(true);
-  };
-
   // handle form submit/move to next step
   const handleSubmit = async () => {
+    console.log("Form submit start")
     // handle form submit to backend here
-    if (ref.current) {
-      const formValues = ref.current?.values; 
-      // generate customer id
-      const customerId = generateCustomerId();
-      const formData = new FormData();
-      formData.append("customerId", customerId);
-      formData.append("loanamount", formValues.loanamount);
-      formData.append("numberofmonth", formValues.numberofmonth);
-      formData.append("loantotalrepayment", loanRepaymentTotal);
-      formData.append("monthlyrepayment", monthlyRepayment);
-      formData.append("careertype", formValues.careertype);
-      formData.append("loanproduct", formValues.loanproduct);
-      formData.append("loanpurpose", formValues.loanpurpose);
-      formData.append("otherpurpose", formValues.otherpurpose);
-      formData.append("bvnnumber", formValues.bvnnumber);
-      formData.append("title", formValues.title);
-      formData.append("firstname", formValues.firstname);
-      formData.append("lastname", formValues.lastname);
-      formData.append("phonenumber", formValues.phonenumber);
-      formData.append("dob", formValues.dob);
-      formData.append("email", formValues.email);
-      formData.append("maritalstatus", formValues.maritalstatus);
-      formData.append("noofdependent", formValues.noofdependent);
-      formData.append("educationlevel", formValues.educationlevel);
-      formData.append("howdidyouhearaboutus", formValues.howdidyouhearaboutus);
-      formData.append("houseaddress", formValues.houseaddress);
-      formData.append("stateofresidence", formValues.stateofresidence);
-      formData.append("lga", formValues.lga);
-      formData.append("stateoforigin", formValues.stateoforigin);
-      formData.append("ippis", formValues.ippis);
-      formData.append("servicenumber", formValues.servicenumber);
-      formData.append("valididcard", formValues.valididcard);
-      formData.append("idcardnotinclude", formValues.idcardnotinclude);
-      formData.append("nkinfirstname", formValues.nkinfirstname);
-      formData.append("nkinlastname", formValues.nkinlastname);
-      formData.append("nkinphonenumber", formValues.nkinphonenumber);
-      formData.append("nkinrelationship", formValues.nkinrelationship);
-      formData.append(
-        "nkinresidentialaddress",
-        formValues.nkinresidentialaddress
-      );
-      formData.append("employername", formValues.employername);
-      formData.append("otheremployername", formValues.otheremployername);
-      formData.append("employeraddress", formValues.employeraddress);
-      formData.append("employmentstartdate", formValues.employmentstartdate);
-      formData.append("employmentletter", formValues.employmentletter);
-      formData.append("netmonthlyincome", formValues.netmonthlyincome);
-      formData.append("totalannualincome", formValues.totalannualincome);
-      formData.append("officialemail", formValues.officialemail);
-      formData.append("uploadpayslip", formValues.uploadpayslip);
+    try {
+      if (ref.current.values) {
+        const formValues = ref.current?.values;
+        // generate customer id
+        const customerId = generateCustomerId();
+        const formData = new FormData();
+        formData.append("customerId", customerId);
+        formData.append("loanamount", loanamount);
+        formData.append("numberofmonth", noofmonth);
+        formData.append("loantotalrepayment", loanRepaymentTotal);
+        formData.append("monthlyrepayment", monthlyRepayment);
+        formData.append("careertype", careertype);
+        formData.append("loanproduct", formValues.loanproduct);
+        formData.append("loanpurpose", formValues.loanpurpose);
+        formData.append("otherpurpose", formValues.otherpurpose);
+        formData.append("bvnnumber", formValues.bvnnumber);
+        formData.append("title", formValues.title);
+        formData.append("firstname", formValues.firstname);
+        formData.append("lastname", formValues.lastname);
+        formData.append("phonenumber", formValues.phonenumber);
+        formData.append("dob", formValues.dob);
+        formData.append("email", formValues.email);
+        formData.append("maritalstatus", formValues.maritalstatus);
+        formData.append("noofdependent", formValues.noofdependent);
+        formData.append("educationlevel", formValues.educationlevel);
+        formData.append(
+          "howdidyouhearaboutus",
+          formValues.howdidyouhearaboutus
+        );
+        formData.append("houseaddress", formValues.houseaddress);
+        formData.append("stateofresidence", formValues.stateofresidence);
+        formData.append("lga", formValues.lga);
+        formData.append("stateoforigin", formValues.stateoforigin);
+        formData.append("ippis", formValues.ippis);
+        formData.append("servicenumber", formValues.servicenumber);
+        formData.append("valididcard", formValues.valididcard);
+        formData.append("idcardnotinclude", formValues.idcardnotinclude);
+        formData.append("nkinfirstname", formValues.nkinfirstname);
+        formData.append("nkinlastname", formValues.nkinlastname);
+        formData.append("nkinphonenumber", formValues.nkinphonenumber);
+        formData.append("nkinrelationship", formValues.nkinrelationship);
+        formData.append(
+          "nkinresidentialaddress",
+          formValues.nkinresidentialaddress
+        );
+        formData.append("employername", formValues.employername);
+        formData.append("otheremployername", formValues.otheremployername);
+        formData.append("employeraddress", formValues.employeraddress);
+        formData.append("employmentstartdate", formValues.employmentstartdate);
+        formData.append("employmentletter", formValues.employmentletter);
+        formData.append("netmonthlyincome", formValues.netmonthlyincome);
+        formData.append("totalannualincome", formValues.totalannualincome);
+        formData.append("officialemail", formValues.officialemail);
+        formData.append("uploadpayslip", formValues.uploadpayslip);
 
-      // financial info
-      formData.append("salarybankname", formValues.salarybankname);
-      formData.append("salaryaccountnumber", formValues.salaryaccountnumber);
-      formData.append("bankcode", formValues.bankcode);
-      formData.append("sameasaboveaccount", formValues.sameasaboveaccount);
-      formData.append("disbursementbankname", formValues.disbursementbankname);
-      formData.append(
-        "disbursementaccountnumber",
-        formValues.disbursementaccountnumber
-      );
-      formData.append("hasloan", formValues.hasloan);
-      formData.append(
-        "currentmonthlyplanrepaymentamount",
-        formValues.currentmonthlyplanrepaymentamount
-      );
-      formData.append(
-        "estimatedmonthlylivingexpense",
-        formValues.estimatedmonthlylivingexpense
-      );
-      formData.append("buyoverloan", formValues.buyoverloan);
-      formData.append("beneficiaryname", formValues.beneficiaryname);
-      formData.append("beneficiarybank", formValues.beneficiarybank);
-      formData.append(
-        "beneficiaryaccountnumber",
-        formValues.beneficiaryaccountnumber
-      );
-      formData.append("liquidationbalance", formValues.liquidationbalance);
-      formData.append("deductions", formValues.deductions);
-      formData.append("guarantee", formValues.guarantee);
+        // financial info
+        formData.append("salarybankname", formValues.salarybankname);
+        formData.append("salaryaccountnumber", formValues.salaryaccountnumber);
+        formData.append("bankcode", formValues.bankcode);
+        formData.append("sameasaboveaccount", formValues.sameasaboveaccount);
+        formData.append(
+          "disbursementbankname",
+          formValues.disbursementbankname
+        );
+        formData.append(
+          "disbursementaccountnumber",
+          formValues.disbursementaccountnumber
+        );
+        formData.append("hasloan", formValues.hasloan);
+        formData.append(
+          "currentmonthlyplanrepaymentamount",
+          formValues.currentmonthlyplanrepaymentamount
+        );
+        formData.append(
+          "estimatedmonthlylivingexpense",
+          formValues.estimatedmonthlylivingexpense
+        );
+        formData.append("buyoverloan", formValues.buyoverloan);
+        formData.append("beneficiaryname", formValues.beneficiaryname);
+        formData.append("beneficiarybank", formValues.beneficiarybank);
+        formData.append(
+          "beneficiaryaccountnumber",
+          formValues.beneficiaryaccountnumber
+        );
+        formData.append("liquidationbalance", formValues.liquidationbalance);
+        formData.append("deductions", formValues.deductions);
+        formData.append("guarantee", formValues.guarantee);
 
-      // agree and sign
-      formData.append("acceptterms", formValues.acceptterms);
-      formData.append("acceptpolicy", formValues.acceptpolicy);
-      formData.append("sharemyremita", formValues.sharemyremita);
-      formData.append("agreefullname", formValues.agreefullname);
-      formData.append("agreedate", formValues.agreedate);
-      formData.append("signature", formValues.signature);
-      formData.append(
-        "photocapture",
-        dataURItoBlob(formValues.photocapture),
-        "image.jpg"
-      ); // Convert data URI to Blob
-      formData.append("haveagent", formValues.haveagent);
-      formData.append("agentname", formValues.agentname);
-      formData.append("username", formValues.username);
-      formData.append("password", formValues.password);
-      formData.append("confirmpassword", formValues.confirmpassword);
+        // agree and sign
+        formData.append("acceptterms", formValues.acceptterms);
+        formData.append("acceptpolicy", formValues.acceptpolicy);
+        formData.append("sharemyremita", formValues.sharemyremita);
+        formData.append("agreefullname", formValues.agreefullname);
+        formData.append("agreedate", formValues.agreedate);
+        formData.append("signature", formValues.signature);
+        formData.append(
+          "photocapture",
+          dataURItoBlob(formValues.photocapture),
+          "image.jpg"
+        ); // Convert data URI to Blob
+        formData.append("haveagent", formValues.haveagent);
+        formData.append("agentname", formValues.agentname);
+        formData.append("username", formValues.username);
+        formData.append("password", formValues.password);
+        formData.append("confirmpassword", formValues.confirmpassword);
 
-      // send formData to database
-      const apiUrl = import.meta.env.VITE_BASE_URL;
-      await fetch(`${apiUrl}/api/customer/customer`, {
-        method: "POST",
-        enctype: "multipart/form-data",
-        body: formData,
-      });
+        // send formData to database
+        const apiUrl = import.meta.env.VITE_BASE_URL;
+        await fetch(`${apiUrl}/api/customer/customer`, {
+          method: "POST",
+          enctype: "multipart/form-data",
+          body: formData,
+        });
+      }
+    } catch (error) {
+      console.log(error);
     }
+    
     // setSubmitting(false);
   };
 
@@ -270,24 +240,21 @@ const LoanForm = () => {
   const handleNext = () => {
     if (step === 1) {
       setStep(2);
-      setStepImg("images/step2.png");
+      setStepImg("https://i.imgur.com/mObbs26.png");
     } else if (step === 2) {
       if (careertype.toLowerCase() === "government employee") {
-        setStep(3);
-        setStepImg("images/step3.png");
+        setStep(2);
+        setStepImg("https://i.imgur.com/mObbs26.png");
       } else {
-        setStep(4);
-        setStepImg("images/step4.png");
+        setStep(3);
+        setStepImg("https://i.imgur.com/kDbL3XN.png");
       }
     } else if (step === 3) {
       setStep(4);
-      setStepImg("images/step4.png");
+      setStepImg("https://i.imgur.com/SCIwWO7.png");
     } else if (step === 4) {
       setStep(5);
-      setStepImg("images/step5.png");
-    } else if (step === 5) {
-      setStep(6);
-      setStepImg("images/step5.png");
+      setStepImg("https://i.imgur.com/SCIwWO7.png");
     }
   };
 
@@ -295,16 +262,16 @@ const LoanForm = () => {
   const handlePrevious = () => {
     if (step === 2) {
       setStep(1);
-      setStepImg("images/step1.png");
+      setStepImg("https://i.imgur.com/mObbs26.png");
     } else if (step === 3) {
       setStep(2);
-      setStepImg("images/step2.png");
+      setStepImg("https://i.imgur.com/mObbs26.png");
     } else if (step === 4) {
       setStep(3);
-      setStepImg("images/step3.png");
+      setStepImg("https://i.imgur.com/kDbL3XN.png");
     } else if (step === 5) {
       setStep(4);
-      setStepImg("images/step4.png");
+      setStepImg("https://i.imgur.com/SCIwWO7.png");
     }
   };
 
@@ -329,207 +296,9 @@ const LoanForm = () => {
                       <div className="col-sm-12 col-md-8 FormInputBox">
                         <Form>
                           {/* loan first step section */}
-                          {step === 1 && (
-                            <>
-                              <div id="Step1">
-                                <Headline
-                                  spacer="12px 0"
-                                  color="#000"
-                                  text="Select loan amount and duration"
-                                />
-                                <Headline
-                                  spacer="0"
-                                  fontSize="16px"
-                                  text="This is required to process this application"
-                                />
-                                <img
-                                  src="images/naira.png"
-                                  alt=""
-                                  className="NairaI"
-                                />
-                                <div>
-                                  <label htmlFor="loanamount">
-                                    How much you want to borrow
-                                  </label>
-                                  <Field
-                                    type="text"
-                                    name="loanamount"
-                                    className="TextInput"
-                                    value={currentLoanAmount}
-                                    onChange={(e) =>
-                                      setCurrentLoanAmount(e.target.value)
-                                    }
-                                  />
-                                  {currentLoanAmount === "" ? (
-                                    <p className="ErrorMsg">Required</p>
-                                  ) : null}
-                                  {parseInt(currentLoanAmount) < 10000 ||
-                                  parseInt(currentLoanAmount) > 2000000 ? (
-                                    <p className="ErrorMsg">
-                                      Enter loan amount between 10000 to 2000000
-                                      Naira only
-                                    </p>
-                                  ) : null}
-                                </div>
-
-                                {/* repayments months */}
-                                <div>
-                                  <TextInput
-                                    label="Enter Number of Repayment Months"
-                                    name="numberofmonth"
-                                    type="number"
-                                  />
-                                </div>
-
-                                {/* loan product */}
-                                <div>
-                                  <label htmlFor="loanproduct">
-                                    Select Loan Product
-                                  </label>
-                                  {/* select loan product list */}
-                                  <Field
-                                    as="select"
-                                    name="loanproduct"
-                                    className="TextInput"
-                                  >
-                                    <option value=""></option>
-                                    {loanProducts?.map((product) => (
-                                      <option
-                                        key={product._id}
-                                        value={product._id}
-                                      >
-                                        {product.productName}
-                                      </option>
-                                    ))}
-                                  </Field>
-                                </div>
-                                {/* calculate repayment btn */}
-                                <div className="ButtonContainer">
-                                  <button
-                                    type="button"
-                                    onClick={calculateRepayment}
-                                    className="BtnAction BtnSecondary"
-                                  >
-                                    Calculate Repayment
-                                  </button>
-                                </div>
-
-                                {/* loan cal result */}
-                                <div className="LoanCal">
-                                  <Headline
-                                    fontSize="22px"
-                                    align="left"
-                                    text="Loan:"
-                                  />
-                                  <h4>
-                                    <span className="CalNaira">
-                                      <img src="images/naira.png" alt="" />
-                                    </span>
-                                    {loanTotal || loanamount} <span> for </span>
-                                    {noofmonth}
-                                    {noofmonth > 1 ? (
-                                      <span> months</span>
-                                    ) : (
-                                      <span> month</span>
-                                    )}
-                                  </h4>
-                                  <Headline
-                                    fontSize="22px"
-                                    align="left"
-                                    text="Monthly Repayment:"
-                                  />
-                                  <h4>
-                                    <span className="CalNaira">
-                                      <img src="images/naira.png" alt="" />
-                                    </span>
-
-                                    {isNaN(monthlyPay) ? 0 : monthlyPay}
-                                  </h4>
-                                </div>
-                                <div className="Purpose">
-                                  <Headline
-                                    fontSize="24px"
-                                    spacer="28px 0 0 0"
-                                    align="left"
-                                    color="#000"
-                                    text="Purpose of Loan"
-                                  />
-
-                                  <div className="CheckboxContainer">
-                                    <label className="CheckboxGroup">
-                                      <Field
-                                        type="checkbox"
-                                        name="loanpurpose"
-                                        value="school fees"
-                                      />
-                                      School Fees
-                                    </label>
-                                    <label className="CheckboxGroup">
-                                      <Field
-                                        type="checkbox"
-                                        name="loanpurpose"
-                                        value="business support"
-                                      />
-                                      Business Support
-                                    </label>
-                                    <label className="CheckboxGroup">
-                                      <Field
-                                        type="checkbox"
-                                        name="loanpurpose"
-                                        value="travel"
-                                      />
-                                      Travel
-                                    </label>
-                                  </div>
-                                  <div className="CheckboxContainer">
-                                    <label className="CheckboxGroup">
-                                      <Field
-                                        type="checkbox"
-                                        name="loanpurpose"
-                                        value="car"
-                                      />
-                                      Car
-                                    </label>
-                                    <label className="CheckboxGroup">
-                                      <Field
-                                        type="checkbox"
-                                        name="loanpurpose"
-                                        value="personal"
-                                      />
-                                      Personal
-                                    </label>
-                                    <label className="CheckboxGroup">
-                                      <Field type="checkbox" name="other" />
-                                      Other
-                                    </label>
-                                  </div>
-                                  {values.other && (
-                                    <div>
-                                      <TextInput
-                                        label="Please specify"
-                                        name="otherpurpose"
-                                        type="text"
-                                      />
-                                    </div>
-                                  )}
-                                </div>
-                              </div>
-                              {/* next form page btn */}
-                              <div className="ButtonContainer">
-                                <button
-                                  type="button"
-                                  disabled={isSubmitting}
-                                  onClick={handleNext}
-                                  className="BtnAction BtnSecondary"
-                                >
-                                  Next
-                                </button>
-                              </div>
-                            </>
-                          )}
 
                           {/* customer details section */}
-                          {step === 2 && (
+                          {step === 1 && (
                             <>
                               <div id="Step2">
                                 <Headline
@@ -537,365 +306,337 @@ const LoanForm = () => {
                                   color="#000"
                                   text="Start your application process"
                                 />
-                                {!isBvnVarified ? (
-                                  <div id="BvnVarification">
+                                <div>
+                                  {/* customer details section */}
+                                  <Headline
+                                    spacer="12px 0"
+                                    color="#000"
+                                    text="Customer Details"
+                                  />
+                                  {/* dropdown list */}
+                                  <SelectField label="Title" name="title">
+                                    <option value=""></option>
+                                    <option value="Mr">Mr</option>
+                                    <option value="Mrs">Mrs</option>
+                                    <option value="Miss">Miss</option>
+                                    <option value="Dr">Dr</option>
+                                  </SelectField>
+
+                                  {/* Input row sectioin */}
+                                  <div className="InputRow">
                                     <TextInput
-                                      label="Please enter your BVN to proceed"
-                                      name="bvnnumber"
+                                      label="First Name"
+                                      name="firstname"
                                       type="text"
                                     />
-                                    <div className="ButtonContainer">
-                                      <button
-                                        className="BtnAction BtnPrimary"
-                                        type="button"
-                                        onClick={handleBvnVarification}
-                                      >
-                                        Verify your BVN
-                                      </button>
-                                    </div>
-                                  </div>
-                                ) : (
-                                  <div>
-                                    {/* customer details section */}
-                                    <Headline
-                                      spacer="12px 0"
-                                      color="#000"
-                                      text="Customer Details"
+                                    <div className="Space"></div>
+                                    <TextInput
+                                      label="Last Name"
+                                      name="lastname"
+                                      type="text"
                                     />
-                                    {/* dropdown list */}
-                                    <SelectField label="Title" name="title">
+                                  </div>
+
+                                  <TextInput
+                                    label="Phone Number"
+                                    name="phonenumber"
+                                    type="tel"
+                                  />
+
+                                  {/* Input row sectioin */}
+                                  <div className="InputRow">
+                                    <TextInput
+                                      label="Date of Birth"
+                                      name="dob"
+                                      type="date"
+                                    />
+                                    <div className="Space"></div>
+                                    <TextInput
+                                      label="Email"
+                                      name="email"
+                                      type="email"
+                                    />
+                                  </div>
+
+                                  {/* Input row sectioin */}
+                                  <div className="InputRow">
+                                    <SelectField
+                                      label="Marital Status"
+                                      name="maritalstatus"
+                                    >
                                       <option value=""></option>
-                                      <option value="Mr">Mr</option>
-                                      <option value="Mrs">Mrs</option>
-                                      <option value="Miss">Miss</option>
-                                      <option value="Dr">Dr</option>
+                                      <option value="single">Single</option>
+                                      <option value="married">Married</option>
+                                      <option value="divorced">Divorced</option>
+                                      <option value="widowed">Widowed</option>
+                                    </SelectField>
+                                    <div className="Space"></div>
+                                    <SelectField
+                                      label="No of Dependents"
+                                      name="noofdependent"
+                                    >
+                                      <option value=""></option>
+                                      <option value="1">1</option>
+                                      <option value="2">2</option>
+                                      <option value="3">3</option>
+                                      <option value="4">4</option>
+                                      <option value="5">5</option>
+                                      <option value="6">6</option>
+                                      <option value="7">7</option>
+                                      <option value="more than 7">
+                                        More than 7
+                                      </option>
+                                    </SelectField>
+                                  </div>
+
+                                  {/* Input row sectioin */}
+                                  <div className="InputRow">
+                                    <SelectField
+                                      label="Highest Level of Education"
+                                      name="educationlevel"
+                                    >
+                                      <option value=""></option>
+                                      <option value="primary">Primary</option>
+                                      <option value="secondary">
+                                        Secondary
+                                      </option>
+                                      <option value="tertiary">Tertiary</option>
+                                      <option value="post graduate">
+                                        Post Graduate
+                                      </option>
+                                    </SelectField>
+                                    <div className="Space"></div>
+                                    <SelectField
+                                      label="How did you hear about us"
+                                      name="howdidyouhearaboutus"
+                                    >
+                                      <option value=""></option>
+                                      <option value="facebook">Facebook</option>
+                                      <option value="instagram">
+                                        Instagram
+                                      </option>
+                                      <option value="twitter">Twitter</option>
+                                      <option value="linkedin">Linkedin</option>
+                                      <option value="google">Google</option>
+                                      <option value="friend">Friend</option>
+                                      <option value="colleague">
+                                        Colleague
+                                      </option>
+                                      <option value="agent">
+                                        Buctrust Agent
+                                      </option>
+                                      <option value="other">Other</option>
+                                    </SelectField>
+                                  </div>
+
+                                  {/* Input row sectioin */}
+                                  <div className="InputRow">
+                                    <SelectField
+                                      label="State of Resident"
+                                      name="stateofresidence"
+                                      value={state}
+                                      onChange={handleSelectState}
+                                    >
+                                      <option value=""></option>
+                                      {ngState.map((state) => (
+                                        <option key={state} value={state}>
+                                          {state}
+                                        </option>
+                                      ))}
                                     </SelectField>
 
+                                    <div className="Space"></div>
+                                    <TextInput
+                                      label="House Address"
+                                      name="houseaddress"
+                                      type="text"
+                                    />
+                                  </div>
+
+                                  {/* Input row sectioin */}
+                                  <div className="InputRow">
+                                    <SelectField
+                                      label="LGA of Resident"
+                                      name="lga"
+                                    >
+                                      <option value=""></option>
+                                      {lgas?.map((lga) => (
+                                        <option key={lga} value={lga}>
+                                          {lga}
+                                        </option>
+                                      ))}
+                                    </SelectField>
+                                    <div className="Space"></div>
+                                    <SelectField
+                                      label="State of Origin"
+                                      name="stateoforigin"
+                                    >
+                                      <option value=""></option>
+                                      {ngState.map((state) => (
+                                        <option key={state} value={state}>
+                                          {state}
+                                        </option>
+                                      ))}
+                                    </SelectField>
+                                  </div>
+
+                                  {/* Staff ID card upload */}
+                                  <div>
+                                    {careertype.toLowerCase() ===
+                                    "government employee" ? (
+                                      <div>
+                                        <div className="InputRow">
+                                          <TextInput
+                                            label="IPPIS Number"
+                                            name="ippis"
+                                            type="text"
+                                          />
+                                          <div className="Space"></div>
+                                          <TextInput
+                                            label="Service Number"
+                                            name="servicenumber"
+                                            type="text"
+                                          />
+                                        </div>
+
+                                        {/* Input row sectioin */}
+                                        <div className="FileUploadBox ">
+                                          <Headline
+                                            color="#000"
+                                            fontSize="22px"
+                                            text="Upload Staff ID Card"
+                                          />
+                                          <div>
+                                            <input
+                                              type="file"
+                                              name="valididcard"
+                                              accept="image/png, .jpg, .jpeg"
+                                              className="UploadFile"
+                                              onChange={(e) =>
+                                                convertFile(e, setIdCard)
+                                              }
+                                            />
+                                          </div>
+                                        </div>
+                                        <div className="CheckboxGroup">
+                                          <label className="CheckInput">
+                                            <Field
+                                              type="checkbox"
+                                              name="idcardnotinclude"
+                                            />
+                                            My work ID card does not include my
+                                            picture and signature
+                                          </label>
+                                        </div>
+                                      </div>
+                                    ) : (
+                                      <div className="FileUploadBox ">
+                                        <Headline
+                                          color="#000"
+                                          fontSize="22px"
+                                          text="Upload Valid ID Card"
+                                        />
+
+                                        <input
+                                          type="file"
+                                          name="valididcard"
+                                          accept="image/png, .svg, .jpg, .jpeg, .pdf"
+                                          className="UploadFile"
+                                          onChange={(e) =>
+                                            convertFile(e, setIdCard)
+                                          }
+                                        />
+                                      </div>
+                                    )}
+                                    <hr />
+                                  </div>
+
+                                  {/* Next off kin information */}
+                                  <div className="NextOfKin">
+                                    <Headline
+                                      fontSize="24px"
+                                      spacer="48px 0 0 0"
+                                      align="left"
+                                      color="#000"
+                                      text="Next of Kin Information"
+                                    />
                                     {/* Input row sectioin */}
                                     <div className="InputRow">
                                       <TextInput
                                         label="First Name"
-                                        name="firstname"
+                                        name="nkinfirstname"
                                         type="text"
                                       />
                                       <div className="Space"></div>
                                       <TextInput
                                         label="Last Name"
-                                        name="lastname"
-                                        type="text"
-                                      />
-                                    </div>
-
-                                    <TextInput
-                                      label="Phone Number"
-                                      name="phonenumber"
-                                      type="tel"
-                                    />
-
-                                    {/* Input row sectioin */}
-                                    <div className="InputRow">
-                                      <TextInput
-                                        label="Date of Birth"
-                                        name="dob"
-                                        type="date"
-                                      />
-                                      <div className="Space"></div>
-                                      <TextInput
-                                        label="Email"
-                                        name="email"
-                                        type="email"
-                                      />
-                                    </div>
-
-                                    {/* Input row sectioin */}
-                                    <div className="InputRow">
-                                      <SelectField
-                                        label="Marital Status"
-                                        name="maritalstatus"
-                                      >
-                                        <option value=""></option>
-                                        <option value="single">Single</option>
-                                        <option value="married">Married</option>
-                                        <option value="divorced">
-                                          Divorced
-                                        </option>
-                                        <option value="widowed">Widowed</option>
-                                      </SelectField>
-                                      <div className="Space"></div>
-                                      <SelectField
-                                        label="No of Dependents"
-                                        name="noofdependent"
-                                      >
-                                        <option value=""></option>
-                                        <option value="1">1</option>
-                                        <option value="2">2</option>
-                                        <option value="3">3</option>
-                                        <option value="4">4</option>
-                                        <option value="5">5</option>
-                                        <option value="6">6</option>
-                                        <option value="7">7</option>
-                                        <option value="more than 7">
-                                          More than 7
-                                        </option>
-                                      </SelectField>
-                                    </div>
-
-                                    {/* Input row sectioin */}
-                                    <div className="InputRow">
-                                      <SelectField
-                                        label="Highest Level of Education"
-                                        name="educationlevel"
-                                      >
-                                        <option value=""></option>
-                                        <option value="primary">Primary</option>
-                                        <option value="secondary">
-                                          Secondary
-                                        </option>
-                                        <option value="tertiary">
-                                          Tertiary
-                                        </option>
-                                        <option value="post graduate">
-                                          Post Graduate
-                                        </option>
-                                      </SelectField>
-                                      <div className="Space"></div>
-                                      <SelectField
-                                        label="How did you hear about us"
-                                        name="howdidyouhearaboutus"
-                                      >
-                                        <option value=""></option>
-                                        <option value="facebook">
-                                          Facebook
-                                        </option>
-                                        <option value="instagram">
-                                          Instagram
-                                        </option>
-                                        <option value="twitter">Twitter</option>
-                                        <option value="linkedin">
-                                          Linkedin
-                                        </option>
-                                        <option value="google">Google</option>
-                                        <option value="friend">Friend</option>
-                                        <option value="colleague">
-                                          Colleague
-                                        </option>
-                                        <option value="agent">
-                                          Buctrust Agent
-                                        </option>
-                                        <option value="other">Other</option>
-                                      </SelectField>
-                                    </div>
-
-                                    {/* Input row sectioin */}
-                                    <div className="InputRow">
-                                      <SelectField
-                                        label="State of Resident"
-                                        name="stateofresidence"
-                                        value={state}
-                                        onChange={handleSelectState}
-                                      >
-                                        <option value=""></option>
-                                        {ngState.map((state) => (
-                                          <option key={state} value={state}>
-                                            {state}
-                                          </option>
-                                        ))}
-                                      </SelectField>
-
-                                      <div className="Space"></div>
-                                      <TextInput
-                                        label="House Address"
-                                        name="houseaddress"
+                                        name="nkinlastname"
                                         type="text"
                                       />
                                     </div>
 
                                     {/* Input row sectioin */}
                                     <div className="InputRow">
-                                      <SelectField
-                                        label="LGA of Resident"
-                                        name="lga"
-                                      >
-                                        <option value=""></option>
-                                        {lgas?.map((lga) => (
-                                          <option key={lga} value={lga}>
-                                            {lga}
-                                          </option>
-                                        ))}
-                                      </SelectField>
-                                      <div className="Space"></div>
-                                      <SelectField
-                                        label="State of Origin"
-                                        name="stateoforigin"
-                                      >
-                                        <option value=""></option>
-                                        {ngState.map((state) => (
-                                          <option key={state} value={state}>
-                                            {state}
-                                          </option>
-                                        ))}
-                                      </SelectField>
-                                    </div>
-
-                                    {/* Staff ID card upload */}
-                                    <div>
-                                      {careertype.toLowerCase() ===
-                                      "government employee" ? (
-                                        <div>
-                                          <div className="InputRow">
-                                            <TextInput
-                                              label="IPPIS Number"
-                                              name="ippis"
-                                              type="text"
-                                            />
-                                            <div className="Space"></div>
-                                            <TextInput
-                                              label="Service Number"
-                                              name="servicenumber"
-                                              type="text"
-                                            />
-                                          </div>
-
-                                          {/* Input row sectioin */}
-                                          <div className="FileUploadBox ">
-                                            <Headline
-                                              color="#000"
-                                              fontSize="22px"
-                                              text="Upload Staff ID Card"
-                                            />
-                                            <div>
-                                              <input
-                                                type="file"
-                                                name="valididcard"
-                                                accept="image/png, .jpg, .jpeg"
-                                                className="UploadFile"
-                                                onChange={(e) =>
-                                                  convertFile(e, setIdCard)
-                                                }
-                                              />
-                                            </div>
-                                          </div>
-                                          <div className="CheckboxGroup">
-                                            <label className="CheckInput">
-                                              <Field
-                                                type="checkbox"
-                                                name="idcardnotinclude"
-                                              />
-                                              My work ID card does not include
-                                              my picture and signature
-                                            </label>
-                                          </div>
-                                        </div>
-                                      ) : (
-                                        <div className="FileUploadBox ">
-                                          <Headline
-                                            color="#000"
-                                            fontSize="22px"
-                                            text="Upload Valid ID Card"
-                                          />
-
-                                          <input
-                                            type="file"
-                                            name="valididcard"
-                                            accept="image/png, .svg, .jpg, .jpeg, .pdf"
-                                            className="UploadFile"
-                                            onChange={(e) =>
-                                              convertFile(e, setIdCard)
-                                            }
-                                          />
-                                        </div>
-                                      )}
-                                      <hr />
-                                    </div>
-
-                                    {/* Next off kin information */}
-                                    <div className="NextOfKin">
-                                      <Headline
-                                        fontSize="24px"
-                                        spacer="48px 0 0 0"
-                                        align="left"
-                                        color="#000"
-                                        text="Next of Kin Information"
+                                      <TextInput
+                                        label="Phone Number"
+                                        name="nkinphonenumber"
+                                        type="tel"
                                       />
-                                      {/* Input row sectioin */}
-                                      <div className="InputRow">
-                                        <TextInput
-                                          label="First Name"
-                                          name="nkinfirstname"
-                                          type="text"
-                                        />
-                                        <div className="Space"></div>
-                                        <TextInput
-                                          label="Last Name"
-                                          name="nkinlastname"
-                                          type="text"
-                                        />
-                                      </div>
-
-                                      {/* Input row sectioin */}
-                                      <div className="InputRow">
-                                        <TextInput
-                                          label="Phone Number"
-                                          name="nkinphonenumber"
-                                          type="tel"
-                                        />
-                                        <div className="Space"></div>
-                                        <TextInput
-                                          label="Residential Address"
-                                          name="nkinresidentialaddress"
-                                          type="text"
-                                        />
-                                      </div>
-                                      {/* select relationship */}
-                                      <SelectField
-                                        label="Select Relationship"
-                                        name="nkinrelationship"
-                                      >
-                                        <option value=""></option>
-                                        <option value="father">Father</option>
-                                        <option value="mother">Mother</option>
-                                        <option value="brother">Brother</option>
-                                        <option value="sister">Sister</option>
-                                        <option value="husband">Husband</option>
-                                        <option value="wife">Wife</option>
-                                        <option value="son">Son</option>
-                                        <option value="daughter">
-                                          Daughter
-                                        </option>
-                                        <option value="uncle">Uncle</option>
-                                        <option value="aunt">Aunt</option>
-                                        <option value="nephew">Nephew</option>
-                                        <option value="niece">Niece</option>
-                                        <option value="cousin">Cousin</option>
-                                        <option value="other">other</option>
-                                      </SelectField>
+                                      <div className="Space"></div>
+                                      <TextInput
+                                        label="Residential Address"
+                                        name="nkinresidentialaddress"
+                                        type="text"
+                                      />
                                     </div>
-
-                                    <div className="ButtonContainer">
-                                      <button
-                                        type="button"
-                                        onClick={handlePrevious}
-                                        className="BtnAction BtnPrimary"
-                                      >
-                                        Previous
-                                      </button>
-                                      {/* next form page btn */}
-                                      <button
-                                        type="submit"
-                                        onClick={handleNext}
-                                        disabled={isSubmitting}
-                                        className="BtnAction BtnSecondary"
-                                      >
-                                        Next
-                                      </button>
-                                    </div>
+                                    {/* select relationship */}
+                                    <SelectField
+                                      label="Select Relationship"
+                                      name="nkinrelationship"
+                                    >
+                                      <option value=""></option>
+                                      <option value="father">Father</option>
+                                      <option value="mother">Mother</option>
+                                      <option value="brother">Brother</option>
+                                      <option value="sister">Sister</option>
+                                      <option value="husband">Husband</option>
+                                      <option value="wife">Wife</option>
+                                      <option value="son">Son</option>
+                                      <option value="daughter">Daughter</option>
+                                      <option value="uncle">Uncle</option>
+                                      <option value="aunt">Aunt</option>
+                                      <option value="nephew">Nephew</option>
+                                      <option value="niece">Niece</option>
+                                      <option value="cousin">Cousin</option>
+                                      <option value="other">other</option>
+                                    </SelectField>
                                   </div>
-                                )}
+
+                                  <div className="ButtonContainer">
+                                    <button
+                                      type="button"
+                                      onClick={handlePrevious}
+                                      className="BtnAction BtnPrimary"
+                                    >
+                                      Previous
+                                    </button>
+                                    {/* next form page btn */}
+                                    <button
+                                      type="submit"
+                                      onClick={handleNext}
+                                      disabled={isSubmitting}
+                                      className="BtnAction BtnSecondary"
+                                    >
+                                      Next
+                                    </button>
+                                  </div>
+                                </div>
                               </div>
                             </>
                           )}
 
-                          {step === 3 && (
+                          {/* employer information */}
+                          {step === 2 && (
                             <>
                               <div id="Step3">
                                 <Headline
@@ -988,26 +729,6 @@ const LoanForm = () => {
                                   </div>
                                 ) : null}
 
-                                {/* employement card upload */}
-                                {careertype.toLowerCase() ===
-                                "private employee" ? (
-                                  <div className="FileUploadBox ">
-                                    <Headline
-                                      color="#000"
-                                      fontSize="22px"
-                                      text="Upload Pay Slip"
-                                    />
-                                    <input
-                                      type="file"
-                                      name="employmentletter"
-                                      accept="image/png, .svg, .jpg, .jpeg"
-                                      className="UploadFile"
-                                      onChange={(e) =>
-                                        convertFile(e, setEmploymentLetter)
-                                      }
-                                    />
-                                  </div>
-                                ) : null}
                               </div>
 
                               <div className="ButtonContainer">
@@ -1032,7 +753,7 @@ const LoanForm = () => {
                           )}
 
                           {/* financial information */}
-                          {step === 4 && (
+                          {step === 3 && (
                             <>
                               <div id="Step4">
                                 <Headline
@@ -1341,7 +1062,7 @@ const LoanForm = () => {
                           )}
 
                           {/* agree and sign */}
-                          {step === 5 && (
+                          {step === 4 && (
                             <>
                               <div id="Step5">
                                 <Headline
@@ -1526,7 +1247,7 @@ const LoanForm = () => {
                           )}
 
                           {/* review and proceed */}
-                          {step === 6 && (
+                          {step === 5 && (
                             <>
                               <div id="Step6">
                                 <Headline
@@ -1557,7 +1278,7 @@ const LoanForm = () => {
 
                       {/* right loan step section */}
                       <div className="col-sm-12 col-md-4 Step">
-                        <img src="images/step1.png" alt={step} />
+                        <img src={stepImg} alt={step} />
                       </div>
                     </div>
                   </div>
