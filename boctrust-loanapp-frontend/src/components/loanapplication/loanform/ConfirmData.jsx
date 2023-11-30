@@ -1,9 +1,10 @@
+import PropTypes from "prop-types"
 import { useFormikContext } from "formik";
 import ConfirmField from "./ConfirmField";
 import Headline from "../../shared/Headline";
 import "./Form.css";
 
-const ConfirmData = () => {
+const ConfirmData = ({career}) => {
   const { values, setFieldValue } = useFormikContext();
 
   const handleInputChange = (fieldName, event) => {
@@ -129,7 +130,7 @@ const ConfirmData = () => {
             func={handleInputChange}
           />
 
-          {values.careertype.toLowerCase() === "government employee" ? (
+          {career.toLowerCase() === "government employee" ? (
             <div className="InputRow">
               <ConfirmField
                 labelName="IPPIS Number"
@@ -205,7 +206,7 @@ const ConfirmData = () => {
         </div>
 
         {/* employment details */}
-        {values.careertype.toLowerCase() === "government employee" ? (
+        {career.toLowerCase() === "government employee" ? (
           <div>
             <Headline
               align="left"
@@ -398,5 +399,9 @@ const ConfirmData = () => {
     </>
   );
 };
+
+ConfirmData.propTypes = {
+  career: PropTypes.string
+}
 
 export default ConfirmData;

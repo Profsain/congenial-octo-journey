@@ -1257,7 +1257,7 @@ const LoanForm = () => {
                                 />
 
                                 <div>
-                                  <ConfirmData />
+                                  <ConfirmData career={careertype}/>
                                 </div>
 
                                 <div className="ButtonContainer">

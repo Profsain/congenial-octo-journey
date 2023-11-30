@@ -40,6 +40,7 @@ router.put('/creditDbSearch/:customerId', multipleUpload, async (req, res) => {
 
 // Update the deductcheck field
 router.put('/deductcheck/:customerId', multipleUpload, async (req, res) => {
+  console.log("req.body", req.body)
   if (req.files.deductSearchReport) {
     req.body.deductSearchReport = req.files.deductSearchReport[0].filename;
   }

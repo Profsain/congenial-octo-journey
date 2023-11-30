@@ -7,6 +7,9 @@ import DecisionSummary from "./DecisionSummary";
 import PdfDocument from "../../../shared/PdfDocument";
 import PageLoader from "../../shared/PageLoader";
 
+import handleDownload from "./downloadPdf";
+import FirstCentralPdfReport from "./firstCentralPdfReport";
+
 
 const creditBureauOptions = [
   { value: "first_central", label: "First Central" },
@@ -16,6 +19,7 @@ const creditBureauOptions = [
 ];
 
 const apiUrl = import.meta.env.VITE_BASE_URL;
+
 const reportOptions = [
   { value: "consumer", label: "Consumer Report" },
   { value: "finance", label: "Financial Report" },
@@ -92,7 +96,7 @@ const CreditCheckhtmlForm = ({ customerId }) => {
     }
     if (isBureauChecked) {
       console.log("bureau check");
-    }
+    }  
     console.log("Update file");
   };
 
@@ -204,11 +208,14 @@ const CreditCheckhtmlForm = ({ customerId }) => {
 
   const [bureauReport, setBureauReport] = useState({});
   const [bureauLoading, setBureauLoading] = useState(false);
+  const [showDownloadBtn, setShowDownloadBtn] = useState(false);
+  const [firstCentralReport, setFirstCentralReport] = useState({});
 
   const handleBureauCheck = async (e) => {
     e.preventDefault();
     setBureauLoading(true);
     if (bureauData.bureauName === "first_central") {
+      setShowDownloadBtn(false);
        try {
          const bvn = bureauData.bvnNo;
          const response = await fetch(
@@ -224,8 +231,8 @@ const CreditCheckhtmlForm = ({ customerId }) => {
          }
 
          const data = await response.json();
-         // set bureau report
-         setBureauReport(data.data);
+         // set first central report
+          setFirstCentralReport(data.data);
          // set bureau loading
          setBureauLoading(false);
          // updateBureauLoading("success");
@@ -235,6 +242,7 @@ const CreditCheckhtmlForm = ({ customerId }) => {
     }
 
     if (bureauData.bureauName === "crc_bureau") {
+      setShowDownloadBtn(false);
       try {
          const bvn = bureauData.bvnNo;
          const response = await fetch(`${apiUrl}/api/crc/getcrc`, {
@@ -248,7 +256,7 @@ const CreditCheckhtmlForm = ({ customerId }) => {
 
         const data = await response.json();
         // set bureau report 
-        setBureauReport(data.data);
+        setBureauReport(data.data.ConsumerSearchResultResponse);
         // set bureau loading
         setBureauLoading(false);
         // updateBureauLoading("success");
@@ -258,6 +266,7 @@ const CreditCheckhtmlForm = ({ customerId }) => {
     }
 
     if (bureauData.bureauName === "credit_register") {
+      setShowDownloadBtn(false);
        try {
          const bvn = bureauData.bvnNo;
          const response = await fetch(
@@ -274,7 +283,10 @@ const CreditCheckhtmlForm = ({ customerId }) => {
 
          const data = await response.json();
          // set bureau report
-         setBureauReport(data.data);
+         setBureauReport(data.data.Reports
+         );
+         // show download button
+         setShowDownloadBtn(true);
          // set bureau loading
          setBureauLoading(false);
          // updateBureauLoading("success");
@@ -316,7 +328,6 @@ const CreditCheckhtmlForm = ({ customerId }) => {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [formStep]);
-
 
   return (
     <>
@@ -578,21 +589,30 @@ const CreditCheckhtmlForm = ({ customerId }) => {
 
                 <div className="row mx-5 align-items-center">
                   <button type="submit" className="btn btn-warning mt-3">
-                    Generate Report
-                  </button>
+                      Generate Report
+                    </button>
+                  {showDownloadBtn && (
+                    <button type="button" className="btn btn-warning mt-3" onClick={() => handleDownload(bureauReport[0])}>
+                      Download Report
+                    </button>
+                  )}
                 </div>
               </form>
             </div>
             {/* loading bar */}
-            <div>
-              {bureauLoading && <PageLoader />}
-            </div>
+            <div>{bureauLoading && <PageLoader />}</div>
           </div>
 
           <div className="row m-5">
             {/* generated pdf report component */}
             {Object.keys(reportObj).length > 0 && (
               <PdfDocument report={reportObj} />
+            )}
+          </div>
+          <div className="row m-5">
+            {/* generated pdf report component */}
+            {Object.keys(firstCentralReport).length > 0 && (
+              <FirstCentralPdfReport report={firstCentralReport} />
             )}
           </div>
 

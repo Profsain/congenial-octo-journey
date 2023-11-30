@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchAllCustomer } from "../../../../redux/reducers/customerReducer";
@@ -44,7 +45,7 @@ const CreditBureauDashboard = () => {
   const [customerId, setCustomerId] = useState("");
   const [showCreditCheckForm, setShowCreditCheckForm] = useState(false);
   const [show, setShow] = useState(false);
-  const [creditAnalyst, setCreditAnalyst] = useState("Profsain");
+  const [creditAnalyst, setCreditAnalyst] = useState("");
 
   // fetch all customer
   const dispatch = useDispatch();
@@ -53,9 +54,48 @@ const CreditBureauDashboard = () => {
   );
   const status = useSelector((state) => state.customerReducer.status);
 
+  // get current login admin
+  const admin = useSelector((state) => state.adminAuth.user);
+  const [adminName, setAdminName] = useState("");
+  useEffect(() => {
+    setAdminName(admin.fullName);
+  }, [admin]);
+
   useEffect(() => {
     dispatch(fetchAllCustomer());
   }, [dispatch]);
+
+  // check if login admin is coo or credit analyst
+  // if coo, show all customers
+  // if credit analyst, show only customers assigned to him/her
+  const [filteredCustomersData, setFilteredCustomersData] = useState([]);
+
+  const filterCustomers = () => {
+    if (admin.role === "credit analyst") {
+      const filteredCustomers = customers?.filter((customer) => {
+        return (
+          customer.creditCheck.assignment.isCreditAnalystAssigned === false || customer.creditCheck.assignment.creditAnalyst === adminName
+        );
+      });
+      setFilteredCustomersData(filteredCustomers);
+    } else {
+      setFilteredCustomersData(customers);
+    }
+  };
+
+  useEffect(() => {
+    filterCustomers();
+  }, [customers]);
+
+  // console.log(filteredCustomersData)
+
+  // filter customer by credit officer assigned and kyc not completed
+  // const filteredCustomers = customers?.filter((customer) => {
+  //   return (
+  //     customer.creditCheck.assignment.isCreditAnalystAssigned === false ||
+  //     customer.creditCheck.assignment.creditAnalyst === adminName
+  //   );
+  // });
 
   // handle credit check start btn
   const handleStartCheck = (id) => {
@@ -77,6 +117,7 @@ const CreditBureauDashboard = () => {
   // handle assignment and start credit check
   const assignCustomer = async () => {
     const apiUrl = import.meta.env.VITE_BASE_URL;
+    setCreditAnalyst(adminName);
     await fetch(
       `${apiUrl}/api/updatecustomer/assignto/${customerId}`,
       {
@@ -143,7 +184,7 @@ const CreditBureauDashboard = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {customers?.map((customer) => (
+                  {filteredCustomersData?.map((customer) => (
                     <tr key={customer._id}>
                       <td>{customer.customerId}</td>
                       <td>
