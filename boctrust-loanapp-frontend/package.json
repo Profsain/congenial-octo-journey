@@ -1,6 +1,6 @@
 {
   "name": "boctrust-frontend",
-  "homepage": "https://boctrust.com",
+  "homepage": ".",
   "version": "0.0.0",
   "type": "module",
   "scripts": {
