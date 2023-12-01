@@ -58,6 +58,7 @@ const LoanForm = () => {
       setMonthlyRepayment(parsedStartData.monthlyRepayment);
     }
   }, []);
+  console.log(careertype);
 
   const [step, setStep] = useState(1);
   const [showForm, setShowForm] = useState(true);
@@ -106,7 +107,7 @@ const LoanForm = () => {
 
   // handle form submit/move to next step
   const handleSubmit = async () => {
-    console.log("Form submit start")
+    console.log("Form submit start");
     // handle form submit to backend here
     try {
       if (ref.current.values) {
@@ -225,7 +226,7 @@ const LoanForm = () => {
     } catch (error) {
       console.log(error);
     }
-    
+
     // setSubmitting(false);
   };
 
@@ -239,9 +240,6 @@ const LoanForm = () => {
   // handle next step, check validation schema and move to next step
   const handleNext = () => {
     if (step === 1) {
-      setStep(2);
-      setStepImg("https://i.imgur.com/mObbs26.png");
-    } else if (step === 2) {
       if (careertype.toLowerCase() === "government employee") {
         setStep(2);
         setStepImg("https://i.imgur.com/mObbs26.png");
@@ -645,11 +643,7 @@ const LoanForm = () => {
                                   text="Employer Details"
                                 />
                                 {/* to be change to dropdown list and input field */}
-                                {/* <TextInput
-                                  label="Employer Name"
-                                  name="employername"
-                                  type="text"
-                                /> */}
+
                                 <div>
                                   {/* dropdown list */}
                                   <SelectField
@@ -728,7 +722,6 @@ const LoanForm = () => {
                                     />
                                   </div>
                                 ) : null}
-
                               </div>
 
                               <div className="ButtonContainer">
@@ -1257,7 +1250,7 @@ const LoanForm = () => {
                                 />
 
                                 <div>
-                                  <ConfirmData career={careertype}/>
+                                  <ConfirmData career={careertype} />
                                 </div>
 
                                 <div className="ButtonContainer">

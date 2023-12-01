@@ -74,12 +74,16 @@ const CreditBureauDashboard = () => {
     if (admin.role === "credit analyst") {
       const filteredCustomers = customers?.filter((customer) => {
         return (
-          customer.creditCheck.assignment.isCreditAnalystAssigned === false || customer.creditCheck.assignment.creditAnalyst === adminName
+          customer.creditCheck.assignment.isCreditAnalystAssigned === false || customer.creditCheck.assignment.creditAnalyst === adminName && customer.kyc.isKycCompleted === true
         );
       });
       setFilteredCustomersData(filteredCustomers);
     } else {
-      setFilteredCustomersData(customers);
+      const filteredCustomers = customers?.filter((customer) => {
+        return customer.kyc.isKycApproved === true;
+      });
+
+      setFilteredCustomersData(filteredCustomers);
     }
   };
 

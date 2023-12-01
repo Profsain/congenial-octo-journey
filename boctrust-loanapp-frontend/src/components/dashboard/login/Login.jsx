@@ -5,6 +5,7 @@ import { loginUser } from "../../../redux/reducers/adminAuthReducer";
 // import { login } from "../../../redux/reducers/userSlice";
 import { Form, Button } from "react-bootstrap";
 import loginUserOnServer from "./loginUserOnServer";
+import loginCustomerOnServer from "./loginCustomerOnServer";
 import HeadLine from "../../shared/Headline";
 import "./Login.css";
 
@@ -52,7 +53,16 @@ const Login = ({ setLogin }) => {
         setErrorMessage("Invalid username or password");
       }
     } else if (loginAs === "customer") {
-      console.log("customer login");
+      const response = await loginCustomerOnServer(username, password);
+      if (response.success) {
+        clearField();
+        // Dispatch the login action with the user data.
+        dispatch(loginUser(response));
+        setLogin(true);
+      } else {
+        // Handle login failure.
+        setErrorMessage("Invalid username/password or account not activated");
+      }
     }
   };
 

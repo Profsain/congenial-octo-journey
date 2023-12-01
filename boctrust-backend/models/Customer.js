@@ -87,6 +87,7 @@ const customerSchema = new mongoose.Schema({
     username: { type: String, unique: true, required: true },
     password: String,
     confirmpassword: String,
+    token: String,
     creditCheck: {
       assignment: {
         creditAnalyst: { type: String, default: "" },

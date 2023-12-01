@@ -1,6 +1,10 @@
+import {useSelector} from "react-redux";
 import ProfileCard from "./ProfileCard";
 
 const MyProfile = () => {
+  // get current login user
+  const user = useSelector((state) => state.adminAuth.user);
+  const branch = user.branch.charAt(0).toUpperCase() + user.branch.slice(1);
   const styles = {
     container: {
       backgroundColor: "#f5f6f7",
@@ -11,7 +15,9 @@ const MyProfile = () => {
     img: {
       width: "90px",
       height: "90px",
+      borderRadius: "50%",
       marginBottom: "1rem",
+      border: "2px solid orange",
     }
   };
 
@@ -19,19 +25,22 @@ const MyProfile = () => {
     <div style={styles.container} className="PCon">
       <div>
         <img
-          src="images/profileavaterlg.png"
+          src={user.photocaptureImg || "images/profileavaterlg.png"}
           alt="profile-image"
           style={styles.img}
         />
       </div>
       <div>
-        <ProfileCard title="First Name" value="Femi" />
-        <ProfileCard title="Last Name" value="Akinwande" />
-        <ProfileCard title="Business Name/Employer" value="NG Fire Service" />
-        <ProfileCard title="Branch" value="Lagos Island" />
+        <ProfileCard title="First Name" value={user.firstname} />
+        <ProfileCard title="Last Name" value={user.lastname} />
+        <ProfileCard
+          title="Business Name/Employer"
+          value={user.employername || "Self Employed"}
+        />
+        <ProfileCard title="Branch" value={branch} />
         <ProfileCard title="Email" value="femiakin@gmail.com" />
-        <ProfileCard title="Mobile Number" value="08012349812" />
-        <ProfileCard title="Gender" value="Male" />
+        <ProfileCard title="Mobile Number" value={user.phonenumber} />
+        <ProfileCard title="Address" value={user.houseaddress} />
       </div>
     </div>
   );

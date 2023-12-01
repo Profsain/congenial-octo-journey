@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useSelector } from "react-redux/es/hooks/useSelector";
 import SidebarIcons from "./SidebarIcons";
 import "./Dashboard.css";
 import SidebarMain from "./SidebarMain";
@@ -17,9 +18,13 @@ import AccountBalance from "./dashboardcomponents/report/AccountBalance";
 import AccountTransaction from "./dashboardcomponents/account/AccountTransaction";
 
 const CustomerDashboard = () => {
+  // get current login user
+  const user = useSelector((state) => state.adminAuth.user);
   const [showSidebar, setShowSidebar] = useState(false);
   const [currentComponent, setCurrentComponent] = useState("dashboard");
   const [currentTitle, setCurrentTitle] = useState("Dashboard");
+
+  const userName = user.firstname + " " + user.lastname;
 
   const handleMouseOver = () => {
     setShowSidebar(true);
@@ -139,7 +144,7 @@ const CustomerDashboard = () => {
           </div>
           <div className="col-sm-12 col-md-10">
             <div className="TopNavber">
-              <TopNavber title={currentTitle} />
+              <TopNavber title={currentTitle} user={userName} />
             </div>
             {renderComponent()}
           </div>

@@ -31,7 +31,6 @@ const multipleUpload = upload.fields([{ name: 'valididcard' }, { name: 'uploadpa
 
 // Create a new customer
 router.post('/customer', multipleUpload, async (req, res) => {
-  console.log("req.body", req.body)
   if (req.files.valididcard) {
     req.body.valididcard = req.files.valididcard[0].filename;
   }
@@ -73,9 +72,50 @@ router.post('/customer', multipleUpload, async (req, res) => {
   }
 });
 
+// customer login
+router.post('/login', async (req, res) => { 
+
+   try {
+        // get user input
+        const { username, password } = req.body;
+      
+        // validate user input
+        if (!(username && password)) {
+            return res.status(400).json({ error: 'All input is required' });
+        }
+
+        // find customer by username
+     const customer = await CustomerModel.findOne({ username });
+
+        // validate if user exist in our database and create token
+        if (customer && (bcrypt.compare(password, customer.password))) {
+            // Create token
+            const token = jwt.sign(
+                { customer_id: customer._id, username },
+                process.env.TOKEN_KEY,
+                {
+                    expiresIn: '2h',
+                }
+            );
+
+            // save customer token
+            customer.token = token;
+
+          // map customer to include image URLs
+          const customerWithImages = {
+            ...customer.toJSON(),
+            photocaptureImg: `${baseUrl}/public/filesUpload/${customer.photocapture}`,
+          };
+            return res.status(200).json({ success: 'Login successful', customer: customerWithImages });
+        }
+        return res.status(400).json({ error: 'Invalid Credentials' });
+    } catch (error) {
+        return res.status(500).json({ error: error.message });
+    }
+});
+
 // Read all customer
 const baseUrl = process.env.BASE_URL;
-console.log(baseUrl)
 
 router.get('/customers', async (req, res) => {
   try {
