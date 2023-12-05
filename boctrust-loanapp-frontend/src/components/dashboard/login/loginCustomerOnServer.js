@@ -20,7 +20,6 @@ const loginCustomerOnServer = async (username, password) => {
     }
 
       const data = await response.json();
-      console.log('data', data);
     return data;
   } catch (error) {
     console.error('Error logging in:', error);

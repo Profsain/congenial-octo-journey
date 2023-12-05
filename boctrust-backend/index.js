@@ -43,7 +43,7 @@ mongoose
         const app = express();
 
         // use cors
-        app(cors());
+        app.use(cors());
 
         // use express json
         app.use(express.json());
