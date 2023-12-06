@@ -43,7 +43,12 @@ mongoose
         const app = express();
 
         // use cors
-        app.use(cors());
+        const corsOptions = {
+            origin: "https://boctrust.com",
+            methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+            
+        }
+        app.use(cors(corsOptions));
 
         // use express json
         app.use(express.json());
