@@ -9,6 +9,7 @@ const loginCustomerOnServer = async (username, password) => {
   try {
     const response = await fetch(`${apiUrl}/api/customer/login`, {
       method: 'POST',
+      mode: 'cors',
       headers: {
         'Content-Type': 'application/json',
       },

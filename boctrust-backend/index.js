@@ -44,10 +44,12 @@ mongoose
 
         // use cors
         const corsOptions = {
-            origin: "https://boctrust.com",
+            origin: "https://boctrustmfb.com",
             methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
-            
+            credentials: true,
+            production: "https://boctrustmfb.com",
         }
+
         app.use(cors(corsOptions));
 
         // use express json

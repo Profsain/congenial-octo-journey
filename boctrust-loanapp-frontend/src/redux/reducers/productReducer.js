@@ -8,7 +8,12 @@ const API_ENDPOINT = `${apiUrl}/api/product/products`;
 
 // Thunk to fetch product from the API
 export const fetchProduct = createAsyncThunk('product/fetchProduct', async () => {
-    const response = await axios.get(API_ENDPOINT);
+  const response = await axios.get(API_ENDPOINT, {
+        mode: 'cors',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+    });
   return response.data;
 });
 

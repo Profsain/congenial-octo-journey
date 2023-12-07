@@ -99,7 +99,7 @@ const LoanFirstStep = ({ data }) => {
     // send data to redux store
     const productId = ref.current?.values.loanproduct;
     const product = loanProducts?.find((product) => product._id === productId);
-    console.log(product)
+ 
     const startData = {
         loanamount,
         careertype,
@@ -113,13 +113,11 @@ const LoanFirstStep = ({ data }) => {
         // store startData to local storage
   
     localStorage.setItem("startData", JSON.stringify(startData));
-    dispatch(addData(startData));
+  
     // idpRedirect();
     bvnVerification();
-  };
+  }
 
-  const loanStartData = useSelector((state) => state.startData);
-  console.log(loanStartData);
   return (
     <div className="container-fluid FormContainer">
       <div>
