@@ -44,16 +44,26 @@ mongoose
 
         // use cors
         const corsOptions = {
-            origin: "https://boctrustmfb.com",
-            methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
-            credentials: true,
-            production: "https://boctrustmfb.com",
+            origin: "*",
+            methods: ['GET', 'PUT', 'POST', 'DELETE', 'OPTIONS'],
+            allowedHeaders: ['Content-Type'],
         }
 
         app.use(cors(corsOptions));
 
+        // app.use((req, res, next) => {
+        //     //allow access to current url. work for https as well
+        //     res.setHeader('Access-Control-Allow-Origin', req.header('Origin'));
+        //     res.removeHeader('x-powered-by');
+        //     //allow access to current method
+        //     res.setHeader('Access-Control-Allow-Methods', req.method);
+        //     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+        //     next();
+        // });
+
         // use express json
         app.use(express.json());
+
         // Serve static files from the "uploads" directory
         app.use('/uploads', express.static('uploads'));
 
