@@ -37,6 +37,7 @@ const Contact = () => {
 
   // contact form submission
   const [message, setMessage] = useState("");
+  const [words, setWords] = useState(0);
   const [formData, setFormData] = useState({
     fullName: "",
     phoneNumber: "",
@@ -46,9 +47,34 @@ const Contact = () => {
   });
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value
+    });
   };
 
+  // handle message word count
+  const handleMessageChange = (e) => {
+    const inputValue = e.target.value;
+
+    // Check if the input exceeds the 300-word limit
+    if (wordCount(inputValue) <= 150) {
+      setFormData({
+        ...formData,
+        [e.target.name]: inputValue,
+      });
+    }
+  };
+
+
+  // Function to count words in a string
+  const wordCount = (text) => {
+    const words = text.trim().split(/\s+/);
+    setWords(words.length)
+    return words.length;
+  };
+
+  
   const clearField = () => {
     setFormData({
       fullName: "",
@@ -189,7 +215,7 @@ const Contact = () => {
                 <Form.Group className="mb-3">
                   <Form.Label>Comment or Message</Form.Label>
                   <Form.Control
-                    onChange={handleChange}
+                    onChange={handleMessageChange}
                     name="message"
                     value={formData.message}
                     as="textarea"
@@ -197,6 +223,7 @@ const Contact = () => {
                     placeholder="Type here"
                     required
                   />
+                  <p style={{fontSize: "12px", padding: "6px"}}>Words { words} of 150</p>
                 </Form.Group>
 
                 <Button

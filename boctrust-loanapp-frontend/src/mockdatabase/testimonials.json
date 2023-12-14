@@ -23,7 +23,7 @@
   {
     "id": 4,
     "name": "Sarah Thompson",
-    "image": "https://shorturl.at/mpIVY",
+    "image": "images/sarah.jpg",
     "text": "The microfinance bank understood my financial needs and provided me with a tailored loan solution. They genuinely care about their customers and strive to make a positive impact in the community.",
     "career": "Freelancer"
   },
@@ -36,7 +36,7 @@
   {
     "id": 6,
     "name": "Emeka Nwankwo",
-    "image": "https://shorturl.at/alzR9",
+    "image": "images/avater.jpg",
     "text": "The microfinance bank's loan officers are knowledgeable and professional. They guided me through every step and made the application process seamless. I'm grateful for their assistance!",
     "career": "Business Professional"
   },
@@ -49,21 +49,21 @@
   {
     "id": 8,
     "name": "Yusuf Ibrahim",
-    "image": "https://shorturl.at/qrux6",
+    "image": "images/ibrahim.jpg",
     "text": "I've been a loyal customer of the microfinance bank for many years. Their personalized approach, competitive interest rates, and hassle-free loan process have always exceeded my expectations.",
     "career": "Professional"
   },
   {
     "id": 9,
     "name": "Ethan Johnson",
-    "image": "https://shorturl.at/fAOQ7",
+    "image": "images/avater.jpg",
     "text": "The microfinance bank played a crucial role in my education. They provided me with an educational loan that helped me pursue my dream degree. I'm thankful for their support and belief in me.",
     "career": "Student"
   },
   {
     "id": 10,
     "name": "Aisha Mohammed",
-    "image": "https://shorturl.at/egjJ9",
+    "image": "images/avater.jpg",
     "text": "The microfinance bank empowered me to become a homeowner. With their affordable housing loan and guidance, I was able to purchase my dream home. They truly made a difference in my life.",
     "career": "Homeowner"
   }

@@ -51,11 +51,6 @@ const Footer = () => {
                   </Link>
                 </li>
                 <li>
-                  <Link className="Link" to="/blog">
-                    News & Events
-                  </Link>
-                </li>
-                <li>
                   <Link className="Link" to="/support">
                     FAQ
                   </Link>
@@ -70,30 +65,16 @@ const Footer = () => {
             <div className="col-md-6">
               <ul>
                 <li>
-                  <Link className="Link" to="/product">
-                    Services
-                  </Link>
-                </li>
-                <li>
-                  <Link className="Link" to="/#">
+                  <Link className="Link" to="/loan">
                     Account Opening
                   </Link>
                 </li>
                 <li>
-                  <Link className="Link" to="/#">
+                  <Link className="Link" to="/careers">
                     Careers
                   </Link>
                 </li>
-                <li>
-                  <Link className="Link" to="/">
-                    Internet Banking
-                  </Link>
-                </li>
-                <li>
-                  <Link className="Link" to="/#">
-                    Portfolio
-                  </Link>
-                </li>
+
                 <li>
                   <Link className="Link" to="/support">
                     Help
@@ -122,34 +103,34 @@ const Footer = () => {
           <div>
             <p>Connect On Social Media</p>
             <div className="SocialContainer">
-            <div className="SocialMedia">
-              <a
-                href="https://www.facebook.com/pages/Boctrust%20Microfinance%20Bank/1188460931185967/"
-                target="_blank"
-                rel="noreferrer"
-              >
-                <FacebookIcon />
-              </a>
-            </div>
-            <div className="SocialMedia">
-              <a
-                href="https://www.twitter.com/boctrustmfb"
-                target="_blank"
-                rel="noreferrer"
-              >
-                <TwitterIcon />
-              </a>
-            </div>
-            <div className="SocialMedia">
-              <a
-                href="https://www.linkedin.com/company/boctrustmfb/"
-                target="_blank"
-                rel="noreferrer"
-              >
-                <LinkedIn />
-              </a>
+              <div className="SocialMedia">
+                <a
+                  href="https://www.facebook.com/pages/Boctrust%20Microfinance%20Bank/1188460931185967/"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  <FacebookIcon />
+                </a>
               </div>
+              <div className="SocialMedia">
+                <a
+                  href="https://www.twitter.com/boctrustmfb"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  <TwitterIcon />
+                </a>
               </div>
+              <div className="SocialMedia">
+                <a
+                  href="https://www.linkedin.com/company/boctrustmfb/"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  <LinkedIn />
+                </a>
+              </div>
+            </div>
           </div>
         </div>
       </div>
