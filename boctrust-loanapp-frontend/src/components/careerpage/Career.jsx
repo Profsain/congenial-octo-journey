@@ -502,7 +502,7 @@ const Career = () => {
                   </div>
                 </div>
               </Tab>
-              <Tab eventKey="vacancy" title="Vacancy">
+              <Tab eventKey="vacancy" title="Vacancies">
                 <div className="container ">
                   <Headline spacer="48px 0" text="Find a place with us!" />
                   <div className="SearchBox">

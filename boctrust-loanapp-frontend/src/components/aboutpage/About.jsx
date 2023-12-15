@@ -19,12 +19,13 @@ const About = () => {
 
   return (
     <>
-      <Header imgurl="images/bocoverview.png" />
+      <Header imgurl="images/boctrustviewl.png" />
       <TopCardSection />
       <div className="container">
         <div>
           <div data-aos="fade-up">
             <TopCard
+              className="overCard"
               spacer="0 68px 28px 68px"
               size="1.5rem"
               lineHeight="38px"
@@ -36,6 +37,7 @@ const About = () => {
           </div>
           <div data-aos="fade-up">
             <TopCard
+              className="overCard"
               spacer="0 68px 28px 68px"
               size="1.5rem"
               lineHeight="38px"
@@ -47,6 +49,7 @@ const About = () => {
           </div>
           <div data-aos="fade-up">
             <TopCard
+              className="overCard"
               spacer="0 68px 28px 68px"
               size="1.4rem"
               lineHeight="38px"

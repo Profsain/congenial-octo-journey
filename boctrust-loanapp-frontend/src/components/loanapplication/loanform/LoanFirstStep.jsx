@@ -34,8 +34,7 @@ const LoanFirstStep = ({ data }) => {
   const loanamount = data?.loanamount;
   const careertype = data?.careertype;
   const [noofmonth, setNoofmonth] = useState(1);
-  const [currentLoanAmount, setCurrentLoanAmount] = useState(
-    parseInt(loanamount)
+  const [currentLoanAmount, setCurrentLoanAmount] = useState((loanamount)
   );
   const [interestResult, setInterestResult] = useState(0);
 
@@ -69,7 +68,7 @@ const LoanFirstStep = ({ data }) => {
 
     // calculator loan amount
     const loanCal = calculatorfunc(
-      parseInt(currentLoanAmount),
+      parseInt(currentLoanAmount.replace(/,/g, "")),
       noofmonth * 30,
       loanRate
     );
@@ -80,7 +79,8 @@ const LoanFirstStep = ({ data }) => {
     calculateRepayment();
   }, [noofmonth, currentLoanAmount]);
 
-  const loanTotal = parseInt(currentLoanAmount) + interestResult;
+  const loanTotal =
+    parseInt(currentLoanAmount.replace(/,/g, "")) + interestResult;
   const monthlyPay = (loanTotal / parseInt(noofmonth)).toFixed();
   // update repayment
   useEffect(() => {
@@ -172,8 +172,10 @@ const LoanFirstStep = ({ data }) => {
                                 {currentLoanAmount === "" ? (
                                   <p className="ErrorMsg">Required</p>
                                 ) : null}
-                                {parseInt(currentLoanAmount) < 10000 ||
-                                parseInt(currentLoanAmount) > 2000000 ? (
+                                {parseInt(currentLoanAmount.replace(/,/g, "")) <
+                                  10000 ||
+                                parseInt(currentLoanAmount.replace(/,/g, "")) >
+                                  5000000 ? (
                                   <p className="ErrorMsg">
                                     Enter loan amount between 10000 to 2000000
                                     Naira only
@@ -234,7 +236,8 @@ const LoanFirstStep = ({ data }) => {
                                   <span className="CalNaira">
                                     <img src="images/naira.png" alt="" />
                                   </span>
-                                  {loanTotal || loanamount} <span> for </span>
+                                  {isNaN(loanTotal) ? 0 : loanTotal.toLocaleString() || loanamount}{" "}
+                                  <span> for </span>
                                   {noofmonth}
                                   {noofmonth > 1 ? (
                                     <span> months</span>
@@ -252,7 +255,9 @@ const LoanFirstStep = ({ data }) => {
                                     <img src="images/naira.png" alt="" />
                                   </span>
 
-                                  {isNaN(monthlyPay) ? 0 : monthlyPay}
+                                  {isNaN(monthlyPay)
+                                    ? 0
+                                    : Number(monthlyPay).toLocaleString()}
                                 </h4>
                               </div>
                               <div className="Purpose">

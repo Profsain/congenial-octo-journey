@@ -18,6 +18,7 @@ const CustomerProduct = () => {
       <div className="row gx-2">
         <div className="col-md-6 col-sm-12">
           <TopCard
+            className="overCard"
             spacer="0 18px 68px 68px"
             size={"1.3rem"}
             title={
@@ -51,6 +52,7 @@ const CustomerProduct = () => {
         </div>
         <div className="col-md-6 col-sm-12">
           <TopCard
+            className="overCard"
             spacer="0 68px 68px 18px"
             size={"1.3rem"}
             title={

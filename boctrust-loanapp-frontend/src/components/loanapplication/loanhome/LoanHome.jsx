@@ -58,13 +58,7 @@ const LoanHome = () => {
                   careertype: "",
                 }}
                 validationSchema={Yup.object({
-                  loanamount: Yup.number()
-                    .min(10000, "Please enter amount from 10000 upto 2000000 ")
-                    .max(
-                      2000000,
-                      "Please enter amount from 10000 upto 2000000 "
-                    )
-                    .required("Required"),
+                  loanamount: Yup.string().required("Required"),
                   careertype: Yup.string().required("Required"),
                 })}
                 onSubmit={(values, { setSubmitting }) => {
@@ -82,12 +76,34 @@ const LoanHome = () => {
                       text="How much do you need?"
                     />
                     <img src="images/naira.png" alt="" className="NairaIcon" />
+                    {/* <input
+                      className="Field"
+                      id="loanamount"
+                      type="text"
+                      value={Number(formik.values.loanamount).toLocaleString()}
+                      {...formik.getFieldProps("loanamount")}
+                    /> */}
                     <input
                       className="Field"
                       id="loanamount"
                       type="text"
-                      {...formik.getFieldProps("loanamount")}
+                      value={formik.values.loanamount} // Keep the raw numeric value in state
+                      onChange={(e) => {
+                        // Handle the change event and update the state with the raw numeric value
+                        const rawValue = e.target.value.replace(/,/g, ""); // Remove commas if present
+                        formik.setFieldValue("loanamount", rawValue);
+                      }}
+                      onBlur={(e) => {
+                        // Format the value with toLocaleString when the input loses focus
+                        const rawValue = e.target.value.replace(/,/g, ""); // Remove commas if present
+                        // formik.values.loanamount = Number(rawValue).toLocaleString();
+                        formik.setFieldValue(
+                          "loanamount",
+                          Number(rawValue).toLocaleString()
+                        );
+                      }}
                     />
+
                     {formik.touched.loanamount && formik.errors.loanamount ? (
                       <p className="ErrorMsg">{formik.errors.loanamount}</p>
                     ) : null}

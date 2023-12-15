@@ -405,4 +405,10 @@ p {
    .asBox {
       flex-direction: column;
     }
+
+    /* overview card */
+    .overCard {
+      width: 90% !important;
+      margin: 8px !important;
+    }
 }

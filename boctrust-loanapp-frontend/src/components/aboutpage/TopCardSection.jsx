@@ -10,6 +10,7 @@ const TopCardSection = () => {
       <div className="row">
         <div className="col-md-6 col-sm-12">
           <TopCard
+            className="overCard"
             spacer="78px"
             size="1.2rem"
             title={<Headline text="Who we are" />}
@@ -18,6 +19,7 @@ const TopCardSection = () => {
         </div>
         <div className="col-md-6 col-sm-12">
           <TopCard
+            className="overCard"
             spacer="78px"
             size="1.2rem"
             title={<Headline text="Our Mission" />}

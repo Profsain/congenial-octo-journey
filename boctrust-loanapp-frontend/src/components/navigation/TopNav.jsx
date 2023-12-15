@@ -64,7 +64,7 @@ const TopNav = () => {
                       Our Board
                     </NavDropdown.Item>
                     <NavDropdown.Divider />
-                    <NavDropdown.Item href="/career" className="DropItem">
+                    <NavDropdown.Item href="/careers" className="DropItem">
                       Careers
                     </NavDropdown.Item>
                     <NavDropdown.Divider />
