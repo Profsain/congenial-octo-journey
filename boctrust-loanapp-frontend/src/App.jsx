@@ -84,7 +84,7 @@ function App() {
       <Footer />
       <ScrollToTop />
       <CookieConsent
-        debug={true}
+        // debug={true}
         enableDeclineButton
         declineButtonText="I Decline"
         declineButtonStyle={{fontSize: "18px"}}
