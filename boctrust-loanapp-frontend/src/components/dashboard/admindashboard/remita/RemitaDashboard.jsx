@@ -71,7 +71,7 @@ const RemitaDashboard = () => {
 
   useEffect(() => {
     dispatch(fetchAllCustomer());
-  }, [dispatch]);
+  }, [dispatch, openModel]);
 
   // filter customer by remitaStatus
   const remitaCustomers = customers.filter(
@@ -173,30 +173,6 @@ const RemitaDashboard = () => {
                     </tr>
                   );
                 })}
-                <tr>
-                  <td>7456161553</td>
-                  <td>Cynthia Aremu</td>
-                  <td>N230,000</td>
-                  <td>N75,000</td>
-                  <td>N80,500</td>
-                  <td>03-03-2023</td>
-                  <td>30-03-2023</td>
-                  <td style={styles.approved}>Done</td>
-                  <td style={styles.approved}>Processed</td>
-                  <td style={styles.completed}>View</td>
-                </tr>
-                <tr>
-                  <td>7456161598</td>
-                  <td>Ebuka Akim</td>
-                  <td>N300,000</td>
-                  <td>N750,000</td>
-                  <td>N900,000</td>
-                  <td>01-02-2023</td>
-                  <td>30-03-2023</td>
-                  <td style={styles.pending}>Pending</td>
-                  <td style={styles.pending}>Pending</td>
-                  <td style={styles.completed}>View</td>
-                </tr>
               </tbody>
             </Table>
           </div>

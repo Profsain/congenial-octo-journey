@@ -138,18 +138,19 @@ const MandateHistory = () => {
                   <td>{customer.employername || "N/A"}</td>
                   <td>N{customer.loantotalrepayment}</td>
                   <td>
-                    {customer.remita.remitaDetails.firstPaymentDate.slice(
-                      0,
-                      10
-                    )}
+                    {!customer.remita.remitaDetails.firstPaymentDate
+                      ? "N/A"
+                      : customer.remita.remitaDetails.firstPaymentDate.slice(
+                          0,
+                          10
+                        )}
                   </td>
                   <td>
-                    {getNextMonthDate(
-                      customer.remita.remitaDetails.firstPaymentDate.slice(
-                        0,
-                        10
-                      )
-                    )}
+                    {!customer.remita.remitaDetails.firstPaymentDate
+                      ? "N/A"
+                      : getNextMonthDate(
+                          customer.remita.remitaDetails.firstPaymentDate
+                        )}
                   </td>
                   <td style={styles.padding}>
                     {viewLoader && <PageLoader width="25" />}
@@ -166,64 +167,6 @@ const MandateHistory = () => {
                   </td>
                 </tr>
               ))}
-
-              <tr>
-                <td>2346161553</td>
-                <td>Cynthia Bola</td>
-                <td>NPF</td>
-                <td>75,000</td>
-                <td>03-03-2023</td>
-                <td>03-04-2023</td>
-                <td style={styles.padding}>
-                  <BocButton
-                    bradius="12px"
-                    fontSize="14px"
-                    width="90px"
-                    margin="0 4px"
-                    bgcolor="#7dd50e"
-                  >
-                    View
-                  </BocButton>
-                </td>
-              </tr>
-              <tr>
-                <td>2346161543</td>
-                <td>John Doe</td>
-                <td>Nigeria Custom</td>
-                <td>750,000</td>
-                <td>01-04-2023</td>
-                <td>01-05-2023</td>
-                <td style={styles.padding}>
-                  <BocButton
-                    bradius="12px"
-                    fontSize="14px"
-                    width="90px"
-                    margin="0 4px"
-                    bgcolor="#7dd50e"
-                  >
-                    View
-                  </BocButton>
-                </td>
-              </tr>
-              <tr>
-                <td>2346161599</td>
-                <td>Musa Misola</td>
-                <td>Immigration</td>
-                <td>500,000</td>
-                <td>01-03-2023</td>
-                <td>01-04-2023</td>
-                <td style={styles.padding}>
-                  <BocButton
-                    bradius="12px"
-                    fontSize="14px"
-                    width="90px"
-                    margin="0 4px"
-                    bgcolor="#7dd50e"
-                  >
-                    View
-                  </BocButton>
-                </td>
-              </tr>
             </tbody>
           </Table>
         </div>

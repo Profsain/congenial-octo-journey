@@ -1,4 +1,4 @@
-import { useEffect, useState} from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchAllCustomer } from "../../../../redux/reducers/customerReducer";
 import { Table } from "react-bootstrap";
@@ -45,7 +45,6 @@ const CollectionNotifications = () => {
   useEffect(() => {
     dispatch(fetchAllCustomer());
   }, [dispatch]);
-
 
   // filter customer by remitaStatus
   const [remitaCustomers, setRemitaCustomers] = useState([]);
@@ -110,7 +109,7 @@ const CollectionNotifications = () => {
 
               {remitaCustomers.map((customer) => (
                 <tr key={customer._id}>
-                  <td>{customer.remita.remitaDetails.customerId}</td>
+                  <td>{customer.remita.disbursementDetails.data.customerId}</td>
                   <td>{customer.loanproduct || "General Loan"}</td>
                   <td>N{customer.loanamount}</td>
                   <td>N{customer.loantotalrepayment}</td>
@@ -118,75 +117,14 @@ const CollectionNotifications = () => {
                     {customer.remita.disbursementDetails.data.mandateReference}
                   </td>
                   <td>
-                    {customer.remita.remitaDetails.firstPaymentDate.slice(
-                      0,
-                      10
-                    )}
+                    {!customer.remita.remitaDetails.firstPaymentDate ? ("N/A") : (customer.remita.remitaDetails.firstPaymentDate.slice(0, 10))}
                   </td>
                   <td>
-                    {getNextMonthDate(
-                      customer.remita.remitaDetails.firstPaymentDate.slice(
-                        0,
-                        10
-                      )
-                    )}
+                    {!customer.remita.remitaDetails.firstPaymentDate ? ("N/A") : (getNextMonthDate(customer.remita.remitaDetails.firstPaymentDate.slice(0, 10)))}
                   </td>
                 </tr>
               ))}
-              <tr>
-                <td>C001</td>
-                <td>Car Loan</td>
-                <td>2,000,000</td>
-                <td>700,000</td>
-                <td>443535545654</td>
-                <td>03-03-2023</td>
-                <td>21-03-2023</td>
-              </tr>
-              <tr>
-                <td>C003</td>
-                <td>Salary Advance</td>
-                <td>200,000</td>
-                <td>120,000</td>
-                <td>123535545644</td>
-                <td>02-04-2023</td>
-                <td>30-05-2023</td>
-              </tr>
-              <tr>
-                <td>C002</td>
-                <td>SME Loan</td>
-                <td>1,500,000</td>
-                <td>1,000,000</td>
-                <td>333535545609</td>
-                <td>01-02-2023</td>
-                <td>29-03-2023</td>
-              </tr>
-              <tr>
-                <td>C001</td>
-                <td>Travel Loan</td>
-                <td>50,000</td>
-                <td>20,000</td>
-                <td>443535545654</td>
-                <td>03-05-2023</td>
-                <td>31-06-2023</td>
-              </tr>
-              <tr>
-                <td>C004</td>
-                <td>SME Loan</td>
-                <td>1,000,000</td>
-                <td>900,000</td>
-                <td>993535545612</td>
-                <td>03-04-2023</td>
-                <td>21-05-2023</td>
-              </tr>
-              <tr>
-                <td>C006</td>
-                <td>Car Loan</td>
-                <td>900,000</td>
-                <td>700,000</td>
-                <td>443535545699</td>
-                <td>01-03-2023</td>
-                <td>30-03-2023</td>
-              </tr>
+              
             </tbody>
           </Table>
         </div>
