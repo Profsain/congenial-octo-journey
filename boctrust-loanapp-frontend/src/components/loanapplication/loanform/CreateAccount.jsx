@@ -103,8 +103,9 @@ const CreateAccount = ({ handleSubmit, phoneNumber }) => {
             <div className="col-sm-12 col-md-4 RecaptchaBox">
               <div className="RecaptchaBadge ">
                 <ReCAPTCHA
-                  sitekey="6Lfm1MgmAAAAAJVycYHLFujgGixm-JkyY2gv-r9o"
+                  sitekey="6Ld7FzcpAAAAAJ9iY3KIg0kfAYGpVtICJN1iAE30"
                   onChange={handleRecaptcha}
+                  // ref={captchaRef}
                 />
               </div>
 

@@ -7,6 +7,7 @@ import { Modal } from "react-bootstrap";
 import { Form, Button } from "react-bootstrap";
 import loginUserOnServer from "./loginUserOnServer";
 import loginCustomerOnServer from "./loginCustomerOnServer";
+import forgotPassword from "./forgotPassword";
 import HeadLine from "../../shared/Headline";
 import "./Login.css";
 
@@ -28,14 +29,17 @@ const Login = ({ setLogin }) => {
   const handleForgotPassword = () => setShow(true);
 
   // handle forgot password submit
-  const handleForgotPasswordSubmit = (e) => {
+  const handleForgotPasswordSubmit = async (e) => {
     e.preventDefault();
     if (formData.loginAs === "staff") {
       console.log("staff");
+      const response = await forgotPassword(forgotUsername, forgotEmail);
+      console.log(response)
+
+
     } else if (formData.loginAs === "customer") {
       console.log("customer");
     }
-    console.log(forgotUsername, forgotEmail);
 
     // clear fields
     setForgotUsername("");

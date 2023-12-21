@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchAllCustomer } from "../../../../redux/reducers/customerReducer";
@@ -51,6 +52,18 @@ const CheckSalaryHistory = () => {
     dispatch(fetchAllCustomer());
   }, [dispatch]);
 
+  // scroll to salary check details section
+  const scrollToDetails = () => { 
+    if (openDetails) {
+      const checkDetails = document.getElementById("checkDetails");
+      checkDetails.scrollIntoView({ behavior: "smooth" });
+    }
+  }
+
+  useEffect(() => {
+    scrollToDetails();
+   }, [openDetails]);
+
   // handle salary check
   const handleCheck = async (id) => {
     const apiUrl = import.meta.env.VITE_BASE_URL;
@@ -95,9 +108,9 @@ const CheckSalaryHistory = () => {
 
   // handle view
   const handleView = (id) => {
+    scrollToDetails();
     // find customer by id
     const customer = customers.find((customer) => customer._id === id);
-    // console.log(id, customer)
 
     // set customerObj to customer
     setCustomerObj(customer);
@@ -161,7 +174,7 @@ const CheckSalaryHistory = () => {
                 <th>Account Number</th>
                 <th>BVN</th>
                 <th>Do Check</th>
-                <th>Action</th>
+                <th>Status</th>
               </tr>
             </thead>
             <tbody>
@@ -198,9 +211,9 @@ const CheckSalaryHistory = () => {
                             <BocButton
                               bradius="12px"
                               fontSize="14px"
-                              width="90px"
+                              width="100px"
                               margin="0 4px"
-                              bgcolor="#145088"
+                              bgcolor="green"
                             >
                               Processed
                             </BocButton>
@@ -211,7 +224,7 @@ const CheckSalaryHistory = () => {
                             <BocButton
                               bradius="12px"
                               fontSize="14px"
-                              width="90px"
+                              width="100px"
                               margin="0 4px"
                               bgcolor="#f64f4f"
                             >
@@ -257,10 +270,12 @@ const CheckSalaryHistory = () => {
       {/* details section */}
       {isLoading ? <PageLoader /> : null}
       {openDetails && (
-        <CheckSalaryDetails
-          customerObj={customerObj}
-          setOpenDetails={setOpenDetails}
-        />
+        <div id="checkDetails">
+          <CheckSalaryDetails
+            customerObj={customerObj}
+            setOpenDetails={setOpenDetails}
+          />
+        </div>
       )}
     </div>
   );

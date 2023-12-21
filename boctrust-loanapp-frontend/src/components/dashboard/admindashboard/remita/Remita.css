@@ -1,6 +1,8 @@
 .DetailsCon {
     background-color: #f2f2f7;
     padding: 4rem;
+    padding-top: 8rem !important;
+    margin-top: 5rem;
 }
 .RowSection {
     display: flex;
