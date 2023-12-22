@@ -130,6 +130,14 @@ const RemitaDashboard = () => {
                 </tr>
               </thead>
               <tbody>
+                 {remitaCustomers.length === 0 && (
+                <tr>
+                  <td colSpan="8" style={{ textAlign: "center" }}>
+                    No record found
+                  </td>
+                </tr>
+                )}
+                
                 {remitaCustomers?.map((customer) => {
                   return (
                     <tr key={customer._id}>

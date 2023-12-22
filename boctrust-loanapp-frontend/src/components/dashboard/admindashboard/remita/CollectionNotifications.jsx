@@ -117,14 +117,33 @@ const CollectionNotifications = () => {
                     {customer.remita.disbursementDetails.data.mandateReference}
                   </td>
                   <td>
-                    {!customer.remita.remitaDetails.firstPaymentDate ? ("N/A") : (customer.remita.remitaDetails.firstPaymentDate.slice(0, 10))}
+                    {!customer.remita.remitaDetails.firstPaymentDate
+                      ? customer.remita.remitaDetails.data.data.firstPaymentDate.slice(
+                          0,
+                          10
+                        ) || "N/A"
+                      : customer.remita.remitaDetails.firstPaymentDate.slice(
+                          0,
+                          10
+                        )}
                   </td>
                   <td>
-                    {!customer.remita.remitaDetails.firstPaymentDate ? ("N/A") : (getNextMonthDate(customer.remita.remitaDetails.firstPaymentDate.slice(0, 10)))}
+                    {!customer.remita.remitaDetails.firstPaymentDate
+                      ? getNextMonthDate(
+                          customer.remita.remitaDetails.data.data.firstPaymentDate.slice(
+                            0,
+                            10
+                          )
+                        ) || "N/A"
+                      : getNextMonthDate(
+                          customer.remita.remitaDetails.firstPaymentDate.slice(
+                            0,
+                            10
+                          )
+                        )}
                   </td>
                 </tr>
               ))}
-              
             </tbody>
           </Table>
         </div>

@@ -136,6 +136,54 @@ router.post('/login', async (req, res) => {
     }
 }); // login logic ends here
 
+// forget password logic
+router.post('/forgot-password', async (req, res) => {
+    console.log("req.body", req.body)
+  try {
+    const { email } = req.body;
+
+    // Check if the email exists in the database
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      return res.status(404).json({ message: 'Email not found' });
+    }
+
+    // Generate a password reset token
+    const resetToken = crypto.randomBytes(20).toString('hex');
+    user.token = resetToken;
+    await user.save();
+
+    // Send an email with the password reset link
+    const transporter = nodemailer.createTransport({
+      // Configure your email service here
+      service: 'gmail',
+      auth: {
+        user: 'boctrustebusiness@gmail.com', // Replace with your email
+        pass: 'your-email-password', // Replace with your email password
+      },
+    });
+
+    const mailOptions = {
+      from: 'your-email@gmail.com', // Replace with your email
+      to: user.email,
+      subject: 'Password Reset',
+      text: `Click the following link to reset your password: http://your-app-url/reset-password/${resetToken}`,
+    };
+
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        return res.status(500).json({ message: 'Failed to send reset email' });
+      }
+
+      res.status(200).json({ message: 'Reset email sent successfully' });
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
 // Delete a user
 router.delete('/users/:id', async (req, res) => {
 

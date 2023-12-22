@@ -139,7 +139,10 @@ const MandateHistory = () => {
                   <td>N{customer.loantotalrepayment}</td>
                   <td>
                     {!customer.remita.remitaDetails.firstPaymentDate
-                      ? "N/A"
+                      ? customer.remita.remitaDetails.data.data.firstPaymentDate.slice(
+                          0,
+                          10
+                        ) || "N/A"
                       : customer.remita.remitaDetails.firstPaymentDate.slice(
                           0,
                           10
@@ -147,7 +150,10 @@ const MandateHistory = () => {
                   </td>
                   <td>
                     {!customer.remita.remitaDetails.firstPaymentDate
-                      ? "N/A"
+                      ? customer.remita.remitaDetails.data.data.firstPaymentDate.slice(
+                          0,
+                          10
+                        ) || "N/A"
                       : getNextMonthDate(
                           customer.remita.remitaDetails.firstPaymentDate
                         )}

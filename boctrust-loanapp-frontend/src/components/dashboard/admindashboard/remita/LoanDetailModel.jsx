@@ -12,6 +12,7 @@ const LoanDetailModel = (props) => {
   const userType = props.usertype;
   const remitaData = customer?.remita?.remitaDetails;
   const [isLoading, setIsLoading] = useState(false);
+  console.log(customer);
 
   // close model box
   const handleClose = () => {
@@ -69,6 +70,7 @@ const LoanDetailModel = (props) => {
       backdrop="static"
       keyboard={false}
     >
+      
       <Modal.Header>
         <Modal.Title id="contained-modal-title-vcenter">
           {customer.firstname} {customer.lastname} Loan Details
@@ -124,7 +126,7 @@ const LoanDetailModel = (props) => {
         <Button variant="secondary" onClick={handleClose}>
           Close
         </Button>
-        {userType === "admin" && (
+        {userType === "admin" && customer?.remita?.loanStatus === "pending" && (
           <Button variant="primary" type="button" onClick={handleSubmit}>
             Approve Loan
           </Button>
