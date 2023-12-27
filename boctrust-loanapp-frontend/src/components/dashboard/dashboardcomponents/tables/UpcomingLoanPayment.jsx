@@ -1,3 +1,5 @@
+import { useEffect } from "react";
+import { useSelector } from "react-redux";
 import BocButton from "../../shared/BocButton";
 import DashboardHeadline from "../../shared/DashboardHeadline";
 import Table from "react-bootstrap/Table";
@@ -9,6 +11,24 @@ const UpcomingLoanPayment = () => {
     },
     head: { color: "#145098", fontWeight: "bold", fontSize: "1.2rem" },
   };
+
+   const user = useSelector((state) => state.adminAuth.user);
+  console.log(user);
+
+  const api_user = import.meta.env.VITE_BASE_URL;
+  
+  // fetch upcoming loan payment
+  const fetchUpcomingLoanPayment = async () => {
+    const response = await fetch(
+      `${api_user}/api/bankone/getLoanRepaymentSchedule/${user.banking.accountDetails.Message.AccountNumber}`
+    );
+    const data = await response.json();
+    console.log(data);
+  };
+
+  useEffect(() => {
+    fetchUpcomingLoanPayment();
+  }, []);
 
   return (
     <div>

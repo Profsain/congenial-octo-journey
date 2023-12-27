@@ -230,34 +230,34 @@ router.get("/getLoanByAccount/:accountNumber", (req, res) => {
 });
 
 // get loan repayment schedule
-router.get("/getLoanRepaymentSchedule/:loanAccountNumber", (req, res) => {
-  const { loanAccountNumber } = req.params; // Get the loan account number from the URL parameters
+router.get("/getLoanRepaymentSchedule/:loanAccountNumber", async (req, res) => {
+  try {
+    const { loanAccountNumber } = req.params; // Get the loan account number from the URL parameters
 
-  // Construct the URL with the provided loan account number
-  const apiUrl = `https://staging.mybankone.com/BankOneWebAPI/api/Loan/GetLoanRepaymentSchedule/2?authToken=c175cfbe-e036-487b-9cc5-d8dfd21999ad&loanAccountNumber=${loanAccountNumber}`;
+    // Construct the URL with the provided loan account number
+    const apiUrl = `https://staging.mybankone.com/BankOneWebAPI/api/Loan/GetLoanRepaymentSchedule/2?authToken=c175cfbe-e036-487b-9cc5-d8dfd21999ad&loanAccountNumber=${loanAccountNumber}`;
 
-  const options = {
-    method: 'GET',
-    headers: {
-      'accept': 'application/json'
-    }
-  };
-
-  fetch(apiUrl, options)
-    .then(response => {
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
+    const options = {
+      method: 'GET',
+      headers: {
+        'Accept': 'application/json'
       }
-      return response.json();
-    })
-    .then(data => {
-      // Handle the data as needed
-      res.json(data); // Send the response to the client
-    })
-    .catch(err => {
-      console.error(err);
-      res.status(500).json({ error: 'Internal Server Error' }); // Handle errors and send a response to the client
-    });
+    };
+
+    const response = await fetch(apiUrl, options);
+
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
+    }
+
+    const data = await response.json();
+
+    // Handle the data as needed
+    res.json(data); // Send the response to the client
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Internal Server Error' }); // Handle errors and send a response to the client
+  }
 });
 
 // get total loan repayment

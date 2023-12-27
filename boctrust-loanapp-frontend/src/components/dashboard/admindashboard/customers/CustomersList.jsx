@@ -92,7 +92,9 @@ const CustomersList = () => {
                     />
                   </td>
                   <td>
-                    {customer.banking.accountDetails.Message.AccountNumber}
+                    {/* {customer?.banking.accountDetails.Message.AccountNumber || "-"} */}
+                    {customer?.banking?.accountDetails?.Message?.AccountNumber ||
+                      "-"}
                   </td>
                   <td>{customer.firstname}</td>
                   <td>{customer.lastname}</td>

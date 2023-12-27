@@ -171,42 +171,6 @@ const OurBoardPage = () => {
               className="accordion-button collapsed"
               type="button"
               data-bs-toggle="collapse"
-              data-bs-target="#flush-collapseFour"
-              aria-expanded="false"
-              aria-controls="flush-collapseFour"
-            >
-              Bukar Mamman Zargana MBA - Director
-            </button>
-          </h2>
-          <div
-            id="flush-collapseFour"
-            className="accordion-collapse collapse"
-            data-bs-parent="#accordionFlushExample"
-          >
-            <div className="accordion-body px-5">
-              <p>
-                Mr Zargana is the current Managing Director of Mainstreet Bank
-                Capital Limited with over 19 years investment banking experience
-                working with Afribank Capital Limited (later Mainstreet Bank
-                capital). He is a Director at Platform Capital Limited,
-                Multiverse Mining and Exploration Limited. Currently an
-                appointee of the Federal government as a Board Member of the
-                Investments and securities Tribunal, the tribunal which oversees
-                dispute resolution of the Nigerian Capital Market. He is a
-                graduate of Accountancy from the University of Maiduguri and
-                holds an MBA from Lagos state University.
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {/* ===================== */}
-        <div className="accordion-item">
-          <h2 className="accordion-header">
-            <button
-              className="accordion-button collapsed"
-              type="button"
-              data-bs-toggle="collapse"
               data-bs-target="#flush-collapseFive"
               aria-expanded="false"
               aria-controls="flush-collapseFive"
