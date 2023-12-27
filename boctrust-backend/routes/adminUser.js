@@ -157,17 +157,17 @@ router.post('/forgot-password', async (req, res) => {
     // Send an email with the password reset link
     const transporter = nodemailer.createTransport({
       // Configure your email service here
-      service: 'gmail',
+      service: 'Bluehost SMTP',
       auth: {
-        user: 'boctrustebusiness@gmail.com', // Replace with your email
-        pass: 'your-email-password', // Replace with your email password
+        user: 'ebusiness@boctrustmfb.com', 
+        pass: ' eBiz-9945@', 
       },
     });
 
     const mailOptions = {
-      from: 'your-email@gmail.com', // Replace with your email
+      from: 'ebusiness@boctrustmfb.com', 
       to: user.email,
-      subject: 'Password Reset',
+      subject: 'Boctrust MFB Password Reset',
       text: `Click the following link to reset your password: http://your-app-url/reset-password/${resetToken}`,
     };
 

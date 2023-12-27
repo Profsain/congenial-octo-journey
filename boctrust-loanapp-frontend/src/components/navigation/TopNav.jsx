@@ -1,5 +1,5 @@
 import { useDispatch, useSelector } from "react-redux";
-import { logout } from "../../redux/reducers/userSlice";
+import { logoutUser } from "../../redux/reducers/adminAuthReducer"
 import { Navbar, Container, Nav, NavDropdown } from "react-bootstrap";
 import "./Navigation.css";
 import { Link } from "react-router-dom";
@@ -14,11 +14,12 @@ const TopNav = () => {
   // handle logout
   const dispatch = useDispatch();
   const handleLogout = () => {
-    dispatch(logout());
+    dispatch(logoutUser());
   };
 
-  // get current user
-  const currentUser = useSelector((state) => state.user.currentUser);
+  // get current admin
+  const currentUser = useSelector((state) => state.adminAuth.user);
+  console.log("Login user", currentUser)
 
   return (
     <div className="TopNavContainer">
@@ -39,7 +40,6 @@ const TopNav = () => {
             </h1>
             <button className="CallUs">Call us today! 08076710000</button>
           </div>
-          {/* <div>welcome</div> */}
         </div>
 
         <div className="BottomStyle">

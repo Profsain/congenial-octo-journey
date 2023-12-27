@@ -77,17 +77,14 @@ const SideNavMain = ({ onMenuItemClick }) => {
       <div onMouseOver={openSubItem} onMouseLeave={closeSubItem}>
         <div className="IconBox">
           <img src="images/dprofile.png" alt="customer" />
-          <p>Customer</p>
+          <p>Customers</p>
         </div>
         {isOpen ? (
           <div className="SubItem">
             <ul>
               <li id="customer" onClick={onMenuItemClick}>
-                All Customer
+                All Customers
               </li>
-              {/* <li id="addcustomer" onClick={onMenuItemClick}>
-                Add Customer
-              </li> */}
               <li id="customerrequest" onClick={onMenuItemClick}>
                 Customer Request
               </li>

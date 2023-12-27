@@ -47,6 +47,7 @@ const CreateAccount = ({ handleSubmit, phoneNumber }) => {
     }
   };
 
+  const key = import.meta.env.VITE_GOOGLE_RECAPTCHA_KEY;
   const handleRecaptcha = (value) => {
     if (value) {
       setIsValid(true);
@@ -103,7 +104,7 @@ const CreateAccount = ({ handleSubmit, phoneNumber }) => {
             <div className="col-sm-12 col-md-4 RecaptchaBox">
               <div className="RecaptchaBadge ">
                 <ReCAPTCHA
-                  sitekey="6Ld7FzcpAAAAAJ9iY3KIg0kfAYGpVtICJN1iAE30"
+                  sitekey={key}
                   onChange={handleRecaptcha}
                   // ref={captchaRef}
                 />

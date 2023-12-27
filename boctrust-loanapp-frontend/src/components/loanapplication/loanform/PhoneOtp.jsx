@@ -54,7 +54,7 @@ const PhoneOtp = (props) => {
       setConfirmOtp(response);
       setFlag(true);
     } catch (error) {
-      setErrorMsg(error.message);
+      setErrorMsg("This is error", error.message);
     }
   };
 
