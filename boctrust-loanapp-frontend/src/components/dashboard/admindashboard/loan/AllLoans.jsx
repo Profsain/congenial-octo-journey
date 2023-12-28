@@ -1,3 +1,4 @@
+import PropTypes from "prop-types"
 import { useState,  useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchAllCustomer } from "../../../../redux/reducers/customerReducer";
@@ -9,9 +10,11 @@ import NextPreBtn from "../../shared/NextPreBtn";
 import PageLoader from "../../shared/PageLoader";
 import getDateOnly from "../../../../../utilities/getDate";
 import capitalizeEachWord from "../../../../../utilities/capitalizeFirstLetter";
+import searchList from "../../../../../utilities/searchListFunc";
 import LoanDetails from "./LoanDetails";
+import NoResult from "../../../shared/NoResult";
 
-const AllLoans = () => {
+const AllLoans = ({showCount, searchTerms}) => {
   const styles = {
     table: {
       //   margin: "0 2rem 0 3rem",
@@ -63,6 +66,29 @@ const AllLoans = () => {
     setShow(true);
   };
 
+  // search customer list
+  const [customerList, setCustomerList] = useState(filteredCustomers);
+
+  // update customerList to show 10 customers on page load
+  // or on count changes
+  useEffect(() => {
+    setCustomerList(filteredCustomers?.slice(0, showCount));
+  }, [customers, showCount]);
+
+  // update customerList on search
+  const handleSearch = () => {
+    const currSearch = searchList(
+      filteredCustomers,
+      searchTerms,
+      "agreefullname"
+    );
+    setCustomerList(currSearch?.slice(0, showCount));
+  };
+
+  useEffect(() => {
+    handleSearch();
+  }, [searchTerms]);
+
   return (
     <>
       {/* data loader */}
@@ -87,14 +113,15 @@ const AllLoans = () => {
             </tr>
           </thead>
           <tbody>
-            {filteredCustomers?.map((customer) => {
+            {customerList?.length === 0 && <NoResult name="customer" />}
+            {customerList?.map((customer) => {
               return (
                 <tr key={customer._id}>
                   <td>{customer.banking.accountDetails.Message.Id}</td>
                   <td>{customer.loanProduct || "General Loan"}</td>
                   <td>{customer.banking.accountDetails.Message.FullName}</td>
                   <td>
-                    {customer.banking.accountDetails.Message.AccountNumber}
+                    {customer?.banking?.accountDetails?.Message?.AccountNumber}
                   </td>
                   <td>{getDateOnly(customer.createdAt)}</td>
                   <td>N{customer.loanamount}</td>
@@ -118,17 +145,23 @@ const AllLoans = () => {
                   </td>
                 </tr>
               );
-            }
-            )}
+            })}
           </tbody>
         </Table>
       </div>
       <NextPreBtn />
 
       {/* show loan details model */}
-      {show && (<LoanDetails show={show} handleClose={handleClose} loanObj={loanObj} />)}
+      {show && (
+        <LoanDetails show={show} handleClose={handleClose} loanObj={loanObj} />
+      )}
     </>
   );
 };
+
+AllLoans.propTypes = {
+  searchTerms: PropTypes.string,
+  showCount: PropTypes.number
+}
 
 export default AllLoans;

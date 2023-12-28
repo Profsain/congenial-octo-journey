@@ -1,3 +1,4 @@
+import PropTypes from "prop-types"
 import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchAllCustomer } from "../../../../redux/reducers/customerReducer";
@@ -7,10 +8,12 @@ import "../../Dashboard.css";
 import DashboardHeadline from "../../shared/DashboardHeadline";
 import BocButton from "../../shared/BocButton";
 import LoanDetails from "../loan/LoanDetails";
+import NoResult from "../../../shared/NoResult";
 import capitalizeEachWord from "../../../../../utilities/capitalizeFirstLetter";
+import searchList from "../../../../../utilities/searchListFunc";
 
 
-const CustomersList = () => {
+const CustomersList = ({ showCount, searchTerms }) => {
   const styles = {
     table: {
       // margin: "0 2rem 0 3rem",
@@ -59,6 +62,25 @@ const CustomersList = () => {
     setShow(true);
   };
 
+  // search customer list
+  const [customerList, setCustomerList] = useState(customers);
+
+  // update customerList to show 10 customers on page load
+  // or on count changes
+  useEffect(() => {
+    setCustomerList(customers?.slice(0, showCount));
+  }, [customers, showCount]);
+
+  // update customerList on search
+  const handleSearch = () => {
+    const currSearch = searchList(customers, searchTerms, `firstname`);
+    setCustomerList(currSearch?.slice(0, showCount));
+  };
+
+  useEffect(() => {
+    handleSearch();
+  }, [searchTerms]);
+  
   return (
     <>
       {status === "loading" && <PageLoader />}
@@ -82,7 +104,8 @@ const CustomersList = () => {
               </tr>
             </thead>
             <tbody>
-              {customers?.map((customer) => (
+              {customerList?.length === 0 && <NoResult name="customer" />}
+              {customerList?.map((customer) => (
                 <tr key={customer._id}>
                   <td>
                     <img
@@ -93,8 +116,8 @@ const CustomersList = () => {
                   </td>
                   <td>
                     {/* {customer?.banking.accountDetails.Message.AccountNumber || "-"} */}
-                    {customer?.banking?.accountDetails?.Message?.AccountNumber ||
-                      "-"}
+                    {customer?.banking?.accountDetails?.Message
+                      ?.AccountNumber || "-"}
                   </td>
                   <td>{customer.firstname}</td>
                   <td>{customer.lastname}</td>
@@ -123,5 +146,10 @@ const CustomersList = () => {
     </>
   );
 };
+
+CustomersList.propTypes = {
+  searchTerms: PropTypes.string,
+  showCount: PropTypes.number
+}
 
 export default CustomersList;

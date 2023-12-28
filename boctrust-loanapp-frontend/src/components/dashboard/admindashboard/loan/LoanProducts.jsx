@@ -48,7 +48,7 @@ const CustomersDashboard = () => {
                 <div className="FormGroup SBox">
                   <input
                     name="search"
-                    placeholder="Search"
+                    placeholder="Search by name"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                   />

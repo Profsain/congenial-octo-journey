@@ -24,6 +24,7 @@ const RepaymentList = () => {
       color: "#ecaa00",
     },
   };
+  
   return (
     <div>
       <DashboardHeadline

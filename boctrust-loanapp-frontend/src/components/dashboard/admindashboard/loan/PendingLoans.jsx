@@ -9,8 +9,10 @@ import NextPreBtn from "../../shared/NextPreBtn";
 import PageLoader from "../../shared/PageLoader";
 import getDateOnly from "../../../../../utilities/getDate";
 import capitalizeEachWord from "../../../../../utilities/capitalizeFirstLetter";
+import searchList from "../../../../../utilities/searchListFunc";
 import LoanDetails from "./LoanDetails";
 import NotificationBox from "../../shared/NotificationBox";
+import NoResult from "../../../shared/NoResult";
 
 const PaddingLoans = () => {
   const styles = {
@@ -105,7 +107,7 @@ const PaddingLoans = () => {
       body: JSON.stringify(data),
     });
   };
-  
+
   const handleApproval = (id) => {
     // process loan approval
     if (currentAdmin === "admin" || currentAdmin === "md") {
@@ -144,6 +146,33 @@ const PaddingLoans = () => {
     dispatch(fetchAllCustomer());
   };
 
+  // handle search
+  const [showCount, setShowCount] = useState(10);
+  const [searchTerms, setSearchTerms] = useState("");
+
+  // search customer list
+  const [customerList, setCustomerList] = useState(filteredCustomers);
+
+  // update customerList to show 10 customers on page load
+  // or on count changes
+  useEffect(() => {
+    setCustomerList(filteredCustomers?.slice(0, showCount));
+  }, [customers, showCount]);
+
+  // update customerList on search
+  const handleSearch = () => {
+    const currSearch = searchList(
+      filteredCustomers,
+      searchTerms,
+      "agreefullname"
+    );
+    setCustomerList(currSearch?.slice(0, showCount));
+  };
+
+  useEffect(() => {
+    handleSearch();
+  }, [searchTerms]);
+
   return (
     <>
       <div className="MainBox">
@@ -153,10 +182,21 @@ const PaddingLoans = () => {
             <div className="SearchBar">
               <div className="FormGroup">
                 <label htmlFor="show">Show</label>
-                <input name="showCount" type="number" step={10} min={10} />
+                <input
+                  name="showCount"
+                  type="number"
+                  step={10}
+                  min={10}
+                  value={showCount}
+                  onChange={(e) => setShowCount(e.target.value)}
+                />
               </div>
               <div className="FormGroup SBox">
-                <input name="search" placeholder="Search" />
+                <input
+                  name="search"
+                  placeholder="Search by name"
+                  onChange={(e) => setSearchTerms(e.target.value)}
+                />
                 <img src="images/search.png" alt="search-icon" />
               </div>
             </div>
@@ -188,7 +228,8 @@ const PaddingLoans = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {filteredCustomers?.map((customer) => {
+                  {customerList?.length === 0 && <NoResult name="customer" />}
+                  {customerList?.map((customer) => {
                     return (
                       <tr key={customer.id}>
                         <td>{customer.banking.accountDetails.Message.Id}</td>

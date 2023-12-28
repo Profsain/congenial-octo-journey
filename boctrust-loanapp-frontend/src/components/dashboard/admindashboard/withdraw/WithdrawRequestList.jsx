@@ -1,8 +1,15 @@
+import PropTypes from "prop-types"
+import { useEffect, useState } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { fetchAllCustomer } from "../../../../redux/reducers/customerReducer";
 import Table from "react-bootstrap/Table";
 import "../../Dashboard.css";
 import DashboardHeadline from "../../shared/DashboardHeadline";
+import PageLoader from "../../shared/PageLoader";
+import NoResult from "../../../shared/NoResult";
+import searchList from "../../../../../utilities/searchListFunc";
 
-const WithdrawRequestList = () => {
+const WithdrawRequestList = ({showCount, searchTerms}) => {
   const styles = {
     table: {
       // margin: "0 2rem 0 3rem",
@@ -24,8 +31,51 @@ const WithdrawRequestList = () => {
       color: "#ecaa00",
     },
   };
+
+  // fetch all customer
+  const dispatch = useDispatch();
+  const customers = useSelector(
+    (state) => state.customerReducer.customers.customer
+  );
+
+  const status = useSelector((state) => state.customerReducer.status);
+
+  useEffect(() => {
+    dispatch(fetchAllCustomer());
+  }, [dispatch]);
+
+  // filter customer by isAccountCreated
+  const filteredCustomers = customers?.filter(
+    (customer) => customer?.banking?.isAccountCreated === true
+  );
+
+  // search customer list
+  const [customerList, setCustomerList] = useState(filteredCustomers);
+
+  // update customerList to show 10 customers on page load
+  // or on count changes
+  useEffect(() => {
+    setCustomerList(filteredCustomers?.slice(0, showCount));
+  }, [customers, showCount]);
+
+  // update customerList on search
+  const handleSearch = () => {
+    const currSearch = searchList(
+      filteredCustomers,
+      searchTerms,
+      "agreefullname"
+    );
+    setCustomerList(currSearch?.slice(0, showCount));
+  };
+
+  useEffect(() => {
+    handleSearch();
+  }, [searchTerms]);
+
+  console.log(customerList)
   return (
     <div>
+      {status === "loading" && <PageLoader />}
       <DashboardHeadline
         height="52px"
         mspacer="2rem 0 -2.95rem -1rem"
@@ -40,92 +90,30 @@ const WithdrawRequestList = () => {
               <th>Amount</th>
               <th>Method</th>
               <th>Status</th>
-              <th>Action</th>
+              {/* <th>Action</th> */}
             </tr>
           </thead>
           <tbody>
-            <tr>
-              <td>Kola Abiola</td>
-              <td>7460615677</td>
-              <td>N50,000</td>
-              <td>Transfer</td>
-              <td style={styles.completed}>Active</td>
-              <td>
-                <select name="action" id="action">
-                  <option value="">Action</option>
-                  <option value="">Action 1</option>
-                  <option value="">Action 2</option>
-                  <option value="">Action 3</option>
-                </select>
-              </td>
-            </tr>
-            <tr>
-              <td>Mariam Salawu</td>
-              <td>7460615997</td>
-              <td>N500,000</td>
-              <td>Deposit</td>
-              <td style={styles.completed}>Active</td>
-              <td>
-                <select name="action" id="action">
-                  <option value="">Action</option>
-                  <option value="">Action 1</option>
-                  <option value="">Action 2</option>
-                  <option value="">Action 3</option>
-                </select>
-              </td>
-            </tr>
-            <tr>
-              <td>Emmanuel Opopo</td>
-              <td>7460615643</td>
-              <td>N20,000</td>
-              <td>Transfer</td>
-              <td style={styles.completed}>Active</td>
-              <td>
-                <select name="action" id="action">
-                  <option value="">Action</option>
-                  <option value="">Action 1</option>
-                  <option value="">Action 2</option>
-                  <option value="">Action 3</option>
-                </select>
-              </td>
-            </tr>
-            <tr>
-              <td>Faith Igwe</td>
-              <td>7460615698</td>
-              <td>N80,000</td>
-              <td>Deposit</td>
-              <td style={styles.completed}>Active</td>
-              <td>
-                <select name="action" id="action">
-                  <option value="">Action</option>
-                  <option value="">Action 1</option>
-                  <option value="">Action 2</option>
-                  <option value="">Action 3</option>
-                </select>
-              </td>
-            </tr>
-            <tr>
-              <td>Glory John</td>
-              <td>7460615645</td>
-              <td>N40,000</td>
-              <td>Transfer</td>
-              <td style={styles.completed}>Active</td>
-              <td>
-                <select name="action" id="action">
-                  <option value="">Action</option>
-                  <option value="">Action 1</option>
-                  <option value="">Action 2</option>
-                  <option value="">Action 3</option>
-                </select>
-              </td>
-            </tr>
-
-           
+            {customerList?.length === 0 && <NoResult name="customer" />}
+            {customerList?.map((customer) => (
+              <tr key={customer._id}>
+                <td>{customer.banking.accountDetails.Message.FullName}</td>
+                <td>{customer.banking.accountDetails.Message.AccountNumber}</td>
+                <td>{customer.loanamount}</td>
+                <td>{customer.deductions}</td>
+                <td style={styles.completed}>Active</td>
+              </tr>
+            ))}
           </tbody>
         </Table>
       </div>
     </div>
   );
 };
+
+WithdrawRequestList.propTypes = {
+  searchTerms: PropTypes.string,
+  showCount: PropTypes.number
+}
 
 export default WithdrawRequestList;

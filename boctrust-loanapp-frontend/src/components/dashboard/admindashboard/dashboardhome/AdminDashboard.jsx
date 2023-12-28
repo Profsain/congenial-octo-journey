@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 import { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import "../../Dashboard.css";
@@ -117,7 +118,7 @@ const AdminDashboard = () => {
         setCurrentTitle("Account Types");
         break;
       case "withdraw":
-        setCurrentTitle("Disbursement Requests");
+        setCurrentTitle("Disbursement");
         break;
       case "transaction":
         setCurrentTitle("Transaction History");

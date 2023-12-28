@@ -1,12 +1,15 @@
+import PropTypes from "prop-types"
 import { useSelector, useDispatch } from "react-redux";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { fetchAllCustomer } from "../../../../redux/reducers/customerReducer";
 import Table from "react-bootstrap/Table";
 import "../../Dashboard.css";
 import DashboardHeadline from "../../shared/DashboardHeadline";
 import PageLoader from "../../shared/PageLoader";
+import NoResult from "../../../shared/NoResult";
+import searchList from "../../../../../utilities/searchListFunc";
 
-const AccountList = () => {
+const AccountList = ({showCount, searchTerms}) => {
   const styles = {
     table: {
       // margin: "0 2rem 0 3rem",
@@ -34,6 +37,7 @@ const AccountList = () => {
   const customers = useSelector(
     (state) => state.customerReducer.customers.customer
   );
+
   const status = useSelector((state) => state.customerReducer.status);
 
   useEffect(() => {
@@ -41,12 +45,32 @@ const AccountList = () => {
   }, [dispatch]);
 
   // filter customer by isAccountCreated
-  let filteredCustomers; 
-  if (customers) {
-    filteredCustomers = customers.filter(
-      (customer) => customer.banking.isAccountCreated === true
+  const filteredCustomers = customers?.filter(
+    (customer) => customer?.banking?.isAccountCreated === true
+  );
+
+  // search customer list
+  const [customerList, setCustomerList] = useState(filteredCustomers);
+
+  // update customerList to show 10 customers on page load
+  // or on count changes
+  useEffect(() => {
+    setCustomerList(filteredCustomers?.slice(0, showCount));
+  }, [customers, showCount]);
+
+  // update customerList on search
+  const handleSearch = () => {
+    const currSearch = searchList(
+      filteredCustomers,
+      searchTerms,
+      "agreefullname"
     );
-  }
+    setCustomerList(currSearch?.slice(0, showCount));
+  };
+
+  useEffect(() => {
+    handleSearch();
+  }, [searchTerms]);
 
   return (
     <div>
@@ -68,9 +92,9 @@ const AccountList = () => {
             </tr>
           </thead>
           <tbody>
-            {filteredCustomers?.length === 0 && (<tr><td>No customer data</td></tr>)}
-            
-            {filteredCustomers?.map((customer) => (
+            {customerList?.length === 0 && <NoResult name="customer" />}
+
+            {customerList?.map((customer) => (
               <tr key={customer._id}>
                 <td>{customer.banking.accountDetails.Message.AccountNumber}</td>
                 <td>{customer.banking.accountDetails.Message.FullName}</td>
@@ -92,5 +116,10 @@ const AccountList = () => {
     </div>
   );
 };
+
+AccountList.propTypes = {
+  searchTerms: PropTypes.string,
+  showCount: PropTypes.number
+}
 
 export default AccountList;
