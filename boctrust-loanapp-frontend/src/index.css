@@ -411,4 +411,15 @@ p {
       width: 90% !important;
       margin: 8px !important;
     }
+
+    /* search by box */
+    .searchByBox {
+      width: 90% !important;
+      margin-top: 4rem !important;
+      margin-bottom: -5rem !important;
+    }
+
+    .searchByBox input {
+      width: 100% !important;
+    }
 }

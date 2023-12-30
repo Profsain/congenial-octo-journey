@@ -2,7 +2,6 @@
 import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchAllCustomer } from "../../../../redux/reducers/customerReducer";
-import Headline from "../../../shared/Headline";
 import { Table } from "react-bootstrap";
 import BocButton from "../../shared/BocButton";
 import DashboardHeadline from "../../shared/DashboardHeadline";
@@ -12,6 +11,10 @@ import CheckSalaryDetails from "./CheckSalaryDetails";
 import "./Remita.css";
 import "../customers/Customer.css";
 import updateSalaryHistory from "./updateSalaryHistory.js";
+import ViewBySection from "./ViewBySection.jsx";
+import NoResult from "../../../shared/NoResult.jsx";
+
+import searchList from "../../../../../utilities/searchListFunc.js";
 
 const CheckSalaryHistory = () => {
   const styles = {
@@ -53,16 +56,16 @@ const CheckSalaryHistory = () => {
   }, [dispatch]);
 
   // scroll to salary check details section
-  const scrollToDetails = () => { 
+  const scrollToDetails = () => {
     if (openDetails) {
       const checkDetails = document.getElementById("checkDetails");
       checkDetails.scrollIntoView({ behavior: "smooth" });
     }
-  }
+  };
 
   useEffect(() => {
     scrollToDetails();
-   }, [openDetails]);
+  }, [openDetails]);
 
   // handle salary check
   const handleCheck = async (id) => {
@@ -73,24 +76,21 @@ const CheckSalaryHistory = () => {
     setIsLoading(true);
 
     // get customer history from remita
-    const response = await fetch(
-      `${apiUrl}/api/remita/get-salary-history`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          authorisationCode: customer.bvnnumber,
-          firstName: customer.firstname,
-          lastName: customer.lastname,
-          accountNumber: customer.salaryaccountnumber,
-          bankCode: customer.bankcode,
-          bvn: customer.bvnnumber || "041",
-          authorisationChannel: "WEB",
-        }),
-      }
-    );
+    const response = await fetch(`${apiUrl}/api/remita/get-salary-history`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        authorisationCode: customer.bvnnumber,
+        firstName: customer.firstname,
+        lastName: customer.lastname,
+        accountNumber: customer.salaryaccountnumber,
+        bankCode: customer.bankcode,
+        bvn: customer.bvnnumber || "041",
+        authorisationChannel: "WEB",
+      }),
+    });
 
     const data = await response.json();
     // set customerObj to remita data
@@ -139,22 +139,29 @@ const CheckSalaryHistory = () => {
     dispatch(fetchAllCustomer());
   };
 
+  // handle search by
+  const [searchTerm, setSearchTerm] = useState("");
+  const [customerList, setCustomerList] = useState(customers);
+
+  // update customerList on search
+  const handleSearch = () => {
+    const currSearch = searchList(
+      customers,
+      searchTerm,
+      "firstname"
+    );
+    setCustomerList(currSearch);
+  };
+
+  useEffect(() => {
+    handleSearch();
+  }, [searchTerm]);
+
+
   return (
     <div>
-      <div>
-        <Headline text="View by:" />
-        <div style={styles.btnBox} className="VBox">
-          <BocButton margin="8px 18px" bgcolor="#ecaa00" bradius="25px">
-            Applicant Today
-          </BocButton>
-          <BocButton margin="8px 18px" bgcolor="#ecaa00" bradius="25px">
-            Date Range
-          </BocButton>
-          <BocButton margin="8px 18px" bgcolor="#ecaa00" bradius="25px">
-            Specific User
-          </BocButton>
-        </div>
-      </div>
+      {/* viewby section */}
+      <ViewBySection setSearch={setSearchTerm} />
 
       {/* data loader */}
       {status === "loading" && <PageLoader />}
@@ -178,7 +185,8 @@ const CheckSalaryHistory = () => {
               </tr>
             </thead>
             <tbody>
-              {customers?.map((customer) => {
+              {customerList?.length === 0 && <NoResult name="customer" />}
+              {customerList?.map((customer) => {
                 if (customer.kyc.isKycApproved) {
                   return (
                     <tr key={customer._id}>
