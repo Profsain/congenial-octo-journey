@@ -21,6 +21,9 @@ const Footer = () => {
                 Terms and Condition
               </Link>
             </li>
+            <li>
+              <img src="images/ssl.png" alt="ssl-cert"  style={{marginLeft: "-25px"}}/>
+            </li>
           </ul>
 
           <h6 className="FooterHeadline">About</h6>

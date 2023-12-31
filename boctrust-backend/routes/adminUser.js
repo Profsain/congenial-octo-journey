@@ -4,7 +4,7 @@ const multer = require('multer');
 const User = require('../models/AdminUser');
 const express = require('express');
 const router = express.Router();
-// const auth = require('../middleware/auth');
+// const adminUserVerification = require('../middleware/AuthMiddleware');
 
 // Set up Multer storage to define where to save the uploaded images
 const storage = multer.diskStorage({
@@ -44,7 +44,7 @@ router.get('/users', async (req, res) => {
 // register new user endpoint
 const type = upload.single('photo');
 
-router.post('/register', type, async (req, res) => {
+router.post('/register', type, async (req, res, next) => {
     try {
         // Get user input
         const { fullName, email, phone, username, password, jobRole, userType } = req.body;
@@ -85,22 +85,46 @@ router.post('/register', type, async (req, res) => {
           { user_id: user._id, username },
           process.env.TOKEN_KEY,
           {
-            expiresIn: '1h',
+            expiresIn: '2h',
           }
         );
         // save user token
         user.token = token;
         user.save();
-    
+        
+        // return token
+        res.cookie("token", token, {
+          withCredentials: true,
+          httpOnly: false,
+        });
+      
         // return new user
-        return res.status(201).json({ success: 'User created successfully' });
+      return res.status(201).json({ success: 'User created successfully' });
+      next();
     } catch (error) {
         return res.status(500).json({ error: error.message });
     }
 }); // registration logic ends here
     
+// verify admin middleware route
+router.post('/verify', (req, res) => {
+  const token = req.cookies.token
+  if (!token) {
+    return res.json({ status: false })
+  }
+  jwt.verify(token, process.env.TOKEN_KEY, async (err, data) => {
+    if (err) {
+     return res.json({ status: false })
+    } else {
+      const user = await User.findById(data.id)
+      if (user) return res.json({ status: true, user: user.username })
+      else return res.json({ status: false })
+    }
+  })
+});
+
 // Login user using username and password
-router.post('/login', async (req, res) => {
+router.post('/login', async (req, res, next) => {
     try {
         // get user input
         const { username, password } = req.body;
@@ -114,7 +138,8 @@ router.post('/login', async (req, res) => {
         const user = await User.findOne({ username });
 
         // validate if user exist in our database and create token
-        if (user && (await bcrypt.compare(password, user.password))) {
+      if (user && (await bcrypt.compare(password, user.password))) {
+          
             // Create token
             const token = jwt.sign(
                 { user_id: user._id, username },
@@ -122,15 +147,23 @@ router.post('/login', async (req, res) => {
                 {
                     expiresIn: '2h',
                 }
-            );
+        );
 
             // save user token
-            user.token = token;
+        user.token = token;
+        
+                
+        res.cookie("token", token, {
+          withCredentials: true,
+          httpOnly: false,
+        });
 
             // user
-            return res.status(200).json({ success: 'Login successful', user });
-        }
-        return res.status(400).json({ error: 'Invalid Credentials' });
+        return res.status(200).json({ success: 'Login successful', user });
+      }
+      
+      return res.status(400).json({ error: 'Invalid Credentials' });
+      next()
     } catch (error) {
         return res.status(500).json({ error: error.message });
     }
@@ -138,7 +171,6 @@ router.post('/login', async (req, res) => {
 
 // forget password logic
 router.post('/forgot-password', async (req, res) => {
-    console.log("req.body", req.body)
   try {
     const { email } = req.body;
 
