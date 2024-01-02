@@ -4,7 +4,7 @@ const consumerMatch = async(bvn, ticket) => {
 
     const raw = JSON.stringify({
     "DataTicket": ticket,  // data ticket
-    "EnquiryReason": "Test",
+    "EnquiryReason": "credit scoring of the client by credit bureau",
     "ConsumerName": "",
     "DateOfBirth": "",
     "Identification": bvn, // customer bvn
@@ -20,7 +20,7 @@ const consumerMatch = async(bvn, ticket) => {
     };
 
     try {
-        const response = await fetch("https://uat.firstcentralcreditbureau.com/firstcentralrestv2/ConnectConsumerMatch", requestOptions);
+        const response = await fetch("https://online.firstcentralcreditbureau.com/firstcentralrestv2/ConnectConsumerMatch", requestOptions);
         if (!response.ok) {
             throw new Error(`HTTP error! Status: ${response.status}`);
         }

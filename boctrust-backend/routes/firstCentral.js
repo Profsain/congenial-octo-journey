@@ -6,16 +6,18 @@ const consumerMatch = require("../firstCentralMethods/getConsumerMatch");
 
 
 router.post('/firstcentralreport', async (req, res) => {
-  console.log("first central api called", req.body);
+
+  const { bvn } = req.body;
 
   // get first central login
   const login = await loginFirstCentral();
   const dataTicket = login[0].DataTicket;
+
   let consumer;
   if (dataTicket) {
-    consumer = await consumerMatch("22471069115", dataTicket);
+    consumer = await consumerMatch(bvn, dataTicket);
   }
-  console.log("consumer", consumer[0]);
+
   const { MatchingEngineID, EnquiryID, ConsumerID } = consumer[0];
 
   const myHeaders = new Headers();
@@ -37,7 +39,7 @@ router.post('/firstcentralreport', async (req, res) => {
   };
 
   try {
-    const response = await fetch("https://uat.firstcentralcreditbureau.com/firstcentralrestv2/GetConsumerFullCreditReport", requestOptions);
+    const response = await fetch("https://online.firstcentralcreditbureau.com/firstcentralrestv2/GetConsumerFullCreditReport", requestOptions);
 
     if (!response) {
       throw new Error(`HTTP error! Status: ${response.status}`);
@@ -49,26 +51,10 @@ router.post('/firstcentralreport', async (req, res) => {
     });
 
   } catch (error) {
-    console.log('Error:', error);
+    throw new Error(error);
   }
 
 });
 
 // export router
 module.exports = router;
-
-// const fetchData = async() => {
-//   const login = await loginFirstCentral();
-//   const dataTicket = login[0].DataTicket;
-//   let consumer;
-//   if (dataTicket) {
-//     consumer = await consumerMatch("22471069115", dataTicket);
-//   }
-//   console.log("consumer", consumer[0]);
-//   const { MatchingEngineID, EnquiryID, ConsumerID } = consumer[0];
-//   console.log("MatchingEngineID", MatchingEngineID);
-//   console.log("EnquiryID", EnquiryID);
-//   console.log("ConsumerID", ConsumerID);
-// }
-
-// fetchData();

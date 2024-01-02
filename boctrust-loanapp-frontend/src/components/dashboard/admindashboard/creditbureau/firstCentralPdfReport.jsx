@@ -31,13 +31,53 @@ const styles = StyleSheet.create({
 });
 
 const FirstCentralPdfReport = ({ report }) => {
-    const creditReport = report[3].CreditAccountSummary[0];
-    const bioData = report[1].PersonalDetailsSummary[0];
+  const creditReport = report[3].CreditAccountSummary[0];
+  const bioData = report[1].PersonalDetailsSummary[0];
 
-    const { Amountarrear, LastJudgementDate, TotalAccountarrear, TotalAccount, TotalMonthlyInstalment, TotalOutstandingdebt } = creditReport;
-    const { Header, BankVerificationNo, ConsumerID } = bioData;
-    
-  
+  // check if creditReport is not empty
+  if (!creditReport) {
+    return (
+      <PDFViewer style={styles.viewer}>
+        <Document>
+          <Page size="A4" style={styles.page}>
+            <View style={styles.section}>
+              <Text style={styles.title}>First Central Credit Check</Text>
+            </View>
+            <View style={styles.section}>
+              <Text>No data</Text>
+            </View>
+          </Page>
+        </Document>
+      </PDFViewer>
+    );
+  }
+  const {
+    Amountarrear,
+    LastJudgementDate,
+    TotalAccount,
+    TotalMonthlyInstalment,
+    TotalOutstandingdebt,
+  } = creditReport;
+
+  // check if bioData is not empty
+  if (!bioData) {
+    return (
+      <PDFViewer style={styles.viewer}>
+        <Document>
+          <Page size="A4" style={styles.page}>
+            <View style={styles.section}>
+              <Text style={styles.title}>First Central Credit Check</Text>
+            </View>
+            <View style={styles.section}>
+              <Text>No data</Text>
+            </View>
+          </Page>
+        </Document>
+      </PDFViewer>
+    );
+  }
+  const { Header, BankVerificationNo, ConsumerID } = bioData;
+
   return (
     <PDFViewer style={styles.viewer}>
       {/* Start of the document*/}
@@ -101,8 +141,8 @@ FirstCentralPdfReport.propTypes = {
     applicantName: PropTypes.string,
     searchBy: PropTypes.string,
     searchDate: PropTypes.string,
-    searchType: PropTypes.string
-  })
-}
+    searchType: PropTypes.string,
+  }),
+};
 
 export default FirstCentralPdfReport;

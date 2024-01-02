@@ -46,7 +46,7 @@ mongoose
         // use cors
         const corsOptions = {
             origin: "*",
-            methods: ['GET', 'PUT', 'POST', 'DELETE', 'OPTIONS'],
+            methods: 'GET, PUT, POST, DELETE',
             allowedHeaders: ['Content-Type'],
         }
 

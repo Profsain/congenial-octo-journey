@@ -91,15 +91,6 @@ const CreditBureauDashboard = () => {
     filterCustomers();
   }, [customers]);
 
-  // console.log(filteredCustomersData)
-
-  // filter customer by credit officer assigned and kyc not completed
-  // const filteredCustomers = customers?.filter((customer) => {
-  //   return (
-  //     customer.creditCheck.assignment.isCreditAnalystAssigned === false ||
-  //     customer.creditCheck.assignment.creditAnalyst === adminName
-  //   );
-  // });
 
   // handle credit check start btn
   const handleStartCheck = (id) => {

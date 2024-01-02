@@ -149,7 +149,7 @@ const CreditCheckhtmlForm = ({ customerId }) => {
     clearForm();
   };
 
-  // handle Credit DB check
+  // handle deduct DB check
   const handleDeductCheck = async (e) => {
     e.preventDefault();
 
@@ -291,15 +291,11 @@ const CreditCheckhtmlForm = ({ customerId }) => {
          setBureauLoading(false);
          // updateBureauLoading("success");
        } catch (error) {
+         setBureauLoading(false);
          throw new Error(error.message);
        }
     }
   };
-
-  // check if bureauReport is not empty
-  if (Object.keys(bureauReport).length > 0) {
-    console.log("bureau report", bureauReport);
-  }
 
 
   // handle next prev form step start
@@ -326,6 +322,7 @@ const CreditCheckhtmlForm = ({ customerId }) => {
 
   // scroll to the top of the page
   useEffect(() => {
+    // eslint-disable-next-line no-undef
     window.scrollTo(0, 0);
   }, [formStep]);
 
@@ -610,6 +607,9 @@ const CreditCheckhtmlForm = ({ customerId }) => {
             )}
           </div>
           <div className="row m-5">
+            {!Object.keys(firstCentralReport).length > 0 && (
+              <h4>No First Central Report</h4>
+            )}
             {/* generated pdf report component */}
             {Object.keys(firstCentralReport).length > 0 && (
               <FirstCentralPdfReport report={firstCentralReport} />

@@ -1,11 +1,12 @@
+
 const getCreditRegistrySessionCode = async () => {
     const myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
 
     const raw = JSON.stringify({
-        "EmailAddress": "t.akinpelu@boctrustmfb.com",
-        "Password": "boctrust@100%",
-        "SubscriberID": "738795738430091048"
+        "EmailAddress": process.env.CR_EMAIL,
+        "Password": process.env.CR_PASSWORD,
+        "SubscriberID": process.env.CR_SUBSCRIBER_ID
     });
 
     const requestOptions = {
@@ -16,11 +17,13 @@ const getCreditRegistrySessionCode = async () => {
     };
 
     try {
-        const response = await fetch("https://api.creditregistry.com/nigeria/AutoCred/Test/v8/api/Login", requestOptions);
+        const response = await fetch("https://api.creditregistry.com/nigeria/AutoCred/Live/v8/api/Login", requestOptions);
         if (!response.ok) {
             throw new Error(`HTTP error! Status: ${response.status}`);
         }
+
         const result = await response.json();
+        console.log(result) // log in failed due to no live api password
         return result;
     } catch (error) {
         throw new Error(error);

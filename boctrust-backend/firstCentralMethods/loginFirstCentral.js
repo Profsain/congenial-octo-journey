@@ -3,8 +3,8 @@ const loginFirstCentral = async() => {
     myHeaders.append("Content-Type", "application/json");
 
     const raw = JSON.stringify({
-    "username": "demo",
-    "password": "demo@123"
+    "username": process.env.FC_USERNAME,
+    "password": process.env.FC_PASSWORD
     });
 
     const requestOptions = {
@@ -15,7 +15,7 @@ const loginFirstCentral = async() => {
     };
 
     try {
-        const response = await fetch("https://uat.firstcentralcreditbureau.com/firstcentralrestv2/login", requestOptions);
+        const response = await fetch("https://online.firstcentralcreditbureau.com/firstcentralrestv2/login", requestOptions);
         if (!response.ok) {
             throw new Error(`HTTP error! Status: ${response.status}`);
         }
