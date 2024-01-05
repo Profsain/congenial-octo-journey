@@ -422,4 +422,13 @@ p {
     .searchByBox input {
       width: 100% !important;
     }
+
+    .range {
+      flex-direction: column !important;
+      width: 90% !important;
+    }
+
+    .range input {
+      width: 100% !important;
+    }
 }

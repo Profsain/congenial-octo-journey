@@ -14,7 +14,10 @@ import updateSalaryHistory from "./updateSalaryHistory.js";
 import ViewBySection from "./ViewBySection.jsx";
 import NoResult from "../../../shared/NoResult.jsx";
 
-import searchList from "../../../../../utilities/searchListFunc.js";
+import useSearch from "../../../../../utilities/useSearchName.js";
+import useSearchByDate from "../../../../../utilities/useSearchByDate.js";
+import useSearchByDateRange from "../../../../../utilities/useSearchByDateRange.js";
+
 
 const CheckSalaryHistory = () => {
   const styles = {
@@ -140,28 +143,54 @@ const CheckSalaryHistory = () => {
   };
 
   // handle search by
-  const [searchTerm, setSearchTerm] = useState("");
   const [customerList, setCustomerList] = useState(customers);
+  const { searchTerm, setSearchTerm, filteredData } = useSearch(
+    customers,
+    "firstname"
+  );
 
-  // update customerList on search
-  const handleSearch = () => {
-    const currSearch = searchList(
-      customers,
-      searchTerm,
-      "firstname"
-    );
-    setCustomerList(currSearch);
-  };
+  const [dateRange, setDateRange] = useState({
+    fromDate: "",
+    toDate: "",
+  });
 
   useEffect(() => {
-    handleSearch();
-  }, [searchTerm]);
+    setCustomerList(filteredData);
+  }, [searchTerm, filteredData]);
 
+  // handle search by date
+  const { filteredDateData } = useSearchByDate(customers, "createdAt");
+  useEffect(() => {
+    setCustomerList(filteredDateData);
+  }, [filteredDateData]);
+
+  // handle list reload
+  const handleReload = () => {
+    dispatch(fetchAllCustomer());
+    setCustomerList(customers);
+  };
+
+  // handle search by date range
+  const { searchData } = useSearchByDateRange(
+    customers,
+    dateRange,
+    "createdAt"
+  );
+
+  useEffect(() => {
+    setCustomerList(searchData);
+  }, [searchData]);
 
   return (
     <div>
       {/* viewby section */}
-      <ViewBySection setSearch={setSearchTerm} />
+      <ViewBySection
+        setSearch={setSearchTerm}
+        setDateRange={setDateRange}
+        dateRange={dateRange}
+        searchDateFunc={searchByDate}
+        handleReload={handleReload}
+      />
 
       {/* data loader */}
       {status === "loading" && <PageLoader />}
