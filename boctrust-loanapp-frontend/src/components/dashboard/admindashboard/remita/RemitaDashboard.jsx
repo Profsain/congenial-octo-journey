@@ -3,14 +3,17 @@ import { useDispatch, useSelector } from "react-redux";
 import { fetchAllCustomer } from "../../../../redux/reducers/customerReducer";
 import { Table } from "react-bootstrap";
 import DashboardHeadline from "../../shared/DashboardHeadline";
-import Headline from "../../../shared/Headline";
-import BocButton from "../../shared/BocButton";
 import NextPreBtn from "../../shared/NextPreBtn";
 import PageLoader from "../../shared/PageLoader";
 import "./Remita.css";
+import LoanDetailModel from "./LoanDetailModel";import ViewBySection from "./ViewBySection.jsx";
+import NoResult from "../../../shared/NoResult.jsx";
+
+import useSearch from "../../../../../utilities/useSearchName.js";
+import useSearchByDate from "../../../../../utilities/useSearchByDate.js";
+import useSearchByDateRange from "../../../../../utilities/useSearchByDateRange.js";
 
 import getDateOnly from "../../../../../utilities/getDate";
-import LoanDetailModel from "./LoanDetailModel";
 
 const RemitaDashboard = () => {
   const styles = {
@@ -64,7 +67,6 @@ const RemitaDashboard = () => {
   // current login admin user
   const currentUser = useSelector((state) => state.adminAuth.user);
   const userType = currentUser.userType;
- 
 
   const [openModel, setOpenModel] = useState(false);
   const [currentCustomer, setCurrentCustomer] = useState("");
@@ -85,23 +87,61 @@ const RemitaDashboard = () => {
     setOpenModel(true);
   };
 
+  // handle search by
+  const [customerList, setCustomerList] = useState(remitaCustomers);
+  const { searchTerm, setSearchTerm, filteredData } = useSearch(
+    remitaCustomers,
+    "firstname"
+  );
+
+  const [dateRange, setDateRange] = useState({
+    fromDate: "",
+    toDate: "",
+  });
+
+  useEffect(() => {
+    setCustomerList(filteredData);
+  }, [searchTerm, filteredData]);
+
+  // handle search by date
+  const { filteredDateData } = useSearchByDate(remitaCustomers, "createdAt");
+  const searchByDate = () => {
+    setCustomerList(filteredDateData);
+  };
+
+  // handle list reload
+  const handleReload = () => {
+    setDateRange({
+      fromDate: "",
+      toDate: "",
+    });
+    dispatch(fetchAllCustomer());
+    setCustomerList(remitaCustomers);
+  };
+
+  // handle search by date range
+  const { searchData } = useSearchByDateRange(
+    remitaCustomers,
+    dateRange,
+    "createdAt"
+  );
+
+  useEffect(() => {
+    setCustomerList(searchData);
+  }, [searchData]);
+
   return (
     <>
       <div className="DetailSection DCard" style={styles.container}>
-        <div>
-          <Headline text="View by:" />
-          <div style={styles.btnBox} className="VBox">
-            <BocButton margin="8px 18px" bgcolor="#ecaa00" bradius="25px">
-              Disbursement Today
-            </BocButton>
-            <BocButton margin="8px 18px" bgcolor="#ecaa00" bradius="25px">
-              Date Range
-            </BocButton>
-            <BocButton margin="8px 18px" bgcolor="#ecaa00" bradius="25px">
-              Specific User
-            </BocButton>
-          </div>
-        </div>
+
+        {/* viewby section */}
+        <ViewBySection
+          setSearch={setSearchTerm}
+          setDateRange={setDateRange}
+          dateRange={dateRange}
+          searchDateFunc={searchByDate}
+          handleReload={handleReload}
+        />
 
         {/* data loader */}
         {status === "loading" && <PageLoader />}
@@ -117,7 +157,7 @@ const RemitaDashboard = () => {
             <Table borderless hover responsive="sm">
               <thead style={styles.head}>
                 <tr>
-                  <th>Customer Acct No</th>
+                  <th>Acc No</th>
                   <th>Name</th>
                   <th>Income from Employer</th>
                   <th>Loan Amount</th>
@@ -130,15 +170,13 @@ const RemitaDashboard = () => {
                 </tr>
               </thead>
               <tbody>
-                 {remitaCustomers.length === 0 && (
                 <tr>
-                  <td colSpan="8" style={{ textAlign: "center" }}>
-                    No record found
+                  <td colSpan="10">
+                    {customerList?.length === 0 && <NoResult name="Customer"/>}
                   </td>
                 </tr>
-                )}
-                
-                {remitaCustomers?.map((customer) => {
+
+                {customerList?.map((customer) => {
                   return (
                     <tr key={customer._id}>
                       <td>

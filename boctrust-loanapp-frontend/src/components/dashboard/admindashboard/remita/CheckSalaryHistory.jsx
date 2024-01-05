@@ -160,12 +160,16 @@ const CheckSalaryHistory = () => {
 
   // handle search by date
   const { filteredDateData } = useSearchByDate(customers, "createdAt");
-  useEffect(() => {
+  const searchByDate = () => {
     setCustomerList(filteredDateData);
-  }, [filteredDateData]);
+  }
 
   // handle list reload
   const handleReload = () => {
+    setDateRange({
+      fromDate: "",
+      toDate: "",
+    });
     dispatch(fetchAllCustomer());
     setCustomerList(customers);
   };

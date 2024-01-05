@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 import { useDispatch, useSelector } from "react-redux";
 import { logoutUser } from "../../redux/reducers/adminAuthReducer"
 import { Navbar, Container, Nav, NavDropdown } from "react-bootstrap";
@@ -19,7 +20,6 @@ const TopNav = () => {
 
   // get current admin
   const currentUser = useSelector((state) => state.adminAuth.user);
-  console.log("Login user", currentUser)
 
   return (
     <div className="TopNavContainer">

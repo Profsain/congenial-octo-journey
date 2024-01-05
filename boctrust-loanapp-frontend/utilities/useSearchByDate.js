@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import searchListByDate from './searchListByDateFunc';
+import searchListByDate from './searchListByDate';
 
 const useSearchByDate = (initialList, dateKey) => {
   const [filteredDateData, setFilteredDateData] = useState(initialList);

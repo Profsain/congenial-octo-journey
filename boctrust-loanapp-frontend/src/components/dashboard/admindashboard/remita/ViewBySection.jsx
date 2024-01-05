@@ -49,6 +49,10 @@ const ViewBySection = ({
     setShowSearchName(false);
     // toggle search name input
     if (showDateRange) {
+      setDateRange({
+        fromDate: "",
+        toDate: "",
+      });
       setShowDateRange(false);
     } else {
       setShowDateRange(true);
