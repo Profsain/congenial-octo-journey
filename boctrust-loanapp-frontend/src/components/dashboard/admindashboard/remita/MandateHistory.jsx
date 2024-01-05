@@ -1,13 +1,18 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchAllCustomer } from "../../../../redux/reducers/customerReducer";
-import Headline from "../../../shared/Headline";
 import { Table } from "react-bootstrap";
 import BocButton from "../../shared/BocButton";
 import DashboardHeadline from "../../shared/DashboardHeadline";
 import NextPreBtn from "../../shared/NextPreBtn";
 import PageLoader from "../../shared/PageLoader";
 import MandateHistoryDetailsModel from "./MandateHistoryDetailsModel";
+import ViewBySection from "./ViewBySection.jsx";
+import NoResult from "../../../shared/NoResult.jsx";
+
+import useSearch from "../../../../../utilities/useSearchName.js";
+import useSearchByDate from "../../../../../utilities/useSearchByDate.js";
+import useSearchByDateRange from "../../../../../utilities/useSearchByDateRange.js";
 import getNextMonthDate from "../../../../../utilities/getNextMonthDate";
 
 const MandateHistory = () => {
@@ -37,9 +42,15 @@ const MandateHistory = () => {
   }, [dispatch]);
 
   // filter customer by remitaStatus
-  const remitaCustomers = customers.filter(
-    (customer) => customer?.remita.loanStatus === "approved"
-  );
+  const [remitaCustomers, setRemitaCustomers] = useState([]);
+  useEffect(() => {
+    if (customers?.length > 0) {
+      const remitaCustomers = customers.filter(
+        (customer) => customer?.remita.loanStatus === "approved"
+      );
+      setRemitaCustomers(remitaCustomers);
+    }
+  }, [customers]);
 
   // handle mandate view
   const [show, setShow] = useState(false);
@@ -54,20 +65,17 @@ const MandateHistory = () => {
     const customer = customers.find((customer) => customer._id === id);
 
     // call mandate history api
-    const response = await fetch(
-      `${apiUrl}/api/remita/mandate-history`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+    const response = await fetch(`${apiUrl}/api/remita/mandate-history`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
 
-        // send customer details to remita
-        body: JSON.stringify({
-          customer: customer,
-        }),
-      }
-    );
+      // send customer details to remita
+      body: JSON.stringify({
+        customer: customer,
+      }),
+    });
     const data = await response.json();
 
     // update model object
@@ -80,22 +88,61 @@ const MandateHistory = () => {
     setViewLoader(false);
   };
 
+  // handle search by
+  const [customerList, setCustomerList] = useState(remitaCustomers);
+  const { searchTerm, setSearchTerm, filteredData } = useSearch(
+    remitaCustomers,
+    "firstname"
+  );
+
+  const [dateRange, setDateRange] = useState({
+    fromDate: "",
+    toDate: "",
+  });
+
+  useEffect(() => {
+    setCustomerList(filteredData);
+  }, [searchTerm, filteredData]);
+
+  // handle search by date
+  const { filteredDateData } = useSearchByDate(remitaCustomers, "createdAt");
+  const searchByDate = () => {
+    setCustomerList(filteredDateData);
+  };
+
+  // handle list reload
+  const handleReload = () => {
+    setDateRange({
+      fromDate: "",
+      toDate: "",
+    });
+    dispatch(fetchAllCustomer());
+    setCustomerList(remitaCustomers);
+  };
+
+  // handle search by date range
+  const { searchData } = useSearchByDateRange(
+    remitaCustomers,
+    dateRange,
+    "createdAt"
+  );
+
+  useEffect(() => {
+    setCustomerList(searchData);
+  }, [searchData]);
+
   return (
     <>
-      <div>
-        <Headline text="View by:" />
-        <div style={styles.btnBox} className="VBox">
-          <BocButton margin="8px 18px" bgcolor="#ecaa00" bradius="25px">
-            Today&apos;s Mandate
-          </BocButton>
-          <BocButton margin="8px 18px" bgcolor="#ecaa00" bradius="25px">
-            Date Range
-          </BocButton>
-          <BocButton margin="8px 18px" bgcolor="#ecaa00" bradius="25px">
-            Specific User
-          </BocButton>
-        </div>
-      </div>
+
+      {/* view by section */}
+      <ViewBySection
+        firstBtn="Today's Mandate"
+        setSearch={setSearchTerm}
+        setDateRange={setDateRange}
+        dateRange={dateRange}
+        searchDateFunc={searchByDate}
+        handleReload={handleReload}
+      />
 
       {/* data loader */}
       {status === "loading" && <PageLoader />}
@@ -121,15 +168,13 @@ const MandateHistory = () => {
               </tr>
             </thead>
             <tbody>
-              {remitaCustomers.length === 0 && (
-                <tr>
-                  <td colSpan="8" style={{ textAlign: "center" }}>
-                    No record found
-                  </td>
-                </tr>
-              )}
+              <tr>
+                <td colSpan="10">
+                  {customerList?.length === 0 && <NoResult name="Customer" />}
+                </td>
+              </tr>
 
-              {remitaCustomers.map((customer) => (
+              {customerList.map((customer) => (
                 <tr key={customer._id}>
                   <td>{customer.salaryaccountnumber}</td>
                   <td>

@@ -2,11 +2,15 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchAllCustomer } from "../../../../redux/reducers/customerReducer";
 import { Table } from "react-bootstrap";
-import Headline from "../../../shared/Headline";
-import BocButton from "../../shared/BocButton";
 import DashboardHeadline from "../../shared/DashboardHeadline";
 import NextPreBtn from "../../shared/NextPreBtn";
 import PageLoader from "../../shared/PageLoader";
+import ViewBySection from "./ViewBySection.jsx";
+import NoResult from "../../../shared/NoResult.jsx";
+
+import useSearch from "../../../../../utilities/useSearchName.js";
+import useSearchByDate from "../../../../../utilities/useSearchByDate.js";
+import useSearchByDateRange from "../../../../../utilities/useSearchByDateRange.js";
 import getNextMonthDate from "../../../../../utilities/getNextMonthDate";
 
 const CollectionNotifications = () => {
@@ -58,22 +62,60 @@ const CollectionNotifications = () => {
     }
   }, [customers]);
 
+  // handle search by
+  const [customerList, setCustomerList] = useState(remitaCustomers);
+  const { searchTerm, setSearchTerm, filteredData } = useSearch(
+    remitaCustomers,
+    "firstname"
+  );
+
+  const [dateRange, setDateRange] = useState({
+    fromDate: "",
+    toDate: "",
+  });
+
+  useEffect(() => {
+    setCustomerList(filteredData);
+  }, [searchTerm, filteredData]);
+
+  // handle search by date
+  const { filteredDateData } = useSearchByDate(remitaCustomers, "createdAt");
+  const searchByDate = () => {
+    setCustomerList(filteredDateData);
+  };
+
+  // handle list reload
+  const handleReload = () => {
+    setDateRange({
+      fromDate: "",
+      toDate: "",
+    });
+    dispatch(fetchAllCustomer());
+    setCustomerList(remitaCustomers);
+  };
+
+  // handle search by date range
+  const { searchData } = useSearchByDateRange(
+    remitaCustomers,
+    dateRange,
+    "createdAt"
+  );
+
+  useEffect(() => {
+    setCustomerList(searchData);
+  }, [searchData]);
+
   return (
     <div>
-      <div>
-        <Headline text="View by:" />
-        <div style={styles.btnBox} className="VBox">
-          <BocButton margin="8px 18px" bgcolor="#ecaa00" bradius="25px">
-            Collections Today
-          </BocButton>
-          <BocButton margin="8px 18px" bgcolor="#ecaa00" bradius="25px">
-            Date Range
-          </BocButton>
-          <BocButton margin="8px 18px" bgcolor="#ecaa00" bradius="25px">
-            Specific User
-          </BocButton>
-        </div>
-      </div>
+
+      {/* view by section */}
+      <ViewBySection
+        setSearch={setSearchTerm}
+        setDateRange={setDateRange}
+        dateRange={dateRange}
+        searchDateFunc={searchByDate}
+        handleReload={handleReload}
+      />
 
       {/* data loader */}
       {status === "loading" && <PageLoader />}
@@ -99,15 +141,13 @@ const CollectionNotifications = () => {
               </tr>
             </thead>
             <tbody>
-              {remitaCustomers.length === 0 && (
-                <tr>
-                  <td colSpan="7" style={{ textAlign: "center" }}>
-                    No record found
-                  </td>
-                </tr>
-              )}
+              <tr>
+                <td colSpan="10">
+                  {customerList?.length === 0 && <NoResult name="Customer" />}
+                </td>
+              </tr>
 
-              {remitaCustomers.map((customer) => (
+              {customerList.map((customer) => (
                 <tr key={customer._id}>
                   <td>{customer.remita.disbursementDetails.data.customerId}</td>
                   <td>{customer.loanproduct || "General Loan"}</td>

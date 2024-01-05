@@ -7,6 +7,12 @@ import BocButton from "../../shared/BocButton";
 import DashboardHeadline from "../../shared/DashboardHeadline";
 import NextPreBtn from "../../shared/NextPreBtn";
 import PageLoader from "../../shared/PageLoader";
+import ViewBySection from "./ViewBySection.jsx";
+import NoResult from "../../../shared/NoResult.jsx";
+
+import useSearch from "../../../../../utilities/useSearchName.js";
+import useSearchByDate from "../../../../../utilities/useSearchByDate.js";
+import useSearchByDateRange from "../../../../../utilities/useSearchByDateRange.js";
 
 import stopLoanFunc from "./stopLoanFunc";
 
@@ -61,16 +67,17 @@ const StopCollections = () => {
   }, [customers]);
 
   // handle stop collection
-  const handleStopCollection = async (id) => { 
+  const handleStopCollection = async (id) => {
     const apiUrl = import.meta.env.VITE_BASE_URL;
-    
+
     setProcessLoader(true);
-   
+
     // find customer by id
     const customer = remitaCustomers.find((customer) => customer._id === id);
 
     // extract details from customer object
-    const { authorisationCode, customerId, mandateReference } = customer.remita.disbursementDetails.data;
+    const { authorisationCode, customerId, mandateReference } =
+      customer.remita.disbursementDetails.data;
 
     const raw = {
       authorisationCode,
@@ -79,22 +86,19 @@ const StopCollections = () => {
     };
 
     // call stop collection api
-     const response = await fetch(
-       `${apiUrl}/api/remita/stop-loan-collection`,
-       {
-         method: "POST",
-         headers: {
-           "Content-Type": "application/json",
-         },
+    const response = await fetch(`${apiUrl}/api/remita/stop-loan-collection`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
 
-         // send customer details to remita
-         body: JSON.stringify({
-           ...raw,
-         }),
-       }
-     );
+      // send customer details to remita
+      body: JSON.stringify({
+        ...raw,
+      }),
+    });
     const data = await response.json();
-    
+
     // check if response is success
     if (data.data.status === "success") {
       setProcessLoader(false);
@@ -103,26 +107,62 @@ const StopCollections = () => {
       // call dispatch
       dispatch(fetchAllCustomer());
     }
-
   };
 
-  return (
-    <div>
-      <div>
-        <Headline text="View by:" />
-        <div style={styles.btnBox} className="VBox">
-          <BocButton margin="8px 18px" bgcolor="#ecaa00" bradius="25px">
-            Collections Today
-          </BocButton>
-          <BocButton margin="8px 18px" bgcolor="#ecaa00" bradius="25px">
-            Date Range
-          </BocButton>
-          <BocButton margin="8px 18px" bgcolor="#ecaa00" bradius="25px">
-            Specific User
-          </BocButton>
-        </div>
-      </div>
+  // handle search by
+  const [customerList, setCustomerList] = useState(remitaCustomers);
+  const { searchTerm, setSearchTerm, filteredData } = useSearch(
+    remitaCustomers,
+    "firstname"
+  );
 
+  const [dateRange, setDateRange] = useState({
+    fromDate: "",
+    toDate: "",
+  });
+
+  useEffect(() => {
+    setCustomerList(filteredData);
+  }, [searchTerm, filteredData]);
+
+  // handle search by date
+  const { filteredDateData } = useSearchByDate(remitaCustomers, "createdAt");
+  const searchByDate = () => {
+    setCustomerList(filteredDateData);
+  };
+
+  // handle list reload
+  const handleReload = () => {
+    setDateRange({
+      fromDate: "",
+      toDate: "",
+    });
+    dispatch(fetchAllCustomer());
+    setCustomerList(remitaCustomers);
+  };
+
+  // handle search by date range
+  const { searchData } = useSearchByDateRange(
+    remitaCustomers,
+    dateRange,
+    "createdAt"
+  );
+
+  useEffect(() => {
+    setCustomerList(searchData);
+  }, [searchData]);
+
+  return (
+    <>
+      {/* view by section */}
+      <ViewBySection
+        firstBtn="Collections Today"
+        setSearch={setSearchTerm}
+        setDateRange={setDateRange}
+        dateRange={dateRange}
+        searchDateFunc={searchByDate}
+        handleReload={handleReload}
+      />
       {/* page loader */}
       {status === "loading" && <PageLoader />}
 
@@ -146,15 +186,13 @@ const StopCollections = () => {
               </tr>
             </thead>
             <tbody>
-              {remitaCustomers.length === 0 && (
-                <tr>
-                  <td colSpan="8" style={{ textAlign: "center" }}>
-                    No record found
-                  </td>
-                </tr>
-              )}
+              <tr>
+                <td colSpan="10">
+                  {customerList?.length === 0 && <NoResult name="Customer" />}
+                </td>
+              </tr>
 
-              {remitaCustomers.map((customer) => (
+              {customerList.map((customer) => (
                 <tr key={customer._id}>
                   <td>{customer.remita.disbursementDetails.data.customerId}</td>
                   <td>{customer.loanproduct || "General Loan"}</td>
@@ -192,13 +230,12 @@ const StopCollections = () => {
                   </td>
                 </tr>
               ))}
-              
             </tbody>
           </Table>
         </div>
         <NextPreBtn />
       </div>
-    </div>
+    </>
   );
 };
 

@@ -134,7 +134,7 @@ const RemitaDashboard = () => {
     <>
       <div className="DetailSection DCard" style={styles.container}>
 
-        {/* viewby section */}
+        {/* view by section */}
         <ViewBySection
           setSearch={setSearchTerm}
           setDateRange={setDateRange}

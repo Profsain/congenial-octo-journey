@@ -4,6 +4,7 @@ import Headline from "../../../shared/Headline";
 import BocButton from "../../shared/BocButton";
 
 const ViewBySection = ({
+  firstBtn = "Applicant Today",
   setSearch,
   setDateRange,
   dateRange,
@@ -64,7 +65,7 @@ const ViewBySection = ({
     // update object state
     setDateRange({
       ...dateRange,
-      [e.target.name]: e.target.value
+      [e.target.name]: e.target.value,
     });
   };
 
@@ -78,7 +79,7 @@ const ViewBySection = ({
           bradius="25px"
           func={searchDateFunc}
         >
-          Applicant Today
+          {firstBtn}
         </BocButton>
 
         <BocButton
@@ -143,6 +144,7 @@ const ViewBySection = ({
 };
 
 ViewBySection.propTypes = {
+  firstBtn: PropTypes.string,
   setSearch: PropTypes.func,
   setDateRange: PropTypes.func,
   dateRange: PropTypes.object,
