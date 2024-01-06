@@ -45,12 +45,17 @@ router.get('/users', async (req, res) => {
 const type = upload.single('photo');
 
 router.post('/register', type, async (req, res, next) => {
+  console.log(req.body)
     try {
         // Get user input
-        const { fullName, email, phone, username, password, jobRole, userType } = req.body;
+        const { fullName, email, phone, username, password, jobRole, userType, adminRoles } = req.body;
         
          // Get the image file name from req.file
-        const photo = req.file.filename;
+      const photo = req.file.filename;
+      
+      // convert array string to array
+      // const adminRolesArray = adminRoles[0].split(',');
+      console.log(typeof(adminRoles))
     
         // Validate user input
         if (!(email && password && fullName && phone && username && jobRole && userType && photo)) {
@@ -77,6 +82,7 @@ router.post('/register', type, async (req, res, next) => {
         password: encryptedPassword,
         jobRole,
         userType,
+        adminRoles,
         photo,
         });
     
@@ -238,10 +244,10 @@ router.delete('/users/:id', async (req, res) => {
 
 // Update a user
 router.put('/update/:id', async (req, res) => {
-    console.log("req.body", req.body)
+    console.log(req.body)
     try {
         const { id } = req.params;
-        const { fullName, email, phone, username, jobRole, userType } = req.body;
+        const { fullName, email, phone, username, jobRole, userType, adminRoles } = req.body;
 
         if (!(email && fullName && phone && username && jobRole && userType)) {
             return res.status(400).json({ error: 'All input is required' });
@@ -260,6 +266,7 @@ router.put('/update/:id', async (req, res) => {
             password: password,
             jobRole,
             userType,
+            adminRoles,
         });
         // const updated = await User.findByIdAndUpdate(id, {
         //     fullName,

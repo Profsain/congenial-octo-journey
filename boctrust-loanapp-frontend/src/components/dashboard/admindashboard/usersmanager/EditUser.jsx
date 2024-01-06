@@ -4,10 +4,14 @@ import { useDispatch } from "react-redux";
 import { fetchAdmins } from "../../../../redux/reducers/adminUserReducer";
 import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
+import "./CreateNewAdmin.css";
+import adminRoles from "./adminRoles";
 
 const EditUser = (props) => {
   const dispatch = useDispatch();
   const user = props.userobj;
+  const roles = props.adminRoles;
+  const viewEdit = props.viewEdit;
 
   // form state
   const [editFullName, setEditFullName] = useState("");
@@ -17,6 +21,7 @@ const EditUser = (props) => {
   const [editPassword, setEditPassword] = useState("");
   const [editUserType, setEditUserType] = useState("");
   const [editJobRole, setEditJobRole] = useState("");
+  const [editAdminRoles, setEditAdminRoles] = useState([]);
 
   // pass object data to form
   const updateFormObject = () => {
@@ -26,6 +31,7 @@ const EditUser = (props) => {
     setEditUsername(user.username);
     setEditUserType(user.userType);
     setEditJobRole(user.jobRole);
+    setEditAdminRoles(roles);
   };
 
   useEffect(() => {
@@ -41,6 +47,7 @@ const EditUser = (props) => {
     setEditPassword("");
     setEditUserType("");
     setEditJobRole("");
+    setEditAdminRoles([]);
     dispatch(fetchAdmins());
   };
 
@@ -49,7 +56,7 @@ const EditUser = (props) => {
     props.onHide();
     clearForm();
   };
-
+  
   // submit update to api endpoint
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -63,6 +70,8 @@ const EditUser = (props) => {
       password: editPassword,
       userType: editUserType,
       jobRole: editJobRole,
+      adminRoles: editAdminRoles,
+
     };
 
     await fetch(`${apiUrl}/api/admin/update/${user._id}`, {
@@ -77,6 +86,7 @@ const EditUser = (props) => {
     handleClose();
   };
 
+  console.log("Edit Roles", editAdminRoles)
   return (
     <Modal
       {...props}
@@ -145,19 +155,6 @@ const EditUser = (props) => {
               onChange={(e) => setEditUsername(e.target.value)}
             />
           </div>
-          {/* <div className="FieldGroup">
-            <label htmlFor="password" style={{ marginTop: "-1rem" }}>
-              Password
-            </label>
-            <input
-              type="password"
-              placeholder="Enter new password or retype old password"
-              style={{ width: "100%" }}
-              className="Input"
-              value={editPassword}
-              onChange={(e) => setEditPassword(e.target.value)}
-            />
-          </div> */}
 
           <div className="FieldGroup">
             <label htmlFor="userType" style={{ marginTop: "-1rem" }}>
@@ -184,6 +181,38 @@ const EditUser = (props) => {
               onChange={(e) => setEditJobRole(e.target.value)}
             />
           </div>
+
+          {/* adminRoles checkbox options section */}
+          <div className="AdminRoles">
+            <label htmlFor="adminRoles">Admin Roles</label>
+
+            <div className="CheckboxContainer">
+              {adminRoles.map((option) => (
+                <div key={option.value} className="CheckboxGroup">
+                  <input
+                    type="checkbox"
+                    name="adminRoles"
+                    checked={editAdminRoles.includes(option.value)}
+                    id={option.value}
+                    value={option.value}
+                    onChange={(e) => {
+                      const checked = e.target.checked;
+                      if (checked) {
+                        setEditAdminRoles([...editAdminRoles, e.target.value]);
+                      } else {
+                        setEditAdminRoles(
+                          editAdminRoles.filter(
+                            (item) => item !== e.target.value
+                          )
+                        );
+                      }
+                    }}
+                  />
+                  <label htmlFor={option.value}>{option.label}</label>
+                </div>
+              ))}
+            </div>
+          </div>
         </form>
       </Modal.Body>
       <Modal.Footer>
@@ -191,9 +220,11 @@ const EditUser = (props) => {
           Close
         </Button>
 
-        <Button variant="primary" type="button" onClick={handleSubmit}>
-          Update
-        </Button>
+        {viewEdit === "edit" && (
+          <Button variant="primary" type="button" onClick={handleSubmit}>
+            Update
+          </Button>
+        )}
       </Modal.Footer>
     </Modal>
   );

@@ -1,0 +1,19 @@
+.CheckboxContainer {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-gap: 1rem;
+}
+
+.CheckboxGroup {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    margin-bottom: -4rem;
+}
+
+.CheckboxGroup label {
+    margin-bottom: 1.8rem;
+
+    
+}

@@ -43,6 +43,8 @@ const UsersList = ({ count, searchTerms }) => {
   const [action, setAction] = useState(false);
   const [userId, setUserId] = useState("");
   const [userObj, setUserObj] = useState({});
+  const [adminRoles, setAdminRoles] = useState([]);
+  const [viewEdit, setViewEdit] = useState("edit");
 
   // update usersList to show 10 users on page load
   useEffect(() => {
@@ -69,8 +71,20 @@ const UsersList = ({ count, searchTerms }) => {
     setUserObj(user);
     setUserId(id);
 
+    // check array of adminRoles
+    if (user.adminRoles.length > 1) {
+      setAdminRoles(user.adminRoles);
+    } else {
+      const roles = user.adminRoles[0].split(",");
+      setAdminRoles(roles);
+    }
+
     if (option === "edit") {
       setShow(true);
+      setViewEdit("edit");
+    } else if (option === "view") { 
+      setShow(true);
+      setViewEdit("view");
     } else if (option === "delete") {
       setAction(true);
     }
@@ -138,6 +152,7 @@ const UsersList = ({ count, searchTerms }) => {
                     >
                       <option value="">Action</option>
                       <option value="edit">Edit</option>
+                      <option value="view">View</option>
                       <option value="delete">Delete</option>
                     </select>
                   </td>
@@ -149,7 +164,11 @@ const UsersList = ({ count, searchTerms }) => {
       </div>
 
       {/* edit user popup model */}
-      <EditUser show={show} onHide={() => setShow(false)} userobj={userObj} />
+      {show && (
+        <EditUser show={show} onHide={() => setShow(false)} userobj={userObj} adminRoles={adminRoles} viewEdit={viewEdit} />
+      )
+      }
+    
 
       {/* acton popup model */}
       <ActionNotification

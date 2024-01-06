@@ -34,6 +34,11 @@ const userSchema = new mongoose.Schema({
     default: 'user',
   },
 
+  adminRoles: {
+    type: Array,
+    default: [],
+  },
+
   status: {
     type: String,
     enum: ['active', 'inactive'],

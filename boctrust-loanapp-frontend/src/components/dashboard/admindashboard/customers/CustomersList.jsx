@@ -63,13 +63,19 @@ const CustomersList = ({ showCount, searchTerms }) => {
   };
 
   // search customer list
-  const [customerList, setCustomerList] = useState(customers);
-
+  const [customerList, setCustomerList] = useState([]);
+  // check customers not empty and update customerList
   // update customerList to show 10 customers on page load
   // or on count changes
   useEffect(() => {
-    setCustomerList(customers?.slice(0, showCount));
+    if (customers?.length > 0) {
+      const filteredCustomer = customers?.filter(
+        (customer) => customer?.kyc.isKycApproved === true
+      );
+      setCustomerList(filteredCustomer?.slice(0, showCount));
+    }
   }, [customers, showCount]);
+
 
   // update customerList on search
   const handleSearch = () => {
@@ -80,7 +86,7 @@ const CustomersList = ({ showCount, searchTerms }) => {
   useEffect(() => {
     handleSearch();
   }, [searchTerms]);
-  
+
   return (
     <>
       {status === "loading" && <PageLoader />}
