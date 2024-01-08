@@ -34,6 +34,11 @@ const userSchema = new mongoose.Schema({
     default: 'user',
   },
 
+  adminType: {
+    type: String,
+    default: "admin"
+  },
+
   adminRoles: {
     type: Array,
     default: [],

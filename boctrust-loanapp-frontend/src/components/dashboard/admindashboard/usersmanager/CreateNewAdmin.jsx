@@ -37,7 +37,6 @@ const CreateNewAdmin = ({ func }) => {
 
   const handleSubmit = async (values, { resetForm }) => {
     const apiUrl = import.meta.env.VITE_BASE_URL;
-    console.log(values.adminRoles)
 
     // Handle form submission logic here
     const formData = new FormData();
@@ -205,7 +204,7 @@ const CreateNewAdmin = ({ func }) => {
             </div>
 
             <div className="FieldGroup">
-              <label htmlFor="userType">Admin Role</label>
+              <label htmlFor="userType">Admin Type</label>
               <select
                 name="userType"
                 id="userType"

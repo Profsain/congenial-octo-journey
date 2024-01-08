@@ -8,10 +8,11 @@ import "../../Dashboard.css";
 import PageLoader from "../../shared/PageLoader";
 import NoResult from "../../../shared/NoResult";
 import ActionNotification from "../../shared/ActionNotification";
+import EditUser from "./EditUser";
 
 // function
 import searchList from "../../../../../utilities/searchListFunc";
-import EditUser from "./EditUser";
+import handleAdminRoles from "../../../../../utilities/getAdminRoles";
 
 const UsersList = ({ count, searchTerms }) => {
   const styles = {
@@ -72,12 +73,7 @@ const UsersList = ({ count, searchTerms }) => {
     setUserId(id);
 
     // check array of adminRoles
-    if (user.adminRoles.length > 1) {
-      setAdminRoles(user.adminRoles);
-    } else {
-      const roles = user.adminRoles[0].split(",");
-      setAdminRoles(roles);
-    }
+    handleAdminRoles(user, setAdminRoles);
 
     if (option === "edit") {
       setShow(true);

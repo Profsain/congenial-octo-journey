@@ -41,8 +41,6 @@ import ExpenseReport from "../report/expensereport/ExpenseReport";
 import RevenueReport from "../report/revenuereport/RevenueReport";
 import TransactionDashboard from "../transaction/TransactionDashboard";
 import UserManagerDashboard from "../usersmanager/UserManagerDashboard";
-import UserControls from "../usersmanager/UserControls";
-import AccessControls from "../usersmanager/AccessControls";
 import WebsiteManagerDashboard from "../website/WebsiteManagerDashboard";
 import WithdrawRequestDashboard from "../withdraw/WithdrawRequestDashboard";
 import WithdrawMethodDashboard from "../withdrawmethod/WithdrawMethodDashboard";
@@ -298,10 +296,6 @@ const AdminDashboard = () => {
         return <AllWebsitePages />;
       case "usermanager":
         return <UserManagerDashboard />;
-      case "userroles":
-        return <UserControls />;
-      case "accesscontrols":
-        return <AccessControls />;
       case "withdrawmethod":
         return <WithdrawMethodDashboard />;
       case "report":
@@ -326,6 +320,7 @@ const AdminDashboard = () => {
   // current login admin user
   const currentUser = useSelector((state) => state.adminAuth.user);
   const adminName = currentUser.fullName;
+  console.log("User", currentUser)
 
   return (
     <div className="DashboardContainer">

@@ -74,10 +74,12 @@ const Login = ({ setLogin }) => {
     const { username, password, loginAs } = formData;
 
     if (loginAs === "staff") {
+      console.log("Staff login")
       const response = await loginUserOnServer(username, password);
       if (response.success) {
         clearField();
         // Dispatch the login action with the user data.
+        console.log(response)
         dispatch(loginUser(response));
         setLogin(true);
       } else {

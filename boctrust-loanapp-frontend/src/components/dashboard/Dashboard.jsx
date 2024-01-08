@@ -13,7 +13,7 @@ const Dashboard = () => {
   useEffect(() => {
     if (currentUser) {
       setIsLogin(true);
-      setUser(currentUser.userType);
+      setUser(currentUser.adminType);
     }
   }, [currentUser]);
 

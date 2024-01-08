@@ -12,7 +12,7 @@ import NextPreBtn from "../../shared/NextPreBtn";
 // function
 import searchList from "../../../../../utilities/searchListFunc";
 
-const BranchesList = ({ showCount, searchTerms }) => {
+const BranchesList = ({ showCount, searchTerms, admin, adminRoles }) => {
   // styles
   const styles = {
     head: {
@@ -140,8 +140,13 @@ const BranchesList = ({ showCount, searchTerms }) => {
                     >
                       <option value="">Action</option>
                       <option value="view">View</option>
-                      <option value="edit">Edit</option>
-                      <option value="delete">Delete</option>
+                      {admin || adminRoles.includes("manage_branch") ? (
+                            <>
+                              <option value="edit">Edit</option>
+                              <option value="delete">Delete</option>
+                            </>
+                          ) : null
+                        }
                     </select>
                   </td>
                 </tr>
@@ -178,6 +183,8 @@ const BranchesList = ({ showCount, searchTerms }) => {
 BranchesList.propTypes = {
   searchTerms: PropTypes.string,
   showCount: PropTypes.number,
+  admin: PropTypes.string,
+  adminRoles: PropTypes.array
 };
 
 export default BranchesList;

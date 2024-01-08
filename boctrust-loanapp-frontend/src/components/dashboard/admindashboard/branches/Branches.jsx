@@ -1,11 +1,17 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useSelector } from "react-redux";
 import BocButton from "../../shared/BocButton";
 import DashboardHeadline from "../../shared/DashboardHeadline";
 import "../customers/Customer.css";
 import BranchesList from "./BranchesList";
 import AddBranch from "./AddBranch";
+import handleAdminRoles from "../../../../../utilities/getAdminRoles";
 
 const Branches = () => {
+  const currentUser = useSelector((state) => state.adminAuth.user);
+  const [admin, setAdmin] = useState("");
+  const [adminRoles, setAdminRoles] = useState([]);
+
   const [openAddBranch, setOpenAddBranch] = useState(false);
   // open add branch component
   const openAddBranches = () => setOpenAddBranch(true);
@@ -14,15 +20,31 @@ const Branches = () => {
   const [showCount, setShowCount] = useState(10);
   const [searchTerms, setSearchTerms] = useState("");
 
+  useEffect(() => {
+    if (currentUser) {
+      if (currentUser.userType === "admin" || currentUser.userType === "md") {
+        setAdmin("admin")
+      }
+
+      handleAdminRoles(currentUser, setAdminRoles)
+    }
+  }, [])
+
   return (
     <>
       {!openAddBranch ? (
         <div className="MainBox">
-          <div className="AddBtn">
-            <BocButton bgcolor="#ecaa00" bradius="22px" func={openAddBranches}>
-              <span>+</span> Add New Branch
-            </BocButton>
-          </div>
+          {admin || adminRoles.includes("manage_branch") ? (
+            <div className="AddBtn">
+              <BocButton
+                bgcolor="#ecaa00"
+                bradius="22px"
+                func={openAddBranches}
+              >
+                <span>+</span> Add New Branch
+              </BocButton>
+            </div>
+          ) : null}
 
           {/* top search bar */}
           <div className="Search">
@@ -54,7 +76,7 @@ const Branches = () => {
           <div>
             {/* branches list  */}
             <div className="ListSec">
-              <BranchesList showCount={showCount} searchTerms={searchTerms} />
+              <BranchesList showCount={showCount} searchTerms={searchTerms} admin={admin} adminRoles={ adminRoles} />
             </div>
           </div>
         </div>
