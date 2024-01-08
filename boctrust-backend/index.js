@@ -57,9 +57,6 @@ mongoose
         // use express json
         app.use(express.json());
 
-        // uploads files middleware
-        app.use(fileUpload({ useTempFiles: true }));
-
         // Serve static files from the "uploads" directory
         app.use('/uploads', express.static('uploads'));
 

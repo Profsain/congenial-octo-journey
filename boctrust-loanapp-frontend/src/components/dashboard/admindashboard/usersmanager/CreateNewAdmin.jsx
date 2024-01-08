@@ -9,7 +9,6 @@ import "./CreateNewAdmin.css";
 import validationSchema from "./validationSchema";
 import adminRoles from "./adminRoles";
 
-
 const initialValues = {
   fullName: "",
   photo: "",
@@ -225,27 +224,27 @@ const CreateNewAdmin = ({ func }) => {
           </div>
 
           {/* adminRoles checkbox options section */}
-            <div className="AdminRoles">
-              <label htmlFor="adminRoles">Admin Roles</label>
-    
-               <div className="CheckboxContainer">
-                {adminRoles.map((option) => (
-                  <div key={option.value} className="CheckboxGroup">
-                    <input
-                      type="checkbox"
-                      name="adminRoles"
-                      id={option.value}
-                      value={option.value}
-                      onChange={formik.handleChange}
-                    />
-                    <label htmlFor={option.value}>{option.label}</label>
-                  </div>
-                ))}
-              </div>
-              {formik.errors.adminRoles && formik.touched.adminRoles ? (
-                <div className="Error">{formik.errors.adminRoles}</div>
-              ) : null}
-            </div> 
+          <div className="AdminRoles">
+            <label htmlFor="adminRoles">Admin Roles</label>
+
+            <div className="CheckboxContainer">
+              {adminRoles.map((option) => (
+                <div key={option.value} className="CheckboxGroup">
+                  <input
+                    type="checkbox"
+                    name="adminRoles"
+                    id={option.value}
+                    value={option.value}
+                    onChange={formik.handleChange}
+                  />
+                  <label htmlFor={option.value}>{option.label}</label>
+                </div>
+              ))}
+            </div>
+            {formik.errors.adminRoles && formik.touched.adminRoles ? (
+              <div className="Error">{formik.errors.adminRoles}</div>
+            ) : null}
+          </div>
 
           {/* notification message */}
           <div className="Notification">

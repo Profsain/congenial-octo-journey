@@ -45,7 +45,6 @@ router.get('/users', async (req, res) => {
 const type = upload.single('photo');
 
 router.post('/register', type, async (req, res, next) => {
-  console.log(req.body)
     try {
         // Get user input
         const { fullName, email, phone, username, password, jobRole, userType, adminRoles } = req.body;
@@ -53,9 +52,7 @@ router.post('/register', type, async (req, res, next) => {
          // Get the image file name from req.file
       const photo = req.file.filename;
       
-      // convert array string to array
-      // const adminRolesArray = adminRoles[0].split(',');
-      console.log(typeof(adminRoles))
+   
     
         // Validate user input
         if (!(email && password && fullName && phone && username && jobRole && userType && photo)) {
