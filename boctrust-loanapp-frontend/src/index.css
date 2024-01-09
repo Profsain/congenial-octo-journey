@@ -431,4 +431,8 @@ p {
     .range input {
       width: 100% !important;
     }
+
+    .asBox {
+      flex-direction: row;
+    }
 }

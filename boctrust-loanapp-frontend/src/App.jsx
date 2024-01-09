@@ -34,6 +34,7 @@ import PrivacyPolicy from "./components/terms&condition/PrivacyPolicy";
 import TermsCondition from "./components/terms&condition/TermsCondition";
 import TopNav from "./components/navigation/TopNav";
 import LoanForm from "./components/loanapplication/loanform/LoanForm";
+import Login from "./components/dashboard/login/Login";
 
 function App() {
   return (
@@ -41,6 +42,7 @@ function App() {
       <TopNav />
       <Routes>
         <Route path="/" element={<Home />} />
+        <Route path="/login" element={<Login />} />
         <Route path="/about" element={<About />} />
         <Route path="/board" element={<OurBoardPage />} />
         <Route path="/regular-savings" element={<RegularSavings />} />

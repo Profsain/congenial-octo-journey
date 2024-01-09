@@ -1,6 +1,7 @@
 import { useState } from "react";
+import {useNavigate} from "react-router-dom";
 import PropTypes from "prop-types";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { loginUser } from "../../../redux/reducers/adminAuthReducer";
 import { Modal } from "react-bootstrap";
 // import { login } from "../../../redux/reducers/userSlice";
@@ -74,12 +75,11 @@ const Login = ({ setLogin }) => {
     const { username, password, loginAs } = formData;
 
     if (loginAs === "staff") {
-      console.log("Staff login")
       const response = await loginUserOnServer(username, password);
       if (response.success) {
         clearField();
         // Dispatch the login action with the user data.
-        console.log(response)
+    
         dispatch(loginUser(response));
         setLogin(true);
       } else {
@@ -99,6 +99,13 @@ const Login = ({ setLogin }) => {
       }
     }
   };
+
+  // check if user is logged in and redirect to dashboard
+  const navigate = useNavigate();
+  const currentUser = useSelector((state) => state.adminAuth.user);
+  if (currentUser) {
+    navigate("/dashboard");
+  }
 
   return (
     <div className="LogContainer">

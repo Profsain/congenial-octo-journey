@@ -174,11 +174,11 @@ const TopNav = () => {
                     Contact
                   </Nav.Link>
                   {currentUser ? (
-                    <Nav.Link href="/dashboard" onClick={handleLogout} className="mx-4">
+                    <Nav.Link href="/login" onClick={handleLogout} className="mx-4">
                       Logout
                     </Nav.Link>
                   ) : (
-                    <Nav.Link href="/dashboard" className="mx-4">
+                    <Nav.Link href="/login" className="mx-4">
                       Login
                     </Nav.Link>
                   )}
