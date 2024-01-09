@@ -87,15 +87,26 @@ function App() {
         // debug={true}
         enableDeclineButton
         declineButtonText="I Decline"
-        declineButtonStyle={{fontSize: "18px"}}
+        declineButtonStyle={{
+          fontSize: "18px",
+          background: "gray  ",
+          borderRadius: "5px",
+        }}
         location="bottom"
         buttonText="Accept All"
         cookieName="Boctrust MFB "
-        style={{ background: "#2B373B" }}
-        buttonStyle={{ color: "#4e503b", fontSize: "18px" }}
+        style={{ background: "#145088" }}
+        buttonStyle={{
+          color: "#fff",
+          fontSize: "18px",
+          background: "#ecaa00",
+          borderRadius: "5px",
+        }}
         expires={90}
       >
-        Welcome to Boctrust Micro Finance Bank! To provide you with the best possible experience, our website uses cookies.
+        Welcome to Boctrust Micro Finance Bank! To provide you with the best
+        possible experience, our website uses cookies. By clicking &#34;Accept
+        All&#34; you agree to our <a href="/privacy">Privacy Policy</a> 
       </CookieConsent>
     </>
   );
