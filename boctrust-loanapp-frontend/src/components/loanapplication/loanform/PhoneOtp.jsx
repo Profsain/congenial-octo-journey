@@ -2,9 +2,9 @@ import PropTypes from "prop-types";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Modal, Button, Form } from "react-bootstrap";
-import { authentication } from "../../../firebase-config";
+// import { authentication } from "../../../firebase-config";
+import { auth } from "../../../firebase/setup"
 import {
-  getAuth,
   RecaptchaVerifier,
   signInWithPhoneNumber,
 } from "firebase/auth";
@@ -22,41 +22,46 @@ const styles = {
 
 
 const PhoneOtp = (props) => {
+  const number = props.phonenumber;
   const [confirmOtp, setConfirmOtp] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
-  const [updatePhone, setUpdatePhone] = useState(props.phonenumber);
+  const [updatePhone, setUpdatePhone] = useState(number);
   const [otp, setOtp] = useState("");
   const [flag, setFlag] = useState(false);
 
   const navigate = useNavigate();
 
   // generate recaptcha
-  const auth = getAuth();
   const setUpRecaptcha = (number) => {
     const recaptchaVerifier = new RecaptchaVerifier(
-      authentication,
+      auth,
       "recaptcha-container",
       {}
     );
     recaptchaVerifier.render();
     return signInWithPhoneNumber(auth, number, recaptchaVerifier);
+    
   };
 
   // handle otp request
   const requestOtp = async (e) => {
     e.preventDefault();
     const phone = "+234" + updatePhone.slice(1);
+    
     setErrorMsg("");
+
     if (updatePhone === "" || updatePhone === undefined)
       return setErrorMsg("Please enter a valid phone number");
     try {
       const response = await setUpRecaptcha(phone);
+
       setConfirmOtp(response);
       setFlag(true);
     } catch (error) {
       setErrorMsg("This is error", error.message);
     }
   };
+
 
   // handle otp verification
   const verifyOtp = async (e) => {
@@ -67,7 +72,7 @@ const PhoneOtp = (props) => {
       setErrorMsg("");
       await confirmOtp.confirm(otp);
       props.onHide(false);
-      navigate("/dashboard");
+      navigate("/login");
     } catch (error) {
       setErrorMsg(error.message);
     }
