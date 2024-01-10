@@ -58,7 +58,8 @@ const PhoneOtp = (props) => {
       setConfirmOtp(response);
       setFlag(true);
     } catch (error) {
-      setErrorMsg("This is error", error.message);
+      console.error("Error setting up reCAPTCHA:", error);
+      setErrorMsg(`Error setting up reCAPTCHA: ${error.message}`);
     }
   };
 
@@ -74,7 +75,8 @@ const PhoneOtp = (props) => {
       props.onHide(false);
       navigate("/login");
     } catch (error) {
-      setErrorMsg(error.message);
+      console.error("Error verifying OTP:", error);
+      setErrorMsg(`Error verifying OTP: ${error.message}`);
     }
   };
 
