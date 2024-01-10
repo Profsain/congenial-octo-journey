@@ -219,6 +219,7 @@ const LoanForm = () => {
         const apiUrl = import.meta.env.VITE_BASE_URL;
         await fetch(`${apiUrl}/api/customer/customer`, {
           method: "POST",
+          mode: 'cors',
           enctype: "multipart/form-data",
           body: formData,
         });
