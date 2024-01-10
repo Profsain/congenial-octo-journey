@@ -320,7 +320,6 @@ const AdminDashboard = () => {
   // current login admin user
   const currentUser = useSelector((state) => state.adminAuth.user);
   const adminName = currentUser.fullName;
-  console.log("User", currentUser)
 
   return (
     <div className="DashboardContainer">

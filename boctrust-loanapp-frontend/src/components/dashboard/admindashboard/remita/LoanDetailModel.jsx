@@ -12,7 +12,6 @@ const LoanDetailModel = (props) => {
   const userType = props.usertype;
   const remitaData = customer?.remita?.remitaDetails;
   const [isLoading, setIsLoading] = useState(false);
-  console.log(customer);
 
   // close model box
   const handleClose = () => {

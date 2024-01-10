@@ -33,11 +33,9 @@ const OtherDocuments = ({ customerObj, setShowDocs }) => {
   const [currentDocs, setCurrentDocs] = useState(customerObj.photocaptureImg);
 
   const handleDocs = (docs) => {
-    console.log("current docs", docs);
     setCurrentDocs(docs);
   };
 
-  console.log("current customer", customerObj);
   return (
     <div>
       {/* table section */}

@@ -116,7 +116,6 @@ const PaddingLoans = () => {
     } else if (currentAdmin === "coo") {
       updateLoanStatus(id, "with operation");
     } else if (currentAdmin === "operation") {
-      console.log("Operation approval");
       updateLoanStatus(id, "booked");
     }
 
@@ -133,7 +132,6 @@ const PaddingLoans = () => {
     if (currentAdmin === "admin" || currentAdmin === "md") {
       updateLoanStatus(id, "rejected admin");
     } else if (currentAdmin === "coo") {
-      console.log("Coo approval");
       updateLoanStatus(id, "rejected coo");
     } else if (currentAdmin === "operation") {
       updateLoanStatus(id, "rejected operation");

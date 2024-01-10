@@ -86,7 +86,6 @@ const EditUser = (props) => {
     handleClose();
   };
 
-  console.log("Edit Roles", editAdminRoles)
   return (
     <Modal
       {...props}

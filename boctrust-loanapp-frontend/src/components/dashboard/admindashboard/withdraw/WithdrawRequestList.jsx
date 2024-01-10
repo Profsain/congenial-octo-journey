@@ -72,7 +72,6 @@ const WithdrawRequestList = ({showCount, searchTerms}) => {
     handleSearch();
   }, [searchTerms]);
 
-  console.log(customerList)
   return (
     <div>
       {status === "loading" && <PageLoader />}

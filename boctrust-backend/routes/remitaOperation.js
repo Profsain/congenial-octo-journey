@@ -79,7 +79,6 @@ REMITA_TOKEN;
 
 // loan disbursement notification endpoint
 router.post('/loan-disbursement-notification', async (req, res) => {
-  // console.log("Request body", req.body)
   try {
     const myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
@@ -118,7 +117,6 @@ router.post('/loan-disbursement-notification', async (req, res) => {
     }
 
     const result = await response.json();
-    // console.log("Loan Disbursement", result);
     res.status(200).json({
       message: "Loan disbursement notification api called successfully",
       data: result
