@@ -12,7 +12,7 @@ import forgotPassword from "./forgotPassword";
 import HeadLine from "../../shared/Headline";
 import "./Login.css";
 
-const Login = ({ setLogin }) => {
+const Login = () => {
   const dispatch = useDispatch();
   const [formData, setFormData] = useState({
     username: "",
@@ -81,7 +81,7 @@ const Login = ({ setLogin }) => {
         // Dispatch the login action with the user data.
     
         dispatch(loginUser(response));
-        setLogin(true);
+        // setLogin(true);
       } else {
         // Handle login failure.
         setErrorMessage("Invalid username or password");
@@ -92,7 +92,7 @@ const Login = ({ setLogin }) => {
         clearField();
         // Dispatch the login action with the user data.
         dispatch(loginUser(response));
-        setLogin(true);
+        // setLogin(true);
       } else {
         // Handle login failure.
         setErrorMessage("Invalid username/password or account not activated");

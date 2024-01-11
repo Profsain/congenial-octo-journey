@@ -1,4 +1,4 @@
-import { useState } from "react"; 
+import { useState} from "react"; 
 import DashboardHeadline from "../../shared/DashboardHeadline";
 import "../customers/Customer.css";
 import AllLoans from "./AllLoans";
@@ -7,6 +7,8 @@ const LoanDashboard = () => {
   // handle search
   const [showCount, setShowCount] = useState(10);
   const [searchTerms, setSearchTerms] = useState("");
+
+
 
   return (
     <div className="MainBox">

@@ -28,7 +28,7 @@ const Branches = () => {
 
       handleAdminRoles(currentUser, setAdminRoles)
     }
-  }, [])
+  }, []);
 
   return (
     <>

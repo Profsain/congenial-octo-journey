@@ -12,7 +12,7 @@ import NoResult from "../../../shared/NoResult";
 // function
 import searchList from "../../../../../utilities/searchListFunc";
 
-const LoanProductsList = ({ count, searchTerm }) => {
+const LoanProductsList = ({ count, searchTerm, admin, adminRoles }) => {
   // styles
   const styles = {
     head: {
@@ -138,8 +138,15 @@ const LoanProductsList = ({ count, searchTerm }) => {
                           style={styles.select}
                         >
                           <option value="">Action</option>
-                          <option value="edit">Edit</option>
-                          <option value="delete">Delete</option>
+                          {admin ||
+                          adminRoles.includes("update_loan_product") ? (
+                            <option value="edit">Edit</option>
+                          ) : null}
+
+                          {admin ||
+                          adminRoles.includes("delete_loan_product") ? (
+                            <option value="delete">Delete</option>
+                          ) : null}
                         </select>
                       </div>
                     </td>
@@ -169,6 +176,8 @@ const LoanProductsList = ({ count, searchTerm }) => {
 LoanProductsList.propTypes = {
   count: PropTypes.number,
   searchTerm: PropTypes.string,
+  admin: PropTypes.string,
+  adminRoles: PropTypes.array,
 };
 
 export default LoanProductsList;

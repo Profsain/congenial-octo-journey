@@ -1,8 +1,11 @@
+import { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 import Table from "react-bootstrap/Table";
 import "../../Dashboard.css";
 import DashboardHeadline from "../../shared/DashboardHeadline";
 import BocButton from "../../shared/BocButton";
 import NextPreBtn from "../../shared/NextPreBtn";
+import handleAdminRoles from "../../../../../utilities/getAdminRoles";
 
 const RepaymentList = () => {
   const styles = {
@@ -24,7 +27,21 @@ const RepaymentList = () => {
       color: "#ecaa00",
     },
   };
-  
+
+  // role based access
+  const currentUser = useSelector((state) => state.adminAuth.user);
+  const [admin, setAdmin] = useState("");
+  const [adminRoles, setAdminRoles] = useState([]);
+  useEffect(() => {
+    if (currentUser) {
+      if (currentUser.userType === "admin" || currentUser.userType === "md") {
+        setAdmin("admin");
+      }
+
+      handleAdminRoles(currentUser, setAdminRoles);
+    }
+  }, []);
+
   return (
     <div>
       <DashboardHeadline
@@ -72,15 +89,17 @@ const RepaymentList = () => {
                   >
                     View
                   </BocButton>
-                  <BocButton
-                    bradius="12px"
-                    fontSize="14px"
-                    width="80px"
-                    margin="0 4px"
-                    bgcolor="#f64f4f"
-                  >
-                    Delete
-                  </BocButton>
+                  {admin || adminRoles.includes("delete_loan_repayment") ? (
+                    <BocButton
+                      bradius="12px"
+                      fontSize="14px"
+                      width="80px"
+                      margin="0 4px"
+                      bgcolor="#f64f4f"
+                    >
+                      Delete
+                    </BocButton>
+                  ) : null}
                 </div>
               </td>
             </tr>
@@ -274,8 +293,6 @@ const RepaymentList = () => {
                 </div>
               </td>
             </tr>
-         
-            
           </tbody>
         </Table>
       </div>

@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import PropTypes from "prop-types";
 import "../../Dashboard.css";
+import handleAdminRoles from "../../../../../utilities/getAdminRoles";
 
 const SideNavMain = ({ onMenuItemClick }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -40,6 +41,19 @@ const SideNavMain = ({ onMenuItemClick }) => {
   // current login admin user
   const currentUser = useSelector((state) => state.adminAuth.user);
   const userRole = currentUser.jobRole;
+
+  // role based menu
+  const [admin, setAdmin] = useState("");
+  const [adminRoles, setAdminRoles] = useState([]);
+  useEffect(() => {
+    if (currentUser) {
+      if (currentUser.userType === "admin" || currentUser.userType === "md") {
+        setAdmin("admin");
+      }
+
+      handleAdminRoles(currentUser, setAdminRoles);
+    }
+  }, []);
 
   return (
     <div className="NavIcons SideMain FixSideNav">
@@ -85,41 +99,45 @@ const SideNavMain = ({ onMenuItemClick }) => {
               <li id="customer" onClick={onMenuItemClick}>
                 All Customers
               </li>
-              <li id="customerrequest" onClick={onMenuItemClick}>
-                Customer Request
-              </li>
+              {admin || adminRoles.includes("customer_request") ? (
+                <li id="customerrequest" onClick={onMenuItemClick}>
+                  Customer Request
+                </li>
+              ) : null}
             </ul>
           </div>
         ) : null}
       </div>
 
-      <div onMouseOver={openSubLoan} onMouseLeave={closeSubLoan}>
-        <div className="IconBox">
-          <img src="images/dmyloan.png" alt="loan" />
-          <p>My Loans</p>
-        </div>
-        {isLoanOpen ? (
-          <div className="SubItem">
-            <ul>
-              <li id="myloan" onClick={onMenuItemClick}>
-                All Loans
-              </li>
-              <li id="pendingloans" onClick={onMenuItemClick}>
-                Pending Loan
-              </li>
-              <li id="activeloans" onClick={onMenuItemClick}>
-                Active Loan
-              </li>
-              <li id="loancalculator" onClick={onMenuItemClick}>
-                Loan Calculator
-              </li>
-              <li id="loanproducts" onClick={onMenuItemClick}>
-                Loan Products
-              </li>
-            </ul>
+      {admin || adminRoles.includes("my_loan") ? (
+        <div onMouseOver={openSubLoan} onMouseLeave={closeSubLoan}>
+          <div className="IconBox">
+            <img src="images/dmyloan.png" alt="loan" />
+            <p>My Loans</p>
           </div>
-        ) : null}
-      </div>
+          {isLoanOpen ? (
+            <div className="SubItem">
+              <ul>
+                <li id="myloan" onClick={onMenuItemClick}>
+                  All Loans
+                </li>
+                <li id="pendingloans" onClick={onMenuItemClick}>
+                  Pending Loan
+                </li>
+                <li id="activeloans" onClick={onMenuItemClick}>
+                  Active Loan
+                </li>
+                <li id="loancalculator" onClick={onMenuItemClick}>
+                  Loan Calculator
+                </li>
+                <li id="loanproducts" onClick={onMenuItemClick}>
+                  Loan Products
+                </li>
+              </ul>
+            </div>
+          ) : null}
+        </div>
+      ) : null}
 
       <div id="repayment" className="IconBox" onClick={onMenuItemClick}>
         <img
@@ -178,19 +196,18 @@ const SideNavMain = ({ onMenuItemClick }) => {
 
       <div onMouseOver={openSubRemita} onMouseLeave={closeSubRemita}>
         <div className="IconBox">
-          <img
-            
-            src="images/dremita.png"
-            alt="remita"
-          />
+          <img src="images/dremita.png" alt="remita" />
           <p>Remita Collections</p>
         </div>
         {isRemitaOpen ? (
           <div className="SubItem">
             <ul>
-              <li id="checksalaryhistory" onClick={onMenuItemClick}>
-                Check Salary History
-              </li>
+              {admin || adminRoles.includes("get_salary_history") ? (
+                <li id="checksalaryhistory" onClick={onMenuItemClick}>
+                  Check Salary History
+                </li>
+              ) : null}
+
               <li id="remita" onClick={onMenuItemClick}>
                 Loan Disbursements
               </li>
@@ -201,9 +218,11 @@ const SideNavMain = ({ onMenuItemClick }) => {
               <li id="mandatehistory" onClick={onMenuItemClick}>
                 Mandate History
               </li>
-              <li id="stopcollections" onClick={onMenuItemClick}>
-                Stop Collections
-              </li>
+              {admin || adminRoles.includes("stop_remita_loan") ? (
+                <li id="stopcollections" onClick={onMenuItemClick}>
+                  Stop Collections
+                </li>
+              ) : null}
             </ul>
           </div>
         ) : null}
@@ -221,50 +240,54 @@ const SideNavMain = ({ onMenuItemClick }) => {
         </p>
       </div>
 
-      <div onMouseOver={openSubEmployer} onMouseLeave={closeSubEmployer}>
-        <div className="IconBox">
-          <img src="images/dmda.png" alt="mdas" />
-          <p>Employer Manager</p>
-        </div>
-        {isEmployerOpen ? (
-          <div className="SubItem">
-            <ul>
-              <li id="addemployer" onClick={onMenuItemClick}>
-                Add Employer
-              </li>
-              <li id="mandaterules" onClick={onMenuItemClick}>
-                Mandate Rules
-              </li>
-              <li id="statementrules" onClick={onMenuItemClick}>
-                Statement Rules
-              </li>
-              <li id="mdas" onClick={onMenuItemClick}>
-                All Employers
-              </li>
-            </ul>
+      {admin || adminRoles.includes("employer_manager") ? (
+        <div onMouseOver={openSubEmployer} onMouseLeave={closeSubEmployer}>
+          <div className="IconBox">
+            <img src="images/dmda.png" alt="mdas" />
+            <p>Employer Manager</p>
           </div>
-        ) : null}
-      </div>
-
-      <div onMouseOver={openSubKyc} onMouseLeave={closeSubKyc}>
-        <div className="IconBox">
-          <img src="images/dkyc.png" alt="kyc" />
-          <p>KYC Review</p>
+          {isEmployerOpen ? (
+            <div className="SubItem">
+              <ul>
+                <li id="addemployer" onClick={onMenuItemClick}>
+                  Add Employer
+                </li>
+                <li id="mandaterules" onClick={onMenuItemClick}>
+                  Mandate Rules
+                </li>
+                <li id="statementrules" onClick={onMenuItemClick}>
+                  Statement Rules
+                </li>
+                <li id="mdas" onClick={onMenuItemClick}>
+                  All Employers
+                </li>
+              </ul>
+            </div>
+          ) : null}
         </div>
+      ) : null}
 
-        {isKycOpen ? (
-          <div className="SubItem">
-            <ul>
-              <li id="kyc" onClick={onMenuItemClick}>
-                Do KYC Review
-              </li>
-              <li id="signature" onClick={onMenuItemClick}>
-                Review Report
-              </li>
-            </ul>
+      {admin || adminRoles.includes("kyc_review") ? (
+        <div onMouseOver={openSubKyc} onMouseLeave={closeSubKyc}>
+          <div className="IconBox">
+            <img src="images/dkyc.png" alt="kyc" />
+            <p>KYC Review</p>
           </div>
-        ) : null}
-      </div>
+
+          {isKycOpen ? (
+            <div className="SubItem">
+              <ul>
+                <li id="kyc" onClick={onMenuItemClick}>
+                  Do KYC Review
+                </li>
+                <li id="signature" onClick={onMenuItemClick}>
+                  Review Report
+                </li>
+              </ul>
+            </div>
+          ) : null}
+        </div>
+      ) : null}
 
       <div onMouseOver={openSubWebManager} onMouseLeave={closeSubWebManager}>
         <div className="IconBox">

@@ -45,10 +45,10 @@ const MandateHistory = () => {
   const [remitaCustomers, setRemitaCustomers] = useState([]);
   useEffect(() => {
     if (customers?.length > 0) {
-      const remitaCustomers = customers.filter(
+      const result = customers.filter(
         (customer) => customer?.remita.loanStatus === "approved"
       );
-      setRemitaCustomers(remitaCustomers);
+      setRemitaCustomers(result);
     }
   }, [customers]);
 
@@ -89,7 +89,6 @@ const MandateHistory = () => {
   };
 
   // handle search by
-  const [customerList, setCustomerList] = useState(remitaCustomers);
   const { searchTerm, setSearchTerm, filteredData } = useSearch(
     remitaCustomers,
     "firstname"
@@ -101,13 +100,13 @@ const MandateHistory = () => {
   });
 
   useEffect(() => {
-    setCustomerList(filteredData);
+    setRemitaCustomers(filteredData);
   }, [searchTerm, filteredData]);
 
   // handle search by date
   const { filteredDateData } = useSearchByDate(remitaCustomers, "createdAt");
   const searchByDate = () => {
-    setCustomerList(filteredDateData);
+    setRemitaCustomers(filteredDateData);
   };
 
   // handle list reload
@@ -117,7 +116,7 @@ const MandateHistory = () => {
       toDate: "",
     });
     dispatch(fetchAllCustomer());
-    setCustomerList(remitaCustomers);
+    setRemitaCustomers(remitaCustomers);
   };
 
   // handle search by date range
@@ -128,12 +127,11 @@ const MandateHistory = () => {
   );
 
   useEffect(() => {
-    setCustomerList(searchData);
+    setRemitaCustomers(searchData);
   }, [searchData]);
 
   return (
     <>
-
       {/* view by section */}
       <ViewBySection
         firstBtn="Today's Mandate"
@@ -170,11 +168,13 @@ const MandateHistory = () => {
             <tbody>
               <tr>
                 <td colSpan="10">
-                  {customerList?.length === 0 && <NoResult name="Customer" />}
+                  {remitaCustomers?.length === 0 && (
+                    <NoResult name="Customer" />
+                  )}
                 </td>
               </tr>
 
-              {customerList.map((customer) => (
+              {remitaCustomers.map((customer) => (
                 <tr key={customer._id}>
                   <td>{customer.salaryaccountnumber}</td>
                   <td>

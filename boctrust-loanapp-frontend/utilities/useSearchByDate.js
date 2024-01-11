@@ -13,7 +13,7 @@ const useSearchByDate = (initialList, dateKey) => {
 
   useEffect(() => {
     searchByDate();
-  }, [initialList, dateKey]);
+  }, [dateKey]);
 
   return {
     filteredDateData,

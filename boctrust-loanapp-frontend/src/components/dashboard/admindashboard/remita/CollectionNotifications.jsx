@@ -55,33 +55,33 @@ const CollectionNotifications = () => {
   // check if customer is not empty and filter by remitaStatus
   useEffect(() => {
     if (customers?.length > 0) {
-      const remitaCustomers = customers.filter(
+      const result = customers.filter(
         (customer) => customer?.remita.loanStatus === "approved"
       );
-      setRemitaCustomers(remitaCustomers);
+      setRemitaCustomers(result);
     }
   }, [customers]);
 
   // handle search by
-  const [customerList, setCustomerList] = useState(remitaCustomers);
   const { searchTerm, setSearchTerm, filteredData } = useSearch(
     remitaCustomers,
     "firstname"
   );
 
+  // console.log("Result", customerList)
   const [dateRange, setDateRange] = useState({
     fromDate: "",
     toDate: "",
   });
 
   useEffect(() => {
-    setCustomerList(filteredData);
+    setRemitaCustomers(filteredData);
   }, [searchTerm, filteredData]);
 
   // handle search by date
   const { filteredDateData } = useSearchByDate(remitaCustomers, "createdAt");
   const searchByDate = () => {
-    setCustomerList(filteredDateData);
+    setRemitaCustomers(filteredDateData);
   };
 
   // handle list reload
@@ -91,7 +91,7 @@ const CollectionNotifications = () => {
       toDate: "",
     });
     dispatch(fetchAllCustomer());
-    setCustomerList(remitaCustomers);
+    setRemitaCustomers(remitaCustomers);
   };
 
   // handle search by date range
@@ -102,12 +102,11 @@ const CollectionNotifications = () => {
   );
 
   useEffect(() => {
-    setCustomerList(searchData);
+    setRemitaCustomers(searchData);
   }, [searchData]);
 
   return (
     <div>
-
       {/* view by section */}
       <ViewBySection
         setSearch={setSearchTerm}
@@ -143,11 +142,13 @@ const CollectionNotifications = () => {
             <tbody>
               <tr>
                 <td colSpan="10">
-                  {customerList?.length === 0 && <NoResult name="Customer" />}
+                  {remitaCustomers?.length === 0 && (
+                    <NoResult name="Customer" />
+                  )}
                 </td>
               </tr>
 
-              {customerList.map((customer) => (
+              {remitaCustomers.map((customer) => (
                 <tr key={customer._id}>
                   <td>{customer.remita.disbursementDetails.data.customerId}</td>
                   <td>{customer.loanproduct || "General Loan"}</td>

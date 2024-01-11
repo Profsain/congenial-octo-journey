@@ -76,9 +76,14 @@ const RemitaDashboard = () => {
   }, [dispatch, openModel]);
 
   // filter customer by remitaStatus
-  const remitaCustomers = customers.filter(
-    (customer) => customer?.remita.remitaStatus === "processed"
-  );
+  const remitaCustomers = customers.filter((customer) => {
+    try {
+      // Check if 'customer', 'remita', and 'remitaStatus' properties exist before accessing them
+      return customer?.remita?.remitaStatus === "processed";
+    } catch (error) {
+      return false; 
+    }
+  });
 
   // handle view details
   const handleView = (id) => {
@@ -127,7 +132,14 @@ const RemitaDashboard = () => {
   );
 
   useEffect(() => {
-    setCustomerList(searchData);
+    try {
+      if (searchData) {
+        setCustomerList(searchData);
+      }
+    } catch (error) {
+      console.error("Error updating customer list:", error);
+      // Handle the error as appropriate for your application
+    }
   }, [searchData]);
 
   return (

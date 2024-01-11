@@ -1,6 +1,9 @@
+import { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 import Table from "react-bootstrap/Table";
 import "../../Dashboard.css";
 import DashboardHeadline from "../../shared/DashboardHeadline";
+import handleAdminRoles from "../../../../../utilities/getAdminRoles";
 
 const TransactionList = () => {
   const styles = {
@@ -24,6 +27,20 @@ const TransactionList = () => {
       color: "#ecaa00",
     },
   };
+
+  // role based access
+  const currentUser = useSelector((state) => state.adminAuth.user);
+  const [admin, setAdmin] = useState("");
+  const [adminRoles, setAdminRoles] = useState([]);
+  useEffect(() => {
+    if (currentUser) {
+      if (currentUser.userType === "admin" || currentUser.userType === "md") {
+        setAdmin("admin");
+      }
+
+      handleAdminRoles(currentUser, setAdminRoles);
+    }
+  }, []);
   return (
     <div>
       <DashboardHeadline
@@ -57,9 +74,12 @@ const TransactionList = () => {
               <td>
                 <select name="action" id="action">
                   <option value="">Action</option>
-                  <option value="">Action 1</option>
-                  <option value="">Action 2</option>
-                  <option value="">Action 3</option>
+                  {admin || adminRoles.includes("manage_transaction") ? (
+                    <>
+                      <option value="">Approve</option>
+                      <option value="">Delete</option>
+                    </>
+                  ) : null}
                 </select>
               </td>
             </tr>
@@ -74,9 +94,12 @@ const TransactionList = () => {
               <td>
                 <select name="action" id="action">
                   <option value="">Action</option>
-                  <option value="">Action 1</option>
-                  <option value="">Action 2</option>
-                  <option value="">Action 3</option>
+                  {admin || adminRoles.includes("manage_transaction") ? (
+                    <div>
+                      <option value="">Approve</option>
+                      <option value="">Delete</option>
+                    </div>
+                  ) : null}
                 </select>
               </td>
             </tr>
@@ -91,9 +114,12 @@ const TransactionList = () => {
               <td>
                 <select name="action" id="action">
                   <option value="">Action</option>
-                  <option value="">Action 1</option>
-                  <option value="">Action 2</option>
-                  <option value="">Action 3</option>
+                  {admin || adminRoles.includes("manage_transaction") ? (
+                    <div>
+                      <option value="">Approve</option>
+                      <option value="">Delete</option>
+                    </div>
+                  ) : null}
                 </select>
               </td>
             </tr>
@@ -108,30 +134,16 @@ const TransactionList = () => {
               <td>
                 <select name="action" id="action">
                   <option value="">Action</option>
-                  <option value="">Action 1</option>
-                  <option value="">Action 2</option>
-                  <option value="">Action 3</option>
+                  {admin || adminRoles.includes("manage_transaction") ? (
+                    <div>
+                      <option value="">Approve</option>
+                      <option value="">Delete</option>
+                    </div>
+                  ) : null}
                 </select>
               </td>
             </tr>
-            <tr>
-              <td>21-05-2023</td>
-              <td>Mariam Makoko</td>
-              <td>7460615623</td>
-              <td>N500,000</td>
-              <td>Cr</td>
-              <td>Deposit</td>
-              <td style={styles.completed}>Completed</td>
-              <td>
-                <select name="action" id="action">
-                  <option value="">Action</option>
-                  <option value="">Action 1</option>
-                  <option value="">Action 2</option>
-                  <option value="">Action 3</option>
-                </select>
-              </td>
-            </tr>
-            
+           
           </tbody>
         </Table>
       </div>

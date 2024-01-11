@@ -16,7 +16,7 @@ const useSearch = (initialList, searchKey) => {
 
   useEffect(() => {
     handleSearch();
-  }, [searchTerm, initialList, searchKey]);
+  }, [searchTerm]);
 
   return {
     searchTerm,

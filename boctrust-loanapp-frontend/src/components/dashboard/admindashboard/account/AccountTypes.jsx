@@ -13,6 +13,7 @@ import NoResult from "../../../shared/NoResult";
 import searchList from "../../../../../utilities/searchListFunc";
 import ActionNotification from "../../shared/ActionNotification";
 import EditAccount from "./EditAccount";
+import handleAdminRoles from "../../../../../utilities/getAdminRoles";
 
 const AccountTypes = () => {
   const [openAddAccountType, setOpenAddAccountType] = useState(false);
@@ -37,7 +38,6 @@ const AccountTypes = () => {
   const [accountId, setAccountId] = useState("");
   const [action, setAction] = useState(false);
   const [openEditModel, setOpenEditModel] = useState(false);
-
 
   // update accountsList to show 10 accounts on page load
   // on count change
@@ -87,6 +87,20 @@ const AccountTypes = () => {
       setAction(true);
     }
   };
+
+  // role based access
+  const currentUser = useSelector((state) => state.adminAuth.user);
+  const [admin, setAdmin] = useState("");
+  const [adminRoles, setAdminRoles] = useState([]);
+  useEffect(() => {
+    if (currentUser) {
+      if (currentUser.userType === "admin" || currentUser.userType === "md") {
+        setAdmin("admin");
+      }
+
+      handleAdminRoles(currentUser, setAdminRoles);
+    }
+  }, []);
   // style
   const styles = {
     head: {
@@ -106,15 +120,17 @@ const AccountTypes = () => {
     <>
       {!openAddAccountType ? (
         <div className="MainBox">
-          <div className="AddBtn">
-            <BocButton
-              bgcolor="#ecaa00"
-              bradius="22px"
-              func={handleAddAccountType}
-            >
-              <span>+</span> Add New Account
-            </BocButton>
-          </div>
+          {admin || adminRoles.includes("add_new_account") ? (
+            <div className="AddBtn">
+              <BocButton
+                bgcolor="#ecaa00"
+                bradius="22px"
+                func={handleAddAccountType}
+              >
+                <span>+</span> Add New Account
+              </BocButton>
+            </div>
+          ) : null}
 
           {/* top search bar */}
           <div className="Search">
@@ -180,8 +196,13 @@ const AccountTypes = () => {
                               style={styles.select}
                             >
                               <option value="">Action</option>
-                              <option value="edit">Edit</option>
-                              <option value="delete">Delete</option>
+                              {admin || adminRoles.includes("edit_account") ? (
+                                <option value="edit">Edit</option>
+                              ) : null}
+                              {admin ||
+                              adminRoles.includes("delete_account") ? (
+                                <option value="delete">Delete</option>
+                              ) : null}
                             </select>
                           </td>
                         </tr>
@@ -197,9 +218,7 @@ const AccountTypes = () => {
           </div>
         </div>
       ) : (
-        <AddNewAccountType
-          func={setOpenAddAccountType}
-        />
+        <AddNewAccountType func={setOpenAddAccountType} />
       )}
 
       <EditAccount

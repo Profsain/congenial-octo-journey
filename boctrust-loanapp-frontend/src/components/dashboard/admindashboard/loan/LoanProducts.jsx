@@ -1,10 +1,12 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useSelector } from "react-redux";
 import BocButton from "../../shared/BocButton";
 import DashboardHeadline from "../../shared/DashboardHeadline";
 import "../customers/Customer.css";
 import NextPreBtn from "../../shared/NextPreBtn";
 import LoanProductsList from "./LoanProductsList";
 import AddNewLoanProduct from "./AddNewLoanProduct";
+import handleAdminRoles from "../../../../../utilities/getAdminRoles";
 
 const CustomersDashboard = () => {
   const [openAddLoanProduct, setOpenAddLoanProduct] = useState(false);
@@ -16,19 +18,35 @@ const CustomersDashboard = () => {
     setOpenAddLoanProduct(true);
   };
 
+  // role based access
+  const currentUser = useSelector((state) => state.adminAuth.user);
+  const [admin, setAdmin] = useState("");
+  const [adminRoles, setAdminRoles] = useState([]);
+  useEffect(() => {
+    if (currentUser) {
+      if (currentUser.userType === "admin" || currentUser.userType === "md") {
+        setAdmin("admin");
+      }
+
+      handleAdminRoles(currentUser, setAdminRoles);
+    }
+  }, []);
+
   return (
     <>
       {!openAddLoanProduct ? (
         <div className="MainBox">
-          <div className="AddBtn">
-            <BocButton
-              bgcolor="#ecaa00"
-              bradius="22px"
-              func={handleAddLoanProduct}
-            >
-              <span>+</span> New Loan Product
-            </BocButton>
-          </div>
+          {admin || adminRoles.includes("add_loan_product") ? (
+            <div className="AddBtn">
+              <BocButton
+                bgcolor="#ecaa00"
+                bradius="22px"
+                func={handleAddLoanProduct}
+              >
+                <span>+</span> New Loan Product
+              </BocButton>
+            </div>
+          ) : null}
 
           {/* top search bar */}
           <div className="Search">
@@ -63,6 +81,8 @@ const CustomersDashboard = () => {
               func={setOpenAddLoanProduct}
               count={showCount}
               searchTerm={searchTerm}
+              admin={admin}
+              adminRoles={adminRoles}
             />
 
             {/* next and previous button  */}
