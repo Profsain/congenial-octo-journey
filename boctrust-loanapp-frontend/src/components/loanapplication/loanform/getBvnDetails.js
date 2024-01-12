@@ -1,10 +1,10 @@
 const getBvnDetails = () => {
     // Step 2: After the customer is redirected back to callback URL with a temporary code,
   // extract the code and exchange it for an access token
-    const clientSecret = 'R6EuiPa8sLsrdbNMVoxMadTOFlbuEXfdEOTabq82';
-    const grantType = 'authorization_code';
-     const clientId = '8e7cd2fe-35b5-4e25-9a98-0a555f1c23cd';
-     const redirectUri = 'https://www.boctrustmfb.com/app/nibbs-login';
+    // const clientSecret = 'R6EuiPa8sLsrdbNMVoxMadTOFlbuEXfdEOTabq82';
+    // const grantType = 'authorization_code';
+    //  const clientId = '8e7cd2fe-35b5-4e25-9a98-0a555f1c23cd';
+    //  const redirectUri = 'https://www.boctrustmfb.com/app/nibbs-login';
 
     // Simulate receiving the temporary code (replace with the actual code received)
     const urlSearchParams = new URLSearchParams(window.location.search);
@@ -19,20 +19,7 @@ const getBvnDetails = () => {
         if (!code) {
             throw new Error('Authorization code not found in the URL');
         }
-        const tokenRequestBody = new URLSearchParams();
-        tokenRequestBody.append('client_id', clientId);
-        tokenRequestBody.append('client_secret', clientSecret);
-        tokenRequestBody.append('code', code);
-        tokenRequestBody.append('redirect_uri', redirectUri);
-        tokenRequestBody.append('grant_type', grantType);
-
-        const response = await fetch(`${serverUrl}/api/bvn/getAccessToken`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: tokenRequestBody,
-      });
+        const response = await fetch(`${serverUrl}/api/bvn/getAccessToken`);
 
         if (!response.ok) {
             throw new Error(`Token request failed with status ${response.status}`);
