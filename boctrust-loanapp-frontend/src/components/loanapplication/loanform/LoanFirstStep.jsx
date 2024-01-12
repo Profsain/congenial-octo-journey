@@ -34,8 +34,7 @@ const LoanFirstStep = ({ data }) => {
   const loanamount = data?.loanamount;
   const careertype = data?.careertype;
   const [noofmonth, setNoofmonth] = useState(1);
-  const [currentLoanAmount, setCurrentLoanAmount] = useState((loanamount)
-  );
+  const [currentLoanAmount, setCurrentLoanAmount] = useState(loanamount);
   const [interestResult, setInterestResult] = useState(0);
 
   const [step, setStep] = useState(1);
@@ -44,7 +43,6 @@ const LoanFirstStep = ({ data }) => {
   // get current formik value
   const ref = useRef();
 
-    
   // scroll to the top of the page
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -53,6 +51,7 @@ const LoanFirstStep = ({ data }) => {
   // calculate interest rate
   const [loanRepaymentTotal, setLoanRepaymentTotal] = useState(0);
   const [monthlyRepayment, setMonthlyRepayment] = useState(0);
+  // const [bvn, setBvn] = useState("");
 
   const calculateRepayment = () => {
     // get product id from formik values
@@ -61,8 +60,8 @@ const LoanFirstStep = ({ data }) => {
     setNoofmonth(noOfMonths);
 
     // find product
-      const product = loanProducts?.find((product) => product._id === productId);
-      
+    const product = loanProducts?.find((product) => product._id === productId);
+
     // get interest rate
     const loanRate = product?.interestRate;
 
@@ -96,27 +95,46 @@ const LoanFirstStep = ({ data }) => {
     }
   };
 
-    // send data to redux store
-    const productId = ref.current?.values.loanproduct;
-    const product = loanProducts?.find((product) => product._id === productId);
- 
-    const startData = {
-        loanamount,
-        careertype,
-        noofmonth,
-        loanRepaymentTotal,
-        monthlyRepayment,
-        product
-  };
+  // send data to redux store
+  const productId = ref.current?.values.loanproduct;
+
+  const product = loanProducts?.find((product) => product._id === productId);
+
   // handle bvn verification
-    const handleBvnVerification = () => {
-        // store startData to local storage
+  const handleBvnVerification = () => {
+    const bvn = ref.current?.values.bvnnumber;
+    const apiUrl = import.meta.env.VITE_BASE_URL;
+
+    const myHeaders = new Headers();
+    myHeaders.append("Content-Type", "application/json");
+
+    const raw = JSON.stringify({
+      bvn,
+      loanAmount: loanamount,
+      careerType: careertype,
+      numberOfMonths: noofmonth,
+      loanTotalRepayment: loanRepaymentTotal,
+      monthlyRepayment,
+      loanProduct: product,
+    });
+
+    const requestOptions = {
+      method: "POST",
+      headers: myHeaders,
+      body: raw,
+      redirect: "follow",
+    };
+
+    fetch(`${apiUrl}/api/tempdata/tempdata`, requestOptions)
+      .then((response) => response.text())
+      .then((result) => {
+        console.log(result);
+        // idpRedirect();
+        bvnVerification();
+      })
+      .catch((error) => console.log("error", error));
   
-    localStorage.setItem("startData", JSON.stringify(startData));
-  
-    // idpRedirect();
-    bvnVerification();
-  }
+  };
 
   return (
     <div className="container-fluid FormContainer">
@@ -130,7 +148,7 @@ const LoanFirstStep = ({ data }) => {
             innerRef={ref}
             encType="multipart/form-data"
           >
-            {({ isSubmitting, values }) => (
+            {({ isSubmitting }) => (
               <>
                 <div className="container">
                   <div className="row">
@@ -236,7 +254,10 @@ const LoanFirstStep = ({ data }) => {
                                   <span className="CalNaira">
                                     <img src="images/naira.png" alt="" />
                                   </span>
-                                  {isNaN(loanTotal) ? 0 : loanTotal.toLocaleString() || loanamount}{" "}
+                                  {isNaN(loanTotal)
+                                    ? 0
+                                    : loanTotal.toLocaleString() ||
+                                      loanamount}{" "}
                                   <span> for </span>
                                   {noofmonth}
                                   {noofmonth > 1 ? (
@@ -260,7 +281,7 @@ const LoanFirstStep = ({ data }) => {
                                     : Number(monthlyPay).toLocaleString()}
                                 </h4>
                               </div>
-                              <div className="Purpose">
+                              {/* <div className="Purpose">
                                 <Headline
                                   fontSize="24px"
                                   spacer="28px 0 0 0"
@@ -326,7 +347,7 @@ const LoanFirstStep = ({ data }) => {
                                     />
                                   </div>
                                 )}
-                              </div>
+                              </div> */}
                             </div>
                             {/* next form page btn */}
                             <div className="ButtonContainer">

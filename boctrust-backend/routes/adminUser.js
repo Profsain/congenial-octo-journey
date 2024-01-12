@@ -241,7 +241,6 @@ router.delete('/users/:id', async (req, res) => {
 
 // Update a user
 router.put('/update/:id', async (req, res) => {
-    console.log(req.body)
     try {
         const { id } = req.params;
         const { fullName, email, phone, username, jobRole, userType, adminRoles } = req.body;
@@ -265,15 +264,6 @@ router.put('/update/:id', async (req, res) => {
             userType,
             adminRoles,
         });
-        // const updated = await User.findByIdAndUpdate(id, {
-        //     fullName,
-        //     email: email.toLowerCase(),
-        //     phone,
-        //     username,
-        //     password: encryptedPassword,
-        //     jobRole,
-        //     userType,
-        // });
 
         if (updated) {
             return res.status(200).json({ success: 'User updated successfully' });

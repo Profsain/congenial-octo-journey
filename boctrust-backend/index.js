@@ -28,6 +28,7 @@ const crcRegisterRoutes = require("./routes/crcRegister");
 const creditRegistryRoutes = require("./routes/creditRegistry");
 // first central routes
 const firstCentralRoutes = require("./routes/firstCentral");
+const tempDataRoutes = require("./routes/tempData");
 
 // configure dotenv
 dotenv.config();
@@ -92,6 +93,9 @@ mongoose
         app.use('/api/creditregistry', creditRegistryRoutes);
         // first central routes
         app.use('/api/firstcentral', firstCentralRoutes);
+
+        // temp data routes
+        app.use('/api/tempdata', tempDataRoutes);
 
         app.listen(process.env.PORT || 3030, () => console.log("Server running on port 3030"));
     })

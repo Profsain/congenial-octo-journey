@@ -23,6 +23,7 @@ import initialValues from "./formInitialValue";
 import convertFile from "../../../../utilities/convertFile";
 import dataURItoBlob from "../../../../utilities/dataURItoBlob";
 import generateCustomerId from "../../dashboard/admindashboard/customers/generateCustomerId";
+import getBvnDetails from "./getBvnDetails";
 
 // loan form component
 const LoanForm = () => {
@@ -32,6 +33,8 @@ const LoanForm = () => {
     dispatch(fetchProduct());
     dispatch(fetchEmployers());
   }, [dispatch]);
+
+
 
   const employers = useSelector(
     (state) => state.employersManagerReducer.employers.employers
@@ -44,21 +47,23 @@ const LoanForm = () => {
   const [loanRepaymentTotal, setLoanRepaymentTotal] = useState("");
   const [monthlyRepayment, setMonthlyRepayment] = useState("");
 
+  // fetch first form data here
   useEffect(() => {
-    const storedStartData = localStorage.getItem("startData");
-    if (storedStartData) {
-      // Parse the JSON data retrieved from local storage
-      const parsedStartData = JSON.parse(storedStartData);
+    // const storedStartData = localStorage.getItem("startData");
+    // if (storedStartData) {
+    //   // Parse the JSON data retrieved from local storage
+    //   // const parsedStartData = JSON.parse(storedStartData);
 
-      // Set the state with the retrieved data
-      setLoanAmount(parsedStartData.loanamount);
-      setCareerType(parsedStartData.careertype);
-      setNoOfMonth(parsedStartData.noofmonth);
-      setLoanRepaymentTotal(parsedStartData.loanRepaymentTotal);
-      setMonthlyRepayment(parsedStartData.monthlyRepayment);
-    }
+    //   // Set the state with the retrieved data
+    //   // setLoanAmount(parsedStartData.loanamount);
+    //   // setCareerType(parsedStartData.careertype);
+    //   // setNoOfMonth(parsedStartData.noofmonth);
+    //   // setLoanRepaymentTotal(parsedStartData.loanRepaymentTotal);
+    //   // setMonthlyRepayment(parsedStartData.monthlyRepayment);
+    // }
+    getBvnDetails();
   }, []);
-  console.log(careertype);
+  // console.log(careertype);
 
   const [step, setStep] = useState(1);
   const [showForm, setShowForm] = useState(true);
