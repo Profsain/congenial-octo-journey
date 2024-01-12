@@ -29,6 +29,7 @@ const creditRegistryRoutes = require("./routes/creditRegistry");
 // first central routes
 const firstCentralRoutes = require("./routes/firstCentral");
 const tempDataRoutes = require("./routes/tempData");
+const bvnVerificationRoutes = require("./routes/bvnVerification");
 
 // configure dotenv
 dotenv.config();
@@ -66,6 +67,7 @@ mongoose
         
         // Middleware
         app.use(bodyParser.json());
+        app.use(bodyParser.urlencoded({ extended: true }));
 
         // use routes
         app.use('/api/blog', blogRoutes);
@@ -96,6 +98,9 @@ mongoose
 
         // temp data routes
         app.use('/api/tempdata', tempDataRoutes);
+
+        // bvn verification routes
+        app.use('/api/bvn', bvnVerificationRoutes);
 
         app.listen(process.env.PORT || 3030, () => console.log("Server running on port 3030"));
     })
