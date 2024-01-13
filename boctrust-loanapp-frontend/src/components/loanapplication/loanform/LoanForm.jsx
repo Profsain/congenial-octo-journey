@@ -49,21 +49,21 @@ const LoanForm = () => {
 
   // fetch first form data here
   useEffect(() => {
-    // const storedStartData = localStorage.getItem("startData");
-    // if (storedStartData) {
-    //   // Parse the JSON data retrieved from local storage
-    //   // const parsedStartData = JSON.parse(storedStartData);
+    const storedStartData = localStorage.getItem("startData");
+    if (storedStartData) {
+      // Parse the JSON data retrieved from local storage
+      const parsedStartData = JSON.parse(storedStartData);
 
-    //   // Set the state with the retrieved data
-    //   // setLoanAmount(parsedStartData.loanamount);
-    //   // setCareerType(parsedStartData.careertype);
-    //   // setNoOfMonth(parsedStartData.noofmonth);
-    //   // setLoanRepaymentTotal(parsedStartData.loanRepaymentTotal);
-    //   // setMonthlyRepayment(parsedStartData.monthlyRepayment);
-    // }
-    getBvnDetails();
+      // Set the state with the retrieved data
+      setLoanAmount(parsedStartData.loanamount);
+      setCareerType(parsedStartData.careertype);
+      setNoOfMonth(parsedStartData.noofmonth);
+      setLoanRepaymentTotal(parsedStartData.loanRepaymentTotal);
+      setMonthlyRepayment(parsedStartData.monthlyRepayment);
+    }
+    // getBvnDetails();
   }, []);
-  // console.log(careertype);
+  console.log("Local Storage data", careertype);
 
   const [step, setStep] = useState(1);
   const [showForm, setShowForm] = useState(true);
