@@ -13,6 +13,7 @@ import Headline from "../../shared/Headline";
 import TextInput from "./formcomponents/TextInput";
 import "./Form.css";
 import calculatorfunc from "../../shared/calculatorfunc";
+import bvnVerification from "./bvnVerification";
 import { setCookie, getCookie } from "./cookiesStore";
 
 // loan form component
