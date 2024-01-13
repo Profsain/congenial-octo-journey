@@ -13,8 +13,7 @@ import Headline from "../../shared/Headline";
 import TextInput from "./formcomponents/TextInput";
 import "./Form.css";
 import calculatorfunc from "../../shared/calculatorfunc";
-// import idpRedirect from "./bvnIDPAuth"
-import bvnVerification from "./bvnVerification";
+import { setCookie, getCookie } from "./cookiesStore";
 
 // loan form component
 const LoanFirstStep = ({ data }) => {
@@ -103,10 +102,6 @@ const LoanFirstStep = ({ data }) => {
   // handle bvn verification
   const handleBvnVerification = () => {
     const bvn = ref.current?.values.bvnnumber;
-    // const apiUrl = import.meta.env.VITE_BASE_URL;
-
-    const myHeaders = new Headers();
-    myHeaders.append("Content-Type", "application/json");
 
     const raw = JSON.stringify({
       bvn,
@@ -118,32 +113,15 @@ const LoanFirstStep = ({ data }) => {
       loanProduct: product,
     });
 
-    // store data to local storage
-    localStorage.setItem("loanData", raw);
-    // check if data is stored in local storage
-    const loanData = JSON.parse(localStorage.getItem("loanData"));
+    // Store data in a cookie that expires in 2 days
+    setCookie("loanData", raw, 2);
+
+    // Retrieve the data from the cookie
+    const loanData = getCookie("loanData");
     if (loanData) {
-      console.log("data stored", loanData);
-      // idpRedirect();
+      // redirect to bvn verification page
       bvnVerification();
     }
-
-    // const requestOptions = {
-    //   method: "POST",
-    //   headers: myHeaders,
-    //   body: raw,
-    //   redirect: "follow",
-    // };
-
-    // fetch(`${apiUrl}/api/tempdata/tempdata`, requestOptions)
-    //   .then((response) => response.text())
-    //   .then((result) => {
-    //     console.log(result);
-    //     // idpRedirect();
-    //     bvnVerification();
-    //   })
-    //   .catch((error) => console.log("error", error));
-  
   };
 
   return (
