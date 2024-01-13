@@ -52,6 +52,7 @@ const CreditCheckhtmlForm = ({ customerId }) => {
   const [isDeductCheck, setIsDeductCheck] = useState(false);
   const [deductSearchReport, setDeductSearchReport] = useState("");
   const [bureauSearchReport, setBureauSearchReport] = useState("");
+  const [noReport, setNoReport] = useState(false);
 
   const handleChange = () => {
     setIsCreditDbCheck(!isCreditDbCheck);
@@ -227,6 +228,8 @@ const CreditCheckhtmlForm = ({ customerId }) => {
            }
          );
          if (!response.ok) {
+          setBureauLoading(false);
+          setNoReport(true)
            throw new Error("Network response was not ok");
          }
 
@@ -255,8 +258,9 @@ const CreditCheckhtmlForm = ({ customerId }) => {
         }
 
         const data = await response.json();
+        console.log("Report data", data.data.ConsumerSearchResultResponse);
         // set bureau report 
-        setBureauReport(data.data.ConsumerSearchResultResponse);
+        setBureauReport(data);
         // set bureau loading
         setBureauLoading(false);
         // updateBureauLoading("success");
@@ -607,7 +611,7 @@ const CreditCheckhtmlForm = ({ customerId }) => {
             )}
           </div>
           <div className="row m-5">
-            {!Object.keys(firstCentralReport).length > 0 && (
+            {noReport && (
               <h4>No First Central Report</h4>
             )}
             {/* generated pdf report component */}

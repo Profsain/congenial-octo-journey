@@ -2,6 +2,8 @@ const express = require("express");
 const router = express.Router();
 
 // add token to environment variable
+const token = process.env.BANKONE_TOKEN;
+const baseUrl = "https://api.mybankone.com";
 
 // Create customer account endpoint
 router.post("/createCustomerAccount", async(req, res) => {
@@ -36,7 +38,7 @@ router.post("/createCustomerAccount", async(req, res) => {
   };
 
   try {
-    const response = await fetch('https://staging.mybankone.com/BankOneWebAPI/api/Account/CreateAccountQuick/2?authToken=c175cfbe-e036-487b-9cc5-d8dfd21999ad', options);
+    const response = await fetch(`${baseUrl}/BankOneWebAPI/api/Account/CreateAccountQuick/2?authToken=${token}`, options);
 
     if (!response) {
       throw new Error(`HTTP error! Status: ${response.status}`);
@@ -64,7 +66,7 @@ router.post("/newCustomerAccount", (req, res) => {
     })
   };
 
-  fetch('https://staging.mybankone.com/BankOneWebAPI/api/Account/CreateCustomerAndAccount/2?authToken=c175cfbe-e036-487b-9cc5-d8dfd21999ad', options)
+  fetch(`${baseUrl}/BankOneWebAPI/api/Account/CreateCustomerAndAccount/2?authToken=${token}`, options)
     .then(response => {
       if (!response.ok) {
         throw new Error('Network response was not ok');
@@ -86,7 +88,7 @@ router.get("/balanceEnquiry/:accountNumber", (req, res) => {
   const { accountNumber } = req.params; // Get the account number from the URL parameters
 
   // Construct the URL with the provided account number
-  const apiUrl = `https://staging.mybankone.com/BankOneWebAPI/api/Account/GetAccountByAccountNumber/2?authtoken=c175cfbe-e036-487b-9cc5-d8dfd21999ad&accountNumber=${accountNumber}&computewithdrawableBalance=false`;
+  const apiUrl = `${baseUrl}/BankOneWebAPI/api/Account/GetAccountByAccountNumber/2?authtoken=${token}&accountNumber=${accountNumber}&computewithdrawableBalance=false`;
 
   const options = {
     method: 'GET',
@@ -124,7 +126,7 @@ router.get("/getCustomerById/:customerId", (req, res) => {
   };
 
   // Construct the URL with the provided customer ID
-  const apiUrl = `https://staging.mybankone.com/BankOneWebAPI/api/Customer/GetByCustomerID/2?authToken=c175cfbe-e036-487b-9cc5-d8dfd21999ad&CustomerID=${customerId}`;
+  const apiUrl = `${baseUrl}/BankOneWebAPI/api/Customer/GetByCustomerID/2?authToken=${token}&CustomerID=${customerId}`;
 
   fetch(apiUrl, options)
     .then(response => {
@@ -147,7 +149,7 @@ router.get("/getCustomerById/:customerId", (req, res) => {
 router.get("/getAllCommercialBank", (req, res) => {
     const options = {method: 'GET', headers: {accept: 'application/json'}};
 
-    fetch('https://staging.mybankone.com/ThirdPartyAPIService/APIService/BillsPayment/GetCommercialBanks/c175cfbe-e036-487b-9cc5-d8dfd21999ad', options)
+    fetch(`${baseUrl}/ThirdPartyAPIService/APIService/BillsPayment/GetCommercialBanks/${token}`, options)
     .then(response => response.json())
     .then(response => console.log(response))
     .catch(err => console.error(err));
@@ -177,7 +179,7 @@ router.post("/interbankTransfer", (req, res) => {
   };
 
   // Construct the URL for interbank transfer
-  const apiUrl = 'https://staging.mybankone.com/thirdpartyapiservice/apiservice/Transfer/InterBankTransfer';
+  const apiUrl = `${baseUrl}/thirdpartyapiservice/apiservice/Transfer/InterBankTransfer`;
 
   fetch(apiUrl, options)
     .then(response => {
@@ -203,7 +205,7 @@ router.get("/getLoanByAccount/:accountNumber", (req, res) => {
   const { customerId } = req.params; // Get the id number from the URL parameters
 
   // Construct the URL with the provided customer id number
-  const apiUrl = `https://staging.mybankone.com/BankOneWebAPI/api/Loan/GetLoansByCustomerId/2?authToken=c175cfbe-e036-487b-9cc5-d8dfd21999ad&institutionCode=0118&CustomerId=${customerId}`;
+  const apiUrl = `${baseUrl}/BankOneWebAPI/api/Loan/GetLoansByCustomerId/2?authToken=${token}&institutionCode=0118&CustomerId=${customerId}`;
 
   const options = {
     method: 'GET',
@@ -235,7 +237,7 @@ router.get("/getLoanRepaymentSchedule/:loanAccountNumber", async (req, res) => {
     const { loanAccountNumber } = req.params; // Get the loan account number from the URL parameters
 
     // Construct the URL with the provided loan account number
-    const apiUrl = `https://staging.mybankone.com/BankOneWebAPI/api/Loan/GetLoanRepaymentSchedule/2?authToken=c175cfbe-e036-487b-9cc5-d8dfd21999ad&loanAccountNumber=${loanAccountNumber}`;
+    const apiUrl = `${baseUrl}/BankOneWebAPI/api/Loan/GetLoanRepaymentSchedule/2?authToken=${token}&loanAccountNumber=${loanAccountNumber}`;
 
     const options = {
       method: 'GET',
@@ -268,7 +270,7 @@ router.get("/loanAccountBalance/:customerId", (req, res) => {
   const { customerId } = req.params; // Get the customer ID from the URL parameters
 
   // Construct the URL with the provided customer ID
-  const apiUrl = `https://staging.mybankone.com/BankOneWebAPI/api/LoanAccount/LoanAccountBalance2/2?authToken=c175cfbe-e036-487b-9cc5-d8dfd21999ad&customerIDInString=${customerId}`;
+  const apiUrl = `${baseUrl}/BankOneWebAPI/api/LoanAccount/LoanAccountBalance2/2?authToken=${token}&customerIDInString=${customerId}`;
 
   const options = {
     method: 'GET',
@@ -299,7 +301,7 @@ router.get("/loanAccountStatement/:loanAccountNumber/:fromDate/:toDate/:institut
   const { loanAccountNumber, fromDate, toDate, institutionCode } = req.params; // Get parameters from the URL
 
   // Construct the URL with the provided parameters
-  const apiUrl = `http://staging.mybankone.com/LoanAccount/LoanAccountStatement/2?authToken=c175cfbe-e036-487b-9cc5-d8dfd21999ad&loanAccountNumber=${loanAccountNumber}&fromDate=${fromDate}&toDate=${toDate}&institutionCode=${institutionCode}`;
+  const apiUrl = `${baseUrl}/LoanAccount/LoanAccountStatement/2?authToken=${token}&loanAccountNumber=${loanAccountNumber}&fromDate=${fromDate}&toDate=${toDate}&institutionCode=${institutionCode}`;
 
   const options = {
     method: 'GET',
@@ -356,7 +358,7 @@ router.post("/createLoan", (req, res) => {
   };
 
   // Construct the URL for loan creation
-  const apiUrl = 'https://staging.mybankone.com/BankOneWebAPI/api/Loan/LoanApplication/LoanCreationApplication2/2?authToken=c175cfbe-e036-487b-9cc5-d8dfd21999ad';
+  const apiUrl = `${baseUrl}/BankOneWebAPI/api/Loan/LoanApplication/LoanCreationApplication2/2?authToken=${token}`;
 
   fetch(apiUrl, options)
     .then(response => {

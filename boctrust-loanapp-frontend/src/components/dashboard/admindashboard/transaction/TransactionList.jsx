@@ -75,10 +75,10 @@ const TransactionList = () => {
                 <select name="action" id="action">
                   <option value="">Action</option>
                   {admin || adminRoles.includes("manage_transaction") ? (
-                    <>
-                      <option value="">Approve</option>
-                      <option value="">Delete</option>
-                    </>
+                    <option value="">Approve</option>
+                  ) : null}
+                  {admin || adminRoles.includes("manage_transaction") ? (
+                    <option value="">Delete</option>
                   ) : null}
                 </select>
               </td>
@@ -143,7 +143,6 @@ const TransactionList = () => {
                 </select>
               </td>
             </tr>
-           
           </tbody>
         </Table>
       </div>

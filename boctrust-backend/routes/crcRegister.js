@@ -6,18 +6,18 @@ router.post('/getcrc', async (req, res) => {
     console.log("crc api called", req.body);
 
     // Extract BVN from the request body
-    const { bvn } = req.body;
+    // const { bvn } = req.body;
+    const bvn = '22170216986';
 
     try {
         const myHeaders = new Headers();
         myHeaders.append("Content-Type", "application/json");
 
         const raw = JSON.stringify({
-            "Request": "{'@REQUEST_ID': '1', 'REQUEST_PARAMETERS': { 'REPORT_PARAMETERS': { '@REPORT_ID': '2', '@SUBJECT_TYPE': '1', '@RESPONSE_TYPE': '5' }, 'INQUIRY_REASON': { '@CODE': '1' }, 'APPLICATION': { '@PRODUCT': '017', '@NUMBER': '232', '@AMOUNT': '15000', '@CURRENCY': 'NGN' } }, 'SEARCH_PARAMETERS': { '@SEARCH-TYPE': '4', 'BVN_NO': '22170216986' }}",
-            "UserName": "14093142boctru1",
-            "Password": "te3tUupw3115@2023"
+            "Request": "{'@REQUEST_ID': '1', 'REQUEST_PARAMETERS': { 'REPORT_PARAMETERS': { '@REPORT_ID': '2', '@SUBJECT_TYPE': '1', '@RESPONSE_TYPE': '5' }, 'INQUIRY_REASON': { '@CODE': '1' }, 'APPLICATION': { '@PRODUCT': '017', '@NUMBER': '232', '@AMOUNT': '15000', '@CURRENCY': 'NGN' } }, 'SEARCH_PARAMETERS': { '@SEARCH-TYPE': '4', 'BVN_NO': '" + bvn + "' }}",
+            "UserName": process.env.CRC_USERNAME,
+            "Password": process.env.CRC_PASSWORD
         });
-
         const requestOptions = {
             method: 'POST',
             headers: myHeaders,
