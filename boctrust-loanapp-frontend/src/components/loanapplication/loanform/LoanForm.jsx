@@ -256,6 +256,9 @@ const LoanForm = () => {
         setStep(3);
         setStepImg("https://i.imgur.com/kDbL3XN.png");
       }
+    } else if (step === 2) {
+      setStep(3);
+      setStepImg("https://i.imgur.com/kDbL3XN.png");
     } else if (step === 3) {
       setStep(4);
       setStepImg("https://i.imgur.com/SCIwWO7.png");

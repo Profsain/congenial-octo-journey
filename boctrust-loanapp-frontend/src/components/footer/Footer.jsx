@@ -28,7 +28,7 @@ const Footer = () => {
 
           <h6 className="FooterHeadline">About</h6>
           <p>
-            BOCTRUST MICROFINANCE BANK is a financial institution licensed by
+            BOCTRUST MICROFINANCE BANK Limited is a financial institution licensed by
             Central Bank of Nigeria to gives social and economic Support to the
             lower middle class, working class and the economically active poor.
           </p>
