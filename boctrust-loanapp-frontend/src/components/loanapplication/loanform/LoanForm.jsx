@@ -23,7 +23,7 @@ import initialValues from "./formInitialValue";
 import convertFile from "../../../../utilities/convertFile";
 import dataURItoBlob from "../../../../utilities/dataURItoBlob";
 import generateCustomerId from "../../dashboard/admindashboard/customers/generateCustomerId";
-import { getCookie } from "./cookiesStore";
+import ReconfirmBvn from "./ReconfirmBvn";
 
 // loan form component
 const LoanForm = () => {
@@ -44,24 +44,30 @@ const LoanForm = () => {
   const [noofmonth, setNoOfMonth] = useState("");
   const [loanRepaymentTotal, setLoanRepaymentTotal] = useState("");
   const [monthlyRepayment, setMonthlyRepayment] = useState("");
+  const [product, setProduct] = useState({});
+  const [bvn, setBvn] = useState("");
+  const [showReconfirmBvn, setShowReconfirmBvn] = useState(false);
+  const [firstStepData, setFirstStepData] = useState({});
 
+  useEffect(() => {
+    // set showReconfirmBvn modal after 30 seconds
+    setTimeout(() => {
+      setShowReconfirmBvn(true);
+    }, 30000);
+  },[])
   // fetch first form data here
   useEffect(() => {
-    const storedStartData = getCookie("loanData");
-    if (storedStartData) {
-      // Parse the JSON data retrieved from local storage
-      const parsedStartData = JSON.parse(storedStartData);
-
-      // Set the state with the retrieved data
-      setLoanAmount(parsedStartData.loanamount);
-      setCareerType(parsedStartData.careertype);
-      setNoOfMonth(parsedStartData.noofmonth);
-      setLoanRepaymentTotal(parsedStartData.loanRepaymentTotal);
-      setMonthlyRepayment(parsedStartData.monthlyRepayment);
+    if (firstStepData) {
+      setBvn(firstStepData.bvn || "");
+      setLoanAmount(firstStepData.loanAmount || "");
+      setCareerType(firstStepData.careerType || "");
+      setNoOfMonth(firstStepData.numberOfMonths || "");
+      setLoanRepaymentTotal(firstStepData.loanTotalRepayment || "");
+      setMonthlyRepayment(firstStepData.monthlyRepayment || "");
+      setProduct(firstStepData.loanProduct || {});
     }
-    // getBvnDetails();
-  }, []);
-  console.log("Local Storage data", careertype);
+  }, [firstStepData]);
+
 
   const [step, setStep] = useState(1);
   const [showForm, setShowForm] = useState(true);
@@ -110,7 +116,6 @@ const LoanForm = () => {
 
   // handle form submit/move to next step
   const handleSubmit = async () => {
-    console.log("Form submit start");
     // handle form submit to backend here
     try {
       if (ref.current.values) {
@@ -124,10 +129,10 @@ const LoanForm = () => {
         formData.append("loantotalrepayment", loanRepaymentTotal);
         formData.append("monthlyrepayment", monthlyRepayment);
         formData.append("careertype", careertype);
-        formData.append("loanproduct", formValues.loanproduct);
+        formData.append("loanproduct", product);
         formData.append("loanpurpose", formValues.loanpurpose);
         formData.append("otherpurpose", formValues.otherpurpose);
-        formData.append("bvnnumber", formValues.bvnnumber);
+        formData.append("bvnnumber", bvn);
         formData.append("title", formValues.title);
         formData.append("firstname", formValues.firstname);
         formData.append("lastname", formValues.lastname);
@@ -222,7 +227,7 @@ const LoanForm = () => {
         const apiUrl = import.meta.env.VITE_BASE_URL;
         await fetch(`${apiUrl}/api/customer/customer`, {
           method: "POST",
-          mode: 'cors',
+          mode: "cors",
           enctype: "multipart/form-data",
           body: formData,
         });
@@ -1292,6 +1297,15 @@ const LoanForm = () => {
           </Formik>
         </div>
       </div>
+
+      {/*  reconfirm modal */}
+      {showReconfirmBvn && (
+        <ReconfirmBvn
+          show={showReconfirmBvn}
+          setShow={setShowReconfirmBvn}
+          setFirstStepData={setFirstStepData}
+        />
+      )}
     </div>
   );
 };

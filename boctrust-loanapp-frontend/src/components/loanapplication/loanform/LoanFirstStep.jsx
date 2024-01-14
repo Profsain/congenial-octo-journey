@@ -14,7 +14,6 @@ import TextInput from "./formcomponents/TextInput";
 import "./Form.css";
 import calculatorfunc from "../../shared/calculatorfunc";
 import bvnVerification from "./bvnVerification";
-import { setCookie, getCookie } from "./cookiesStore";
 
 // loan form component
 const LoanFirstStep = ({ data }) => {
@@ -101,7 +100,8 @@ const LoanFirstStep = ({ data }) => {
   const product = loanProducts?.find((product) => product._id === productId);
 
   // handle bvn verification
-  const handleBvnVerification = () => {
+  const handleBvnVerification = async () => {
+    const apiUrl = import.meta.env.VITE_BASE_URL;
     const bvn = ref.current?.values.bvnnumber;
 
     const raw = JSON.stringify({
@@ -114,15 +114,21 @@ const LoanFirstStep = ({ data }) => {
       loanProduct: product,
     });
 
-    // Store data in a cookie that expires in 2 days
-    setCookie("loanData", raw, 2);
+    // send data to database and redirect to bvn verification page
+    await fetch(`${apiUrl}/api/tempdata/tempdata`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: raw,
+    })
+      .then((response) => response.json())
+      .then((result) => {
+        console.log(result);
 
-    // Retrieve the data from the cookie
-    const loanData = getCookie("loanData");
-    if (loanData) {
-      // redirect to bvn verification page
-      bvnVerification();
-    }
+        // redirect to bvn verification page
+        bvnVerification();
+      });
   };
 
   return (

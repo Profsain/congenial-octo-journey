@@ -40,6 +40,10 @@ router.get('/tempdata/:bvn', async (req, res) => {
         // Get TempData
         const tempData = await TempData.findOne({ bvn });
 
+        if (!tempData) {
+            return res.status(404).json({ error: 'Data not found' });
+        }
+
         // Return success response
         return res.status(200).json({ success: 'Data retrieved successfully', data: tempData });
     } catch (error) {

@@ -111,6 +111,8 @@ function App() {
         possible experience, our website uses cookies. By clicking &#34;Accept
         All&#34; you agree to our <a href="/privacy">Privacy Policy</a> 
       </CookieConsent>
+
+      
     </>
   );
 }
