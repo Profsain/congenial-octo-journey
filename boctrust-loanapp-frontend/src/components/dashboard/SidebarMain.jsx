@@ -1,6 +1,7 @@
 import PropTypes from "prop-types";
 import { useSelector } from "react-redux";
-import { useState } from "react";
+import {useNavigate} from "react-router-dom";
+import { useState, useEffect } from "react";
 import "./Dashboard.css";
 
 const SidebarMain = ({ onMenuItemClick }) => {
@@ -11,8 +12,16 @@ const SidebarMain = ({ onMenuItemClick }) => {
   const openSubReport = () => setIsReportOpen(true);
   const closeSubReport = () => setIsReportOpen(false);
   const currentUser = useSelector((state) => state.adminAuth.user);
-  const user = currentUser.userType;
-  const userRole = currentUser.jobRole;
+
+  // check if user is empty and redirect to login page
+  const navigate = useNavigate();
+  useEffect(() => {
+    if (!currentUser || !currentUser.careertype) {
+      // Add a specific property check or adjust as per your user object structure
+      navigate("/login");
+    }
+  }, [currentUser, navigate]);
+  const customerCareer = currentUser?.careertype;
 
   return (
     <div className="NavIcons SideMain FixSideNav">
@@ -20,7 +29,7 @@ const SidebarMain = ({ onMenuItemClick }) => {
         <div className=" LgLogo">
           <img src="images/dlogo.png" alt="boctrust-logo" />
         </div>
-        <p>{ userRole}</p>
+        <p>Customer</p>
       </div>
       <div id="dashboard" className="IconBox" onClick={onMenuItemClick}>
         <img
@@ -63,21 +72,19 @@ const SidebarMain = ({ onMenuItemClick }) => {
         ) : null}
       </div>
 
-      {user === "customer1" ? (
-        <div id="loanrepayment" className="IconBox" onClick={onMenuItemClick}>
-          <img
-            id="loanrepayment"
-            onClick={onMenuItemClick}
-            src="images/dtransfer.png"
-            alt="repayment"
-          />
-          <p id="loanrepayment" onClick={onMenuItemClick}>
-            Repayments
-          </p>
-        </div>
-      ) : null}
+      <div id="loanrepayment" className="IconBox" onClick={onMenuItemClick}>
+        <img
+          id="loanrepayment"
+          onClick={onMenuItemClick}
+          src="images/dtransfer.png"
+          alt="repayment"
+        />
+        <p id="loanrepayment" onClick={onMenuItemClick}>
+          Repayments
+        </p>
+      </div>
 
-      {user === "customer2" ? (
+      {customerCareer !== "government employee" ? (
         <div id="transfer" className="IconBox" onClick={onMenuItemClick}>
           <img
             id="transfer"
@@ -87,6 +94,21 @@ const SidebarMain = ({ onMenuItemClick }) => {
           />
           <p id="transfer" onClick={onMenuItemClick}>
             Transfer Money
+          </p>
+        </div>
+      ) : null}
+
+      {customerCareer !== "government employee" &&
+      customerCareer !== "private employee" ? (
+        <div id="withdraw" className="IconBox" onClick={onMenuItemClick}>
+          <img
+            id="withdraw"
+            onClick={onMenuItemClick}
+            src="images/dtransfer.png"
+            alt="withdraw"
+          />
+          <p id="withdraw" onClick={onMenuItemClick}>
+            Withdrawal
           </p>
         </div>
       ) : null}
@@ -102,6 +124,20 @@ const SidebarMain = ({ onMenuItemClick }) => {
           Account Transaction
         </p>
       </div>
+
+      {currentUser?.deductions === "remita" ? (
+        <div id="remita" className="IconBox" onClick={onMenuItemClick}>
+          <img
+            id="remita"
+            onClick={onMenuItemClick}
+            src="images/dreport.png"
+            alt="profile"
+          />
+          <p id="remita" onClick={onMenuItemClick}>
+            Remita History
+          </p>
+        </div>
+      ) : null}
 
       <div id="profile" className="IconBox" onClick={onMenuItemClick}>
         <img

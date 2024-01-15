@@ -13,7 +13,7 @@ const UpcomingLoanPayment = () => {
   };
 
    const user = useSelector((state) => state.adminAuth.user);
-  console.log(user);
+  // console.log(user);
 
   const api_user = import.meta.env.VITE_BASE_URL;
   

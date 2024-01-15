@@ -120,6 +120,9 @@ const LoanForm = () => {
     try {
       if (ref.current.values) {
         const formValues = ref.current?.values;
+        const employer = employers.find(
+          (employer) => employer._id === formValues.employername
+        );
         // generate customer id
         const customerId = generateCustomerId();
         const formData = new FormData();
@@ -162,7 +165,7 @@ const LoanForm = () => {
           "nkinresidentialaddress",
           formValues.nkinresidentialaddress
         );
-        formData.append("employername", formValues.employername);
+        formData.append("employername", employer);
         formData.append("otheremployername", formValues.otheremployername);
         formData.append("employeraddress", formValues.employeraddress);
         formData.append("employmentstartdate", formValues.employmentstartdate);
@@ -666,7 +669,7 @@ const LoanForm = () => {
                                     {employers?.map((employer) => (
                                       <option
                                         key={employer._id}
-                                        value={employer.employersName}
+                                        value={employer._id}
                                       >
                                         {employer.employersName}
                                       </option>

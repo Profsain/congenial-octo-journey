@@ -220,7 +220,10 @@ const CheckSalaryHistory = () => {
             <tbody>
               {customerList?.length === 0 && <NoResult name="customer" />}
               {customerList?.map((customer) => {
-                if (customer.kyc.isKycApproved) {
+                if (
+                  customer.kyc.isKycApproved &&
+                  customer.deductions == "remita"
+                ) {
                   return (
                     <tr key={customer._id}>
                       <td>{customer.firstname}</td>

@@ -8,7 +8,6 @@ import initialValues from "./formInitialValue";
 // fetch data from api
 import { useDispatch, useSelector } from "react-redux";
 import { fetchProduct } from "../../../redux/reducers/productReducer";
-import { fetchEmployers } from "../../../redux/reducers/employersManagerReducer";
 import Headline from "../../shared/Headline";
 import TextInput from "./formcomponents/TextInput";
 import "./Form.css";
@@ -22,7 +21,7 @@ const LoanFirstStep = ({ data }) => {
 
   useEffect(() => {
     dispatch(fetchProduct());
-    dispatch(fetchEmployers());
+    // dispatch(fetchEmployers());
   }, [dispatch]);
 
   const loanProducts = useSelector(

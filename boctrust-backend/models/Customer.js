@@ -46,7 +46,7 @@ const customerSchema = new mongoose.Schema({
     },
     loanpurpose: [String],
     otherpurpose: String,
-    employername: String,
+    employername: Object,
     employeraddress: String,
     employmentletter: String,
     employmentstartdate: String,
