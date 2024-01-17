@@ -79,7 +79,7 @@ const LoanForm = () => {
   const [captureImg, setCaptureImg] = useState("");
   const [idCard, setIdCard] = useState("");
   const [paySlip, setPaySlip] = useState("");
-  const [employmentLetter, setEmploymentLetter] = useState("");
+  // const [employmentLetter, setEmploymentLetter] = useState("");
   const [signature, setSignature] = useState("");
 
   // scroll to the top of the page
@@ -113,6 +113,20 @@ const LoanForm = () => {
     // update state form value
     ref.current?.setFieldValue("stateofresidence", state);
   };
+
+  // find employer using id
+  const [employerId, setEmployerId] = useState("");
+
+  const [employer, setEmployer] = useState({});
+  const findEmployer = (id) => {
+    const employer = employers.find((employer) => employer._id === id);
+    return employer;
+  };
+  useEffect(() => {
+    if (employerId) {
+      setEmployer(findEmployer(employerId));
+    }
+  }, [employerId]);
 
   // handle form submit/move to next step
   const handleSubmit = async () => {
@@ -666,14 +680,17 @@ const LoanForm = () => {
                                     name="employername"
                                   >
                                     <option value=""></option>
-                                    {employers?.map((employer) => (
-                                      <option
-                                        key={employer._id}
-                                        value={employer._id}
-                                      >
-                                        {employer.employersName}
-                                      </option>
-                                    ))}
+                                    {employers?.map((employer) => {
+                                      setEmployerId(ref.current?.values.employername)
+                                     return (
+                                        <option
+                                          key={employer._id}
+                                          value={employer._id}
+                                        >
+                                          {employer.employersName}
+                                        </option>
+                                      )
+                                    })}
                                     <option value="other">Other</option>
                                   </SelectField>
 
@@ -719,7 +736,7 @@ const LoanForm = () => {
 
                                 {/* pay slip upload private employee*/}
                                 {careertype.toLowerCase() ===
-                                "private employee" ? (
+                                "private employee" || loanamount > employer?.statementRule?.maximumAmount && noofmonth > employer?.statementRule?.maximumTenure.slice(0, 3) ? (
                                   <div className="FileUploadBox ">
                                     <Headline
                                       color="#000"

@@ -53,6 +53,7 @@ const CreditCheckhtmlForm = ({ customerId }) => {
   const [deductSearchReport, setDeductSearchReport] = useState("");
   const [bureauSearchReport, setBureauSearchReport] = useState("");
   const [noReport, setNoReport] = useState(false);
+  const [isUpdateLoading, setIsUpdateLoading] = useState(false);
 
   const handleChange = () => {
     setIsCreditDbCheck(!isCreditDbCheck);
@@ -66,6 +67,7 @@ const CreditCheckhtmlForm = ({ customerId }) => {
 
   // handle file update
   const handleFileUpdate = async (e) => {
+    setIsUpdateLoading(true);
     e.preventDefault();
     const formData = new FormData();
 
@@ -96,9 +98,19 @@ const CreditCheckhtmlForm = ({ customerId }) => {
       setIsDeductCheck(false);
     }
     if (isBureauChecked) {
-      console.log("bureau check");
+   ;
+      formData.append("bureauSearchReport", bureauSearchReport);
+      await fetch(
+        `${apiUrl}/api/updatecustomer/creditBureauSearch/${customerId}`,
+        {
+          method: "PUT",
+          enctype: "multipart/form-data",
+          body: formData,
+        }
+      );
+      setBureauSearchReport("");
     }  
-    console.log("Update file");
+    setIsUpdateLoading(false);
   };
 
   // clear form fields
@@ -212,6 +224,8 @@ const CreditCheckhtmlForm = ({ customerId }) => {
   const [showDownloadBtn, setShowDownloadBtn] = useState(false);
   const [firstCentralReport, setFirstCentralReport] = useState({});
 
+  const [successMsg, setSuccessMsg] = useState("");
+
   const handleBureauCheck = async (e) => {
     e.preventDefault();
     setBureauLoading(true);
@@ -294,6 +308,13 @@ const CreditCheckhtmlForm = ({ customerId }) => {
          // set bureau loading
          setBureauLoading(false);
          // updateBureauLoading("success");
+         setSuccessMsg("Report generated successfully. Click on Download button above to download report");
+
+         // set success message to empty string after 5 seconds
+         setTimeout(() => {
+           setSuccessMsg("");
+         }, 5000);
+                 
        } catch (error) {
          setBureauLoading(false);
          throw new Error(error.message);
@@ -590,10 +611,14 @@ const CreditCheckhtmlForm = ({ customerId }) => {
 
                 <div className="row mx-5 align-items-center">
                   <button type="submit" className="btn btn-warning mt-3">
-                      Generate Report
-                    </button>
+                    Generate Report
+                  </button>
                   {showDownloadBtn && (
-                    <button type="button" className="btn btn-warning mt-3" onClick={() => handleDownload(bureauReport[0])}>
+                    <button
+                      type="button"
+                      className="btn btn-warning mt-3"
+                      onClick={() => handleDownload(bureauReport[0])}
+                    >
                       Download Report
                     </button>
                   )}
@@ -602,6 +627,8 @@ const CreditCheckhtmlForm = ({ customerId }) => {
             </div>
             {/* loading bar */}
             <div>{bureauLoading && <PageLoader />}</div>
+            {/* success message */}
+            <p>{ successMsg}</p>
           </div>
 
           <div className="row m-5">
@@ -611,9 +638,7 @@ const CreditCheckhtmlForm = ({ customerId }) => {
             )}
           </div>
           <div className="row m-5">
-            {noReport && (
-              <h4>No First Central Report</h4>
-            )}
+            {noReport && <h4>No First Central Report</h4>}
             {/* generated pdf report component */}
             {Object.keys(firstCentralReport).length > 0 && (
               <FirstCentralPdfReport report={firstCentralReport} />
@@ -727,12 +752,17 @@ const CreditCheckhtmlForm = ({ customerId }) => {
 
               <div className="row mx-5 align-items-center">
                 <div className="col-sm-12 col-md-3"></div>
-                <button
-                  type="submit"
-                  className="btn btn-warning mt-3 col-sm-12 col-md-6"
-                >
-                  Update Report
-                </button>
+                {isUpdateLoading ? (
+                  <PageLoader width="34px" />
+                ) : (
+                  <button
+                    type="submit"
+                    className="btn btn-warning mt-3 col-sm-12 col-md-6"
+                  >
+                    Update Report
+                  </button>
+                )}
+
                 <div className="col-sm-12 col-md-3"></div>
               </div>
             </form>

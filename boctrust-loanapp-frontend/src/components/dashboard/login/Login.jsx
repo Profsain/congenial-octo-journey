@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {useNavigate} from "react-router-dom";
 import PropTypes from "prop-types";
 import { useDispatch, useSelector } from "react-redux";
@@ -103,9 +103,13 @@ const Login = () => {
   // check if user is logged in and redirect to dashboard
   const navigate = useNavigate();
   const currentUser = useSelector((state) => state.adminAuth.user);
-  if (currentUser) {
-    navigate("/dashboard");
-  }
+  useEffect(() => {
+    if (currentUser) {
+       navigate('/dashboard')
+    } else {
+      navigate('/login')
+    }
+  }, [currentUser, navigate]);
 
   return (
     <div className="LogContainer">

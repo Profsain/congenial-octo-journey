@@ -23,7 +23,6 @@ const getCreditRegistrySessionCode = async () => {
         }
 
         const result = await response.json();
-        console.log(result) // log in failed due to no live api password
         return result;
     } catch (error) {
         throw new Error(error);

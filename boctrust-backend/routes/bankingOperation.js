@@ -233,6 +233,7 @@ router.get("/getLoanByAccount/:accountNumber", (req, res) => {
 
 // get loan repayment schedule
 router.get("/getLoanRepaymentSchedule/:loanAccountNumber", async (req, res) => {
+  console.log("repayment shedule", req.params)
   try {
     const { loanAccountNumber } = req.params; // Get the loan account number from the URL parameters
 

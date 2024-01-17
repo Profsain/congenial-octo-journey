@@ -4,10 +4,9 @@ const router = express.Router();
 
 router.post('/getcrc', async (req, res) => {
     console.log("crc api called", req.body);
-
     // Extract BVN from the request body
-    // const { bvn } = req.body;
-    const bvn = '22170216986';
+    const { bvn } = req.body;
+    // const bvn = '22170216986';
 
     try {
         const myHeaders = new Headers();

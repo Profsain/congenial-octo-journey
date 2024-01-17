@@ -3,7 +3,7 @@ const router = express.Router();
 // import credit registry methods
 const getCreditRegistrySessionCode = require("../creditMethods/creditRegistryMethods");
 const getCustomerId = require("../creditMethods/creditRegistryIDMethod");
-const e = require("express");
+
 
 
 

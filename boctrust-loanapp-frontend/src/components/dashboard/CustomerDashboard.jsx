@@ -1,7 +1,7 @@
 /* eslint-disable no-undef */
 import { useState, useEffect } from "react";
 import { useSelector } from "react-redux/es/hooks/useSelector";
-import { useNavigate } from "react-router-dom";
+// import { useNavigate } from "react-router-dom";
 import SidebarIcons from "./SidebarIcons";
 import "./Dashboard.css";
 import SidebarMain from "./SidebarMain";
@@ -27,14 +27,14 @@ const CustomerDashboard = () => {
   const [currentComponent, setCurrentComponent] = useState("dashboard");
   const [currentTitle, setCurrentTitle] = useState("Dashboard");
 
-  // check if user is empty and redirect to login page
-  const navigate = useNavigate();
-  useEffect(() => {
-    if (!user || !user.firstname) {
-      // Add a specific property check or adjust as per your user object structure
-      navigate("/login");
-    }
-  }, [user, navigate]);
+  // // check if user is empty and redirect to login page
+  // const navigate = useNavigate();
+  // useEffect(() => {
+  //   if (!user || !user.firstname) {
+  //     // Add a specific property check or adjust as per your user object structure
+  //     navigate("/login");
+  //   }
+  // }, [user, navigate]);
 
   const userName = user?.firstname + " " + user?.lastname;
 

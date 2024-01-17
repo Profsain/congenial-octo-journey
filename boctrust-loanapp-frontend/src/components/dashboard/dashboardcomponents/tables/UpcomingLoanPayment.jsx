@@ -26,9 +26,9 @@ const UpcomingLoanPayment = () => {
     console.log(data);
   };
 
-  useEffect(() => {
-    fetchUpcomingLoanPayment();
-  }, []);
+  // useEffect(() => {
+  //   fetchUpcomingLoanPayment();
+  // }, []);
 
   return (
     <div>
