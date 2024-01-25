@@ -101,7 +101,6 @@ router.post('/firstcentralCommercialReport', async (req, res) => {
       const contentType = response.headers.get("content-type");
     if (contentType && contentType.includes("application/json")) {
       const result = await response.json();
-      console.log(result);
       res.status(200).json({
         message: "First central api called successfully",
         data: result

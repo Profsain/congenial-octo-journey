@@ -9,6 +9,7 @@ import PageLoader from "../../shared/PageLoader";
 
 import handleDownload from "./downloadPdf";
 import FirstCentralPdfReport from "./firstCentralPdfReport";
+import FirstCentralCommercialPdf from "./FirstCentralCommercialPdf";
 
 const creditBureauOptions = [
   { value: "first_central", label: "First Central" },
@@ -653,6 +654,7 @@ const CreditCheckhtmlForm = ({ customerId }) => {
             {Object.keys(firstCentralReport).length > 0 && (
               <FirstCentralPdfReport report={firstCentralReport} />
             )}
+            {Object.keys(firstCentralCommercialReport).length > 0 && (<FirstCentralCommercialPdf report={firstCentralCommercialReport} />)}
           </div>
 
           {/* attach report */}

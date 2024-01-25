@@ -133,43 +133,43 @@ const styles = StyleSheet.create({
     color: "#145980",
     fontWeight: "bold",
     padding: "5px",
-    marginTop: "6px"
+    marginTop: "6px",
   },
 });
 
-const FirstCentralPdfReport = ({ report }) => {
-
+const FirstCentralCommercialPdf = ({ report }) => {
+  console.log("Report", report);
   const {
-    BankVerificationNo,
-    BirthDate,
-    CellularNo,
-    Dependants,
-    DriversLIcenseNo,
-    EmailAddress,
-    EmployerDetail,
-    FirstName,
-    Surname,
-    Gender,
-    HomeTelephoneNo,
-    MaritalStatus,
-    NationalIDNo,
-    Nationality,
-    OtherName,
-    PassportNo,
-    PencomIDNo,
-    ResidentialAddress1,
-    WorkTelephoneNo,
-    ReferenceNo,
-    otheridNo,
-  } = report[1].PersonalDetailsSummary[0];
-  const fullName = `${Surname} ${FirstName} ${OtherName || ""}` || "N/A";
+    BusinessName,
+    BusinessRegistrationNumber,
+    BusinessType,
+    IndustrySector,
+    CommercialAddress1,
+    CommercialEmail1,
+    DateOfIncorporation,
+    NoOfDirectors,
+    Telephone1,
+  } = report[1].BusinessData[0];
 
-  const {Amountarrear, LastBouncedChequesDate, LastJudgementDate, Rating, TotalAccountarrear, TotalAccounts, TotalDishonouredAmount, TotalJudgementAmount, TotalMonthlyInstalment, TotalNumberofDishonoured, TotalNumberofJudgement, TotalOutstandingdebt, TotalaccountinGoodcondition,  } = report[3].CreditAccountSummary[0];
+    const {
+      Amountarrear,
+      LastBouncedChequesDate,
+      LastJudgementDate,
+      Rating,
+      TotalAccountarrear,
+      TotalAccounts,
+      TotalDishonouredAmount,
+      TotalJudgementAmount,
+      TotalMonthlyInstalment,
+      TotalNumberofDishonoured,
+      TotalNumberofJudgement,
+      TotalOutstandingdebt,
+      TotalaccountinGoodcondition,
+    } = report[3].FacilityPerformanceSummary[0];
 
-  const creditAgreementSummary = report[5].CreditAgreementSummary;
-  const accountMonthlyPaymentHistory = report[7].AccountMonthlyPaymentHistory;
-  const employmentHistory = report[13].EmploymentHistory;
-  const enquiryHistory = report[10].EnquiryHistoryTop[0]
+    const creditAgreementSummary = report[5].CreditAgreementSummary;
+    const accountMonthlyPaymentHistory = report[7].AccountMonthlyPaymentHistory;
+  //   const employmentHistory = report[13].EmploymentHistory;
 
   return (
     <PDFViewer style={styles.viewer}>
@@ -185,7 +185,7 @@ const FirstCentralPdfReport = ({ report }) => {
                 style={styles.logo}
               />
               <Image src="images/boclogo.jpeg" alt="logo" style={styles.logo} />
-              <Text>Detailed Credit Check Report</Text>
+              <Text>Detailed Commercial Report </Text>
             </div>
           </View>
 
@@ -201,11 +201,11 @@ const FirstCentralPdfReport = ({ report }) => {
               </div>
               <div style={styles.tbox}>
                 <Text style={styles.p}>Enquiry Date:</Text>
-                <Text style={styles.p}>{enquiryHistory.DateRequested || ""}</Text>
+                <Text style={styles.p}>{"22022"}</Text>
               </div>
               <div style={styles.tbox}>
                 <Text style={styles.p}>Enquiry Type:</Text>
-                <Text style={styles.p}>Consumer Detailed Credit Report</Text>
+                <Text style={styles.p}>Commercial Detailed Credit Report</Text>
               </div>
               <div style={styles.tbox}>
                 <Text style={styles.p}>Subscriber Name:</Text>
@@ -213,7 +213,7 @@ const FirstCentralPdfReport = ({ report }) => {
               </div>
               <div style={styles.tbox}>
                 <Text style={styles.p}>Subscriber User Name:</Text>
-                <Text style={styles.p}>{fullName}</Text>
+                <Text style={styles.p}>{BusinessName || ""}</Text>
               </div>
               <div style={styles.tbox}>
                 <Text style={styles.p}>Enquiry Input:</Text>
@@ -225,104 +225,65 @@ const FirstCentralPdfReport = ({ report }) => {
               </div>
               <div style={styles.tbox}>
                 <Text style={styles.p}>Matching Rate:</Text>
-                <Text style={styles.p}>{Rating}%</Text>
+                <Text style={styles.p}>
+                  {Rating || "0"}%{" "}
+                </Text>
               </div>
             </View>
           </div>
 
-          {/* personal details */}
+          {/* company details */}
           <div style={styles.infoSection}>
             <View style={styles.section}>
               <div style={styles.hori}>
-                <Text style={styles.title}>Personal Details</Text>
+                <Text style={styles.title}>Company Details</Text>
               </div>
 
               <div style={styles.hori}>
                 <div style={styles.horiBox}>
                   <div style={styles.tbox}>
                     <Text style={styles.p}>FirstCentral Reference Number:</Text>
-                    <Text style={styles.p}>{ReferenceNo || "N/A"}</Text>
-                  </div>
-                  <div style={styles.tbox}>
-                    <Text style={styles.p}>Surname:</Text>
-                    <Text style={styles.p}>{Surname || " "}</Text>
-                  </div>
-                  <div style={styles.tbox}>
-                    <Text style={styles.p}>First Name:</Text>
-                    <Text style={styles.p}>{FirstName || " "}</Text>
-                  </div>
-                  <div style={styles.tbox}>
-                    <Text style={styles.p}>Date of Birth:</Text>
-                    <Text style={styles.p}>{BirthDate || " "}</Text>
-                  </div>
-                  <div style={styles.tbox}>
-                    <Text style={styles.p}>Gender:</Text>
-                    <Text style={styles.p}>{Gender || ""}</Text>
-                  </div>
-                  <div style={styles.tbox}>
-                    <Text style={styles.p}>Marital Status:</Text>
-                    <Text style={styles.p}>{MaritalStatus || ""}</Text>
-                  </div>
-                  <div style={styles.tbox}>
-                    <Text style={styles.p}>National ID Number:</Text>
-                    <Text style={styles.p}>{NationalIDNo || ""}</Text>
-                  </div>
-                  <div style={styles.tbox}>
-                    <Text style={styles.p}>Driver&apos;s License Number:</Text>
-                    <Text style={styles.p}>{DriversLIcenseNo || ""}</Text>
-                  </div>
-                  <div style={styles.tbox}>
-                    <Text style={styles.p}>Phone Number:</Text>
-                    <Text style={styles.p}>{HomeTelephoneNo || ""}</Text>
-                  </div>
-                  <div style={styles.tbox}>
-                    <Text style={styles.p}>Mobile Number:</Text>
-                    <Text style={styles.p}>{CellularNo || ""}</Text>
-                  </div>
-                  <div style={styles.tbox}>
-                    <Text style={styles.p}>Email Address:</Text>
-                    <Text style={styles.p}>{EmailAddress || ""}</Text>
-                  </div>
-                </div>
-
-                <div style={styles.horiBox}>
-                  <div style={styles.tbox}>
                     <Text style={styles.p}>
-                      Bank Verification Number (BVN):
+                      {report[0].SubjectList[0].Reference || "N/A"}
                     </Text>
-                    <Text style={styles.p}>{BankVerificationNo || ""}</Text>
                   </div>
                   <div style={styles.tbox}>
-                    <Text style={styles.p}>Unique Tracking Number:</Text>
-                    <Text style={styles.p}>{otheridNo || ""}</Text>
+                    <Text style={styles.p}>Business Name:</Text>
+                    <Text style={styles.p}>{BusinessName || " "}</Text>
                   </div>
                   <div style={styles.tbox}>
-                    <Text style={styles.p}>No. of Dependant:</Text>
-                    <Text style={styles.p}>{Dependants || "0"}</Text>
+                    <Text style={styles.p}>Business Reg. Number:</Text>
+                    <Text style={styles.p}>
+                      {BusinessRegistrationNumber || " "}
+                    </Text>
                   </div>
                   <div style={styles.tbox}>
-                    <Text style={styles.p}>PENCOM ID:</Text>
-                    <Text style={styles.p}>{PencomIDNo || ""}</Text>
+                    <Text style={styles.p}>Date of Incorporation:</Text>
+                    <Text style={styles.p}>{DateOfIncorporation || " "}</Text>
                   </div>
                   <div style={styles.tbox}>
-                    <Text style={styles.p}>Passport Number:</Text>
-                    <Text style={styles.p}>{PassportNo || ""}</Text>
+                    <Text style={styles.p}>Industrial Sector:</Text>
+                    <Text style={styles.p}>{IndustrySector || ""}</Text>
                   </div>
                   <div style={styles.tbox}>
-                    <Text style={styles.p}>Nationality:</Text>
-                    <Text style={styles.p}>{Nationality || ""}</Text>
+                    <Text style={styles.p}>Business Type:</Text>
+                    <Text style={styles.p}>{BusinessType || ""}</Text>
                   </div>
                   <div style={styles.tbox}>
-                    <Text style={styles.p}>Residential Address:</Text>
-                    <Text style={styles.p}>{ResidentialAddress1 || ""}</Text>
+                    <Text style={styles.p}>Telephone Number:</Text>
+                    <Text style={styles.p}>{Telephone1 || ""}</Text>
                   </div>
                   <div style={styles.tbox}>
-                    <Text style={styles.p}>Current Employer:</Text>
-                    <Text style={styles.p}>{EmployerDetail || ""}</Text>
+                    <Text style={styles.p}>Official Email:</Text>
+                    <Text style={styles.p}>{CommercialEmail1 || ""}</Text>
                   </div>
                   <div style={styles.tbox}>
-                    <Text style={styles.p}>Work Telephone:</Text>
-                    <Text style={styles.p}>{WorkTelephoneNo || ""}</Text>
+                    <Text style={styles.p}>Business Address:</Text>
+                    <Text style={styles.p}>{CommercialAddress1 || ""}</Text>
+                  </div>
+                  <div style={styles.tbox}>
+                    <Text style={styles.p}>Number of Directors:</Text>
+                    <Text style={styles.p}>{NoOfDirectors || ""}</Text>
                   </div>
                 </div>
               </div>
@@ -830,56 +791,13 @@ const FirstCentralPdfReport = ({ report }) => {
               </div>
             </View>
           </div>
-
-          {/* Employment History */}
-          <div style={styles.infoSection}>
-            <View style={styles.section}>
-              <div style={styles.hori}>
-                <Text style={styles.title}>Employment History</Text>
-              </div>
-
-              <div>
-                <View style={styles.section}>
-                  <View style={styles.table}>
-                    <View style={styles.tableRow}>
-                      <View style={styles.thb}>
-                        <Text>Bureau Update Date</Text>
-                      </View>
-                      <View style={styles.thb}>
-                        <Text>Company</Text>
-                      </View>
-                      <View style={styles.thb}>
-                        <Text>Occupation</Text>
-                      </View>
-                    </View>
-
-                    {employmentHistory.map(({EmployerDetails, Occupation, UpDateDate, }) => (
-                      <View style={styles.tableRow} key={EmployerDetails || ""}>
-                      <View style={styles.tdb}>
-                        <Text>{EmployerDetails || ""}</Text>
-                      </View>
-                      <View style={styles.tdb}>
-                        <Text>
-                          {UpDateDate || ""}
-                        </Text>
-                      </View>
-                      <View style={styles.tdb}>
-                        <Text>{Occupation || ""}</Text>
-                      </View>
-                    </View>
-                    ))}
-                  </View>
-                </View>
-              </div>
-            </View>
-          </div>
         </Page>
       </Document>
     </PDFViewer>
   );
 };
 
-FirstCentralPdfReport.propTypes = {
+FirstCentralCommercialPdf.propTypes = {
   report: PropTypes.shape({
     Amountarrear: PropTypes.any,
     LastJudgementDate: PropTypes.any,
@@ -894,4 +812,4 @@ FirstCentralPdfReport.propTypes = {
   }),
 };
 
-export default FirstCentralPdfReport;
+export default FirstCentralCommercialPdf;
