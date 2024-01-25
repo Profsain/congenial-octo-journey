@@ -154,14 +154,15 @@ const KycCheck = () => {
         isAccountCreated: true,
         accountDetails: account.data,
       }
-      await fetch(
-        `${apiUrl}/api/updatecustomer/banking/${customerId}`,
-        {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(accountData),
-        }
-      );
+      console.log(accountData);
+      // await fetch(
+      //   `${apiUrl}/api/updatecustomer/banking/${customerId}`,
+      //   {
+      //     method: "PUT",
+      //     headers: { "Content-Type": "application/json" },
+      //     body: JSON.stringify(accountData),
+      //   }
+      // );
 
      }
     setShowKycDetails(false);

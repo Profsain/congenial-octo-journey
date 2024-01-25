@@ -8,6 +8,8 @@ import HomeCarousel from "./carousel/HomeCarousel";
 import Overview from "./overview/Overview";
 import Calculator from "./calculator/Calculator";
 import BlogList from "./blogexperience/BlogList";
+// import sendEmail from "../../../utilities/sendEmail";
+import FirstCentralPdfReport from "../dashboard/admindashboard/creditbureau/firstCentralPdfReport";
 
 const Home = () => {
   useEffect(() => {
@@ -16,6 +18,18 @@ const Home = () => {
     });
   }, []);
 
+  // const emailTemplate = () => {
+  //   return `
+  //   <div>
+  //     <h1>Test Email</h1>
+  //     <p>This is a test email</p>
+  //     <button>Click Me</button>
+  //   </div>
+  //   `;
+  // }
+  // const handleSendEmail = () => {
+  //   sendEmail("husseinimudiking@gmail.com", "Test Email from Boctrust", emailTemplate());
+  // }
 
   return (
     <>
@@ -31,6 +45,10 @@ const Home = () => {
       </div>
       <div data-aos="fade-up">
         <BlogList />
+      </div>
+
+      <div>
+        <FirstCentralPdfReport />
       </div>
     </>
   );

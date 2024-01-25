@@ -17,14 +17,14 @@ const RemitaHistory = () => {
     completed: {
       color: "#5cc51c",
     },
+    decline: {
+      color: "#ff0000",
+    }
   };
 
   return (
     <div>
       <div style={styles.container}>
-        {/* <DashboardHeadline mspacer="0 3rem 0 0">
-          Recent Transaction
-        </DashboardHeadline> */}
         <img width="130px" src="images/remita-logo.jpg" alt="remita-logo" />
       </div>
       <div className="TReport">
@@ -57,7 +57,7 @@ const RemitaHistory = () => {
               <td>1234567891</td>
               <td>N2134</td>
               <td>Repayment</td>
-              <td style={styles.completed}>Decline</td>
+              <td style={styles.decline}>Decline</td>
               <td>
                 <BocButton cursor="pointer" bgcolor="#145098" bradius="18px">
                   View

@@ -10,7 +10,6 @@ import PageLoader from "../../shared/PageLoader";
 import handleDownload from "./downloadPdf";
 import FirstCentralPdfReport from "./firstCentralPdfReport";
 
-
 const creditBureauOptions = [
   { value: "first_central", label: "First Central" },
   { value: "crc_bureau", label: "CRC" },
@@ -20,12 +19,6 @@ const creditBureauOptions = [
 
 const apiUrl = import.meta.env.VITE_BASE_URL;
 
-const reportOptions = [
-  { value: "consumer", label: "Consumer Report" },
-  { value: "finance", label: "Financial Report" },
-  // Add more options as needed
-];
-
 const searchTypes = [
   { value: "defaulters", label: "Defaulters" },
   { value: "request", label: "Request" },
@@ -34,6 +27,7 @@ const searchTypes = [
 ];
 
 const CreditCheckhtmlForm = ({ customerId }) => {
+  const [reportOptions, setReportOptions] = useState([{ value: "", label: "Choose..." }]);
   const [isCreditDbCheck, setIsCreditDbCheck] = useState(false);
   const [searchType, setSearchType] = useState("");
   const [searchBy, setSearchBy] = useState("");
@@ -73,32 +67,25 @@ const CreditCheckhtmlForm = ({ customerId }) => {
 
     if (isCreditDbCheck) {
       formData.append("dbSearchReport", dbSearchReport);
-      await fetch(
-        `${apiUrl}/api/updatecustomer/creditDbSearch/${customerId}`,
-        {
-          method: "PUT",
-          enctype: "multipart/form-data",
-          body: formData,
-        }
-      );
+      await fetch(`${apiUrl}/api/updatecustomer/creditDbSearch/${customerId}`, {
+        method: "PUT",
+        enctype: "multipart/form-data",
+        body: formData,
+      });
       setDbSearchReport("");
       setIsCreditDbCheck(false);
     }
     if (isDeductCheck) {
       formData.append("deductSearchReport", deductSearchReport);
-      await fetch(
-        `${apiUrl}/api/updatecustomer/deductcheck/${customerId}`,
-        {
-          method: "PUT",
-          enctype: "multipart/form-data",
-          body: formData,
-        }
-      );
+      await fetch(`${apiUrl}/api/updatecustomer/deductcheck/${customerId}`, {
+        method: "PUT",
+        enctype: "multipart/form-data",
+        body: formData,
+      });
       setDeductSearchReport("");
       setIsDeductCheck(false);
     }
     if (isBureauChecked) {
-   ;
       formData.append("bureauSearchReport", bureauSearchReport);
       await fetch(
         `${apiUrl}/api/updatecustomer/creditBureauSearch/${customerId}`,
@@ -109,10 +96,15 @@ const CreditCheckhtmlForm = ({ customerId }) => {
         }
       );
       setBureauSearchReport("");
-    }  
+    }
     setIsUpdateLoading(false);
   };
 
+  // clear report
+  const clearReport = () => {
+    setReportObj({});
+    setFirstCentralReport({});
+  };
   // clear form fields
   const clearForm = () => {
     setSearchType("");
@@ -150,14 +142,11 @@ const CreditCheckhtmlForm = ({ customerId }) => {
     setReportObj(pdfReport);
 
     // send update to backend
-    await fetch(
-      `${apiUrl}/api/updatecustomer/creditDbSearch/${customerId}`,
-      {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(searchReport),
-      }
-    );
+    await fetch(`${apiUrl}/api/updatecustomer/creditDbSearch/${customerId}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(searchReport),
+    });
 
     clearForm();
   };
@@ -188,14 +177,11 @@ const CreditCheckhtmlForm = ({ customerId }) => {
     setReportObj(pdfReport);
 
     // send update to backend
-    await fetch(
-      `${apiUrl}/api/updatecustomer/deductcheck/${customerId}`,
-      {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(searchReport),
-      }
-    );
+    await fetch(`${apiUrl}/api/updatecustomer/deductcheck/${customerId}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(searchReport),
+    });
 
     // clear form fields
     setSearchByDeduct("");
@@ -222,58 +208,85 @@ const CreditCheckhtmlForm = ({ customerId }) => {
   const [bureauReport, setBureauReport] = useState({});
   const [bureauLoading, setBureauLoading] = useState(false);
   const [showDownloadBtn, setShowDownloadBtn] = useState(false);
-  const [firstCentralReport, setFirstCentralReport] = useState({});
+  const [firstCentralReport, setFirstCentralReport] = useState([]);
+  const [firstCentralCommercialReport, setFirstCentralCommercialReport] = useState([]);
 
   const [successMsg, setSuccessMsg] = useState("");
+
+  // update report type options
+  useEffect(() => {
+    if (bureauData.bureauName === "first_central") {
+      setReportOptions([{ value: "consumer_report", label: "Consumer Report"}, { value: "commercial_report", label: "Commercial Report"}]);
+    } else if (bureauData.bureauName === "crc_bureau") {
+      setReportOptions([{ value: "consumer_report", label: "Consumer Report"}, { value: "consumer_basic_report", label: "Consumer Basic Report"}, { value: "corporate_basic", label: "Corporate Basic Report"}, {value: "corporate_classic", label: "Corporate Classic Report"}]);
+    } else if (bureauData.bureauName === "credit_register") {
+      setReportOptions([{ value: "consumer_report", label: "Consumer Report"}]);
+    }
+  }, [bureauData.bureauName]);
 
   const handleBureauCheck = async (e) => {
     e.preventDefault();
     setBureauLoading(true);
     if (bureauData.bureauName === "first_central") {
+      clearReport();
       setShowDownloadBtn(false);
-       try {
-         const bvn = bureauData.bvnNo;
-         const response = await fetch(
-           `${apiUrl}/api/firstcentral/firstcentralreport`,
-           {
-             method: "POST",
-             headers: { "Content-Type": "application/json" },
-             body: JSON.stringify({ bvn }),
-           }
-         );
-         if (!response.ok) {
+      const reportType = bureauData.reportType;
+      const apiEndpoint =
+        reportType === "consumer_report"
+          ? `${apiUrl}/api/firstcentral/firstcentralreport`
+          : `${apiUrl}/api/firstcentral/firstcentralCommercialReport`;
+      try {
+        const bvn = bureauData.bvnNo;
+        const response = await fetch(
+          `${apiEndpoint}`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ bvn }),
+          }
+        );
+        if (!response.ok) {
           setBureauLoading(false);
-          setNoReport(true)
-           throw new Error("Network response was not ok");
-         }
+          setNoReport(true);
+          throw new Error("Network response was not ok");
+        }
 
-         const data = await response.json();
-         // set first central report
+        const data = await response.json();
+        // console.log("Report data", data.data);
+        // set first central report
+        if (reportType === "consumer_report") {
           setFirstCentralReport(data.data);
-         // set bureau loading
-         setBureauLoading(false);
-         // updateBureauLoading("success");
-       } catch (error) {
-         throw new Error(error.message);
-       }
+        } else {
+          setFirstCentralCommercialReport(data.data);
+        }
+        console.log("commercial report", firstCentralCommercialReport)
+        // set bureau loading
+        console.log("consumer report", firstCentralReport);
+        setBureauLoading(false);
+        // updateBureauLoading("success");
+      } catch (error) {
+        setBureauLoading(false);
+        throw new Error(error.message);
+      }
     }
 
     if (bureauData.bureauName === "crc_bureau") {
+      clearReport();
       setShowDownloadBtn(false);
       try {
-         const bvn = bureauData.bvnNo;
-         const response = await fetch(`${apiUrl}/api/crc/getcrc`, {
-           method: "POST",
-           headers: { "Content-Type": "application/json" },
-           body: JSON.stringify({ bvn }),
-         });
+        const bvn = bureauData.bvnNo;
+        const response = await fetch(`${apiUrl}/api/crc/getcrc`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ bvn }),
+        });
         if (!response.ok) {
           throw new Error("Network response was not ok");
         }
 
         const data = await response.json();
         console.log("Report data", data.data.ConsumerSearchResultResponse);
-        // set bureau report 
+        // set bureau report
         setBureauReport(data);
         // set bureau loading
         setBureauLoading(false);
@@ -284,44 +297,41 @@ const CreditCheckhtmlForm = ({ customerId }) => {
     }
 
     if (bureauData.bureauName === "credit_register") {
+      clearReport();
       setShowDownloadBtn(false);
-       try {
-         const bvn = bureauData.bvnNo;
-         const response = await fetch(
-           `${apiUrl}/api/creditregistry/getreport`,
-           {
-             method: "POST",
-             headers: { "Content-Type": "application/json" },
-             body: JSON.stringify({ bvn }),
-           }
-         );
-         if (!response.ok) {
-           throw new Error("Network response was not ok");
-         }
+      try {
+        const bvn = bureauData.bvnNo;
+        const response = await fetch(`${apiUrl}/api/creditregistry/getreport`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ bvn }),
+        });
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
 
-         const data = await response.json();
-         // set bureau report
-         setBureauReport(data.data.Reports
-         );
-         // show download button
-         setShowDownloadBtn(true);
-         // set bureau loading
-         setBureauLoading(false);
-         // updateBureauLoading("success");
-         setSuccessMsg("Report generated successfully. Click on Download button above to download report");
+        const data = await response.json();
+        // set bureau report
+        setBureauReport(data.data.Reports);
+        // show download button
+        setShowDownloadBtn(true);
+        // set bureau loading
+        setBureauLoading(false);
+        // updateBureauLoading("success");
+        setSuccessMsg(
+          "Report generated successfully. Click on Download button above to download report"
+        );
 
-         // set success message to empty string after 5 seconds
-         setTimeout(() => {
-           setSuccessMsg("");
-         }, 5000);
-                 
-       } catch (error) {
-         setBureauLoading(false);
-         throw new Error(error.message);
-       }
+        // set success message to empty string after 5 seconds
+        setTimeout(() => {
+          setSuccessMsg("");
+        }, 5000);
+      } catch (error) {
+        setBureauLoading(false);
+        throw new Error(error.message);
+      }
     }
   };
-
 
   // handle next prev form step start
   const [formStep, setFormStep] = useState(1);
@@ -538,7 +548,7 @@ const CreditCheckhtmlForm = ({ customerId }) => {
 
                 <div className="row mb-3">
                   <label htmlFor="dSearchInput" className="col-form-label">
-                    BVN
+                    BVN or Business Name
                   </label>
                   <div>
                     <input
@@ -552,34 +562,15 @@ const CreditCheckhtmlForm = ({ customerId }) => {
                 </div>
 
                 <div className="row mb-3">
-                  <label htmlFor="searchType" className="col-form-label">
-                    Select Report Type
-                  </label>
-                  <div>
-                    <select
-                      id="searchType"
-                      className="form-select"
-                      name="reportType"
-                      value={bureauData.reportType}
-                      onChange={handleBureauDataChange}
-                    >
-                      <option selected>Choose...</option>
-                      <option value="credit">Credit Report</option>
-                      <option value="kyc">KYC</option>
-                    </select>
-                  </div>
-                </div>
-
-                <div className="row mb-3">
                   <label htmlFor="reportType" className="col-form-label">
-                    Reason of Report
+                    Select Report Type
                   </label>
                   <div>
                     <select
                       id="reportType"
                       className="form-select"
-                      name="reportReason"
-                      value={bureauData.reportReason}
+                      name="reportType"
+                      value={bureauData.reportType}
                       onChange={handleBureauDataChange}
                     >
                       <option selected>Choose...</option>
@@ -591,6 +582,25 @@ const CreditCheckhtmlForm = ({ customerId }) => {
                           {reportOption.label}
                         </option>
                       ))}
+                    </select>
+                  </div>
+                </div>
+
+                <div className="row mb-3">
+                  <label htmlFor="reportReason" className="col-form-label">
+                    Reason of Report
+                  </label>
+                  <div>
+                    <select
+                      id="reportReason"
+                      className="form-select"
+                      name="reportReason"
+                      value={bureauData.reportReason}
+                      onChange={handleBureauDataChange}
+                    >
+                      <option selected>Choose...</option>
+                      <option value="credit">Credit Report</option>
+                      <option value="kyc">KYC</option>
                     </select>
                   </div>
                 </div>
@@ -628,7 +638,7 @@ const CreditCheckhtmlForm = ({ customerId }) => {
             {/* loading bar */}
             <div>{bureauLoading && <PageLoader />}</div>
             {/* success message */}
-            <p>{ successMsg}</p>
+            <p>{successMsg}</p>
           </div>
 
           <div className="row m-5">

@@ -3,21 +3,26 @@ const router = express.Router();
 const nodemailer = require('nodemailer');
 
 router.post('/send-email', async (req, res) => {
+    console.log(req.body);
     const { email, subject, html } = req.body;
     try {
         const transporter = nodemailer.createTransport({
-            service: 'gmail',
-             host: "smtp.gmail.com",
-             port: 587,
-             secure: false,
+            service: 'SMTP',
+            name: 'mail.boctrustmfb.com',
+            host: "mail.boctrustmfb.com",
+            port: 2096,
+            secure: true,
             auth: {
-                user: 'husseinimudiking@gmail.com',
-                pass: 'rwaoqkkbaopnzgum'
+                user: 'ebusiness@boctrustmfb.com',
+                pass: 'eBiz-9945@'
+            },
+            tls: {
+                rejectUnauthorized: false
             }
         });
         
         const mailOptions = {
-            from: 'Boctrust MFB',
+            from: 'Boctrust MFB Ltd',
             to: email,
             subject: subject,
             html: html

@@ -6,7 +6,7 @@ const token = process.env.BANKONE_TOKEN;
 const baseUrl = "https://api.mybankone.com";
 
 // Create customer account endpoint
-router.post("/createCustomerAccount", async(req, res) => {
+router.post("/createCustomerAccount", async (req, res) => {
   // destructure the request body
   const { _id, bvnnumber, firstname, lastname, email, phonenumber, dob, stateoforigin, houseaddress } = req.body;
   
@@ -41,15 +41,16 @@ router.post("/createCustomerAccount", async(req, res) => {
     const response = await fetch(`${baseUrl}/BankOneWebAPI/api/Account/CreateAccountQuick/2?authToken=${token}`, options);
 
     if (!response) {
-      throw new Error(`HTTP error! Status: ${response.status}`);
+      throw new Error(`HTTP error! BankOne Account creation failed. Status: ${response.status}`);
     }
     const result = await response.json();
+    console.log(result);
     res.status(200).json({
       message: "Account created successfully",
       data: result
     });
   } catch (error) {
-    res.status(500).json({ error: 'Internal Server Error' });
+    res.status(500).json({ error: 'Internal Server Error BankOne Account creation' });
   }
 });
 

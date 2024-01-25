@@ -93,6 +93,7 @@ const PaddingLoans = () => {
     setLoanObj(loan);
     setShow(true);
     setCustomerId(id);
+    console.log("loan", loan)
   };
 
   // handle loan approval
