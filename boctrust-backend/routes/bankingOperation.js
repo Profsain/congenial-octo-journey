@@ -29,7 +29,7 @@ router.post("/createCustomerAccount", async (req, res) => {
             PlaceOfBirth: stateoforigin,
             DateOfBirth: dob,
             Address: houseaddress,
-            AccountOfficerCode: '100',
+            AccountOfficerCode: '001',
             Email: email,
             NotificationPreference: 3,
             TransactionPermission: '0',

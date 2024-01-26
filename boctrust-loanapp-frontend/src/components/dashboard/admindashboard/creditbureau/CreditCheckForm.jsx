@@ -254,6 +254,7 @@ const CreditCheckhtmlForm = ({ customerId }) => {
         }
 
         const data = await response.json();
+        setBureauLoading(false);
         // console.log("Report data", data.data);
         // set first central report
         if (reportType === "consumer_report") {
