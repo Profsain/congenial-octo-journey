@@ -9,7 +9,6 @@ import Overview from "./overview/Overview";
 import Calculator from "./calculator/Calculator";
 import BlogList from "./blogexperience/BlogList";
 // import sendEmail from "../../../utilities/sendEmail";
-import FirstCentralPdfReport from "../dashboard/admindashboard/creditbureau/firstCentralPdfReport";
 
 const Home = () => {
   useEffect(() => {
@@ -45,10 +44,6 @@ const Home = () => {
       </div>
       <div data-aos="fade-up">
         <BlogList />
-      </div>
-
-      <div>
-        <FirstCentralPdfReport />
       </div>
     </>
   );
