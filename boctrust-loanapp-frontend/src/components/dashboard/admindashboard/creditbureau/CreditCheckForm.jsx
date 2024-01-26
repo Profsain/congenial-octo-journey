@@ -105,6 +105,7 @@ const CreditCheckhtmlForm = ({ customerId }) => {
   const clearReport = () => {
     setReportObj({});
     setFirstCentralReport({});
+    setFirstCentralCommercialReport({});
   };
   // clear form fields
   const clearForm = () => {
@@ -256,14 +257,16 @@ const CreditCheckhtmlForm = ({ customerId }) => {
         // console.log("Report data", data.data);
         // set first central report
         if (reportType === "consumer_report") {
+          // clear report
+          setFirstCentralCommercialReport([]);
           setFirstCentralReport(data.data);
         } else {
+          // clear report
+          setFirstCentralReport([]);
           setFirstCentralCommercialReport(data.data);
         }
-        console.log("commercial report", firstCentralCommercialReport)
+       
         // set bureau loading
-        console.log("consumer report", firstCentralReport);
-        setBureauLoading(false);
         // updateBureauLoading("success");
       } catch (error) {
         setBureauLoading(false);
@@ -286,7 +289,6 @@ const CreditCheckhtmlForm = ({ customerId }) => {
         }
 
         const data = await response.json();
-        console.log("Report data", data.data.ConsumerSearchResultResponse);
         // set bureau report
         setBureauReport(data);
         // set bureau loading
@@ -639,7 +641,7 @@ const CreditCheckhtmlForm = ({ customerId }) => {
             {/* loading bar */}
             <div>{bureauLoading && <PageLoader />}</div>
             {/* success message */}
-            <p>{successMsg}</p>
+            <p style={{ color: "#ecaa00" }}>{successMsg}</p>
           </div>
 
           <div className="row m-5">
@@ -654,7 +656,11 @@ const CreditCheckhtmlForm = ({ customerId }) => {
             {Object.keys(firstCentralReport).length > 0 && (
               <FirstCentralPdfReport report={firstCentralReport} />
             )}
-            {Object.keys(firstCentralCommercialReport).length > 0 && (<FirstCentralCommercialPdf report={firstCentralCommercialReport} />)}
+            {Object.keys(firstCentralCommercialReport).length > 0 && (
+              <FirstCentralCommercialPdf
+                report={firstCentralCommercialReport}
+              />
+            )}
           </div>
 
           {/* attach report */}

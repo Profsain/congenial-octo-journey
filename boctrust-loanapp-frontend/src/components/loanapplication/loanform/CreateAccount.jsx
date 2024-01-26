@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import { useFormikContext } from "formik";
-import ReCAPTCHA from "react-google-recaptcha";
+// import ReCAPTCHA from "react-google-recaptcha";
 import ConfirmField from "./ConfirmField";
 import Headline from "../../shared/Headline";
 import PhoneOtp from "./PhoneOtp";
@@ -47,16 +47,16 @@ const CreateAccount = ({ handleSubmit, phoneNumber }) => {
     }
   };
 
-  const key = import.meta.env.VITE_GOOGLE_RECAPTCHA_KEY;
-  const handleRecaptcha = (value) => {
-    if (value) {
-      setIsValid(true);
-      setErrorMsg("");
-    } else {
-      setIsValid(false);
-      setErrorMsg("Please complete the recaptcha");
-    }
-  };
+  // const key = import.meta.env.VITE_GOOGLE_RECAPTCHA_KEY;
+  // const handleRecaptcha = (value) => {
+  //   if (value) {
+  //     setIsValid(true);
+  //     setErrorMsg("");
+  //   } else {
+  //     setIsValid(false);
+  //     setErrorMsg("Please complete the recaptcha");
+  //   }
+  // };
 
   useEffect(() => {
     validPassword();
@@ -102,15 +102,15 @@ const CreateAccount = ({ handleSubmit, phoneNumber }) => {
               />
             </div>
             <div className="col-sm-12 col-md-4 RecaptchaBox">
-              <div className="RecaptchaBadge ">
+              {/* <div className="RecaptchaBadge ">
                 <ReCAPTCHA
                   sitekey={key}
                   onChange={handleRecaptcha}
                   // ref={captchaRef}
                 />
-              </div>
+              </div> */}
 
-              <div className="ProceedBtn">
+              <div className="ProceedBtn mt-6">
                 {!isValid ? (
                   <button type="button" className="BtnNoAction">
                     Create Account
