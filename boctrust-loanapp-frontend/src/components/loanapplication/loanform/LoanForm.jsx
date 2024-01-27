@@ -24,6 +24,7 @@ import convertFile from "../../../../utilities/convertFile";
 import dataURItoBlob from "../../../../utilities/dataURItoBlob";
 import generateCustomerId from "../../dashboard/admindashboard/customers/generateCustomerId";
 import ReconfirmBvn from "./ReconfirmBvn";
+import fetchAllBanks from "./fetchBanks";
 
 // loan form component
 const LoanForm = () => {
@@ -54,7 +55,8 @@ const LoanForm = () => {
     setTimeout(() => {
       setShowReconfirmBvn(true);
     }, 30000);
-  },[])
+  }, []);
+
   // fetch first form data here
   useEffect(() => {
     if (firstStepData) {
@@ -68,6 +70,12 @@ const LoanForm = () => {
     }
   }, [firstStepData]);
 
+  // fetch all commercial banks
+  const [banks, setBanks] = useState([]);
+  useEffect(() => {
+    fetchAllBanks(setBanks);
+  }, []);
+  console.log("Banks", banks)
 
   const [step, setStep] = useState(1);
   const [showForm, setShowForm] = useState(true);
@@ -79,7 +87,7 @@ const LoanForm = () => {
   const [captureImg, setCaptureImg] = useState("");
   const [idCard, setIdCard] = useState("");
   const [paySlip, setPaySlip] = useState("");
-  // const [employmentLetter, setEmploymentLetter] = useState("");
+  const [employmentLetter, setEmploymentLetter] = useState("");
   const [signature, setSignature] = useState("");
 
   // scroll to the top of the page

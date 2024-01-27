@@ -8,6 +8,7 @@ import HomeCarousel from "./carousel/HomeCarousel";
 import Overview from "./overview/Overview";
 import Calculator from "./calculator/Calculator";
 import BlogList from "./blogexperience/BlogList";
+// import LoanForm from "../loanapplication/loanform/LoanForm";
 // import sendEmail from "../../../utilities/sendEmail";
 
 const Home = () => {
@@ -44,6 +45,10 @@ const Home = () => {
       </div>
       <div data-aos="fade-up">
         <BlogList />
+      </div>
+
+      <div>
+        {/* <LoanForm /> */}
       </div>
     </>
   );

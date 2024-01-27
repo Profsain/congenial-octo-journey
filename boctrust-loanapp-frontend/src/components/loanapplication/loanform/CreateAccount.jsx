@@ -69,7 +69,7 @@ const CreateAccount = ({ handleSubmit, phoneNumber }) => {
 
   const handleCreateAccount = () => {
     setModalShow(true);
-    handleSubmit();
+    // handleSubmit();
   };
 
   return (
@@ -135,6 +135,7 @@ const CreateAccount = ({ handleSubmit, phoneNumber }) => {
         show={modalShow}
         onHide={() => setModalShow(false)}
         phonenumber={phoneNumber}
+        handleSubmit={handleSubmit}
       />
     </>
   );

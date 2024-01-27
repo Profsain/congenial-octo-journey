@@ -153,8 +153,8 @@ const KycCheck = () => {
       const accountData = {
         isAccountCreated: true,
         accountDetails: account.data,
-      }
-      console.log(accountData);
+      };
+      
       await fetch(
         `${apiUrl}/api/updatecustomer/banking/${customerId}`,
         {

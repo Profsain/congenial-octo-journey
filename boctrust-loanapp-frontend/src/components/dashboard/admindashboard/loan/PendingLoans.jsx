@@ -17,8 +17,8 @@ import NoResult from "../../../shared/NoResult";
 const PaddingLoans = () => {
   const styles = {
     table: {
-      //   margin: "0 2rem 0 3rem",
-      fontSize: "12px",
+      // margin: "0 2rem -2rem 3rem",
+      fontSize: "10px",
     },
     head: {
       color: "#fff",
@@ -38,6 +38,10 @@ const PaddingLoans = () => {
       fontSize: "1.2rem",
       color: "#145098",
     },
+    btnBox: {
+      display: "flex",
+      justifyContent: "space-between",
+    }
   };
 
   const [currentAdmin, setCurrentAdmin] = useState("");
@@ -93,7 +97,6 @@ const PaddingLoans = () => {
     setLoanObj(loan);
     setShow(true);
     setCustomerId(id);
-    console.log("loan", loan)
   };
 
   // handle loan approval
@@ -109,11 +112,24 @@ const PaddingLoans = () => {
     });
   };
 
-  const handleApproval = (id) => {
+  const apiUrl = import.meta.env.VITE_BASE_URL;
+
+  const handleApproval = async (id) => {
     // process loan approval
     if (currentAdmin === "admin" || currentAdmin === "md") {
       updateLoanStatus(id, "completed");
-      // add bankone loan app creation here
+      // create loan and disburse in bankone
+      const newDisbursement = await fetch(
+        `${apiUrl}/api/bankone/createLoan`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(loanObj),
+        }
+      );
+      const disbursedData = await newDisbursement.json
+      console.log("Disbursement", disbursedData)
+
     } else if (currentAdmin === "coo") {
       updateLoanStatus(id, "with operation");
     } else if (currentAdmin === "operation") {
@@ -121,7 +137,7 @@ const PaddingLoans = () => {
     }
 
     setShow(false);
-    setMessage("Loan Approved Successfully");
+    setMessage("Loan Processed Successfully by " + currentAdmin);
     setShowNotification(true);
     // dispatch fetch all customer
     dispatch(fetchAllCustomer());
@@ -139,7 +155,7 @@ const PaddingLoans = () => {
     }
 
     setShow(false);
-    setMessage("Loan Approved Successfully");
+    setMessage("Loan Processed Successfully by " + currentAdmin);
     setShowNotification(true);
     // dispatch fetch all customer
     dispatch(fetchAllCustomer());
@@ -248,13 +264,13 @@ const PaddingLoans = () => {
                           {capitalizeEachWord(customer.kyc.loanstatus)}
                         </td>
                         <td>
-                          <div>
+                          <div style={styles.btnBox}>
                             <BocButton
                               func={() => handleShow(customer._id)}
                               bradius="12px"
-                              fontSize="12px"
-                              width="80px"
-                              margin="4px"
+                              fontSize="10px"
+                              width="50px"
+                              margin="2px"
                               bgcolor="#ecaa00"
                             >
                               Details
@@ -262,9 +278,9 @@ const PaddingLoans = () => {
                             <BocButton
                               func={() => handleApproval(customer._id)}
                               bradius="12px"
-                              fontSize="12px"
-                              width="80px"
-                              margin="4px"
+                              fontSize="10px"
+                              width="50px"
+                              margin="2px"
                               bgcolor="#7dd50e"
                             >
                               Approve
@@ -272,9 +288,9 @@ const PaddingLoans = () => {
                             <BocButton
                               func={() => handleRejected(customer._id)}
                               bradius="12px"
-                              fontSize="12px"
-                              width="80px"
-                              margin="4px"
+                              fontSize="10px"
+                              width="50px"
+                              margin="2px"
                               bgcolor="#f64f4f"
                             >
                               Reject

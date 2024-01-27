@@ -23,6 +23,7 @@ const styles = {
 
 const PhoneOtp = (props) => {
   const number = props.phonenumber;
+  const handleSubmit = props.handleSubmit;
   const [confirmOtp, setConfirmOtp] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
   const [updatePhone, setUpdatePhone] = useState(number);
@@ -59,7 +60,7 @@ const PhoneOtp = (props) => {
       setFlag(true);
     } catch (error) {
       console.error("Error setting up reCAPTCHA:", error);
-      setErrorMsg(`Error setting up reCAPTCHA: ${error.message}`);
+      setErrorMsg(`Invalid phone number: ${error.message}`);
     }
   };
 
@@ -73,6 +74,8 @@ const PhoneOtp = (props) => {
       setErrorMsg("");
       await confirmOtp.confirm(otp);
       props.onHide(false);
+      // submit customer details
+      handleSubmit();
       navigate("/login");
     } catch (error) {
       console.error("Error verifying OTP:", error);
@@ -153,6 +156,7 @@ const PhoneOtp = (props) => {
 PhoneOtp.propTypes = {
   onHide: PropTypes.func,
   phonenumber: PropTypes.string,
+  handleSubmit: PropTypes.func,
 };
 
 export default PhoneOtp;
