@@ -5,7 +5,7 @@ const commercialMatch = async(businessName, ticket) => {
     const raw = JSON.stringify({
     "DataTicket": ticket,  // data ticket
     "EnquiryReason": "credit scoring of the client by credit bureau",
-    "BusinessName":"OCH TEST DUMMY", // pass business name
+    "BusinessName":businessName || "OCH TEST DUMMY", // pass business name
     "BusinessRegistrationNumber":"",
     "AccountNumber":"",
     "ProductID":"47"

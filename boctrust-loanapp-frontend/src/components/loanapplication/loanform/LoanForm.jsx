@@ -75,7 +75,6 @@ const LoanForm = () => {
   useEffect(() => {
     fetchAllBanks(setBanks);
   }, []);
-  console.log("Banks", banks)
 
   const [step, setStep] = useState(1);
   const [showForm, setShowForm] = useState(true);
@@ -376,6 +375,7 @@ const LoanForm = () => {
                                     label="Phone Number"
                                     name="phonenumber"
                                     type="tel"
+                                    placeholder="08012345678"
                                   />
 
                                   {/* Input row sectioin */}
@@ -689,15 +689,17 @@ const LoanForm = () => {
                                   >
                                     <option value=""></option>
                                     {employers?.map((employer) => {
-                                      setEmployerId(ref.current?.values.employername)
-                                     return (
+                                      setEmployerId(
+                                        ref.current?.values.employername
+                                      );
+                                      return (
                                         <option
                                           key={employer._id}
                                           value={employer._id}
                                         >
                                           {employer.employersName}
                                         </option>
-                                      )
+                                      );
                                     })}
                                     <option value="other">Other</option>
                                   </SelectField>
@@ -744,7 +746,14 @@ const LoanForm = () => {
 
                                 {/* pay slip upload private employee*/}
                                 {careertype.toLowerCase() ===
-                                "private employee" || loanamount > employer?.statementRule?.maximumAmount && noofmonth > employer?.statementRule?.maximumTenure.slice(0, 3) ? (
+                                  "private employee" ||
+                                (loanamount >
+                                  employer?.statementRule?.maximumAmount &&
+                                  noofmonth >
+                                    employer?.statementRule?.maximumTenure.slice(
+                                      0,
+                                      3
+                                    )) ? (
                                   <div className="FileUploadBox ">
                                     <Headline
                                       color="#000"
@@ -843,12 +852,32 @@ const LoanForm = () => {
                                     name="bankcode"
                                     type="text"
                                   />
+                                  <div>
+                                    {/* dropdown list */}
+                                    <SelectField
+                                      label="Bank code"
+                                      name="bankcode"
+                                    >
+                                      <option value="">Select</option>
+                                      {banks.data?.map((bank) => {
+                                        return (
+                                          <option
+                                            key={bank.ID}
+                                            value={bank.Code}
+                                          >
+                                            {bank.Name}
+                                          </option>
+                                        );
+                                      })}
+                                  
+                                    </SelectField>
+                                  </div>
                                 </div>
 
                                 {!values.sameasaboveaccount && (
                                   <div className="InputRow">
                                     <TextInput
-                                      label="Bank Name"
+                                      label="Bank Code"
                                       name="disbursementbankname"
                                       type="text"
                                     />
@@ -1287,6 +1316,13 @@ const LoanForm = () => {
                                   spacer="28px 0 48px 0"
                                   color="#000"
                                   text="Review your Application Details to Proceed"
+                                />
+                                <Headline
+                                  spacer="18px 08px 0"
+                                  color="#000"
+                                  text="Click to edit any information you want to change"
+                                  fontSize="12px"
+                                  align="left"
                                 />
 
                                 <div>

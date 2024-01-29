@@ -13,7 +13,6 @@ router.post('/getreport', async (req, res) => {
     const sessionCode = await getCreditRegistrySessionCode();
     const sessionCodeValue = sessionCode.SessionCode;
     const bvn = req.body.bvn;
-    console.log(bvn);
 
     // get customer id
     let customerId;

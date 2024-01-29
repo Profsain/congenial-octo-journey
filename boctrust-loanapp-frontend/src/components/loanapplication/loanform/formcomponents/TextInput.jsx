@@ -16,6 +16,7 @@ const TextInput = ({ label, ...props }) => {
         value={field.value || ""}
         onChange={field.onChange}
         onBlur={field.onBlur}
+        placeholder={props.placeholder}
       />
       {meta.touched && meta.error ? (
         <div className="Error">{meta.error}</div>
@@ -28,6 +29,7 @@ TextInput.propTypes = {
   label: PropTypes.any,
   id: PropTypes.any,
   name: PropTypes.string,
+  placeholder: PropTypes.string,
 };
 
 export default TextInput;

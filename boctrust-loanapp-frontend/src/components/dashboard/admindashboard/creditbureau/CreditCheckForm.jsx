@@ -28,7 +28,9 @@ const searchTypes = [
 ];
 
 const CreditCheckhtmlForm = ({ customerId }) => {
-  const [reportOptions, setReportOptions] = useState([{ value: "", label: "Choose..." }]);
+  const [reportOptions, setReportOptions] = useState([
+    { value: "", label: "Choose..." },
+  ]);
   const [isCreditDbCheck, setIsCreditDbCheck] = useState(false);
   const [searchType, setSearchType] = useState("");
   const [searchBy, setSearchBy] = useState("");
@@ -211,18 +213,30 @@ const CreditCheckhtmlForm = ({ customerId }) => {
   const [bureauLoading, setBureauLoading] = useState(false);
   const [showDownloadBtn, setShowDownloadBtn] = useState(false);
   const [firstCentralReport, setFirstCentralReport] = useState([]);
-  const [firstCentralCommercialReport, setFirstCentralCommercialReport] = useState([]);
+  const [firstCentralCommercialReport, setFirstCentralCommercialReport] =
+    useState([]);
+  const [PDFContent, setPDFContent] = useState("");
 
   const [successMsg, setSuccessMsg] = useState("");
 
   // update report type options
   useEffect(() => {
     if (bureauData.bureauName === "first_central") {
-      setReportOptions([{ value: "consumer_report", label: "Consumer Report"}, { value: "commercial_report", label: "Commercial Report"}]);
+      setReportOptions([
+        { value: "consumer_report", label: "Consumer Report" },
+        { value: "commercial_report", label: "Commercial Report" },
+      ]);
     } else if (bureauData.bureauName === "crc_bureau") {
-      setReportOptions([{ value: "consumer_report", label: "Consumer Report"}, { value: "consumer_basic_report", label: "Consumer Basic Report"}, { value: "corporate_basic", label: "Corporate Basic Report"}, {value: "corporate_classic", label: "Corporate Classic Report"}]);
+      setReportOptions([
+        { value: "consumer_report", label: "Consumer Report" },
+        { value: "consumer_basic_report", label: "Consumer Basic Report" },
+        { value: "corporate_basic", label: "Corporate Basic Report" },
+        { value: "corporate_classic", label: "Corporate Classic Report" },
+      ]);
     } else if (bureauData.bureauName === "credit_register") {
-      setReportOptions([{ value: "consumer_report", label: "Consumer Report"}]);
+      setReportOptions([
+        { value: "consumer_report", label: "Consumer Report" },
+      ]);
     }
   }, [bureauData.bureauName]);
 
@@ -239,14 +253,11 @@ const CreditCheckhtmlForm = ({ customerId }) => {
           : `${apiUrl}/api/firstcentral/firstcentralCommercialReport`;
       try {
         const bvn = bureauData.bvnNo;
-        const response = await fetch(
-          `${apiEndpoint}`,
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ bvn }),
-          }
-        );
+        const response = await fetch(`${apiEndpoint}`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ bvn }),
+        });
         if (!response.ok) {
           setBureauLoading(false);
           setNoReport(true);
@@ -266,7 +277,7 @@ const CreditCheckhtmlForm = ({ customerId }) => {
           setFirstCentralReport([]);
           setFirstCentralCommercialReport(data.data);
         }
-       
+
         // set bureau loading
         // updateBureauLoading("success");
       } catch (error) {
@@ -315,8 +326,8 @@ const CreditCheckhtmlForm = ({ customerId }) => {
         }
 
         const data = await response.json();
-        // set bureau report
-        setBureauReport(data.data.Reports);
+        // set  report
+        setPDFContent(data.data.Reports[0].PDFContent);
         // show download button
         setShowDownloadBtn(true);
         // set bureau loading
@@ -639,6 +650,7 @@ const CreditCheckhtmlForm = ({ customerId }) => {
                 </div>
               </form>
             </div>
+
             {/* loading bar */}
             <div>{bureauLoading && <PageLoader />}</div>
             {/* success message */}
@@ -661,6 +673,19 @@ const CreditCheckhtmlForm = ({ customerId }) => {
               <FirstCentralCommercialPdf
                 report={firstCentralCommercialReport}
               />
+            )}
+          </div>
+
+          {/* credit registry report */}
+          <div className="row" style={{ width: "100vw", height: "100vh" }}>
+            {PDFContent && (
+              <div style={{ width: "60%", height: "100%" }}>
+                <h3>Credit Registry Report</h3>
+                <embed
+                  src={`data:application/pdf;base64,${PDFContent}`}
+                  style={{ width: "100%", height: "100%" }}
+                />
+              </div>
             )}
           </div>
 
