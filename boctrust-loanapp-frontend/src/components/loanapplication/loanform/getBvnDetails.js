@@ -31,7 +31,7 @@ const getBvnDetails = () => {
         console.log(`Access Token: ${accessToken}`);
 
         // Step 3: Use the access token to call the API endpoints
-        const apiEndpoint = 'https://idsandbox.nibss-plc.com.ng/oxauth/restv1/getPartialDetailsWithBvn';
+        const apiEndpoint = 'https://api.nibss-plc.com.ng/bvnconsent/v1/getPartialDetailsWithBvn';
 
         const apiResponse = await fetch(apiEndpoint, {
             method: 'GET',

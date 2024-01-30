@@ -10,6 +10,7 @@ import PageLoader from "../../shared/PageLoader";
 import handleDownload from "./downloadPdf";
 import FirstCentralPdfReport from "./firstCentralPdfReport";
 import FirstCentralCommercialPdf from "./FirstCentralCommercialPdf";
+import CRCBasicReportPDF from "./CRCBasicReportPDF";
 
 const creditBureauOptions = [
   { value: "first_central", label: "First Central" },
@@ -50,6 +51,7 @@ const CreditCheckhtmlForm = ({ customerId }) => {
   const [deductSearchReport, setDeductSearchReport] = useState("");
   const [bureauSearchReport, setBureauSearchReport] = useState("");
   const [noReport, setNoReport] = useState(false);
+  const [noCRC, setNoCRC] = useState(false);
   const [isUpdateLoading, setIsUpdateLoading] = useState(false);
 
   const handleChange = () => {
@@ -108,6 +110,7 @@ const CreditCheckhtmlForm = ({ customerId }) => {
     setReportObj({});
     setFirstCentralReport({});
     setFirstCentralCommercialReport({});
+    setPDFContent("");
   };
   // clear form fields
   const clearForm = () => {
@@ -211,7 +214,6 @@ const CreditCheckhtmlForm = ({ customerId }) => {
 
   const [bureauReport, setBureauReport] = useState({});
   const [bureauLoading, setBureauLoading] = useState(false);
-  const [showDownloadBtn, setShowDownloadBtn] = useState(false);
   const [firstCentralReport, setFirstCentralReport] = useState([]);
   const [firstCentralCommercialReport, setFirstCentralCommercialReport] =
     useState([]);
@@ -245,7 +247,7 @@ const CreditCheckhtmlForm = ({ customerId }) => {
     setBureauLoading(true);
     if (bureauData.bureauName === "first_central") {
       clearReport();
-      setShowDownloadBtn(false);
+
       const reportType = bureauData.reportType;
       const apiEndpoint =
         reportType === "consumer_report"
@@ -266,7 +268,6 @@ const CreditCheckhtmlForm = ({ customerId }) => {
 
         const data = await response.json();
         setBureauLoading(false);
-        // console.log("Report data", data.data);
         // set first central report
         if (reportType === "consumer_report") {
           // clear report
@@ -288,7 +289,6 @@ const CreditCheckhtmlForm = ({ customerId }) => {
 
     if (bureauData.bureauName === "crc_bureau") {
       clearReport();
-      setShowDownloadBtn(false);
       try {
         const bvn = bureauData.bvnNo;
         const response = await fetch(`${apiUrl}/api/crc/getcrc`, {
@@ -303,17 +303,19 @@ const CreditCheckhtmlForm = ({ customerId }) => {
         const data = await response.json();
         // set bureau report
         setBureauReport(data);
+
         // set bureau loading
         setBureauLoading(false);
         // updateBureauLoading("success");
       } catch (error) {
+        setBureauLoading(false);
+        setNoCRC(false)
         throw new Error(error.message);
       }
     }
 
     if (bureauData.bureauName === "credit_register") {
       clearReport();
-      setShowDownloadBtn(false);
       try {
         const bvn = bureauData.bvnNo;
         const response = await fetch(`${apiUrl}/api/creditregistry/getreport`, {
@@ -328,13 +330,12 @@ const CreditCheckhtmlForm = ({ customerId }) => {
         const data = await response.json();
         // set  report
         setPDFContent(data.data.Reports[0].PDFContent);
-        // show download button
-        setShowDownloadBtn(true);
+
         // set bureau loading
         setBureauLoading(false);
         // updateBureauLoading("success");
         setSuccessMsg(
-          "Report generated successfully. Click on Download button above to download report"
+          "Report generated successfully"
         );
 
         // set success message to empty string after 5 seconds
@@ -638,15 +639,6 @@ const CreditCheckhtmlForm = ({ customerId }) => {
                   <button type="submit" className="btn btn-warning mt-3">
                     Generate Report
                   </button>
-                  {showDownloadBtn && (
-                    <button
-                      type="button"
-                      className="btn btn-warning mt-3"
-                      onClick={() => handleDownload(bureauReport[0])}
-                    >
-                      Download Report
-                    </button>
-                  )}
                 </div>
               </form>
             </div>
@@ -663,6 +655,7 @@ const CreditCheckhtmlForm = ({ customerId }) => {
               <PdfDocument report={reportObj} />
             )}
           </div>
+          {/* first centra render */}
           <div className="row m-5">
             {noReport && <h4>No First Central Report</h4>}
             {/* generated pdf report component */}
@@ -675,11 +668,24 @@ const CreditCheckhtmlForm = ({ customerId }) => {
               />
             )}
           </div>
+          {/* crc render report */}
+          <div className="row m-5">
+            {noCRC && <h4>No CRC Report</h4>}
+            {/* generated pdf report component */}
+            {PDFContent && (
+              <CRCBasicReportPDF report={PDFContent} />
+            )}
+            {Object.keys(firstCentralCommercialReport).length > 0 && (
+              <FirstCentralCommercialPdf
+                report={firstCentralCommercialReport}
+              />
+            )}
+          </div>
 
           {/* credit registry report */}
-          <div className="row" style={{ width: "100vw", height: "100vh" }}>
+          <div className="row" style={{ width: "100vw" }}>
             {PDFContent && (
-              <div style={{ width: "60%", height: "100%" }}>
+              <div style={{ width: "60%", height: "100vh" }}>
                 <h3>Credit Registry Report</h3>
                 <embed
                   src={`data:application/pdf;base64,${PDFContent}`}
