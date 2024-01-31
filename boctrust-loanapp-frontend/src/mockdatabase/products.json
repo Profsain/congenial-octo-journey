@@ -5,7 +5,7 @@
       "category": "savings",
       "productName": "Regular Savings",
       "description": "This encourages individuals, micro enterprises and cooperative societies to grow their savings and easy their transactions.",
-      "image": "https://shorturl.at/pwQRV",
+      "image": "images/products/savings1.jpeg",
       "benefits": [
         "Easy and convenient",
         "Easy access to loans",
@@ -28,7 +28,7 @@
       "category": "savings",
       "productName": "Target Savings",
       "description": "Target Savings Account is a high interest bearing account that encourages financial discipline through savings. This product is designed to enable micro-clients save towards specific projects or events with ease.",
-      "image": "https://shorturl.at/yzCDH",
+      "image": "images/products/savings2.jpeg",
       "benefits": [
         "Goal-oriented savings for specific financial targets",
         "Develops financial discipline and good saving habits",
@@ -50,7 +50,7 @@
       "category": "savings",
       "productName": "Ajo Plus Account",
       "description": "This is a product for those who want to contribute daily for a number of months and can be withdrawn at their needful time.",
-      "image": "https://shorturl.at/qPQ09",
+      "image": "images/products/savings3.jpeg",
       "benefits": [
         "Easy and convenient for deposits",
         "Convenient withdrawal system",
@@ -68,7 +68,7 @@
       "category": "investment",
       "productName": "Fixed Deposit",
       "description": "This is a product for those who want to contribute daily for a number of months and can be withdrawn at their needful time.",
-      "image": "https://shorturl.at/HPWZ5",
+      "image": "images/products/inves1.jpeg",
       "benefits": [
         "Guaranteed returns with a fixed interest rate",
         "Secure preservation of your principal amount",
@@ -89,7 +89,7 @@
       "category": "investment",
       "productName": "Investment Note",
       "description": "This is to encourage deposit investments from high net-worth individuals and customers with pocket sized deposit to earn higher rates than the normal savings account. It is a short term investment product.",
-      "image": "https://shorturl.at/aiWY3",
+      "image": "images/products/inves2.jpeg",
       "benefits": [
         "Potential for higher returns compared to traditional savings accounts.",
         "Diversification and access to a variety of investment opportunities",
@@ -115,7 +115,7 @@
       "category": "loans",
       "productName": "Salary Advance",
       "description": "In recognition of our strong, continuing partnerships with local corporate entities, Boctrust Microfinance Bank has developed an exclusive lending programme for the employees of organizations that have signed a Memorandum of Understanding with us. Under the Corporate Cash Advance lending programme, employees of any Boctrust Microfinance Bank partner organizations can borrow up to a whopping 35% of their net monthly income, payable against the following month’s salary.",
-      "image": "https://shorturl.at/coyAH",
+      "image": "images/products/loan1.jpeg",
       "benefits": [
         "Provides immediate access to funds before your regular payday",
         "Helps cover unexpected expenses or financial emergencies",
@@ -140,7 +140,7 @@
       "category": "loans",
       "productName": "Personal Loan",
       "description": "A personal loan is a good way to make ends meet when bills stack up, the car breaks down or home remodeling is on the agenda. Or go ahead and add spice to your life by buying something or doing something special for your family",
-      "image": "https://shorturl.at/cdqx6",
+      "image": "images/products/loan2.jpeg",
       "benefits": [
         "Flexible use for various purposes",
         "Quick access to funds",
@@ -162,7 +162,7 @@
       "category": "loans",
       "productName": "SME Loan",
       "description": "This is a product targeted at businessmen and women from all sectors of the economy This loan is geared towards working capital enhancement, to raise finances towards expected receivables or for the execution of jobs. The facility is extended to economically active individuals, Small & Medium scale entrepreneurs for business expansion.",
-      "image": "https://shorturl.at/cptvx",
+      "image": "images/products/loan3.jpeg",
       "benefits": [
         "Access to capital for small and medium-sized enterprises (SMEs)",
         "Funds for business expansion, equipment purchase, or working capital",
@@ -188,7 +188,7 @@
       "category": "loans",
       "productName": "Asset Backed Financing",
       "description": "This product is for direct purchase of assets for (both income generating assets and household items) business owners and salary earners. The Objective is to enable customers acquire assets/Equipment that will boost their income generating capacity or for personal use to improve their standard of living.",
-      "image": "https://shorturl.at/eorP3",
+      "image": "images/products/loan4.jpeg",
       "benefits": [
         "Access to funds for purchasing or leasing essential assets",
         "Preserves working capital for other business needs",
@@ -211,7 +211,7 @@
       "category": "advisory",
       "productName": "Small Business Advisory",
       "description": "At Boctrust, We understand small business is the backbone of the economy, hence, our commitment to their growth and expansion, and investment in sustaining their development.  Our aim is to help our clients achieve their business goals from their present state to their desired state through",
-      "image": "https://shorturl.at/mK129",
+      "image": "images/products/bis2.jpeg",
       "benefits": [
         "Strategic direction and improved decision-making",
         "Enhanced financial performance and profitability",
@@ -234,7 +234,7 @@
       "category": "advisory",
       "productName": "Micro Insurance Advisory",
       "description": "Every business needs protection and thus the need to be secured through appropriate insurance products. At BOCTRUST Microfinance, we are committed to provide timely advisory services on Micro-insurance policies. With Micro-Insurance, low-income earners are protected against specific perils in exchange for regular premium payments proportionate to the likelihood and cost of the risk involved. Thus, with us, customers are always rest assured of the best insurance options required to protect their businesses.",
-      "image": "https://shorturl.at/ajoS3",
+      "image": "images/products/bis3.jpeg",
       "benefits": [
         "Access to affordable insurance options tailored for low-income individuals",
         "Protection against unforeseen risks and financial losses",
@@ -257,7 +257,7 @@
       "category": "advisory",
       "productName": "Financial Advisory",
       "description": "Our expertise is anchored on our extensive business knowledge and technical know-how. We help our customers with focus on strategic, operational, financial and capital needs of their businesses. We provide advisory services on the full spectrum of financial and transactional challenges faced by SMEs which may hinder their business performance.",
-      "image": "https://shorturl.at/gzMO4",
+      "image": "images/products/bis1.png",
       "benefits": [
         "Expert guidance for personalized financial planning and wealth management",
         "Assistance in setting and achieving financial goals",
