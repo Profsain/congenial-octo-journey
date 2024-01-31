@@ -84,3 +84,27 @@
     background-color: #fff;
 }
 
+.Licence {
+    font-size: 10px;
+    margin-top: -0.6rem;
+    font-weight: 800;
+}
+
+.Hero {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding-top: 14px;
+}
+
+.BrandCon {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    align-content: center;
+}
+
+.CallUs {
+    margin-right: 8px;
+}

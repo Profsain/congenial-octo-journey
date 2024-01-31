@@ -1,6 +1,6 @@
 /* eslint-disable no-undef */
 import { useDispatch, useSelector } from "react-redux";
-import { logoutUser } from "../../redux/reducers/adminAuthReducer"
+import { logoutUser } from "../../redux/reducers/adminAuthReducer";
 import { Navbar, Container, Nav, NavDropdown } from "react-bootstrap";
 import "./Navigation.css";
 import { Link } from "react-router-dom";
@@ -26,7 +26,7 @@ const TopNav = () => {
       <div className="StackDiv">
         <div>
           <div className="Topnav">
-            <div>
+            <div className="BrandCon">
               <Link to="/">
                 <img
                   src="../images/boclogo.jpeg"
@@ -35,10 +35,18 @@ const TopNav = () => {
                 />
               </Link>
             </div>
-            <h1 className="Welcome">
-              Welcome to BOCTRUST Microfinance Bank Limited
-            </h1>
-            <button className="CallUs">Call us today! 08076710000</button>
+            <div className="Hero">
+              <h1 className="Welcome">
+                Welcome to BOCTRUST Microfinance Bank Limited
+              </h1>
+              <p className="Licence">Licenced by Central Bank of Nigeria</p>
+            </div>
+            <div>
+              <button className="CallUs">
+                Licenced by Central Bank of Nigeria
+              </button>
+              <img src="images/cbn.jpeg" alt="cbn"  height={40}/>
+            </div>
           </div>
         </div>
 
@@ -174,7 +182,11 @@ const TopNav = () => {
                     Contact
                   </Nav.Link>
                   {currentUser ? (
-                    <Nav.Link href="/login" onClick={handleLogout} className="mx-4">
+                    <Nav.Link
+                      href="/login"
+                      onClick={handleLogout}
+                      className="mx-4"
+                    >
                       Logout
                     </Nav.Link>
                   ) : (

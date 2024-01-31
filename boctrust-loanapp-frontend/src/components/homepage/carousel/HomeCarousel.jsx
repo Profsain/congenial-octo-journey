@@ -6,7 +6,7 @@ import "../Home.css";
 const HomeCarousel = () => {
   // slide images
   const images = [
-    "images/bocslide1.jpg",
+    "images/slide1update.jpg",
     "images/bocslide2.jpg",
     "images/bocslide3.jpg",
   ];
