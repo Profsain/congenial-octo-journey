@@ -43,7 +43,7 @@ const TopNav = () => {
             </div>
             <div>
               <button className="CallUs">
-                Licenced by Central Bank of Nigeria
+                Licenced by CBN
               </button>
               <img src="images/cbn.jpeg" alt="cbn"  height={40}/>
             </div>
