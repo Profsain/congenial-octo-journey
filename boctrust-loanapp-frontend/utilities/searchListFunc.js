@@ -3,7 +3,7 @@
       return listData;
     } else {
       return listData.filter((data) =>
-        data[searchTarget].toLowerCase().includes(searchTerms.toLowerCase())
+        data?.[searchTarget].toLowerCase().includes(searchTerms.toLowerCase())
       );
     }
 };

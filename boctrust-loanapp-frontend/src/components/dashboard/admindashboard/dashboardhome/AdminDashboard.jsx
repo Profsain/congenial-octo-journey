@@ -49,6 +49,13 @@ import CustomerAsk from "../website/CustomerAsk";
 import StatementRules from "../employersmanager/StatementRules";
 import AllWebsitePages from "../website/AllWebsitePages";
 import ContactForm from "../website/ContactForm";
+import LoanDisbursement from "../loan/LoanDisbursement";
+import BalanceEnquiry from "../loan/BalanceEnquiry";
+import CheckCustomer from "../loan/CheckCustomer";
+import GetLoan from "../loan/GetLoan";
+import CheckRepayment from "../loan/CheckRepayment";
+import LoanStatement from "../loan/LoanStatement";
+import LoanBalance from "../loan/LoanBalance";
 
 const AdminDashboard = () => {
   const [showSidebar, setShowSidebar] = useState(false);
@@ -102,6 +109,27 @@ const AdminDashboard = () => {
         break;
       case "loanproducts":
         setCurrentTitle("Loan Products");
+        break;
+      case "loandisbursement":
+        setCurrentTitle("Loan Disbursement");
+        break;
+      case "balanceenquiry":
+        setCurrentTitle("Balance Enquiry");
+        break;
+      case "checkcustomer":
+        setCurrentTitle("Check Customer");
+        break;
+      case "getloan":
+        setCurrentTitle("Get Loan");
+        break;
+      case "checkrepayment":
+        setCurrentTitle("Check Repayment Schedule");
+        break;
+      case "loanstatement":
+        setCurrentTitle("Loan Statement");
+        break;
+      case "loanbalance":
+        setCurrentTitle("Loan Balance");
         break;
       case "transfer":
         setCurrentTitle("Transfer Money");
@@ -244,6 +272,20 @@ const AdminDashboard = () => {
         return <LoanCalculator />;
       case "loanproducts":
         return <LoanProducts />;
+      case "loandisbursement":
+        return <LoanDisbursement />;
+      case "balanceenquiry":
+        return <BalanceEnquiry />;
+      case "checkcustomer":
+        return <CheckCustomer />;
+      case "getloan":
+        return <GetLoan />;
+      case "checkrepayment":
+        return <CheckRepayment />;
+      case "loanstatement":
+        return <LoanStatement />;
+      case "loanbalance":
+        return <LoanBalance />;
       case "repayment":
         return <RepaymentDashboard />;
       case "accounts":

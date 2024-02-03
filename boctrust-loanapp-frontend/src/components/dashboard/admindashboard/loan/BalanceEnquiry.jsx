@@ -14,7 +14,7 @@ import searchList from "../../../../../utilities/searchListFunc";
 import LoanDetails from "./LoanDetails";
 import NoResult from "../../../shared/NoResult";
 
-const AllLoans = ({showCount, searchTerms}) => {
+const BalanceEnquiry = () => {
   const styles = {
     table: {
       //   margin: "0 2rem 0 3rem",
@@ -48,8 +48,11 @@ const AllLoans = ({showCount, searchTerms}) => {
 
   // filtere customer by isKycApproved
   const filteredCustomers = customers?.filter(
-    (customer) => customer.kyc.isKycApproved === true &&  customer.deductions !== "remita"
+    (customer) => customer.kyc.isKycApproved === true && customer.deductions !== "remita"
   );
+
+  const [showCount, setShowCount] = useState(10);
+  const [searchTerms, setSearchTerms] = useState("");
 
   const [show, setShow] = useState(false);
   const [loanObj, setLoanObj] = useState({});
@@ -60,7 +63,7 @@ const AllLoans = ({showCount, searchTerms}) => {
   };
 
   // handle show loan details
-  const handleShow = (id) => {
+  const handleCheckBalance = (id) => {
     const loan = filteredCustomers.find((customer) => customer._id === id);
     setLoanObj(loan);
     setShow(true);
@@ -77,6 +80,8 @@ const AllLoans = ({showCount, searchTerms}) => {
 
   // update customerList on search
   const handleSearch = () => {
+    // check filteredCustomers is not empty
+    if (!filteredCustomers) return;
     const currSearch = searchList(
       filteredCustomers,
       searchTerms,
@@ -91,6 +96,32 @@ const AllLoans = ({showCount, searchTerms}) => {
 
   return (
     <>
+      {/* top search bar */}
+      <div className="Search">
+        <DashboardHeadline padding="0" height="70px" bgcolor="#d9d9d9">
+          <div className="SearchBar">
+            <div className="FormGroup">
+              <label htmlFor="show">Show</label>
+              <input
+                name="showCount"
+                type="number"
+                step={10}
+                min={10}
+                value={showCount}
+                onChange={(e) => setShowCount(e.target.value)}
+              />
+            </div>
+            <div className="FormGroup SBox">
+              <input
+                name="search"
+                placeholder="Search by name"
+                onChange={(e) => setSearchTerms(e.target.value)}
+              />
+              <img src="images/search.png" alt="search-icon" />
+            </div>
+          </div>
+        </DashboardHeadline>
+      </div>
       {/* data loader */}
       {status === "loading" && <PageLoader />}
       <DashboardHeadline
@@ -132,14 +163,14 @@ const AllLoans = ({showCount, searchTerms}) => {
                   <td>
                     <div>
                       <BocButton
-                        func={() => handleShow(customer._id)}
+                        func={() => handleCheckBalance(customer._id)}
                         bradius="12px"
                         fontSize="12px"
                         width="80px"
                         margin="4px"
                         bgcolor="#ecaa00"
                       >
-                        Details
+                        Check
                       </BocButton>
                     </div>
                   </td>
@@ -159,9 +190,9 @@ const AllLoans = ({showCount, searchTerms}) => {
   );
 };
 
-AllLoans.propTypes = {
+BalanceEnquiry.propTypes = {
   searchTerms: PropTypes.string,
-  showCount: PropTypes.number
-}
+  showCount: PropTypes.number,
+};
 
-export default AllLoans;
+export default BalanceEnquiry

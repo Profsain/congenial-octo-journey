@@ -133,6 +133,28 @@ const SideNavMain = ({ onMenuItemClick }) => {
                 <li id="loanproducts" onClick={onMenuItemClick}>
                   Loan Products
                 </li>
+                {/* updated */}
+                <li id="loandisbursement" onClick={onMenuItemClick}>
+                  Loan Disbursement
+                </li>
+                <li id="balanceenquiry" onClick={onMenuItemClick}>
+                  Balance Enquiry
+                </li>
+                <li id="checkcustomer" onClick={onMenuItemClick}>
+                  Check Customer
+                </li>
+                <li id="getloan" onClick={onMenuItemClick}>
+                  Get Loan
+                </li>
+                <li id="checkrepayment" onClick={onMenuItemClick}>
+                  Check Repayment
+                </li>
+                <li id="loanstatement" onClick={onMenuItemClick}>
+                  Statement
+                </li>
+                <li id="loanbalance" onClick={onMenuItemClick}>
+                  Loan Balance
+                </li>
               </ul>
             </div>
           ) : null}

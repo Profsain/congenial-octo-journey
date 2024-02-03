@@ -439,7 +439,7 @@ p {
     .Topnav {
       padding: 0 !important;
       padding-bottom: 16px !important;
-      padding-right: 14px !important;
+      padding-right: 14px !important; 
     }
     .Hero {
       display: none !important;
