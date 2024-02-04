@@ -92,7 +92,6 @@ const LoanDisbursement = () => {
   };
 
   const handleApproval = async (id) => {
-    console.log("Processing loan approval");
     setProcessing(true);
     // process loan approval
     const loan = filteredCustomers.find((customer) => customer._id === id);

@@ -54,20 +54,77 @@ router.post("/createCustomerAccount", async (req, res) => {
 });
 
 // loan creation endpoint (verify)
+// router.post("/createLoan", async (req, res) => {
+//   console.log("Request Body", req.body)
+//   // get the loan creation request payload from the request body
+//   const { _id, salaryaccountnumber, disbursementaccountnumber, numberofmonth, loanamount } = req.body;
+
+//   const accountNumber = disbursementaccountnumber || salaryaccountnumber;
+//   const customerId = req.body.banking?.accountDetails?.Message.CustomerID;
+//   // convert number of month to number of days
+//   const tenure = Number(numberofmonth) * 30;
+//   // remove comma from loan amount
+//   const loanAmount = loanamount?.replace(/,/g, '');
+//   const interestRate = req.body?.interestRate || 5;
+   
+//   // Define the loan creation request payload here
+//   const loanRequestPayload = {
+//     TransactionTrackingRef: _id,
+//     LoanProductCode: '300',
+//     CustomerID: customerId,
+//     LinkedAccountNumber: accountNumber,
+//     CollateralDetails: '',
+//     CollateralType: '',
+//     ComputationMode: '0',
+//     Tenure: tenure.toString(),
+//     Moratorium: '30',
+//     Amount: loanAmount,
+//     InterestRate: interestRate,
+//     PrincipalPaymentFrequency: '2',
+//     InterestPaymentFrequency: '2'
+//   };
+
+//   const options = {
+//     method: 'POST',
+//     headers: {
+//       'accept': 'application/json',
+//       'content-type': 'application/json'
+//     },
+//     body: JSON.stringify(loanRequestPayload)
+//   };
+
+//   // Construct the URL for loan creation
+//   const apiUrl = `${baseUrl}/BankOneWebAPI/api/Loan/LoanApplication/LoanCreationApplication2/2?authToken=${token}`;
+
+//   try {
+//     const response = await fetch(apiUrl, options);
+
+//     if (!response) {
+//       throw new Error(`HTTP error! BankOne Loan creation failed. Status: ${response.status}`);
+//     }
+//     const result = await response.json();
+//     console.log("Result", result)
+//     res.status(200).json({
+//       message: "Loan created successfully",
+//       data: result
+//     });
+//   } catch (error) {
+//     res.status(500).json({ error: 'Internal Server Error BankOne Loan creation' });
+//   }
+// });
 router.post("/createLoan", async (req, res) => {
-  console.log("Request Body", req.body)
-  // get the loan creation request payload from the request body
+  console.log("Request Body", req.body);
+  
+  // Destructure the loan creation request payload from the request body
   const { _id, salaryaccountnumber, disbursementaccountnumber, numberofmonth, loanamount } = req.body;
 
   const accountNumber = disbursementaccountnumber || salaryaccountnumber;
   const customerId = req.body.banking?.accountDetails?.Message.CustomerID;
-  // convert number of month to number of days
-  const tenure = Number(numberofmonth) * 30;
-  // remove comma from loan amount
-  const loanAmount = loanamount?.replace(/,/g, '');
-  const interestRate = req.body?.interestRate || 5;
-   
-  // Define the loan creation request payload here
+  const tenure = Number(numberofmonth) * 30; // Convert number of months to number of days
+  const loanAmount = loanamount?.replace(/,/g, ''); // Remove commas from loan amount
+  const interestRate = req.body?.interestRate || 5; // Default interest rate to 5 if not provided
+
+  // Define the loan creation request payload
   const loanRequestPayload = {
     TransactionTrackingRef: _id,
     LoanProductCode: '300',
@@ -93,25 +150,27 @@ router.post("/createLoan", async (req, res) => {
     body: JSON.stringify(loanRequestPayload)
   };
 
-  // Construct the URL for loan creation
   const apiUrl = `${baseUrl}/BankOneWebAPI/api/Loan/LoanApplication/LoanCreationApplication2/2?authToken=${token}`;
 
   try {
     const response = await fetch(apiUrl, options);
 
-    if (!response) {
+    if (!response.ok) {
       throw new Error(`HTTP error! BankOne Loan creation failed. Status: ${response.status}`);
     }
+
     const result = await response.json();
-    console.log("Result", result)
+    console.log("Result", result);
     res.status(200).json({
       message: "Loan created successfully",
       data: result
     });
   } catch (error) {
+    console.error(error);
     res.status(500).json({ error: 'Internal Server Error BankOne Loan creation' });
   }
 });
+
 
 // create customer and account endpoint
 router.post("/newCustomerAccount", (req, res) => {
