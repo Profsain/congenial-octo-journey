@@ -53,18 +53,19 @@ router.post("/createCustomerAccount", async (req, res) => {
   }
 });
 
-// loan creation endpoint
+// loan creation endpoint (verify)
 router.post("/createLoan", async (req, res) => {
   console.log("Request Body", req.body)
   // get the loan creation request payload from the request body
   const { _id, salaryaccountnumber, disbursementaccountnumber, numberofmonth, loanamount } = req.body;
 
   const accountNumber = disbursementaccountnumber || salaryaccountnumber;
-  const customerId = req.body.banking.accountDetails.Message.CustomerID;
+  const customerId = req.body.banking?.accountDetails?.Message.CustomerID;
   // convert number of month to number of days
   const tenure = Number(numberofmonth) * 30;
   // remove comma from loan amount
-  const loanAmount = loanamount.replace(/,/g, '');
+  const loanAmount = loanamount?.replace(/,/g, '');
+  const interestRate = req.body?.interestRate || 5;
    
   // Define the loan creation request payload here
   const loanRequestPayload = {
@@ -78,7 +79,7 @@ router.post("/createLoan", async (req, res) => {
     Tenure: tenure.toString(),
     Moratorium: '30',
     Amount: loanAmount,
-    InterestRate: 5,
+    InterestRate: interestRate,
     PrincipalPaymentFrequency: '2',
     InterestPaymentFrequency: '2'
   };
@@ -102,6 +103,7 @@ router.post("/createLoan", async (req, res) => {
       throw new Error(`HTTP error! BankOne Loan creation failed. Status: ${response.status}`);
     }
     const result = await response.json();
+    console.log("Result", result)
     res.status(200).json({
       message: "Loan created successfully",
       data: result
@@ -141,9 +143,10 @@ router.post("/newCustomerAccount", (req, res) => {
     });
 });
 
-// bankone balance enquiry endpoint
+// bankone balance enquiry endpoint  (Verify)
 router.get("/balanceEnquiry/:accountNumber", (req, res) => {
   const { accountNumber } = req.params; // Get the account number from the URL parameters
+  console.log("Account No", accountNumber)
 
   // Construct the URL with the provided account number
   const apiUrl = `${baseUrl}/BankOneWebAPI/api/Account/GetAccountByAccountNumber/2?authtoken=${token}&accountNumber=${accountNumber}&computewithdrawableBalance=false`;
@@ -164,7 +167,9 @@ router.get("/balanceEnquiry/:accountNumber", (req, res) => {
     })
     .then(data => {
       // Handle the data as needed
+      console.log("Data", data)
       res.json(data); // Send the response to the client
+
     })
     .catch(err => {
       console.error(err);
@@ -172,9 +177,12 @@ router.get("/balanceEnquiry/:accountNumber", (req, res) => {
     });
 });
 
-// get customer by id endpoint
+
+// get customer by id endpoint (Verify)
 router.get("/getCustomerById/:customerId", (req, res) => {
   const { customerId } = req.params; // Get the customer ID from the URL parameters
+
+  console.log("customer ID", customerId)
 
   const options = {
     method: 'GET',
@@ -268,12 +276,13 @@ router.post("/interbankTransfer", (req, res) => {
 
 // intra bank transfer endpoint (Boctrust)
 
-// get loan by account number
+// get loan by account number (Verify)
 router.get("/getLoanByAccount/:accountNumber", (req, res) => {
-  const { customerId } = req.params; // Get the id number from the URL parameters
+  const { accountNumber } = req.params; // Get the id number from the URL parameters
+  console.log("Get Loan Number", accountNumber)
 
   // Construct the URL with the provided customer id number
-  const apiUrl = `${baseUrl}/BankOneWebAPI/api/Loan/GetLoansByCustomerId/2?authToken=${token}&institutionCode=0118&CustomerId=${customerId}`;
+  const apiUrl = `${baseUrl}/BankOneWebAPI/api/Loan/GetLoansByCustomerId/2?authToken=${token}&institutionCode=0118&CustomerId=${accountNumber}`;
 
   const options = {
     method: 'GET',
@@ -299,7 +308,7 @@ router.get("/getLoanByAccount/:accountNumber", (req, res) => {
     });
 });
 
-// get loan repayment schedule
+// get loan repayment schedule (Verify)
 router.get("/getLoanRepaymentSchedule/:loanAccountNumber", async (req, res) => {
   console.log("repayment shedule", req.params)
   try {
@@ -357,6 +366,7 @@ router.get("/loanAccountBalance/:customerId", (req, res) => {
     })
     .then(data => {
       // Handle the data as needed
+      console.log("Loan Account Balance", data)
       res.json(data); // Send the response to the client
     })
     .catch(err => {
@@ -365,10 +375,10 @@ router.get("/loanAccountBalance/:customerId", (req, res) => {
     });
 });
 
-// loan account statement
+// loan account statement (Verify)
 router.get("/loanAccountStatement/:loanAccountNumber/:fromDate/:toDate/:institutionCode", (req, res) => {
   const { loanAccountNumber, fromDate, toDate, institutionCode } = req.params; // Get parameters from the URL
-
+  console.log("Statement params", loanAccountNumber, fromDate, toDate, institutionCode)
   // Construct the URL with the provided parameters
   const apiUrl = `${baseUrl}/LoanAccount/LoanAccountStatement/2?authToken=${token}&loanAccountNumber=${loanAccountNumber}&fromDate=${fromDate}&toDate=${toDate}&institutionCode=${institutionCode}`;
 

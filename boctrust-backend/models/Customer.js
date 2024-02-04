@@ -71,7 +71,10 @@ const customerSchema = new mongoose.Schema({
     liquidationbalance: String,
     deductions: String,
     guarantee: String,
-
+  disbursementstatus: {
+    type: String,
+    default: "pending"
+    },
     acceptterms: String,
     acceptpolicy: String,
     sharemyremita: Boolean,

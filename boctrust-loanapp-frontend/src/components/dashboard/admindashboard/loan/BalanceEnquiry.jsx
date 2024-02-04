@@ -1,5 +1,5 @@
-import PropTypes from "prop-types"
-import { useState,  useEffect } from "react";
+import PropTypes from "prop-types";
+import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchAllCustomer } from "../../../../redux/reducers/customerReducer";
 import Table from "react-bootstrap/Table";
@@ -9,7 +9,6 @@ import BocButton from "../../shared/BocButton";
 import NextPreBtn from "../../shared/NextPreBtn";
 import PageLoader from "../../shared/PageLoader";
 import getDateOnly from "../../../../../utilities/getDate";
-import capitalizeEachWord from "../../../../../utilities/capitalizeFirstLetter";
 import searchList from "../../../../../utilities/searchListFunc";
 import LoanDetails from "./LoanDetails";
 import NoResult from "../../../shared/NoResult";
@@ -28,10 +27,10 @@ const BalanceEnquiry = () => {
       color: "#5cc51c",
     },
     completed: {
-      color: "#f64f4f",
+      color: "#ecaa00 ",
     },
-    padding: {
-      color: "#ecaa00",
+    pending: {
+      color: "#f64f4f",
     },
   };
 
@@ -48,7 +47,10 @@ const BalanceEnquiry = () => {
 
   // filtere customer by isKycApproved
   const filteredCustomers = customers?.filter(
-    (customer) => customer.kyc.isKycApproved === true && customer.deductions !== "remita"
+    (customer) =>
+      customer.kyc.isKycApproved === true &&
+      customer.deductions !== "remita" &&
+      customer.disbursementstatus === "approved"
   );
 
   const [showCount, setShowCount] = useState(10);
@@ -63,10 +65,28 @@ const BalanceEnquiry = () => {
   };
 
   // handle show loan details
-  const handleCheckBalance = (id) => {
+  const apiUrl = import.meta.env.VITE_BASE_URL;
+  const [isProcessing, setIsProcessing] = useState(false);
+
+  const handleCheckBalance = async (id) => {
+    // set is processing to true
+    setIsProcessing(true);
+    // get loan details
     const loan = filteredCustomers.find((customer) => customer._id === id);
     setLoanObj(loan);
-    setShow(true);
+    const loanAccountNumber = loan.banking.accountDetails.Message.AccountNumber;
+    // call api to get balance details
+    const loanBalance = await fetch(
+      `${apiUrl}/api/bankone/balanceEnquiry/${loanAccountNumber}`
+    );
+    const loanBalanceData = await loanBalance.json();
+    console.log("Loan Balance Result", loanBalanceData);
+
+    // set is processing to false
+    setTimeout(() => {
+      setIsProcessing(false);
+      setShow(true);
+    }, 5000);
   };
 
   // search customer list
@@ -156,12 +176,20 @@ const BalanceEnquiry = () => {
                   </td>
                   <td>{getDateOnly(customer.createdAt)}</td>
                   <td>N{customer.loanamount}</td>
-                  <td style={styles.padding}>
-                    {" "}
-                    {capitalizeEachWord(customer.kyc.loanstatus)}
+                  <td>
+                    {customer.disbursementstatus === "pending" ? (
+                      <p style={styles.pending}>Pending</p>
+                    ) : customer.disbursementstatus === "approved" ? (
+                      <p style={styles.approved}>Disbursed</p>
+                    ) : customer.disbursementstatus === "stopped" ? (
+                      <p style={styles.pending}>Stopped</p>
+                    ) : (
+                      <p style={styles.completed}>Rejected</p>
+                    )}
                   </td>
                   <td>
                     <div>
+                      {isProcessing && (<PageLoader width="12px" />)}
                       <BocButton
                         func={() => handleCheckBalance(customer._id)}
                         bradius="12px"
@@ -195,4 +223,4 @@ BalanceEnquiry.propTypes = {
   showCount: PropTypes.number,
 };
 
-export default BalanceEnquiry
+export default BalanceEnquiry;

@@ -112,23 +112,21 @@ const PaddingLoans = () => {
     });
   };
 
-  const apiUrl = import.meta.env.VITE_BASE_URL;
-
   const handleApproval = async (id) => {
     // process loan approval
     if (currentAdmin === "admin" || currentAdmin === "md") {
       updateLoanStatus(id, "completed");
       // create loan and disburse in bankone
-      const newDisbursement = await fetch(
-        `${apiUrl}/api/bankone/createLoan`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(loanObj),
-        }
-      );
-      const disbursedData = await newDisbursement.json
-      console.log("Disbursement", disbursedData)
+      // const newDisbursement = await fetch(
+      //   `${apiUrl}/api/bankone/createLoan`,
+      //   {
+      //     method: "POST",
+      //     headers: { "Content-Type": "application/json" },
+      //     body: JSON.stringify(loanObj),
+      //   }
+      // );
+      // const disbursedData = await newDisbursement.json
+      // console.log("Disbursement", disbursedData)
 
     } else if (currentAdmin === "coo") {
       updateLoanStatus(id, "with operation");

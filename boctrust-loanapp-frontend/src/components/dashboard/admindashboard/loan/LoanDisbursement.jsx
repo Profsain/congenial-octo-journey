@@ -1,5 +1,5 @@
-import PropTypes from "prop-types"
-import { useState,  useEffect } from "react";
+import PropTypes from "prop-types";
+import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchAllCustomer } from "../../../../redux/reducers/customerReducer";
 import Table from "react-bootstrap/Table";
@@ -9,10 +9,10 @@ import BocButton from "../../shared/BocButton";
 import NextPreBtn from "../../shared/NextPreBtn";
 import PageLoader from "../../shared/PageLoader";
 import getDateOnly from "../../../../../utilities/getDate";
-import capitalizeEachWord from "../../../../../utilities/capitalizeFirstLetter";
 import searchList from "../../../../../utilities/searchListFunc";
 import LoanDetails from "./LoanDetails";
 import NoResult from "../../../shared/NoResult";
+import DisbursementModal from "./DisbursementModal";
 
 const LoanDisbursement = () => {
   const styles = {
@@ -28,10 +28,10 @@ const LoanDisbursement = () => {
       color: "#5cc51c",
     },
     completed: {
-      color: "#f64f4f",
+      color: "#ecaa00 ",
     },
-    padding: {
-      color: "#ecaa00",
+    pending: {
+      color: "#f64f4f",
     },
   };
 
@@ -46,9 +46,12 @@ const LoanDisbursement = () => {
     dispatch(fetchAllCustomer());
   }, [dispatch]);
 
-  // filtere customer by isKycApproved
+  // filter customer by isKycApproved
   const filteredCustomers = customers?.filter(
-    (customer) => customer.kyc.isKycApproved === true && customer.deductions !== "remita"
+    (customer) =>
+      customer.kyc.isKycApproved === true &&
+      customer.deductions !== "remita" &&
+      customer.kyc.loanstatus === "completed"
   );
 
   const [showCount, setShowCount] = useState(10);
@@ -63,10 +66,78 @@ const LoanDisbursement = () => {
   };
 
   // handle show loan details
-  const handleCheckBalance = (id) => {
+  const handleView = (id) => {
     const loan = filteredCustomers.find((customer) => customer._id === id);
     setLoanObj(loan);
     setShow(true);
+  };
+
+  const apiUrl = import.meta.env.VITE_BASE_URL;
+  // handle loan approval
+  const [showDisburse, setShowDisburse] = useState(false);
+  const [processing, setProcessing] = useState(false);
+
+  const updateLoanStatus = async (customerId, status) => {
+    const data = { disbursementstatus: status };
+
+    // send update to backend
+    await fetch(
+      `${apiUrl}/api/customer/customer/disbursestatus/${customerId}`,
+      {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      }
+    );
+  };
+
+  const handleApproval = async (id) => {
+    console.log("Processing loan approval");
+    setProcessing(true);
+    // process loan approval
+    const loan = filteredCustomers.find((customer) => customer._id === id);
+    setLoanObj(loan);
+    // create loan and disburse in bankone
+    const newDisbursement = await fetch(`${apiUrl}/api/bankone/createLoan`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(loanObj),
+    });
+    const disbursedData = await newDisbursement.json;
+
+    // check if disbursement is successful and
+    // update loan status to disbursed
+    // update isProcessed to true
+    if (disbursedData) {
+      updateLoanStatus(id, "approved");
+    }
+    setTimeout(() => {
+      setProcessing(false);
+    }, 5000);
+    console.log("Disbursement", disbursedData);
+    dispatch(fetchAllCustomer());
+  };
+
+  // handle loan rejection
+  const handleRejection = async (id) => {
+    console.log("Processing loan approval");
+    // process loan rejection
+    const loan = filteredCustomers.find((customer) => customer._id === id);
+    setLoanObj(loan);
+
+    // setProcessing to true after 5 second
+    setTimeout(() => {
+      setProcessing(false);
+    }, 5000);
+    // update loan status to rejected
+    // update isProcessed to true
+    updateLoanStatus(id, "rejected");
+    dispatch(fetchAllCustomer());
+  };
+
+  // handle close disburse model
+  const handleCloseDisburse = () => {
+    setShowDisburse(false);
   };
 
   // search customer list
@@ -156,22 +227,56 @@ const LoanDisbursement = () => {
                   </td>
                   <td>{getDateOnly(customer.createdAt)}</td>
                   <td>N{customer.loanamount}</td>
-                  <td style={styles.padding}>
-                    {" "}
-                    {capitalizeEachWord(customer.kyc.loanstatus)}
+
+                  <td>
+                    {customer.disbursementstatus === "pending" ? (
+                      <p style={styles.pending}>Pending</p>
+                    ) : customer.disbursementstatus === "approved" ? (
+                      <p style={styles.approved}>Disbursed</p>
+                    ) : customer.disbursementstatus === "stopped" ? (
+                      <p style={styles.pending}>Stopped</p>
+                    ) : (
+                      <p style={styles.completed}>Rejected</p>
+                    )}
                   </td>
                   <td>
                     <div>
-                      <BocButton
-                        func={() => handleCheckBalance(customer._id)}
-                        bradius="12px"
-                        fontSize="12px"
-                        width="80px"
-                        margin="4px"
-                        bgcolor="#ecaa00"
-                      >
-                        Check
-                      </BocButton>
+                      {customer.disbursementstatus === "pending" ? (
+                        <div>
+                          {processing && <PageLoader width="12px" />}
+                          <BocButton
+                            func={() => handleRejection(customer._id)}
+                            bradius="12px"
+                            fontSize="12px"
+                            width="80px"
+                            margin="4px"
+                            bgcolor="#ecaa00"
+                          >
+                            Reject
+                          </BocButton>
+                          <BocButton
+                            func={() => handleApproval(customer._id)}
+                            bradius="12px"
+                            fontSize="12px"
+                            width="80px"
+                            margin="4px"
+                            bgcolor="#ecaa00"
+                          >
+                            Approve
+                          </BocButton>
+                        </div>
+                      ) : (
+                        <BocButton
+                          func={() => handleView(customer._id)}
+                          bradius="12px"
+                          fontSize="12px"
+                          width="80px"
+                          margin="4px"
+                          bgcolor="#ecaa00"
+                        >
+                          View
+                        </BocButton>
+                      )}
                     </div>
                   </td>
                 </tr>
@@ -186,6 +291,17 @@ const LoanDisbursement = () => {
       {show && (
         <LoanDetails show={show} handleClose={handleClose} loanObj={loanObj} />
       )}
+
+      {/* show disbursement modal */}
+      {show && (
+        <DisbursementModal
+          show={showDisburse}
+          handleClose={handleCloseDisburse}
+          loanObj={loanObj}
+          handleApproval={() => handleApproval(loanObj._id)}
+          handleRejection={() => handleRejection(loanObj._id)}
+        />
+      )}
     </>
   );
 };
@@ -195,5 +311,4 @@ LoanDisbursement.propTypes = {
   showCount: PropTypes.number,
 };
 
-
-export default LoanDisbursement
+export default LoanDisbursement;

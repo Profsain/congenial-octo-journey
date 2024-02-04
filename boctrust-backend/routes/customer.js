@@ -174,6 +174,23 @@ router.put('/customer/:customerId', async (req, res) => {
   }
 });
 
+// update customer loan status
+router.put('/customer/disbursestatus/:customerId', async (req, res) => {
+  try {
+    const customer = await CustomerModel
+      .findByIdAndUpdate(req.params.customerId, { disbursementstatus: req.body.disbursementstatus }, {
+        new: true,
+      });
+    if (!customer) {
+      return res.status(404).json({ error: 'Customer not found' });
+    }
+    res.json(customer);
+  } catch (error) {
+    res.status(500).json({ error: 'Unable to update customer' });
+  }
+});
+
+
 // Delete a customer by ID
 router.delete('/customer/:customerId', async (req, res) => {
   try {
