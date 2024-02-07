@@ -139,7 +139,6 @@ const styles = StyleSheet.create({
     display: "grid",
     gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))",
     gap: "10px",
-
   },
   card: {
     padding: "10px",
@@ -148,8 +147,7 @@ const styles = StyleSheet.create({
   },
 });
 
-const CRCBasicReportPDF = ({ report, formData, title }) => {
-
+const CRCCooporateReport = ({ report, formData }) => {
   return (
     <PDFViewer style={styles.viewer}>
       {/* Start of the document*/}
@@ -210,7 +208,7 @@ const CRCBasicReportPDF = ({ report, formData, title }) => {
           <div style={styles.infoSection}>
             <View style={styles.section}>
               <div style={styles.hori}>
-                <Text style={styles.title}>{title}</Text>
+                <Text style={styles.title}>Cooporate Classic Report</Text>
               </div>
 
               <div style={styles.grid}>
@@ -229,8 +227,8 @@ const CRCBasicReportPDF = ({ report, formData, title }) => {
                       <Text style={styles.p}>{item.CONFIDENCESCORE || ""}</Text>
                     </div>
                     <div style={styles.tbox}>
-                      <Text style={styles.p}>Gender:</Text>
-                      <Text style={styles.p}>{item.GENDER || ""}</Text>
+                      <Text style={styles.p}>Business Reg No:</Text>
+                      <Text style={styles.p}>{item.BUSINESSREGNO || ""}</Text>
                     </div>
                     <div style={styles.tbox}>
                       <Text style={styles.p}>Phone Number:</Text>
@@ -247,13 +245,14 @@ const CRCBasicReportPDF = ({ report, formData, title }) => {
               </div>
             </View>
           </div>
+
         </Page>
       </Document>
     </PDFViewer>
   );
 };
 
-CRCBasicReportPDF.propTypes = {
+CRCCooporateReport.propTypes = {
   formData: PropTypes.shape({
     bureauDate: PropTypes.string,
     bvnNo: PropTypes.string,
@@ -264,7 +263,6 @@ CRCBasicReportPDF.propTypes = {
     }),
     REFERENCENO: PropTypes.string,
   }),
-  title: PropTypes.string,
 };
 
-export default CRCBasicReportPDF;
+export default CRCCooporateReport;

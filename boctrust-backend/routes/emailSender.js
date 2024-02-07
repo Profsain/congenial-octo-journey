@@ -3,7 +3,6 @@ const router = express.Router();
 const nodemailer = require('nodemailer');
 
 router.post('/send-email', async (req, res) => {
-    console.log(req.body);
     const { email, subject, html } = req.body;
     try {
         const transporter = nodemailer.createTransport({

@@ -7,10 +7,10 @@ import DecisionSummary from "./DecisionSummary";
 import PdfDocument from "../../../shared/PdfDocument";
 import PageLoader from "../../shared/PageLoader";
 
-import handleDownload from "./downloadPdf";
 import FirstCentralPdfReport from "./firstCentralPdfReport";
 import FirstCentralCommercialPdf from "./FirstCentralCommercialPdf";
 import CRCBasicReportPDF from "./CRCBasicReportPDF";
+import CRCCooporateReport from "./CRCCooporateReport";
 
 const creditBureauOptions = [
   { value: "first_central", label: "First Central" },
@@ -111,6 +111,9 @@ const CreditCheckhtmlForm = ({ customerId }) => {
     setFirstCentralReport({});
     setFirstCentralCommercialReport({});
     setPDFContent("");
+    setBureauReport("");
+    setCrcClassicReport("");
+    setCrcCooporateReport("");
   };
   // clear form fields
   const clearForm = () => {
@@ -212,11 +215,15 @@ const CreditCheckhtmlForm = ({ customerId }) => {
     setBureauData({ ...bureauData, [name]: value });
   };
 
-  const [bureauReport, setBureauReport] = useState({});
+  const [bureauReport, setBureauReport] = useState(""); // crc basic report
+  const [crcClassicReport, setCrcClassicReport] = useState("");
+  const [crcCooporateReport, setCrcCooporateReport] = useState("");
+  const [crcTitle, setCrcTitle] = useState("");
   const [bureauLoading, setBureauLoading] = useState(false);
   const [firstCentralReport, setFirstCentralReport] = useState([]);
   const [firstCentralCommercialReport, setFirstCentralCommercialReport] =
     useState([]);
+
   const [PDFContent, setPDFContent] = useState("");
 
   const [successMsg, setSuccessMsg] = useState("");
@@ -230,9 +237,8 @@ const CreditCheckhtmlForm = ({ customerId }) => {
       ]);
     } else if (bureauData.bureauName === "crc_bureau") {
       setReportOptions([
-        { value: "consumer_report", label: "Consumer Report" },
-        { value: "consumer_basic_report", label: "Consumer Basic Report" },
-        { value: "corporate_basic", label: "Corporate Basic Report" },
+        { value: "consumer_basic", label: "Consumer Basic Report" },
+        { value: "consumer_classic", label: "Consumer Classic Report" },
         { value: "corporate_classic", label: "Corporate Classic Report" },
       ]);
     } else if (bureauData.bureauName === "credit_register") {
@@ -289,9 +295,17 @@ const CreditCheckhtmlForm = ({ customerId }) => {
 
     if (bureauData.bureauName === "crc_bureau") {
       clearReport();
+      const reportType = bureauData.reportType;
+      const apiEndpoint =
+        reportType === "consumer_basic"
+          ? `${apiUrl}/api/crc/getcrc`
+          : reportType === "consumer_classic"
+          ? `${apiUrl}/api/crc/getcrcclassic`
+          : `${apiUrl}/api/crc/getcrccooporate`;
+
       try {
         const bvn = bureauData.bvnNo;
-        const response = await fetch(`${apiUrl}/api/crc/getcrc`, {
+        const response = await fetch(apiEndpoint, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ bvn }),
@@ -301,15 +315,27 @@ const CreditCheckhtmlForm = ({ customerId }) => {
         }
 
         const data = await response.json();
-        // set bureau report
-        setBureauReport(data);
-
+        // set  report
+        if (reportType === "consumer_basic") {
+          clearReport();
+          setBureauReport(data.data.ConsumerSearchResultResponse);
+          setCrcTitle("Consumer Basic Report");
+        } else if (reportType === "consumer_classic") {
+          clearReport();
+          // setCrcClassicReport(data.data.ConsumerSearchResultResponse);
+          setBureauReport(data.data.ConsumerSearchResultResponse);
+          setCrcTitle("Consumer Classic Report");
+        } else {
+          clearReport();
+          setCrcCooporateReport(data.data.CommercialSearchResultResponse);
+        }
+        
         // set bureau loading
         setBureauLoading(false);
         // updateBureauLoading("success");
       } catch (error) {
         setBureauLoading(false);
-        setNoCRC(false)
+        setNoCRC(false);
         throw new Error(error.message);
       }
     }
@@ -334,9 +360,7 @@ const CreditCheckhtmlForm = ({ customerId }) => {
         // set bureau loading
         setBureauLoading(false);
         // updateBureauLoading("success");
-        setSuccessMsg(
-          "Report generated successfully"
-        );
+        setSuccessMsg("Report generated successfully");
 
         // set success message to empty string after 5 seconds
         setTimeout(() => {
@@ -349,6 +373,7 @@ const CreditCheckhtmlForm = ({ customerId }) => {
     }
   };
 
+  console.log("Report", crcCooporateReport);
   // handle next prev form step start
   const [formStep, setFormStep] = useState(1);
   const handleNext = () => {
@@ -564,7 +589,7 @@ const CreditCheckhtmlForm = ({ customerId }) => {
 
                 <div className="row mb-3">
                   <label htmlFor="dSearchInput" className="col-form-label">
-                    BVN or Business Name
+                    BVN | Business Name | RC. NO
                   </label>
                   <div>
                     <input
@@ -655,6 +680,7 @@ const CreditCheckhtmlForm = ({ customerId }) => {
               <PdfDocument report={reportObj} />
             )}
           </div>
+
           {/* first centra render */}
           <div className="row m-5">
             {noReport && <h4>No First Central Report</h4>}
@@ -668,24 +694,24 @@ const CreditCheckhtmlForm = ({ customerId }) => {
               />
             )}
           </div>
+
           {/* crc render report */}
           <div className="row m-5">
             {noCRC && <h4>No CRC Report</h4>}
             {/* generated pdf report component */}
-            {PDFContent && (
-              <CRCBasicReportPDF report={PDFContent} />
+            {bureauReport && (
+              <CRCBasicReportPDF report={bureauReport} formData={bureauData} title={crcTitle} />
             )}
-            {Object.keys(firstCentralCommercialReport).length > 0 && (
-              <FirstCentralCommercialPdf
-                report={firstCentralCommercialReport}
-              />
+
+            {crcCooporateReport && (
+              <CRCCooporateReport report={crcCooporateReport} formData={bureauData} />
             )}
           </div>
 
           {/* credit registry report */}
           <div className="row" style={{ width: "100vw" }}>
             {PDFContent && (
-              <div style={{ width: "60%", height: "100vh" }}>
+              <div style={{ width: "80%", height: "100vh" }}>
                 <h3>Credit Registry Report</h3>
                 <embed
                   src={`data:application/pdf;base64,${PDFContent}`}
