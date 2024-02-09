@@ -167,7 +167,7 @@ router.post("/createLoan", async (req, res) => {
     });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: 'Internal Server Error BankOne Loan creation' });
+    res.status(500).json({  error: err.message  });
   }
 });
 
@@ -232,7 +232,7 @@ router.get("/balanceEnquiry/:accountNumber", (req, res) => {
     })
     .catch(err => {
       console.error(err);
-      res.status(500).json({ error: 'Internal Server Error' }); // Handle errors and send a response to the client
+      res.status(500).json({  error: err.message  }); // Handle errors and send a response to the client
     });
 });
 
@@ -266,7 +266,7 @@ router.get("/getCustomerById/:customerId", (req, res) => {
     })
     .catch(err => {
       console.error(err);
-      res.status(500).json({ error: 'Internal Server Error' }); // Handle errors and send a response to the client
+      res.status(500).json({ error: err.message  }); // Handle errors and send a response to the client
     });
 });
 
@@ -395,7 +395,7 @@ router.get("/getLoanRepaymentSchedule/:loanAccountNumber", async (req, res) => {
     res.json(data); // Send the response to the client
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: 'Internal Server Error' }); // Handle errors and send a response to the client
+    res.status(500).json({ error: err.message }); // Handle errors and send a response to the client
   }
 });
 
