@@ -29,6 +29,10 @@ const PostSchema = mongoose.Schema({
     image: {
         type: String,
         required: true,
+    }, 
+    isFeatured: {
+        type: Boolean,
+        default: true,
     }
 }, { timestamps: true });
 

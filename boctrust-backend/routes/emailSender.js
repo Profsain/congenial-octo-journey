@@ -9,7 +9,7 @@ router.post('/send-email', async (req, res) => {
             service: 'SMTP',
             name: 'mail.boctrustmfb.com',
             host: "mail.boctrustmfb.com",
-            port: 2096,
+            port: 465,
             secure: true,
             auth: {
                 user: 'ebusiness@boctrustmfb.com',
