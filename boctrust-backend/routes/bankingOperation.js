@@ -127,19 +127,23 @@ router.post("/createLoan", async (req, res) => {
   // Define the loan creation request payload
   const loanRequestPayload = {
     TransactionTrackingRef: _id,
-    LoanProductCode: '300',
+    LoanProductCode: 300,
     CustomerID: customerId,
     LinkedAccountNumber: accountNumber,
-    CollateralDetails: '',
-    CollateralType: '',
-    ComputationMode: '0',
-    Tenure: tenure.toString(),
-    Moratorium: '30',
-    Amount: loanAmount,
+    CollateralDetails: 'string',
+    CollateralType: 'string',
+    ComputationMode: 0,
+    Tenure: tenure,
+    Moratorium: 30,
+    InterestAccrualCommencementDate: new Date().toISOString(),
+    Amount: Number(loanAmount),
     InterestRate: interestRate,
-    PrincipalPaymentFrequency: '2',
-    InterestPaymentFrequency: '2'
+    PrincipalPaymentFrequency: 2,
+    InterestPaymentFrequency: 2,
+    LoanFeeIDs: []
   };
+
+  console.log("payload here", loanRequestPayload)
 
   const options = {
     method: 'POST',
@@ -167,7 +171,7 @@ router.post("/createLoan", async (req, res) => {
     });
   } catch (error) {
     console.error(error);
-    res.status(500).json({  error: err.message  });
+    res.status(500).json({  error: error.message  });
   }
 });
 
