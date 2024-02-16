@@ -1,4 +1,7 @@
+/* eslint-disable no-undef */
 import { useState, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchWikis } from "../../redux/reducers/wikiReducer";
 // animation library
 import AOS from "aos";
 import "aos/dist/aos.css";
@@ -10,8 +13,28 @@ import SearchBox from "../shared/SearchBox";
 import "./Support.css";
 import Divider from "./Divider";
 import TermsPolicy from "./TermsPolicy";
+import PageLoader from "../dashboard/shared/PageLoader";
 
 const Support = () => {
+  // fetch faqs from redux store
+  const dispatch = useDispatch();
+  useEffect(() => {
+    dispatch(fetchWikis());
+  }, [dispatch]);
+
+  const wikis = useSelector((state) => state.wikiReducer.wikis.wikis);
+  const status = useSelector((state) => state.wikiReducer.status);
+
+  // wiki local state
+  const [wikisList, setWikisList] = useState(data.faqs);
+
+  // check if wikis is not empty and update wikisList
+  useEffect(() => {
+    if (wikis) {
+      setWikisList(wikis);
+    }
+  }, [wikis]);
+  
   // inquiry form state
   const [formData, setFormData] = useState({
     email: "",
@@ -78,8 +101,9 @@ const Support = () => {
     },
   };
 
-  const faqs = data.faqs;
-  const currentFaqs = faqs.filter((faq) => faq.category === "deposit");
+  const faqs = wikisList;
+
+  const currentFaqs = faqs.filter((faq) => faq.category.toLowerCase() === "deposit");
   // component state
   const [firstFaqs, setFirstFaqs] = useState(currentFaqs);
   const [searchTerm, setSearchTerm] = useState("");
@@ -211,7 +235,8 @@ const Support = () => {
               </div>
             </div>
           ) : (
-            <div>
+              <div>
+                {status === "loading" && <PageLoader />}
               {firstFaqs.map(({ id, question, answer }) => (
                 <Accordion key={id} defaultActiveKey="0" flush>
                   <Accordion.Item

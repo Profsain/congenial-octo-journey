@@ -107,7 +107,8 @@ const LoanDisbursement = () => {
     // check if disbursement is successful and
     // update loan status to disbursed
     // update isProcessed to true
-    if (disbursedData) {
+    console.log("response", newDisbursement);
+    if (newDisbursement.ok) {
       updateLoanStatus(id, "approved");
     }
     setTimeout(() => {

@@ -5,7 +5,6 @@ import "./Blogs.css";
 const BlogSidebar = ({blogsData}) => {
   // const blogs = blogdata.blogs;
   const blogs = blogsData;
-  console.log("blogsData", blogsData)
 
   // create object with category as key and array of blogs as value
   const blogCategories = blogs.reduce((acc, blog) => {

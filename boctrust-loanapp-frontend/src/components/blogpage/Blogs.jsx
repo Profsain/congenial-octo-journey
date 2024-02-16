@@ -40,8 +40,8 @@ const Blogs = () => {
         <div className="row">
           <div className="col-md-9 col-sm-12">
             <div className="container my-5 ">
+              {status === "loading" && <PageLoader />}
               <Row xs={1} md={2} className="gap-4 px-4">
-                {status === "loading" && <PageLoader />}
                 {blogs?.map((blog) => (
                   <BlogCard
                     func={() => openBlog(blog.title)}
@@ -56,7 +56,7 @@ const Blogs = () => {
             </div>
           </div>
           <div className="col-md-3 col-sm-12 ">
-            <BlogSidebar blogsData={blogs}/>
+            <BlogSidebar blogsData={blogs} />
           </div>
         </div>
       </div>
