@@ -1,5 +1,7 @@
-import PropTypes from "prop-types"
+import PropTypes from "prop-types";
 import { useState, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchProduct } from "../../redux/reducers/productReducer";
 // animation library
 import AOS from "aos";
 import "aos/dist/aos.css";
@@ -12,10 +14,26 @@ import "../ourproductpage/OurProduct.css";
 import ProductImage from "./ProductImage";
 import ProductListCard from "./ProductListCard";
 
-const OurProduct = ({productTitle, headerImg}) => {
+const OurProduct = ({ productTitle, headerImg }) => {
+  // fetch loan product
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(fetchProduct());
+  }, [dispatch]);
+
+  const loanProducts = useSelector(
+    (state) => state.productReducer.products.products
+  );
+  const status = useSelector((state) => state.productReducer.status);
+
+  console.log("status", status)
+  console.log("loanProducts", loanProducts);
+
   // data from json file
   const products = data.products;
-  
+  console.log("dummy data", products)
+
   // filter using productTitle
   const currentProduct = data.products.filter(
     (product) =>
@@ -30,7 +48,7 @@ const OurProduct = ({productTitle, headerImg}) => {
   const [desc, setDesc] = useState(description);
   const [benefit, setBenefit] = useState(benefits);
   const [feature, setFeature] = useState(features);
-  
+
   // create object of products, key is category and value is array of products
   const productsByCategory = products.reduce((acc, product) => {
     if (!acc[product.category]) {
@@ -146,8 +164,8 @@ const OurProduct = ({productTitle, headerImg}) => {
 OurProduct.propTypes = {
   headerImg: PropTypes.string,
   productTitle: PropTypes.shape({
-    toLowerCase: PropTypes.func
-  })
-}
+    toLowerCase: PropTypes.func,
+  }),
+};
 
 export default OurProduct;

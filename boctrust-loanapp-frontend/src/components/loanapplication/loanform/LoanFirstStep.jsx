@@ -21,7 +21,6 @@ const LoanFirstStep = ({ data }) => {
 
   useEffect(() => {
     dispatch(fetchProduct());
-    // dispatch(fetchEmployers());
   }, [dispatch]);
 
   const loanProducts = useSelector(
