@@ -30,6 +30,7 @@ const creditRegistryRoutes = require("./routes/creditRegistry");
 const firstCentralRoutes = require("./routes/firstCentral");
 const tempDataRoutes = require("./routes/tempData");
 const bvnVerificationRoutes = require("./routes/bvnVerification");
+const career = require("./routes/career")
 
 // configure dotenv
 dotenv.config();
@@ -101,6 +102,9 @@ mongoose
 
         // bvn verification routes
         app.use('/api/bvn', bvnVerificationRoutes);
+
+        // career routes
+        app.use('/api/career', career);
 
         app.listen(process.env.PORT || 3030, () => console.log("Server running on port 3030"));
     })

@@ -56,6 +56,7 @@ import GetLoan from "../loan/GetLoan";
 import CheckRepayment from "../loan/CheckRepayment";
 import LoanStatement from "../loan/LoanStatement";
 import LoanBalance from "../loan/LoanBalance";
+import CareerList from "../website/CareerList";
 
 const AdminDashboard = () => {
   const [showSidebar, setShowSidebar] = useState(false);
@@ -206,6 +207,9 @@ const AdminDashboard = () => {
       case "customerAsk":
         setCurrentTitle("Customer FAQ Request");
         break;
+      case "career":
+        setCurrentTitle("Careers/Jobs");
+        break;
       case "contactForm":
         setCurrentTitle("Contact Us Record");
         break;
@@ -332,6 +336,8 @@ const AdminDashboard = () => {
         return <AddWiki />;
       case "customerAsk":
         return <CustomerAsk />;
+      case "career":
+        return <CareerList />;
       case "contactForm":
         return <ContactForm />;
       case "website":

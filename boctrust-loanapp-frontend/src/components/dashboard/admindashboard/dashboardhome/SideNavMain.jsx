@@ -333,7 +333,10 @@ const SideNavMain = ({ onMenuItemClick }) => {
                 Wiki/FAQ
               </li>
               <li id="customerAsk" onClick={onMenuItemClick}>
-                Customer Ask
+                Customer Enquiry
+              </li>
+              <li id="career" onClick={onMenuItemClick}>
+                Career
               </li>
             </ul>
           </div>

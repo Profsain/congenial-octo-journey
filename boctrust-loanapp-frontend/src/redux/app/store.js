@@ -4,6 +4,7 @@ import userSlice from '../reducers/userSlice';
 import blogReducer from '../reducers/blogReducer';
 import productReducer from '../reducers/productReducer';
 import wikiReducer from '../reducers/wikiReducer';
+import careerReducer from '../reducers/careerReducer'
 import contactFormReducer from '../reducers/contactFormReducer';
 import branchReducer from '../reducers/branchReducer';
 import accountReducer from '../reducers/accountReducer';
@@ -20,6 +21,7 @@ const store = configureStore({
         blogReducer,
         productReducer,
         wikiReducer,
+        careerReducer,
         contactFormReducer,
         branchReducer,
         accountReducer,
