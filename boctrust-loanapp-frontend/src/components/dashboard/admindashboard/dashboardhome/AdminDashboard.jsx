@@ -56,7 +56,7 @@ import GetLoan from "../loan/GetLoan";
 import CheckRepayment from "../loan/CheckRepayment";
 import LoanStatement from "../loan/LoanStatement";
 import LoanBalance from "../loan/LoanBalance";
-import CareerList from "../website/CareerList";
+import PostJobs from "../website/PostJobs";
 
 const AdminDashboard = () => {
   const [showSidebar, setShowSidebar] = useState(false);
@@ -337,7 +337,7 @@ const AdminDashboard = () => {
       case "customerAsk":
         return <CustomerAsk />;
       case "career":
-        return <CareerList />;
+        return <PostJobs />;
       case "contactForm":
         return <ContactForm />;
       case "website":

@@ -12,9 +12,9 @@ import CareerList from "./CareerList";
 const validationSchema = Yup.object().shape({
   jobtitle: Yup.string().required("Jobs title is required"),
   description: Yup.string().required("Description is required"),
-    image: Yup.string().required("Image url is required"),
-  dateposted: Yup.String().required("Job posted date is required"),
-  deadline: Yup.String().required("Job closing date is required")
+  image: Yup.string().required("Image url is required"),
+  dateposted: Yup.string().required("Job posted date is required"),
+  deadline: Yup.string().required("Job closing date is required"),
 });
 
 const initialValues = {
@@ -107,7 +107,7 @@ const PostJobs = () => {
             <Form>
               <div className="FieldRow">
                 <div className="FieldGroup">
-                  <label htmlFor="question">Job Title</label>
+                  <label htmlFor="jobtitle">Job Title</label>
                   <Field
                     type="text"
                     name="jobtitle"
@@ -120,25 +120,8 @@ const PostJobs = () => {
                     className="Error"
                   />
                 </div>
-
                 <div className="FieldGroup">
-                  <label htmlFor="answer">Description</label>
-                  <Field
-                    type="text"
-                    name="description"
-                    id="description"
-                    className="Input"
-                  />
-                  <ErrorMessage
-                    name="description"
-                    component="div"
-                    className="Error"
-                  />
-                </div>
-              </div>
-              <div className="FieldRow">
-                <div className="FieldGroup">
-                  <label htmlFor="category">Image Url</label>
+                  <label htmlFor="image">Image Url</label>
                   <Field
                     type="text"
                     name="image"
@@ -152,28 +135,86 @@ const PostJobs = () => {
                   />
                 </div>
               </div>
-              <div className="BtnContainer">
-                <BocButton
-                  fontSize="1.6rem"
-                  type="submit"
-                  width="220px"
-                  margin="1rem 0"
-                  bgcolor="#ecaa00"
-                  bradius="18px"
-                >
-                  Submit
-                </BocButton>
-                <BocButton
-                  fontSize="1.6rem"
-                  type="button"
-                  width="220px"
-                  margin="1rem 0"
-                  bgcolor="gray"
-                  bradius="18px"
-                  func={handleClose}
-                >
-                  Cancel
-                </BocButton>
+
+              <div className="FieldRow">
+                <div className="FieldGroup">
+                  <label htmlFor="dateposted">Posted Date</label>
+                  <Field
+                    type="date"
+                    name="dateposted"
+                    id="dateposted"
+                    className="Input"
+                  />
+                  <ErrorMessage
+                    name="dateposted"
+                    component="div"
+                    className="Error"
+                  />
+                </div>
+                <div className="FieldGroup">
+                  <label htmlFor="deadline">Closing Date</label>
+                  <Field
+                    type="date"
+                    name="deadline"
+                    id="deadline"
+                    className="Input"
+                  />
+                  <ErrorMessage
+                    name="deadline"
+                    component="div"
+                    className="Error"
+                  />
+                </div>
+              </div>
+
+              <div className="DescriptionJob">
+                <div className="FieldGroup">
+                  <label htmlFor="answer">Description</label>
+                  <textarea
+                    name="description"
+                    id="description"
+                    cols="30"
+                    rows="10"
+                    style={{
+                      marginTop: "10px",
+                      borderRadius: "8px",
+                      padding: "18px",
+                    }}
+                  ></textarea>
+                  <ErrorMessage
+                    name="description"
+                    component="div"
+                    className="Error"
+                  />
+                </div>
+              </div>
+
+              <div className="row text-center my-4">
+                <div className="col-sm-12 col-md-6">
+                  <BocButton
+                    fontSize="1.6rem"
+                    type="button"
+                    width="220px"
+                    margin="1rem 0"
+                    bgcolor="gray"
+                    bradius="18px"
+                    func={handleClose}
+                  >
+                    Cancel
+                  </BocButton>
+                </div>
+                <div className="col-sm-12 col-md-6">
+                  <BocButton
+                    fontSize="1.6rem"
+                    type="submit"
+                    width="220px"
+                    margin="1rem 0"
+                    bgcolor="#ecaa00"
+                    bradius="18px"
+                  >
+                    Submit
+                  </BocButton>
+                </div>
               </div>
             </Form>
           </Formik>
