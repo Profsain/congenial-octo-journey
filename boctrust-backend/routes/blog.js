@@ -21,7 +21,7 @@ const upload = multer({ storage: storage });
 router.get('/posts', async (req, res) => {
     try {
         // get all posts
-      const posts = await Post.find();
+      const posts = await Post.find().sort({ createdAt: -1 });
       
       // blogs with images
       const postsWithImages = posts.map(post => {

@@ -72,7 +72,7 @@ const ContactForm = () => {
       padding: "0.2rem 0.5rem",
     },
     w: {
-      width: "5%",
+      width: "15%",
     },
   };
 
@@ -91,7 +91,7 @@ const ContactForm = () => {
                   <th>Email</th>
                   <th>Subject</th>
                   <th style={styles.w}>Date</th>
-                  <th style={styles.w}>Status</th>
+                  {/* <th style={styles.w}>Status</th> */}
                   <th>Action</th>
                 </tr>
               </thead>
@@ -103,7 +103,7 @@ const ContactForm = () => {
                     <td>{contact.email}</td>
                     <td>{contact.subject}</td>
                     <td>{getDateOnly(contact.createdAt)}</td>
-                    <td>New</td>
+                    {/* <td>New</td> */}
                     <td>
                       <div>
                         <select

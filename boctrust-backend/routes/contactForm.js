@@ -6,7 +6,8 @@ const Contact = require('../models/ContactForm'); // import contact model
 // get all contact endpoint
 router.get('/contacts', async (req, res) => {
   try {
-    const contacts = await Contact.find();
+    const contacts = await Contact.find().sort({ createdAt: -1 });
+
     // return success response
     return res.status(200).json({ contacts });
   } catch (error) {
