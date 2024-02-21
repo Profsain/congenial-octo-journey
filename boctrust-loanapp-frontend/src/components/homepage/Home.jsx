@@ -28,7 +28,7 @@ const Home = () => {
   //   `;
   // }
   // const handleSendEmail = () => {
-  //   sendEmail("husseinimudiking@gmail.com", "Test Email from Boctrust", emailTemplate());
+  //   sendEmail("profsainhm@gmail.com", "Test Email from Boctrust", emailTemplate());
   // }
 
   return (
@@ -49,6 +49,7 @@ const Home = () => {
 
       <div>
         {/* <LoanForm /> */}
+        {/* <button onClick={handleSendEmail}>Send Email</button> */}
       </div>
     </>
   );

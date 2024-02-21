@@ -444,4 +444,8 @@ p {
     .Hero {
       display: none !important;
     }
+
+    .DescriptionJob {
+      margin-top: 48px !important;
+    }
 }

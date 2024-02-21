@@ -6,7 +6,7 @@ import Table from "react-bootstrap/Table";
 import PageLoader from "../../shared/PageLoader";
 import ActionNotification from "../../shared/ActionNotification";
 import "../../Dashboard.css";
-import EditWiki from "./EditWiki";
+import ViewContact from "./ViewContact";
 
 const ContactForm = () => {
   const [openModel, setOpenModel] = useState(false);
@@ -35,18 +35,18 @@ const ContactForm = () => {
     setContactObj(contact);
 
     if (option === "view") {
-      console.log("View email details");
+      setOpenModel(true);
     } else if (option === "reply") {
       console.log("Reply to email");
-    } else if (option === "forward") {
-      console.log("Forward to another email");
+    } else if (option === "delete") {
+      setAction(true);
     }
   };
 
   // handle delete action
   const handleDelete = async () => {
     const apiUrl = import.meta.env.VITE_BASE_URL;
-    await fetch(`${apiUrl}/api/wiki/wikis/${contactId}`, {
+    await fetch(`${apiUrl}/api/contact/contacts/${contactId}`, {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
@@ -71,6 +71,9 @@ const ContactForm = () => {
       marginTop: "0.1rem",
       padding: "0.2rem 0.5rem",
     },
+    w: {
+      width: "15%",
+    },
   };
 
   return (
@@ -84,10 +87,11 @@ const ContactForm = () => {
               <thead style={styles.head}>
                 <tr>
                   <th>Full Name</th>
-                  <th>Phone Number</th>
+                  <th>Phone</th>
                   <th>Email</th>
                   <th>Subject</th>
-                  <th>Date</th>
+                  <th style={styles.w}>Date</th>
+                  {/* <th style={styles.w}>Status</th> */}
                   <th>Action</th>
                 </tr>
               </thead>
@@ -99,6 +103,7 @@ const ContactForm = () => {
                     <td>{contact.email}</td>
                     <td>{contact.subject}</td>
                     <td>{getDateOnly(contact.createdAt)}</td>
+                    {/* <td>New</td> */}
                     <td>
                       <div>
                         <select
@@ -110,7 +115,7 @@ const ContactForm = () => {
                           <option value="">Action</option>
                           <option value="view">View</option>
                           <option value="reply">Reply</option>
-                          <option value="forward">Forward</option>
+                          <option value="delete">Delete</option>
                         </select>
                       </div>
                     </td>
@@ -122,10 +127,10 @@ const ContactForm = () => {
         </div>
       )}
 
-      <EditWiki
+      <ViewContact
         onHide={() => setOpenModel(false)}
         show={openModel}
-        wikis={contactObj}
+        data={contactObj}
       />
       <ActionNotification
         show={action}

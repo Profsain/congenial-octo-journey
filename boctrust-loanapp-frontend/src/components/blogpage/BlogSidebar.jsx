@@ -1,9 +1,10 @@
-import blogdata from "../../mockdatabase/blogs.json";
+import PropTypes from "prop-types"
 import Headline from "../shared/Headline";
 import "./Blogs.css";
 
-const BlogSidebar = () => {
-  const blogs = blogdata.blogs;
+const BlogSidebar = ({blogsData}) => {
+  // const blogs = blogdata.blogs;
+  const blogs = blogsData;
 
   // create object with category as key and array of blogs as value
   const blogCategories = blogs.reduce((acc, blog) => {
@@ -29,9 +30,9 @@ const BlogSidebar = () => {
               />
               <ul>
                 {blogCategories[category].map((blog) => {
-                  if (blog.isFeatured === true)
+                  if (blog)
                     return (
-                      <li key={blog.id}>
+                      <li key={blog.id || blog._id}>
                         <a href={`/blog/${blog.title.replaceAll(" ", "-")}`}>
                           {blog.title}
                         </a>
@@ -45,5 +46,9 @@ const BlogSidebar = () => {
     </div>
   );
 };
+
+BlogSidebar.propTypes = {
+  blogsData: PropTypes.any
+}
 
 export default BlogSidebar;

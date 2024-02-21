@@ -91,33 +91,70 @@ const LoanDisbursement = () => {
     );
   };
 
-  const handleApproval = async (id) => {
-    setProcessing(true);
-    // process loan approval
-    const loan = filteredCustomers.find((customer) => customer._id === id);
-    setLoanObj(loan);
-    // create loan and disburse in bankone
-    const newDisbursement = await fetch(`${apiUrl}/api/bankone/createLoan`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(loanObj),
-    });
-    const disbursedData = await newDisbursement.json;
+  // const handleApproval = async (id) => {
+  //   setProcessing(true);
+  //   // process loan approval
+  //   const loan = filteredCustomers.find((customer) => customer._id === id);
+  //   setLoanObj(loan);
+  //   // create loan and disburse in bankone
+  //   const newDisbursement = await fetch(`${apiUrl}/api/bankone/createLoan`, {
+  //     method: "POST",
+  //     headers: { "Content-Type": "application/json" },
+  //     body: JSON.stringify(loanObj),
+  //   });
+  //   const disbursedData = await newDisbursement.json;
 
-    // check if disbursement is successful and
-    // update loan status to disbursed
-    // update isProcessed to true
-    if (disbursedData) {
-      updateLoanStatus(id, "approved");
-    }
-    setTimeout(() => {
-      setProcessing(false);
-    }, 5000);
-    console.log("Disbursement", disbursedData);
-    dispatch(fetchAllCustomer());
-  };
+  //   // check if disbursement is successful and
+  //   // update loan status to disbursed
+  //   // update isProcessed to true
+  //   console.log("response", newDisbursement);
+  //   if (newDisbursement.ok) {
+  //     updateLoanStatus(id, "approved");
+  //   }
+  //   setTimeout(() => {
+  //     setProcessing(false);
+  //   }, 5000);
+  //   console.log("Disbursement", disbursedData);
+  //   dispatch(fetchAllCustomer());
+  // };
 
   // handle loan rejection
+
+  const handleApproval = async (id) => {
+    setProcessing(true);
+
+    try {
+      // Process loan approval
+      const loan = filteredCustomers.find((customer) => customer._id === id);
+      setLoanObj(loan);
+
+      // Create loan and disburse in bankone
+      const newDisbursement = await fetch(`${apiUrl}/api/bankone/createLoan`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(loanObj),
+      });
+
+      if (!newDisbursement.ok) {
+        throw new Error(
+          `Failed to create loan. Status: ${newDisbursement.status}`
+        );
+      }
+
+      const disbursedData = await newDisbursement.json();
+
+      // Check if disbursement is successful and update loan status to disbursed
+      updateLoanStatus(id, "approved");
+
+      console.log("Disbursement", disbursedData);
+      dispatch(fetchAllCustomer());
+    } catch (error) {
+      console.error("Error:", error.message);
+    } finally {
+      setProcessing(false);
+    }
+  };
+
   const handleRejection = async (id) => {
     console.log("Processing loan approval");
     // process loan rejection

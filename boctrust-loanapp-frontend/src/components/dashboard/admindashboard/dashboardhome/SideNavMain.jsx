@@ -320,20 +320,23 @@ const SideNavMain = ({ onMenuItemClick }) => {
         {isWebManagerOpen ? (
           <div className="SubItem">
             <ul>
-              <li id="website" onClick={onMenuItemClick}>
+              {/* <li id="website" onClick={onMenuItemClick}>
                 All Pages
+              </li> */}
+              <li id="webmanager" onClick={onMenuItemClick}>
+                Blogs
               </li>
               <li id="contactForm" onClick={onMenuItemClick}>
                 Contact Form
               </li>
-              <li id="webmanager" onClick={onMenuItemClick}>
-                Blogs
-              </li>
               <li id="addwiki" onClick={onMenuItemClick}>
-                Wiki/FAQ
+                Wikis/FAQs
               </li>
               <li id="customerAsk" onClick={onMenuItemClick}>
-                Customer Ask
+                Customer Enquiry
+              </li>
+              <li id="career" onClick={onMenuItemClick}>
+                Career
               </li>
             </ul>
           </div>

@@ -21,9 +21,20 @@ const upload = multer({ storage: storage });
 router.get('/posts', async (req, res) => {
     try {
         // get all posts
-        const posts = await Post.find();
+      const posts = await Post.find().sort({ createdAt: -1 });
+      
+      // blogs with images
+      const postsWithImages = posts.map(post => {
+        const baseUrl = process.env.BASE_URL || 'http://localhost:3030';
+        return {
+          ...post.toJSON(),
+          imageUrl: `${baseUrl}/uploads/${post.image}`
+        };
+      });
+
+
         // return success response
-        return res.status(200).json({ posts });
+        return res.status(200).json({ posts: postsWithImages});
     } catch (error) {
         return res.status(500).json({ error: error.message });
     }

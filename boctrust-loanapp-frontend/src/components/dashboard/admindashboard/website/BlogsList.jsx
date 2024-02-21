@@ -133,6 +133,7 @@ const BlogsList = ({ count, searchTerms }) => {
                           bgcolor="#145098"
                           func={handleAction}
                           id={blog._id}
+                          width="58px"
                         >
                           Edit
                         </BocButton>
@@ -141,6 +142,7 @@ const BlogsList = ({ count, searchTerms }) => {
                           bradius="8px"
                           func={handleAction}
                           id={blog._id}
+                          width="58px"
                         >
                           Delete
                         </BocButton>
