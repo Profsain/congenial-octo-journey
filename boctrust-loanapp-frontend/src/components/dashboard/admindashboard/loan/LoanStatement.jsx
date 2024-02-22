@@ -71,10 +71,10 @@ const LoanStatement = () => {
     const loan = filteredCustomers.find((customer) => customer._id === id);
     setLoanObj(loan);
 
-    const loanAccountNumber = loan.banking.accountDetails.Message.AccountNumber;
-    const fromDate = "2021-01-01";
-    const toDate = "2021-12-31";
-    const institutionCode = "100579";
+    const loanAccountNumber = "02520013060008033";
+    const fromDate = "01-01-2023";
+    const toDate = "12-25-2023";
+    const institutionCode = 100579;
 
     // call api to get balance details
     const loanStatement = await fetch(
