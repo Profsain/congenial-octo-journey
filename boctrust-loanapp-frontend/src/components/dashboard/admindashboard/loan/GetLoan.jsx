@@ -10,8 +10,8 @@ import NextPreBtn from "../../shared/NextPreBtn";
 import PageLoader from "../../shared/PageLoader";
 import getDateOnly from "../../../../../utilities/getDate";
 import searchList from "../../../../../utilities/searchListFunc";
-import LoanDetails from "./LoanDetails";
 import NoResult from "../../../shared/NoResult";
+import GetLoanDetails from "./GetLoanDetails";
 
 const GetLoan = () => {
   const styles = {
@@ -69,7 +69,6 @@ const GetLoan = () => {
   const handleCheckBalance = async (id) => {
     setIsProcessing(true);
     const loan = filteredCustomers.find((customer) => customer._id === id);
-    setLoanObj(loan);
 
     const accountNumber = loan.banking.accountDetails.Message.CustomerID;
 
@@ -78,7 +77,10 @@ const GetLoan = () => {
       `${apiUrl}/api/bankone/getLoanByAccount/${accountNumber}`
     );
     const customerData = await customerDetails.json();
-    console.log("Get Customer Detail", customerData);
+
+    if (customerData) {
+      setLoanObj(loan);
+    }
 
     // set is processing to false
     setTimeout(() => {
@@ -210,7 +212,7 @@ const GetLoan = () => {
 
       {/* show loan details model */}
       {show && (
-        <LoanDetails show={show} handleClose={handleClose} loanObj={loanObj} />
+        <GetLoanDetails show={show} handleClose={handleClose} loanObj={loanObj} />
       )}
     </>
   );
@@ -221,13 +223,4 @@ GetLoan.propTypes = {
   showCount: PropTypes.number,
 };
 
-
 export default GetLoan
-
-// const GetLoan = () => {
-//   return (
-//     <div>GetLoan</div>
-//   )
-// }
-
-// export default GetLoan
