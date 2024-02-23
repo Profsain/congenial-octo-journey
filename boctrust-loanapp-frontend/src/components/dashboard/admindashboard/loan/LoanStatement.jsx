@@ -8,7 +8,6 @@ import DashboardHeadline from "../../shared/DashboardHeadline";
 import BocButton from "../../shared/BocButton";
 import NextPreBtn from "../../shared/NextPreBtn";
 import PageLoader from "../../shared/PageLoader";
-import getDateOnly from "../../../../../utilities/getDate";
 import searchList from "../../../../../utilities/searchListFunc";
 import LoanDetails from "./LoanDetails";
 import NoResult from "../../../shared/NoResult";
@@ -31,6 +30,13 @@ const LoanStatement = () => {
     },
     pending: {
       color: "#f64f4f",
+    },
+    date: {
+      width: "120px",
+      fontSize: "12px",
+      border: "1px solid #d9d9d9",
+      padding: "0.3rem",
+      margin: "0"
     },
   };
 
@@ -65,15 +71,15 @@ const LoanStatement = () => {
   // handle show loan details
   const apiUrl = import.meta.env.VITE_BASE_URL;
   const [isProcessing, setIsProcessing] = useState(false);
+  const [fromDate, setFromDate] = useState("");
+  const [toDate, setToDate] = useState("");
 
   const handleCheckBalance = async (id) => {
     setIsProcessing(true);
     const loan = filteredCustomers.find((customer) => customer._id === id);
     setLoanObj(loan);
-
-    const loanAccountNumber = "02520013060008033";
-    const fromDate = "01-01-2023";
-    const toDate = "12-25-2023";
+  
+    const loanAccountNumber =  loan.banking.accountDetails.Message.AccountNumber;
     const institutionCode = 100579;
 
     // call api to get balance details
@@ -158,9 +164,9 @@ const LoanStatement = () => {
               <th>Loan Product</th>
               <th>Borrower</th>
               <th>A/C Number</th>
-              <th>Date</th>
               <th>Applied Amount</th>
-              <th>Status</th>
+              <th>FromDate</th>
+              <th>ToDate</th>
               <th>Action</th>
             </tr>
           </thead>
@@ -175,18 +181,22 @@ const LoanStatement = () => {
                   <td>
                     {customer?.banking?.accountDetails?.Message?.AccountNumber}
                   </td>
-                  <td>{getDateOnly(customer.createdAt)}</td>
                   <td>N{customer.loanamount}</td>
+                  <td style={styles.dateT}>
+                    <input
+                      style={styles.date}
+                      type="date"
+                      value={fromDate}
+                      onChange={(e) => setFromDate(e.target.value)}
+                    />
+                  </td>
                   <td>
-                    {customer.disbursementstatus === "pending" ? (
-                      <p style={styles.pending}>Pending</p>
-                    ) : customer.disbursementstatus === "approved" ? (
-                      <p style={styles.approved}>Disbursed</p>
-                    ) : customer.disbursementstatus === "stopped" ? (
-                      <p style={styles.pending}>Stopped</p>
-                    ) : (
-                      <p style={styles.completed}>Rejected</p>
-                    )}
+                    <input
+                      style={styles.date}
+                      type="date"
+                      value={toDate}
+                      onChange={(e) => setToDate(e.target.value)}
+                    />
                   </td>
                   <td>
                     <div>
@@ -225,4 +235,3 @@ LoanStatement.propTypes = {
 };
 
 export default LoanStatement;
-

@@ -71,7 +71,7 @@ const CheckRepayment = () => {
     const loan = filteredCustomers.find((customer) => customer._id === id);
     setLoanObj(loan);
 
-    const loanAccountNumber = loan.banking.accountDetails.Message.AccountNumber;
+    const loanAccountNumber = loan.salaryaccountnumber;
 
     // call api to get balance details
     const repaymentSchedule = await fetch(

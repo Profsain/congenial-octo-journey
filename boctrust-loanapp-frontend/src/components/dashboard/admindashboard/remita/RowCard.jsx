@@ -10,8 +10,8 @@ const RowCard = ({title, text}) => {
 }
 
 RowCard.propTypes = {
-  text: PropTypes.string,
-  title: PropTypes.string
+  text: PropTypes.any,
+  title: PropTypes.any
 }
 
 export default RowCard

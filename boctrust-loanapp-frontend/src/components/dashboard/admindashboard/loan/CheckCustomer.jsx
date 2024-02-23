@@ -10,8 +10,8 @@ import NextPreBtn from "../../shared/NextPreBtn";
 import PageLoader from "../../shared/PageLoader";
 import getDateOnly from "../../../../../utilities/getDate";
 import searchList from "../../../../../utilities/searchListFunc";
-import LoanDetails from "./LoanDetails";
 import NoResult from "../../../shared/NoResult";
+import CheckCustomerDetails from "./CheckCustomerDetails";
 
 const CheckCustomer = () => {
  const styles = {
@@ -69,7 +69,6 @@ const CheckCustomer = () => {
   const handleCheckBalance = async (id) => {
     setIsProcessing(true);
     const loan = filteredCustomers.find((customer) => customer._id === id);
-    setLoanObj(loan);
 
     const customerID = loan.banking.accountDetails.Message.CustomerID;
 
@@ -78,8 +77,10 @@ const CheckCustomer = () => {
       `${apiUrl}/api/bankone/getCustomerById/${customerID}`
     );
     const customerData = await customerDetails.json();
-    console.log("Get Customer Detail", customerData);
 
+    if (customerData) {
+         setLoanObj(customerData);
+    }
     // set is processing to false
     setTimeout(() => {
       setIsProcessing(false);
@@ -158,7 +159,6 @@ const CheckCustomer = () => {
               <th>A/C Number</th>
               <th>Date</th>
               <th>Applied Amount</th>
-              <th>Status</th>
               <th>Action</th>
             </tr>
           </thead>
@@ -175,17 +175,7 @@ const CheckCustomer = () => {
                   </td>
                   <td>{getDateOnly(customer.createdAt)}</td>
                   <td>N{customer.loanamount}</td>
-                  <td>
-                    {customer.disbursementstatus === "pending" ? (
-                      <p style={styles.pending}>Pending</p>
-                    ) : customer.disbursementstatus === "approved" ? (
-                      <p style={styles.approved}>Disbursed</p>
-                    ) : customer.disbursementstatus === "stopped" ? (
-                      <p style={styles.pending}>Stopped</p>
-                    ) : (
-                      <p style={styles.completed}>Rejected</p>
-                    )}
-                  </td>
+                  
                   <td>
                     <div>
                       {isProcessing && <PageLoader width="12px" />}
@@ -211,7 +201,7 @@ const CheckCustomer = () => {
 
       {/* show loan details model */}
       {show && (
-        <LoanDetails show={show} handleClose={handleClose} loanObj={loanObj} />
+        <CheckCustomerDetails show={show} handleClose={handleClose} loanObj={loanObj} />
       )}
     </>
   );
