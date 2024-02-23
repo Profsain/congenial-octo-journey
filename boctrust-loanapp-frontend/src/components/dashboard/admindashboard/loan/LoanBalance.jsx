@@ -9,8 +9,8 @@ import NextPreBtn from "../../shared/NextPreBtn";
 import PageLoader from "../../shared/PageLoader";
 import getDateOnly from "../../../../../utilities/getDate";
 import searchList from "../../../../../utilities/searchListFunc";
-import LoanDetails from "./LoanDetails";
 import NoResult from "../../../shared/NoResult";
+import LoanBalanceDetails from "./LoanBalanceDetails";
 
 const LoanBalance = () => {
   const styles = {
@@ -55,6 +55,8 @@ const LoanBalance = () => {
 
   const [show, setShow] = useState(false);
   const [loanObj, setLoanObj] = useState({});
+  const [fullName, setFullName] = useState("");
+
   // handle close loan details
   const handleClose = () => {
     setLoanObj({});
@@ -68,9 +70,11 @@ const LoanBalance = () => {
   const handleCheckBalance = async (id) => {
     setIsProcessing(true);
     const loan = filteredCustomers.find((customer) => customer._id === id);
-    setLoanObj(loan);
 
-    const customerId = loan.banking.accountDetails.Message.CustomerID;
+    const customerName = `${loan.firstname} ${loan.lastname}`;
+    setFullName(customerName);
+
+    const customerId = loan?.banking?.accountDetails?.Message?.CustomerID;
   
 
     // call api to get balance details
@@ -78,7 +82,10 @@ const LoanBalance = () => {
       `${apiUrl}/api/bankone/loanAccountBalance/${customerId}/`
     );
     const loanBalanceData = await loanBalance.json();
-    console.log("Loan Balance", loanBalanceData);
+    
+    if (loanBalanceData) {
+      setLoanObj(loanBalanceData);
+    }
 
     // set is processing to false
     setTimeout(() => {
@@ -210,7 +217,7 @@ const LoanBalance = () => {
 
       {/* show loan details model */}
       {show && (
-        <LoanDetails show={show} handleClose={handleClose} loanObj={loanObj} />
+        <LoanBalanceDetails show={show} handleClose={handleClose} loanObj={loanObj} fullName={fullName} />
       )}
     </>
   );
