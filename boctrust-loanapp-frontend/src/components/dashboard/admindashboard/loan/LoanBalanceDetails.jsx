@@ -80,5 +80,14 @@ const LoanBalanceDetails = ({ loanObj, show, handleClose, fullName }) => {
   );
 };
 
+LoanBalanceDetails.propTypes = {
+  fullName: PropTypes.any,
+  handleClose: PropTypes.any,
+  loanObj: PropTypes.shape({
+    Message: PropTypes.any
+  }),
+  show: PropTypes.any
+}
+
 
 export default LoanBalanceDetails;

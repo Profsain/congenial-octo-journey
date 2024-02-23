@@ -415,7 +415,7 @@ router.get("/loanAccountStatement/:loanAccountNumber/:fromDate/:toDate/:institut
     console.log("Statement params", loanAccountNumber, fromDate, toDate, institutionCode);
 
     // Construct the URL with the provided parameters
-    const apiUrl = `${baseUrl}/LoanAccount/LoanAccountStatement/2?authToken=${token}&loanAccountNumber=${loanAccountNumber}&fromDate=${fromDate}&toDate=${toDate}&institutionCode=${institutionCode}`;
+    const apiUrl = `${baseUrl}/BankOneWebAPI/api/LoanAccount/LoanAccountStatement/2?authToken=${token}&loanAccountNumber=${loanAccountNumber}&fromDate=${fromDate}&toDate=${toDate}&institutionCode=${institutionCode}`;
 
     const options = {
       method: 'GET',
