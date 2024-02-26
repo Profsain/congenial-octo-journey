@@ -4,7 +4,7 @@ const router = express.Router();
 // add token to environment variable
 const token = process.env.BANKONE_TOKEN;
 const baseUrl = "https://api.mybankone.com";
-const mfbcode = 100579
+const mfbcode = "100579"
 
 // Create customer account endpoint (Done)
 router.post("/createCustomerAccount", async (req, res) => {
@@ -280,7 +280,6 @@ router.post("/interbankTransfer", (req, res) => {
 // get loan by account number (Verify)
 router.get("/getLoanByAccount/:accountNumber", (req, res) => {
   const { accountNumber } = req.params; // Get the id number from the URL parameters
-  console.log("Get Loan Number", accountNumber)
 
   // Construct the URL with the provided customer id number
   const apiUrl = `${baseUrl}/BankOneWebAPI/api/Loan/GetLoansByCustomerId/2?authToken=${token}&institutionCode=0118&CustomerId=${accountNumber}`;
@@ -377,39 +376,10 @@ router.get("/loanAccountBalance/:customerId", async (req, res) => {
 });
 
 // loan account statement (Verify)
-// router.get("/loanAccountStatement/:loanAccountNumber/:fromDate/:toDate/:institutionCode", async (req, res) => {
-//   const { loanAccountNumber, fromDate, toDate, institutionCode } = req.params; // Get parameters from the URL
-//   console.log("Statement params", loanAccountNumber, fromDate, toDate, institutionCode)
-   
-//   try {
-//     // Construct the URL with the provided parameters
-//     const apiUrl = `${baseUrl}/LoanAccount/LoanAccountStatement/2?authToken=${token}&loanAccountNumber=${loanAccountNumber}&fromDate=${fromDate}&toDate=${toDate}&institutionCode=${institutionCode}`;
-
-//     const options = {
-//       method: 'GET',
-//       headers: {
-//         'accept': 'application/json',
-//       }
-//     };
-
-//     const response = await fetch(apiUrl, options);
-
-//     if (!response) {
-//       throw new Error(`HTTP error! BankOne Loan account Statement failed. Status: ${response.status}`);
-//     }
-
-//     const data = await response.json();
-//     console.log("Statement", data);
-//     // send data and status code to client
-//     res.status(200).json(data);
-//   } catch (error) {
-//     // send error message and status code to client
-//     res.status(500).json({ error: error.message });
-//   }
-  
-// });
+// http://52.168.85.231/BankOneWebAPI/api/LoanAccount/LoanAccountStatement/2?authtoken=6bcc4b69-e1a1-415d-bab8-0bfd3eb01b5f&accountNumber=00830013021008172&fromDate=2023-07-09&toDate=2023-09-09&numberOfItems=5
 
 router.get("/loanAccountStatement/:loanAccountNumber/:fromDate/:toDate/:institutionCode", async (req, res) => {
+
   try {
     const { loanAccountNumber, fromDate, toDate, institutionCode } = req.params; // Get parameters from the URL
     console.log("Statement params", loanAccountNumber, fromDate, toDate, institutionCode);
@@ -427,8 +397,9 @@ router.get("/loanAccountStatement/:loanAccountNumber/:fromDate/:toDate/:institut
 
     const response = await fetch(apiUrl, options);
 
-    if (!response.ok) {
-      throw new Error(`HTTP error! BankOne Loan account Statement failed. Status: ${response.status}`);
+    if (!response) {
+      console.log("server error")
+      throw new Error(response);
     }
 
     // Check content-type header to ensure the response is JSON

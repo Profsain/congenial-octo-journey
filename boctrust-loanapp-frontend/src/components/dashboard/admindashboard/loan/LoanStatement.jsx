@@ -79,8 +79,9 @@ const LoanStatement = () => {
     const loan = filteredCustomers.find((customer) => customer._id === id);
     setLoanObj(loan);
   
-    const loanAccountNumber =  loan.banking.accountDetails.Message.AccountNumber;
-    const institutionCode = 100579;
+    const loanAccountNumber =
+      loan.banking.accountDetails.Message.BankoneAccountNumber;
+    const institutionCode = "100579";
 
     // call api to get balance details
     const loanStatement = await fetch(
