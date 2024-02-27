@@ -132,7 +132,7 @@ const LoanDisbursement = () => {
       const newDisbursement = await fetch(`${apiUrl}/api/bankone/createLoan`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(loanObj),
+        body: JSON.stringify(loan),
       });
 
       if (!newDisbursement.ok) {
