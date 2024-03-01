@@ -144,6 +144,7 @@ const CheckSalaryHistory = () => {
 
   // handle search by
   const [customerList, setCustomerList] = useState(customers);
+
   const { searchTerm, setSearchTerm, filteredData } = useSearch(
     customers,
     "firstname"
@@ -155,7 +156,12 @@ const CheckSalaryHistory = () => {
   });
 
   useEffect(() => {
-    setCustomerList(filteredData);
+    // chech if filteredData is empty
+    if (!filteredData) {
+      setCustomerList(customers);
+    } else {
+      setCustomerList(filteredData);
+    }
   }, [searchTerm, filteredData]);
 
   // handle search by date
