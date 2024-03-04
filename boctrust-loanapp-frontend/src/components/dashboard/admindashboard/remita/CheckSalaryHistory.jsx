@@ -1,5 +1,6 @@
 /* eslint-disable no-undef */
-import { useState, useEffect } from "react";
+
+import{ useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchAllCustomer } from "../../../../redux/reducers/customerReducer";
 import { Table } from "react-bootstrap";
@@ -18,7 +19,6 @@ import useSearch from "../../../../../utilities/useSearchName.js";
 import useSearchByDate from "../../../../../utilities/useSearchByDate.js";
 import useSearchByDateRange from "../../../../../utilities/useSearchByDateRange.js";
 
-
 const CheckSalaryHistory = () => {
   const styles = {
     btnBox: {
@@ -26,7 +26,6 @@ const CheckSalaryHistory = () => {
       justifyContent: "center",
     },
     table: {
-      //   margin: "0 2rem 0 3rem",
       fontSize: "14px",
     },
     head: {
@@ -44,7 +43,6 @@ const CheckSalaryHistory = () => {
     },
   };
 
-  // fetch all customer
   const dispatch = useDispatch();
   const customers = useSelector(
     (state) => state.customerReducer.customers.customer
@@ -53,12 +51,14 @@ const CheckSalaryHistory = () => {
   const [customerObj, setCustomerObj] = useState({});
   const [openDetails, setOpenDetails] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [customerList, setCustomerList] = useState([]);
 
   useEffect(() => {
-    dispatch(fetchAllCustomer());
+    dispatch(fetchAllCustomer()).catch((error) =>
+      console.error("Error fetching customers:", error)
+    );
   }, [dispatch]);
 
-  // scroll to salary check details section
   const scrollToDetails = () => {
     if (openDetails) {
       const checkDetails = document.getElementById("checkDetails");
@@ -70,52 +70,44 @@ const CheckSalaryHistory = () => {
     scrollToDetails();
   }, [openDetails]);
 
-  // handle salary check
   const handleCheck = async (id) => {
-    const apiUrl = import.meta.env.VITE_BASE_URL;
-    // find customer by id and update the customerObj
-    const customer = customers.find((customer) => customer._id === id);
-
     setIsLoading(true);
-
-    // get customer history from remita
-    const response = await fetch(`${apiUrl}/api/remita/get-salary-history`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        authorisationCode: customer.bvnnumber,
-        firstName: customer.firstname,
-        lastName: customer.lastname,
-        accountNumber: customer.salaryaccountnumber,
-        bankCode: customer.bankcode,
-        bvn: customer.bvnnumber || "041",
-        authorisationChannel: "WEB",
-      }),
-    });
-
-    const data = await response.json();
-    // set customerObj to remita data
-    setCustomerObj(data);
-
-    // update customer history
-    await updateSalaryHistory(customer._id, data);
-
-    setIsLoading(false);
-    setOpenDetails(true);
-
-    // call dispatch to update list
-    dispatch(fetchAllCustomer());
+    try {
+      const apiUrl = import.meta.env.VITE_BASE_URL;
+      const customer = customers.find((customer) => customer._id === id);
+      const response = await fetch(`${apiUrl}/api/remita/get-salary-history`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          authorisationCode: customer.bvnnumber,
+          firstName: customer.firstname,
+          lastName: customer.lastname,
+          accountNumber: customer.salaryaccountnumber,
+          bankCode: customer.bankcode,
+          bvn: customer.bvnnumber || "041",
+          authorisationChannel: "WEB",
+        }),
+      });
+      if (!response.ok) {
+        throw new Error("Failed to fetch salary history");
+      }
+      const data = await response.json();
+      setCustomerObj(data);
+      await updateSalaryHistory(customer._id, data);
+      setIsLoading(false);
+      setOpenDetails(true);
+      dispatch(fetchAllCustomer());
+    } catch (error) {
+      console.error("Error checking salary:", error);
+      setIsLoading(false);
+    }
   };
 
-  // handle view
   const handleView = (id) => {
     scrollToDetails();
-    // find customer by id
     const customer = customers.find((customer) => customer._id === id);
-
-    // set customerObj to customer
     setCustomerObj(customer);
     setOpenDetails(true);
   };
@@ -123,66 +115,60 @@ const CheckSalaryHistory = () => {
   const handleAction = async (e, id) => {
     e.preventDefault();
     const actionBtn = e.target.innerText;
-
-    // find customer by id
     const customer = customers.find((customer) => customer._id === id);
     const data = customer.remita.remitaDetails;
-
-    if (actionBtn === "Process") {
-      // update remitaStatus to processed
-      await updateSalaryHistory(id, data, "processed");
-    } else if (actionBtn === "Drop") {
-      // update remitaStatus to droped
-      await updateSalaryHistory(id, data, "dropped");
-
-      // send email notification to customer
+    try {
+      if (actionBtn === "Process") {
+        await updateSalaryHistory(id, data, "processed");
+      } else if (actionBtn === "Drop") {
+        await updateSalaryHistory(id, data, "dropped");
+      }
+      dispatch(fetchAllCustomer());
+    } catch (error) {
+      console.error("Error handling action:", error);
     }
-
-    // call dispatch to update list
-    dispatch(fetchAllCustomer());
   };
 
-  // handle search by
-  const [customerList, setCustomerList] = useState(customers);
+  // check if customer is kyc approved and deductions is remita
+  useEffect(() => {
+    if (customers?.length > 0) {
+      const result = customers.filter(
+        (customer) =>
+          customer.kyc.isKycApproved && customer.deductions === "remita"
+      );
+
+      setCustomerList(result);
+    } 
+  }, [customers]);
 
   const { searchTerm, setSearchTerm, filteredData } = useSearch(
-    customers,
+    customerList,
     "firstname"
   );
 
-  const [dateRange, setDateRange] = useState({
-    fromDate: "",
-    toDate: "",
-  });
+  const [dateRange, setDateRange] = useState({ fromDate: "", toDate: "" });
 
   useEffect(() => {
-    // chech if filteredData is empty
-    if (!filteredData) {
-      setCustomerList(customers);
-    } else {
-      setCustomerList(filteredData);
-    }
+    setCustomerList(filteredData);
   }, [searchTerm, filteredData]);
 
   // handle search by date
-  const { filteredDateData } = useSearchByDate(customers, "createdAt");
+  const { filteredDateData } = useSearchByDate(customerList, "createdAt");
+
   const searchByDate = () => {
     setCustomerList(filteredDateData);
-  }
+  };
 
   // handle list reload
   const handleReload = () => {
-    setDateRange({
-      fromDate: "",
-      toDate: "",
-    });
+    setDateRange({ fromDate: "", toDate: "" });
     dispatch(fetchAllCustomer());
-    setCustomerList(customers);
+    setCustomerList(customerList);
   };
 
   // handle search by date range
   const { searchData } = useSearchByDateRange(
-    customers,
+    customerList,
     dateRange,
     "createdAt"
   );
@@ -225,92 +211,83 @@ const CheckSalaryHistory = () => {
             </thead>
             <tbody>
               {customerList?.length === 0 && <NoResult name="customer" />}
-              {customerList?.map((customer) => {
-                if (
-                  customer.kyc.isKycApproved &&
-                  customer.deductions == "remita"
-                ) {
-                  return (
-                    <tr key={customer._id}>
-                      <td>{customer.firstname}</td>
-                      <td>{customer.lastname}</td>
-                      <td>{customer.salaryaccountnumber}</td>
-                      <td>{customer.bvnnumber}</td>
-
-                      {customer.remita?.isRemitaCheck === true ? (
-                        <td
-                          style={styles.pending}
-                          className="startBtn"
-                          onClick={() => handleView(customer._id)}
+              {customerList?.map((customer) => (
+                <tr key={customer._id}>
+                  <td>{customer.firstname}</td>
+                  <td>{customer.lastname}</td>
+                  <td>{customer.salaryaccountnumber}</td>
+                  <td>{customer.bvnnumber}</td>
+                  {customer.remita?.isRemitaCheck ? (
+                    <td
+                      style={styles.pending}
+                      className="startBtn"
+                      onClick={() => handleView(customer._id)}
+                    >
+                      View
+                    </td>
+                  ) : (
+                    <td
+                      style={styles.pending}
+                      className="startBtn"
+                      onClick={() => handleCheck(customer._id)}
+                    >
+                      Start
+                    </td>
+                  )}
+                  <td>
+                    {customer.remita?.remitaStatus === "processed" && (
+                      <div>
+                        <BocButton
+                          bradius="12px"
+                          fontSize="14px"
+                          width="100px"
+                          margin="0 4px"
+                          bgcolor="green"
                         >
-                          View
-                        </td>
-                      ) : (
-                        <td
-                          style={styles.pending}
-                          className="startBtn"
-                          onClick={() => handleCheck(customer._id)}
+                          Processed
+                        </BocButton>
+                      </div>
+                    )}
+                    {customer.remita?.remitaStatus === "dropped" && (
+                      <div>
+                        <BocButton
+                          bradius="12px"
+                          fontSize="14px"
+                          width="100px"
+                          margin="0 4px"
+                          bgcolor="#f64f4f"
                         >
-                          Start
-                        </td>
-                      )}
-
-                      <td>
-                        {customer.remita?.remitaStatus === "processed" && (
-                          <div>
-                            <BocButton
-                              bradius="12px"
-                              fontSize="14px"
-                              width="100px"
-                              margin="0 4px"
-                              bgcolor="green"
-                            >
-                              Processed
-                            </BocButton>
-                          </div>
-                        )}
-                        {customer.remita?.remitaStatus === "dropped" && (
-                          <div>
-                            <BocButton
-                              bradius="12px"
-                              fontSize="14px"
-                              width="100px"
-                              margin="0 4px"
-                              bgcolor="#f64f4f"
-                            >
-                              Dropped
-                            </BocButton>
-                          </div>
-                        )}
-                        {customer.remita?.remitaStatus === "pending" && (
-                          <div>
-                            <BocButton
-                              bradius="12px"
-                              fontSize="14px"
-                              width="90px"
-                              margin="0 4px"
-                              bgcolor="#145088"
-                              func={(e) => handleAction(e, customer._id)}
-                            >
-                              Process
-                            </BocButton>
-                            <BocButton
-                              bradius="12px"
-                              fontSize="14px"
-                              width="90px"
-                              margin="0 4px"
-                              bgcolor="#f64f4f"
-                              func={(e) => handleAction(e, customer._id)}
-                            >
-                              Drop
-                            </BocButton>
-                          </div>
-                        )}
-                      </td>
-                    </tr>
-                  );
-                }
-              })}
+                          Dropped
+                        </BocButton>
+                      </div>
+                    )}
+                    {customer.remita?.remitaStatus === "pending" && (
+                      <div>
+                        <BocButton
+                          bradius="12px"
+                          fontSize="14px"
+                          width="90px"
+                          margin="0 4px"
+                          bgcolor="#145088"
+                          func={(e) => handleAction(e, customer._id)}
+                        >
+                          Process
+                        </BocButton>
+                        <BocButton
+                          bradius="12px"
+                          fontSize="14px"
+                          width="90px"
+                          margin="0 4px"
+                          bgcolor="#f64f4f"
+                          func={(e) => handleAction(e, customer._id)}
+                        >
+                          Drop
+                        </BocButton>
+                      </div>
+                    )}
+                  </td>
+                </tr>
+              ))}
             </tbody>
           </Table>
         </div>
@@ -318,7 +295,7 @@ const CheckSalaryHistory = () => {
       </div>
 
       {/* details section */}
-      {isLoading ? <PageLoader /> : null}
+      {isLoading && <PageLoader />}
       {openDetails && (
         <div id="checkDetails">
           <CheckSalaryDetails
