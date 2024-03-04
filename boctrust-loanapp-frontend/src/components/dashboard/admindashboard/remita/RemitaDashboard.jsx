@@ -203,7 +203,7 @@ const RemitaDashboard = () => {
                       <td>N{customer.loantotalrepayment || "0.00"}</td>
                       <td>{getDateOnly(customer.updatedAt)}</td>
                       <td>
-                        {customer?.remita?.remitaDetails?.data?.data?.firstPaymentDate.slice(
+                        {customer?.remita?.remitaDetails?.data?.data?.firstPaymentDate?.slice(
                           0,
                           10
                         ) || "N/A"}

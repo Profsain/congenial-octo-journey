@@ -8,6 +8,8 @@ const CheckSalaryDetails = ({ customerObj }) => {
   const customerData =
     customerObj?.data?.data || customerObj?.remita?.remitaDetails?.data?.data;
   
+  console.log( "customerData", customerData)
+  
 
   // check if customerData is empty
   if (!customerData) {
@@ -26,21 +28,19 @@ const CheckSalaryDetails = ({ customerObj }) => {
   return (
     <>
       <div className="DetailsCon">
-        <div className="RowSection">
+        <div className="RowSectio">
           <RowCard title="Customer ID:" text={customerData.customerId} />
           <RowCard title="Account Number:" text={customerData.accountNumber} />
-        </div>
-        <div className="RowSection">
           <RowCard title="Bank Code:" text={customerData.bankCode} />
           <RowCard title="BVN:" text={customerData.bvn || "not available"} />
           <RowCard
             title="Next Payment Date:"
-            text={customerData.firstPaymentDate.slice(0, 10)}
+            text={customerData?.firstPaymentDate?.slice(0, 10)}
           />
         </div>
         <hr />
         <div>
-          <select>
+          <select style={{fontSize: "14px"}}>
             <option value="">Select Number of Months</option>
             <option value="">6 months</option>
             <option value="">12 months</option>

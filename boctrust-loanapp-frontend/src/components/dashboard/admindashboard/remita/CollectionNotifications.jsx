@@ -68,7 +68,6 @@ const CollectionNotifications = () => {
     "firstname"
   );
 
-  // console.log("Result", customerList)
   const [dateRange, setDateRange] = useState({
     fromDate: "",
     toDate: "",

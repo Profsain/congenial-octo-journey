@@ -56,6 +56,10 @@ router.post("/createCustomerAccount", async (req, res) => {
 
 // loan creation endpoint (verify)
 router.post("/createLoan", async (req, res) => {
+  // check req body
+  if (Object.keys(req.body).length === 0) {
+    return res.status(400).json({ error: 'Request body is empty. Try again' });
+  }
 
   // get the loan creation request payload from the request body
   const { _id, salaryaccountnumber, disbursementaccountnumber, numberofmonth, loanamount } = req.body;
@@ -86,7 +90,7 @@ router.post("/createLoan", async (req, res) => {
     InterestPaymentFrequency: 2,
     LoanFeeIDs: []
   };
-
+  console.log("payloan", loanRequestPayload)
   const options = {
     method: 'POST',
     headers: {
@@ -277,7 +281,7 @@ router.post("/interbankTransfer", (req, res) => {
 
 // intra bank transfer endpoint (Boctrust)
 
-// get loan by account number (Verify)
+// get loan by account number (Done)
 router.get("/getLoanByAccount/:accountNumber", (req, res) => {
   const { accountNumber } = req.params; // Get the id number from the URL parameters
 
@@ -375,7 +379,7 @@ router.get("/loanAccountBalance/:customerId", async (req, res) => {
   }
 });
 
-// loan account statement (Verify)
+// loan account statement (Done)
 // http://52.168.85.231/BankOneWebAPI/api/LoanAccount/LoanAccountStatement/2?authtoken=6bcc4b69-e1a1-415d-bab8-0bfd3eb01b5f&accountNumber=00830013021008172&fromDate=2023-07-09&toDate=2023-09-09&numberOfItems=5
 
 router.get("/loanAccountStatement/:loanAccountNumber/:fromDate/:toDate/:institutionCode", async (req, res) => {
@@ -385,7 +389,7 @@ router.get("/loanAccountStatement/:loanAccountNumber/:fromDate/:toDate/:institut
     console.log("Statement params", loanAccountNumber, fromDate, toDate, institutionCode);
 
     // Construct the URL with the provided parameters
-    const apiUrl = `${baseUrl}/BankOneWebAPI/api/LoanAccount/LoanAccountStatement/2?authToken=${token}&loanAccountNumber=${loanAccountNumber}&fromDate=${fromDate}&toDate=${toDate}&institutionCode=${institutionCode}`;
+    const apiUrl = `${baseUrl}/BankOneWebAPI/api/LoanAccount/LoanAccountStatement/2?authToken=${token}&accountNumber=${loanAccountNumber}&fromDate=${fromDate}&toDate=${toDate}&institutionCode=${institutionCode}`;
 
     const options = {
       method: 'GET',

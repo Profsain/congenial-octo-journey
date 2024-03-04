@@ -9,6 +9,8 @@ import Overview from "./overview/Overview";
 import Calculator from "./calculator/Calculator";
 import BlogList from "./blogexperience/BlogList";
 // import LoanForm from "../loanapplication/loanform/LoanForm";
+// import ReactDOMServer from "react-dom/server";
+// import EmailTemplate from "../shared/EmailTemplate";
 // import sendEmail from "../../../utilities/sendEmail";
 
 const Home = () => {
@@ -18,18 +20,17 @@ const Home = () => {
     });
   }, []);
 
-  // const emailTemplate = () => {
-  //   return `
-  //   <div>
-  //     <h1>Test Email</h1>
-  //     <p>This is a test email</p>
-  //     <button>Click Me</button>
-  //   </div>
-  //   `;
-  // }
   // const handleSendEmail = () => {
-  //   sendEmail("profsainhm@gmail.com", "Test Email from Boctrust", emailTemplate());
-  // }
+  //   const emailTemplateHtml = ReactDOMServer.renderToString(
+  //     <EmailTemplate firstName="Husseini Mudi" />
+  //   );
+  //   const options = {
+  //     email: "husseinimudiking@gmail.com",
+  //     subject: "Loan Application Notification",
+  //     html: emailTemplateHtml,
+  //   };
+  //   sendEmail(options);
+  // };
 
   return (
     <>
@@ -47,10 +48,7 @@ const Home = () => {
         <BlogList />
       </div>
 
-      <div>
-        {/* <LoanForm /> */}
-        {/* <button onClick={handleSendEmail}>Send Email</button> */}
-      </div>
+      {/* <button onClick={handleSendEmail}>Send Email</button> */}
     </>
   );
 };

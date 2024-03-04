@@ -2,24 +2,21 @@ const express = require('express');
 const router = express.Router();
 const nodemailer = require('nodemailer');
 
+const password = process.env.EMAIL_PASSWORD;
 router.post('/send-email', async (req, res) => {
+
     const { email, subject, html } = req.body;
     try {
         const transporter = nodemailer.createTransport({
-            service: 'SMTP',
-            name: 'mail.boctrustmfb.com',
-            host: "mail.boctrustmfb.com",
-            port: 465,
-            secure: true,
+            host: "smtp-relay.brevo.com",
+            port: 587,
+            secure: false,
             auth: {
-                user: 'ebusiness@boctrustmfb.com',
-                pass: 'eBiz-9945@'
+                user: 'boctrustebusiness@gmail.com',
+                pass: password
             },
-            tls: {
-                rejectUnauthorized: false
-            }
         });
-        
+            
         const mailOptions = {
             from: 'Boctrust MFB Ltd',
             to: email,
@@ -27,17 +24,24 @@ router.post('/send-email', async (req, res) => {
             html: html
 
         };
-        
-        await transporter.sendMail(mailOptions, function(error, info){
-            if (error) {
-                console.log(error);
-                res.status(500).json({ success: false, error: 'Internal Server Error, mail not sent' });
-            } else {
-                console.log('Email sent: ' + info.response);
-                res.status(200).json({ success: true, message: 'Email sent successfully' });
-            }
+            
+        //         if (error) {
+        //             console.log(error);
+        //             res.status(500).json({ success: false, error: 'Internal Server Error, mail not sent' });
+        //         } else {
+        //             console.log('Email sent: ' + info.response);
+        //             res.status(200).json({ success: true, message: 'Email sent successfully' });
+        //         }
+        //     });
+        let info = await transporter.sendMail({
+            from: '"Boctrust"  eBusiness@boctrustmfb.com', // sender address
+            to: email, // list of receivers
+            subject: subject, // Subject line
+            text: html, // plain text body
         });
 
+        console.log("Message sent: %s", info.messageId);
+        res.status(200).json({ success: true, message: 'Email sent successfully' });
     } catch (error) {
         console.log(error);
         res.status(500).json({ success: false, error: 'Internal Server Error' });
