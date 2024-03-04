@@ -84,7 +84,7 @@ router.post('/get-salary-history', async (req, res) => {
 
 // loan disbursement notification endpoint
 router.post('/loan-disbursement-notification', async (req, res) => {
-
+  console.log("Request body", req.body.customer.remita.remitaDetails.data)
   try {
     const d = new Date();
     const requestId = d.getTime();
@@ -109,9 +109,10 @@ router.post('/loan-disbursement-notification', async (req, res) => {
     const dateOfCollection = new Date(new Date().setDate(new Date().getDate() + 30)).toISOString();
     // number of repayment months
     const numberOfRepayments = parseInt(req.body.numberofmonth);
-
+    const customerId = 23;
+    console.log("id", customerId)
     const raw = JSON.stringify({
-      "customerId": req.body.remita.remitaDetails.data.data.customerId,
+      "customerId": customerId,
       "authorisationCode": authorisationCode,
       "authorisationChannel": "WEB",
       "phoneNumber": req.body.phonenumber,
@@ -147,9 +148,78 @@ router.post('/loan-disbursement-notification', async (req, res) => {
     });
   } catch (error) {
     // Handle any errors that occur during the request
+    console.error("Error:", error.message);
     res.status(500).json({ error: 'An error occurred' });
   }
 });
+
+// router.post('/loan-disbursement-notification', async (req, res) => {
+//   try {
+//     const { apiKey, apiToken, merchantId, baseUrl } = req.body;
+//     const d = new Date();
+//     const requestId = d.getTime();
+//     const randomnumber = Math.floor(Math.random() * 1101233);
+//     const authorisationCode = randomnumber;
+//     const dataToHash = apiKey + requestId + apiToken;
+//     const dataBuffer = Buffer.from(dataToHash); // Convert data to Buffer
+//     const apiHash = crypto.createHash('sha512').update(dataBuffer).digest('hex'); // Use Buffer as input
+
+//     const authorization = `remitaConsumerKey=${apiKey}, remitaConsumerToken=${apiHash}`;
+
+//     const myHeaders = {
+//       'Content-Type': 'application/json',
+//       'Api_Key': apiKey,
+//       'Merchant_id': merchantId,
+//       'Request_id': requestId,
+//       'Authorization': authorization
+//     };
+
+//     const loanAmount = parseInt(req.body.loanamount);
+//     const collectionAmount = parseInt(req.body.loantotalrepayment);
+//     const dateOfDisbursement = new Date().toISOString();
+//     const dateOfCollection = new Date(new Date().setDate(new Date().getDate() + 30)).toISOString();
+//     const numberOfRepayments = parseInt(req.body.numberofmonth);
+
+//     const raw = JSON.stringify({
+//       "customerId": req.body.remita.remitaDetails.data.data.customerId,
+//       "authorisationCode": authorisationCode,
+//       "authorisationChannel": "WEB",
+//       "phoneNumber": req.body.phonenumber,
+//       "accountNumber": req.body.salaryaccountnumber,
+//       "currency": "NGN",
+//       "loanAmount": loanAmount,
+//       "collectionAmount": collectionAmount,
+//       "dateOfDisbursement": dateOfDisbursement,
+//       "dateOfCollection": dateOfCollection,
+//       "totalCollectionAmount": collectionAmount,
+//       "numberOfRepayments": numberOfRepayments,
+//       "bankCode": req.body.bankcode
+//     });
+
+//     const requestOptions = {
+//       method: 'POST',
+//       headers: myHeaders,
+//       body: raw,
+//       redirect: 'follow'
+//     };
+
+//     const response = await fetch(`${baseUrl}remita/exapp/api/v1/send/api/loansvc/data/api/v2/payday/post/loan`, requestOptions);
+
+//     if (!response.ok) {
+//       throw new Error(`HTTP error! Status: ${response.status}`);
+//     }
+
+//     const result = await response.json();
+//     console.log(result);
+//     res.status(200).json({
+//       message: "Loan disbursement notification api called successfully",
+//       data: result
+//     });
+//   } catch (error) {
+//     console.error("Error:", error.message);
+//     res.status(500).json({ error: 'An error occurred' });
+//   }
+// });
 
 // collection notification endpoint (webhooks in process )
 router.post('/collection-notification', (req, res) => {
