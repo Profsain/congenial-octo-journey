@@ -13,6 +13,7 @@ const SideNavMain = ({ onMenuItemClick }) => {
   const [isWebManagerOpen, setIsWebManagerOpen] = useState(false);
   const [isKycOpen, setIsKycOpen] = useState(false);
   const [isReportsOpen, setIsReportsOpen] = useState(false);
+  const [isSettingOpen, setIsSettingOpen] = useState(false);
 
   const openSubItem = () => setIsOpen(true);
   const closeSubItem = () => setIsOpen(false);
@@ -37,6 +38,9 @@ const SideNavMain = ({ onMenuItemClick }) => {
 
   const openSubReports = () => setIsReportsOpen(true);
   const closeSubReports = () => setIsReportsOpen(false);
+
+  const openSubSetting = () => setIsSettingOpen(true);
+  const closeSubSetting = () => setIsSettingOpen(false);
 
   // current login admin user
   const currentUser = useSelector((state) => state.adminAuth.user);
@@ -396,6 +400,28 @@ const SideNavMain = ({ onMenuItemClick }) => {
               </li>
               <li id="revenuereport" onClick={onMenuItemClick}>
                 Revenue Report
+              </li> */}
+            </ul>
+          </div>
+        ) : null}
+      </div>
+      <div onMouseOver={openSubSetting} onMouseLeave={closeSubSetting}>
+        <div className="IconBox">
+          <img src="images/dreport.png" alt="report" />
+          <p>Settings</p>
+        </div>
+
+        {isSettingOpen ? (
+          <div className="SubItem">
+            <ul>
+              <li id="general" onClick={onMenuItemClick}>
+                General
+              </li>
+              <li id="email" onClick={onMenuItemClick}>
+                Email
+              </li>
+              {/* <li id="sms" onClick={onMenuItemClick}>
+                SMS
               </li> */}
             </ul>
           </div>

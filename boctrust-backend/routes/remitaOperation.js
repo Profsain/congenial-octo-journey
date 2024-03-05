@@ -43,8 +43,8 @@ router.post('/get-salary-history', async (req, res) => {
     
       const myHeaders = new Headers();
       myHeaders.append("Content-Type", "application/json");
-      myHeaders.append("Api_Key", apiKey);
-      myHeaders.append("Merchant_id", merchantId);
+      myHeaders.append("Api_Key", "QzAwMDAxMDg3MzgxMjM0fEMwMDAwMTA4NzM4");
+      myHeaders.append("Merchant_id", "3229020777");
       myHeaders.append("Request_id", requestId);
       myHeaders.append("Authorization", authorization);
 
@@ -84,7 +84,7 @@ router.post('/get-salary-history', async (req, res) => {
 
 // loan disbursement notification endpoint
 router.post('/loan-disbursement-notification', async (req, res) => {
-  console.log("Request body", req.body.customer.remita.remitaDetails.data)
+  console.log(merchantId, apiKey, apiToken, baseUrl)
   try {
     const d = new Date();
     const requestId = d.getTime();

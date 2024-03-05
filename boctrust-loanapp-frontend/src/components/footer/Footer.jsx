@@ -12,25 +12,30 @@ const Footer = () => {
           <h6 className="FooterHeadline">Quick Links</h6>
           <ul>
             <li>
-              <Link className="Link" to="/">
+              <Link className="Link" to="/privacy">
                 Privacy Policy
               </Link>
             </li>
             <li>
-              <Link className="Link" to="/">
+              <Link className="Link" to="/terms">
                 Terms and Condition
               </Link>
             </li>
             <li>
-              <img src="images/ssl.png" alt="ssl-cert"  style={{marginLeft: "-25px"}}/>
+              <img
+                src="images/ssl.png"
+                alt="ssl-cert"
+                style={{ marginLeft: "-25px" }}
+              />
             </li>
           </ul>
 
           <h6 className="FooterHeadline">About</h6>
           <p>
-            BOCTRUST MICROFINANCE BANK Limited is a financial institution licensed by
-            Central Bank of Nigeria to gives social and economic Support to the
-            lower middle class, working class and the economically active poor.
+            BOCTRUST MICROFINANCE BANK Limited is a financial institution
+            licensed by Central Bank of Nigeria to gives social and economic
+            Support to the lower middle class, working class and the
+            economically active poor.
           </p>
         </div>
         <div className="col-md-6 col-sm-12 Link CompanyLinks">
@@ -139,7 +144,8 @@ const Footer = () => {
       </div>
       <div className="FooterBottom row">
         <p>
-          Copyright BOCTRUST Microfinance Bank Limited All rights reserved 2023.
+          Copyright BOCTRUST Microfinance Bank Limited All rights reserved{" "}
+          {new Date().getFullYear()}.
         </p>
       </div>
     </footer>
