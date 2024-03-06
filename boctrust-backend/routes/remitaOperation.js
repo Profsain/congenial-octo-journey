@@ -86,7 +86,7 @@ router.post('/get-salary-history', async (req, res) => {
 
 // loan disbursement notification endpoint
 router.post('/loan-disbursement-notification', async (req, res) => {
-  console.log(merchantId, apiKey, apiToken, baseUrl)
+
   try {
     const d = new Date();
     const requestId = d.getTime();
@@ -104,14 +104,14 @@ router.post('/loan-disbursement-notification', async (req, res) => {
       myHeaders.append("Request_id", requestId);
       myHeaders.append("Authorization", authorization);
 
-    const loanAmount = parseInt(req.body.loanamount);
-    const collectionAmount = parseInt(req.body.loantotalrepayment);
+    const loanAmount = req.body.loanamount;
+    const collectionAmount = req.body.loantotalrepayment;
     const dateOfDisbursement = new Date().toISOString();
     // next 30 days after date of disbursement
     const dateOfCollection = new Date(new Date().setDate(new Date().getDate() + 30)).toISOString();
     // number of repayment months
-    const numberOfRepayments = parseInt(req.body.numberofmonth);
-    const customerId = 23;
+    const numberOfRepayments = req.body.numberofmonth;
+    const customerId = req.body.remita.remitaDetails.data.data.customerId;
     console.log("id", customerId)
     const raw = JSON.stringify({
       "customerId": customerId,
