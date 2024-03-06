@@ -31,6 +31,8 @@ const baseUrl = "https://login.remita.net/"
 router.post('/get-salary-history', async (req, res) => {
   // extract the customer details from the request body
   const { firstName, lastName, accountNumber, bankCode, bvn, authorisationChannel } = req.body;
+
+  console.log(firstName, lastName, accountNumber, bankCode, bvn, authorisationChannel, apiKey, apiToken, baseUrl)
   try {
       const d = new Date();
       const requestId = d.getTime();
@@ -44,7 +46,7 @@ router.post('/get-salary-history', async (req, res) => {
       const myHeaders = new Headers();
       myHeaders.append("Content-Type", "application/json");
       myHeaders.append("Api_Key", "QzAwMDAxMDg3MzgxMjM0fEMwMDAwMTA4NzM4");
-      myHeaders.append("Merchant_id", "3229020777");
+      myHeaders.append("Merchant_id", merchantId);
       myHeaders.append("Request_id", requestId);
       myHeaders.append("Authorization", authorization);
 

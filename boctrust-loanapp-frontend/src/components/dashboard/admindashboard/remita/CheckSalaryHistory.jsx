@@ -85,7 +85,7 @@ const CheckSalaryHistory = () => {
           firstName: customer.firstname,
           lastName: customer.lastname,
           accountNumber: customer.salaryaccountnumber,
-          bankCode: customer.bankcode,
+          bankCode: customer.bankcode || "058",
           bvn: customer.bvnnumber || "041",
           authorisationChannel: "WEB",
         }),
