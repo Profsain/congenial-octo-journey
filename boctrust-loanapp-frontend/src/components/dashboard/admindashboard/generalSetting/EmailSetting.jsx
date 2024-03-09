@@ -1,8 +1,12 @@
-
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchSetting } from "../../../../redux/reducers/settingReducer";
 import "../../dashboardcomponents/transferdashboard/Transfer.css";
 import BocButton from "../../shared/BocButton";
+import PageLoader from "../../shared/PageLoader";
+import updateSettings from "./updateSetting";
 
 // Define validation schema using Yup
 const validationSchema = Yup.object().shape({
@@ -16,118 +20,161 @@ const validationSchema = Yup.object().shape({
   smptEncryption: Yup.string().required("SMPT encryption is required"),
 });
 
-const initialValues = {
-  mailType: "",
-  fromEmail: "",
-  fromName: "",
-  smptName: "",
-  smptPort: "",
-  smptPassword: "",
-  smptEncryption: "",
-};
-
-const apiUrl = import.meta.env.VITE_BASE_URL;
 
 const EmailSetting = () => {
-  const handleSubmit = async (values, { resetForm }) => {
-    // Handle form submission logic here
-    await fetch(`${apiUrl}api/account/accounts`, {
-      method: "POST",
-      headers: {
-        "Content-type": "application/json; charset=UTF-8",
-      },
-      body: JSON.stringify(values),
-    });
-    resetForm();
+  const dispatch = useDispatch();
+  const settings = useSelector(
+    (state) => state.settingReducer?.settings?.settings[0]
+  );
+  const status = useSelector((state) => state.settingReducer.status);
+
+  useEffect(() => {
+    dispatch(fetchSetting());
+  }, [dispatch]);
+
+  const {
+    mailType,
+    fromEmail,
+    fromName,
+    smtpName,
+    smtpPort,
+    smtpUsername,
+    smtpPassword,
+    smtpEncryption,
+  } = settings;
+
+  const initialValues = {
+    mailType: mailType || "",
+    fromEmail: fromEmail || "",
+    fromName: fromName || "",
+    smptName: smtpName || "",
+    smptPort: smtpPort || "",
+    smptUsername: smtpUsername || "",
+    smptPassword: smtpPassword || "",
+    smptEncryption: smtpEncryption || "",
   };
+
+   const handleSubmit = async (values) => {
+     try {
+       // Handle form submission logic here
+       const data = {
+          mailType: values.mailType,
+          fromEmail: values.fromEmail,
+          fromName: values.fromName,
+          smtpName: values.smptName,
+          smtpPort: values.smptPort,
+          smtpUsername: values.smptUsername,
+          smtpPassword: values.smptPassword,
+          smtpEncryption: values.smptEncryption,
+       };
+
+       console.log(data);
+
+       const response = await updateSettings(data);
+       console.log("Settings updated:", response);
+
+       //  resetForm();
+     } catch (error) {
+       console.error("Error updating settings:", error);
+     }
+   };
 
   return (
     <div className="TransContainer">
-      <Formik
-        initialValues={initialValues}
-        validationSchema={validationSchema}
-        onSubmit={handleSubmit}
-      >
-        <Form>
-          <div className="FieldRow">
-            <div className="FieldGroup">
-              <label htmlFor="mailType">Mail Type</label>
-              <Field
-                type="text"
-                name="mailType"
-                id="mailType"
-                className="Input"
-              />
-              <ErrorMessage name="mailType" component="div" />
-            </div>
-            <div className="FieldGroup">
-              <label htmlFor="fromEmail">From Email</label>
-              <Field
-                type="number"
-                name="fromEmail"
-                id="fromEmail"
-                className="Input"
-              />
-              <ErrorMessage name="fromEmail" component="div" />
-            </div>
-          </div>
-
-          <div className="FieldRow">
-            <div className="FieldGroup">
-              <label htmlFor="smptName">SMPT Name</label>
-              <Field
-                type="text"
-                name="smptName"
-                id="smptName"
-                className="Input"
-              />
-              <ErrorMessage name="smptName" component="div" />
+      {status === "loading" ? (
+        <PageLoader />
+      ) : (
+        <Formik
+          initialValues={initialValues}
+          validationSchema={validationSchema}
+          onSubmit={handleSubmit}
+        >
+          <Form>
+            <div className="FieldRow">
+              <div className="FieldGroup">
+                <label htmlFor="mailType">Mail Type</label>
+                <Field
+                  type="text"
+                  name="mailType"
+                  id="mailType"
+                  className="Input"
+                />
+                <ErrorMessage name="mailType" component="div" />
+              </div>
+              <div className="FieldGroup">
+                <label htmlFor="fromEmail">From Email</label>
+                <Field
+                  type="text"
+                  name="fromEmail"
+                  id="fromEmail"
+                  className="Input"
+                />
+                <ErrorMessage name="fromEmail" component="div" />
+              </div>
             </div>
 
-            <div className="FieldGroup">
-              <label htmlFor="smptPort">SMPT Port</label>
-              <Field
-                type="text"
-                name="smptPort"
-                id="smptPort"
-                className="Input"
-              />
-              <ErrorMessage name="smptPort" component="div" />
+            <div className="FieldRow">
+              <div className="FieldGroup">
+                <label htmlFor="smptName">SMPT Name</label>
+                <Field
+                  type="text"
+                  name="smptName"
+                  id="smptName"
+                  className="Input"
+                />
+                <ErrorMessage name="smptName" component="div" />
+              </div>
+
+              <div className="FieldGroup">
+                <label htmlFor="smptPort">SMPT Port</label>
+                <Field
+                  type="text"
+                  name="smptPort"
+                  id="smptPort"
+                  className="Input"
+                />
+                <ErrorMessage name="smptPort" component="div" />
+              </div>
             </div>
-          </div>
-          <div className="FieldRow">
-            <div className="FieldGroup">
-              <label htmlFor="smptUsername">SMPT Username</label>
-              <Field type="text" name="smptUsername" id="smptUsername" className="Input" />
-              <ErrorMessage name="smptUsername" component="div" />
+            <div className="FieldRow">
+              <div className="FieldGroup">
+                <label htmlFor="smptUsername">SMPT Username</label>
+                <Field
+                  type="text"
+                  name="smptUsername"
+                  id="smptUsername"
+                  className="Input"
+                />
+                <ErrorMessage name="smptUsername" component="div" />
+              </div>
+
+              <div className="FieldGroup">
+                <label htmlFor="smptPassword">SMPT Password</label>
+                <Field
+                  type="text"
+                  name="smptPassword"
+                  id="smptPassword"
+                  className="Input"
+                />
+                <ErrorMessage name="smptPassword" component="div" />
+              </div>
             </div>
 
-            <div className="FieldGroup">
-              <label htmlFor="smptPassword">SMPT Password</label>
-              <Field
-                type="text"
-                name="smptPassword"
-                id="smptPassword"
-                className="Input"
-              />
-              <ErrorMessage name="smptPassword" component="div" />
+            <div className="BtnContainer">
+              <BocButton
+                type="submit"
+                width="220px"
+                bgcolor="#ecaa00"
+                bradius="18px"
+              >
+                Save Settings
+              </BocButton>
             </div>
-          </div>
-
-          <div className="BtnContainer">
-            <BocButton
-              type="submit"
-              width="220px"
-              bgcolor="#ecaa00"
-              bradius="18px"
-            >
-              Save Settings
-            </BocButton>
-          </div>
-        </Form>
-      </Formik>
+          </Form>
+        </Formik>
+      )}
     </div>
   );
 };
 
-export default EmailSetting
+export default EmailSetting;

@@ -1,7 +1,12 @@
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
+import { useEffect, useState} from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchSetting } from "../../../../redux/reducers/settingReducer";
 import "../../dashboardcomponents/transferdashboard/Transfer.css";
 import BocButton from "../../shared/BocButton";
+import PageLoader from "../../shared/PageLoader";
+import updateSettings from "./updateSetting";
 
 // Define validation schema using Yup
 const validationSchema = Yup.object().shape({
@@ -13,34 +18,64 @@ const validationSchema = Yup.object().shape({
   copyrightText: Yup.string().required("copyright is required"),
 });
 
-const initialValues = {
-  siteTitle: "",
-  address: "",
-  phoneNumber1: "",
-  phoneNumber2: "",
-  email: "",
-  copyrightText: "",
-};
-
-const apiUrl = import.meta.env.VITE_BASE_URL;
 
 const GeneralSettings = () => {
-  const handleSubmit = async (values, { resetForm }) => {
-    // Handle form submission logic here
-    await fetch(`${apiUrl}api/account/accounts`, {
-      method: "POST",
-      headers: {
-        "Content-type": "application/json; charset=UTF-8",
-      },
-      body: JSON.stringify(values),
-    });
-    resetForm();
+  const dispatch = useDispatch();
+  const settings = useSelector((state) => state?.settingReducer?.settings?.settings);
+  const status = useSelector((state) => state.settingReducer.status);
+  const [settingData, setSettingData] = useState({});
+
+    useEffect(() => {
+      dispatch(fetchSetting());
+    }, [dispatch]);
+
+    useEffect(() => {
+      // check settings and update the state
+      if (settings && settings.length > 0) {
+        setSettingData(settings[0]);
+      } else {
+        setSettingData({});
+      }
+    }, [settings]);
+
+  const { siteTitle, address, phoneNumber1, phoneNumber2, email, copyrightText } = settingData;
+
+  const initialValues = {
+    siteTitle: siteTitle || "",
+    address: address || "",
+    phoneNumber1: phoneNumber1 || "",
+    phoneNumber2: phoneNumber2 || "",
+    email: email || "",
+    copyrightText: copyrightText || "",
   };
+
+ const handleSubmit = async (values) => {
+   try {
+     // Handle form submission logic here
+     const data = {
+       siteTitle: values.siteTitle,
+       address: values.address,
+       phoneNumber1: values.phoneNumber1,
+       phoneNumber2: values.phoneNumber2,
+       email: values.email,
+       copyrightText: values.copyrightText,
+     };
+
+     await updateSettings(data);
+   
+
+    //  resetForm();
+   } catch (error) {
+     console.error("Error updating settings:", error);
+   }
+ };
+
 
 
   return (
     <div className="TransContainer">
-      <Formik
+      {/* show loading */}
+      {status === "loading" ? (<PageLoader />) : ( <Formik
         initialValues={initialValues}
         validationSchema={validationSchema}
         onSubmit={handleSubmit}
@@ -60,7 +95,7 @@ const GeneralSettings = () => {
             <div className="FieldGroup">
               <label htmlFor="address">Address</label>
               <Field
-                type="number"
+                type="text"
                 name="address"
                 id="address"
                 className="Input"
@@ -127,7 +162,8 @@ const GeneralSettings = () => {
             </BocButton>
           </div>
         </Form>
-      </Formik>
+      </Formik>)}
+     
     </div>
   );
 };

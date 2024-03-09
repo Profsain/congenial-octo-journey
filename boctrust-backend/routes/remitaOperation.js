@@ -32,7 +32,6 @@ router.post('/get-salary-history', async (req, res) => {
   // extract the customer details from the request body
   const { firstName, lastName, accountNumber, bankCode, bvn, authorisationChannel } = req.body;
 
-  console.log(firstName, lastName, accountNumber, bankCode, bvn, authorisationChannel, apiKey, apiToken, baseUrl)
   try {
       const d = new Date();
       const requestId = d.getTime();
