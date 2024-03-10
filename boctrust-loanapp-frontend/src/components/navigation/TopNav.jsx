@@ -1,11 +1,14 @@
 /* eslint-disable no-undef */
+import PropTypes from "prop-types"
 import { useDispatch, useSelector } from "react-redux";
 import { logoutUser } from "../../redux/reducers/adminAuthReducer";
 import { Navbar, Container, Nav, NavDropdown } from "react-bootstrap";
 import "./Navigation.css";
 import { Link } from "react-router-dom";
 
-const TopNav = () => {
+const TopNav = ({ settings }) => {
+  const { siteTitle } = settings;
+
   // change navbar color on scroll
   window.addEventListener("scroll", function () {
     const nav = document.querySelector(".Nav");
@@ -37,15 +40,15 @@ const TopNav = () => {
             </div>
             <div className="Hero">
               <h1 className="Welcome">
-                Welcome to BOCTRUST Microfinance Bank Limited
+                {siteTitle
+                  ? siteTitle
+                  : "Welcome to BOCTRUST Microfinance Bank Limited"}
               </h1>
               <p className="Licence">Licenced by Central Bank of Nigeria</p>
             </div>
             <div>
-              <button className="CallUs">
-                Licenced by CBN
-              </button>
-              <img src="images/cbn.jpeg" alt="cbn"  height={40}/>
+              <button className="CallUs">Licenced by CBN</button>
+              <img src="images/cbn.jpeg" alt="cbn" height={40} />
             </div>
           </div>
         </div>
@@ -203,5 +206,9 @@ const TopNav = () => {
     </div>
   );
 };
+
+TopNav.propTypes = {
+  settings: PropTypes.any
+}
 
 export default TopNav;

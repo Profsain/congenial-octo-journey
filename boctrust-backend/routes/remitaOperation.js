@@ -251,8 +251,8 @@ router.post('/collection-notification', (req, res) => {
 
 // mandate history endpoint (Done)
 router.post('/mandate-history', async (req, res) => {
-
   try {
+  
     const d = new Date();
     const requestId = d.getTime();
     const randomnumber = Math.floor(Math.random() * 1101233);
