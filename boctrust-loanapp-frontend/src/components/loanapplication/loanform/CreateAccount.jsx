@@ -7,7 +7,12 @@ import Headline from "../../shared/Headline";
 import PhoneOtp from "./PhoneOtp";
 import "./Form.css";
 
-const CreateAccount = ({ handleSubmit, phoneNumber }) => {
+const CreateAccount = ({
+  handleSubmit,
+  phoneNumber,
+  customerEmail,
+  customerName,
+}) => {
   const { values, setFieldValue } = useFormikContext();
   const { password, confirmpassword } = values;
   const [isValid, setIsValid] = useState(false);
@@ -65,7 +70,6 @@ const CreateAccount = ({ handleSubmit, phoneNumber }) => {
   useEffect(() => {
     handleValidation();
   }, [confirmpassword]);
-
 
   const handleCreateAccount = () => {
     setModalShow(true);
@@ -135,6 +139,8 @@ const CreateAccount = ({ handleSubmit, phoneNumber }) => {
         show={modalShow}
         onHide={() => setModalShow(false)}
         phonenumber={phoneNumber}
+        customerEmail={customerEmail}
+        customerName={customerName}
         handleSubmit={handleSubmit}
       />
     </>
@@ -144,6 +150,8 @@ const CreateAccount = ({ handleSubmit, phoneNumber }) => {
 CreateAccount.propTypes = {
   handleSubmit: PropTypes.func,
   phoneNumber: PropTypes.string,
+  customerEmail: PropTypes.string,
+  customerName: PropTypes.string,
 };
 
 export default CreateAccount;

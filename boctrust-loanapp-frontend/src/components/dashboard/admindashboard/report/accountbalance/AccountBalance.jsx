@@ -1,3 +1,4 @@
+import {useState} from "react"
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import BocButton from "../../../shared/BocButton";
@@ -6,12 +7,13 @@ import DashboardHeadline from "../../../shared/DashboardHeadline";
 import "../Report.css";
 import AccountBalanceList from "./AccountBalanceList";
 import NextPreBtn from "../../../shared/NextPreBtn";
+import PageLoader from "../../../shared/PageLoader";
 
 // Define validation schema using Yup
 const validationSchema = Yup.object().shape({
   startDate: Yup.string().required("Start date isRequired"),
   endDate: Yup.string().required("End date is required"),
-  customerId: Yup.string().required("Customer is required"),
+  customerId: Yup.string().required("Customer account is required"),
 });
 
 const initialValues = {
@@ -21,9 +23,27 @@ const initialValues = {
 };
 
 const AccountBalance = () => {
-  const handleSubmit = (values) => {
+  const apiUrl = import.meta.env.VITE_BASE_URL;
+  const [accountBalance, setAccountBalance] = useState([]);
+  const [processing, setProcessing] = useState(false);
+
+  const handleSubmit = async(values) => {
     // Handle form submission logic here
-    console.log(values);
+    setProcessing(true);
+    try {
+       const loanBalance = await fetch(
+         `${apiUrl}/api/bankone/balanceEnquiry/${values.customerId}`
+      );
+      
+      const loanBalanceData = await loanBalance.json();
+      if (loanBalanceData) {
+        setAccountBalance(loanBalanceData);
+        setProcessing(false);
+      }
+    } catch (error) {
+      setProcessing(false);
+      throw new Error(error);
+    }
   };
 
   return (
@@ -71,7 +91,7 @@ const AccountBalance = () => {
             </div>
             <div className="BtnRow">
               <div className="BtnContainer">
-                <BocButton
+                {processing ? (<PageLoader />) : (<BocButton
                   margin="0"
                   fontSize="1.6rem"
                   type="submit"
@@ -79,7 +99,8 @@ const AccountBalance = () => {
                   bradius="18px"
                 >
                   Submit
-                </BocButton>
+                </BocButton>)}
+                
               </div>
             </div>
           </Form>
@@ -97,7 +118,7 @@ const AccountBalance = () => {
       </div>
       <div className="ReportCon">
         {/* report table  */}
-        <AccountBalanceList />
+        <AccountBalanceList accountBalance={accountBalance} />
 
         {/* next prev btn  */}
         <NextPreBtn />

@@ -14,6 +14,7 @@ import useSearchByDate from "../../../../../utilities/useSearchByDate.js";
 import useSearchByDateRange from "../../../../../utilities/useSearchByDateRange.js";
 
 import stopLoanFunc from "./stopLoanFunc";
+import sendSMS from "../../../../../utilities/sendSms.js";
 
 const StopCollections = () => {
   const styles = {
@@ -103,6 +104,11 @@ const StopCollections = () => {
       setProcessLoader(false);
       // update stop loan status
       await stopLoanFunc(customer._id);
+
+      // send sms notification to customer
+      const message = `Dear customer, your loan collection has been stopped. Please contact us for more information.`;
+      await sendSMS(customer.phone, message);
+      
       // call dispatch
       dispatch(fetchAllCustomer());
     }

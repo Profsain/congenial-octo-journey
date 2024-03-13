@@ -10,8 +10,7 @@ import Calculator from "./calculator/Calculator";
 import BlogList from "./blogexperience/BlogList";
 // import LoanForm from "../loanapplication/loanform/LoanForm";
 // import ReactDOMServer from "react-dom/server";
-// import EmailTemplate from "../shared/EmailTemplate";
-// import sendEmail from "../../../utilities/sendEmail";
+
 
 const Home = () => {
   useEffect(() => {

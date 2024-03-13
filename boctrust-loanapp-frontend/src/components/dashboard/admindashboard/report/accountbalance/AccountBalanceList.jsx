@@ -1,8 +1,9 @@
+import PropTypes from "prop-types"
 import Table from "react-bootstrap/Table";
 import "../../../Dashboard.css";
 import DashboardHeadline from "../../../shared/DashboardHeadline";
 
-const AccountBalanceList = () => {
+const AccountBalanceList = ({accountBalance}) => {
   const styles = {
     table: {
       // margin: "0 2rem 0 8rem",
@@ -19,6 +20,15 @@ const AccountBalanceList = () => {
       color: "#5cc51c",
     },
   };
+  console.log("Account Balance", accountBalance);
+  // check if account balance is empty
+  if (
+    accountBalance === undefined ||
+    accountBalance === null ||
+    accountBalance.error === "Network response was not ok"
+  ) {
+    return <p style={{textAlign: "center"}}>No account balance available</p>;
+  }
 
   return (
     <div>
@@ -63,5 +73,9 @@ const AccountBalanceList = () => {
     </div>
   );
 };
+
+AccountBalanceList.propTypes = {
+  accountBalance: PropTypes.any
+}
 
 export default AccountBalanceList;

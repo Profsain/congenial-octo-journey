@@ -1,8 +1,9 @@
+import PropTypes from "prop-types"
 import Table from "react-bootstrap/Table";
 import "../../../Dashboard.css";
 import DashboardHeadline from "../../../shared/DashboardHeadline";
 
-const LoanReportList = () => {
+const LoanReportList = ({ loanReport }) => {
   const styles = {
     table: {
       // margin: "0 2rem 0 4rem",
@@ -20,6 +21,17 @@ const LoanReportList = () => {
     },
   };
 
+  // check if loan report is empty
+  if (
+    loanReport === undefined ||
+    loanReport === null ||
+    loanReport.error === "Network response was not ok" ||
+    loanReport.IsSuccessful === false
+  ) {
+    return <p style={{ textAlign: "center" }}>No loan report available</p>;
+  }
+
+  console.log("Loan Report", loanReport);
   return (
     <div>
       <DashboardHeadline
@@ -72,12 +84,15 @@ const LoanReportList = () => {
               <td>30-12-2023</td>
               <td style={styles.completed}>Active</td>
             </tr>
-            
           </tbody>
         </Table>
       </div>
     </div>
   );
 };
+
+LoanReportList.propTypes = {
+  loanReport: PropTypes.any
+}
 
 export default LoanReportList;

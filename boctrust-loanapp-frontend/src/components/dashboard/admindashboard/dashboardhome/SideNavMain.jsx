@@ -389,22 +389,14 @@ const SideNavMain = ({ onMenuItemClick }) => {
               <li id="loanreporting" onClick={onMenuItemClick}>
                 Loan Report
               </li>
-              <li id="loanduereport" onClick={onMenuItemClick}>
-                Loan Due Report
-              </li>
-              <li id="transactionreport" onClick={onMenuItemClick}>
+              {/* <li id="transactionreport" onClick={onMenuItemClick}>
                 Transaction Report
-              </li>
-              {/* <li id="expensereport" onClick={onMenuItemClick}>
-                Expense Report
-              </li>
-              <li id="revenuereport" onClick={onMenuItemClick}>
-                Revenue Report
               </li> */}
             </ul>
           </div>
         ) : null}
       </div>
+      
       <div onMouseOver={openSubSetting} onMouseLeave={closeSubSetting}>
         <div className="IconBox">
           <img src="images/dreport.png" alt="report" />

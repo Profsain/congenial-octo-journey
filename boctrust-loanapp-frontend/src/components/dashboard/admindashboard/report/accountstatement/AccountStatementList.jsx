@@ -1,13 +1,15 @@
+import PropTypes from "prop-types";
 import Table from "react-bootstrap/Table";
 import "../../../Dashboard.css";
+import DashboardHeadline from "../../../shared/DashboardHeadline";
 
-const AccountStatementList = () => {
+const AccountStatementList = ({ accountBalance }) => {
   const styles = {
     table: {
       // margin: "0 2rem 0 8rem",
     },
     head: {
-      color: "#145098",
+      color: "#fff",
       fontSize: "1.2rem",
     },
     img: {
@@ -18,48 +20,61 @@ const AccountStatementList = () => {
       color: "#5cc51c",
     },
   };
+  console.log("Account Balance", accountBalance);
+  // check if account balance is empty
+  if (
+    accountBalance === undefined ||
+    accountBalance === null ||
+    accountBalance.error === "Network response was not ok"
+  ) {
+    return <p style={{ textAlign: "center" }}>No account statement available</p>;
+  }
 
   return (
     <div>
-      {/* <DashboardHeadline
+      <DashboardHeadline
         height="52px"
         mspacer="2rem 0 -2.7rem 0.2rem"
         bgcolor="#145098"
-      ></DashboardHeadline> */}
-      <div style={styles.table} className="DCard">
+      ></DashboardHeadline>
+      <div style={styles.table}>
         <Table hover responsive="sm">
           <thead style={styles.head}>
             <tr>
-              <th>Date</th>
-              <th>Description</th>
-              <th>Dr/Cr</th>
+              <th>Account Number</th>
               <th>Balance</th>
+              <th>Loan Guarantee</th>
+              <th>Current Balance</th>
             </tr>
           </thead>
           <tbody>
             <tr>
-              <td>23-03-2023</td>
-              <td>Bank Transfer</td>
-              <td>Dr</td>
+              <td>1023559802</td>
+              <td>N300,000</td>
+              <td>Government Guarantee</td>
               <td style={styles.completed}>N250,000</td>
             </tr>
             <tr>
-              <td>24-03-2023</td>
-              <td>Loan repayment</td>
-              <td>Cr</td>
-              <td style={styles.completed}>N200,000</td>
+              <td>1023559817</td>
+              <td>N500,000</td>
+              <td>Self Guarantee</td>
+              <td style={styles.completed}>N350,000</td>
             </tr>
             <tr>
-              <td>26-03-2023</td>
-              <td>Bank Transfer</td>
-              <td>Dr</td>
-              <td style={styles.completed}>N150,000</td>
+              <td>1023559199</td>
+              <td>N90,000</td>
+              <td>Guarantee</td>
+              <td style={styles.completed}>N50,000</td>
             </tr>
           </tbody>
         </Table>
       </div>
     </div>
   );
+};
+
+AccountStatementList.propTypes = {
+  accountBalance: PropTypes.any,
 };
 
 export default AccountStatementList;

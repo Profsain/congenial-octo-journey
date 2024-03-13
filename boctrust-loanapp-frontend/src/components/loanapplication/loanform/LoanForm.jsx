@@ -49,6 +49,8 @@ const LoanForm = () => {
   const [bvn, setBvn] = useState("");
   const [showReconfirmBvn, setShowReconfirmBvn] = useState(false);
   const [firstStepData, setFirstStepData] = useState({});
+  const [customerEmail, setCustomerEmail] = useState("");
+  const [customerName, setCustomerName] = useState("");
 
   useEffect(() => {
     // set showReconfirmBvn modal after 30 seconds
@@ -141,6 +143,10 @@ const LoanForm = () => {
     try {
       if (ref.current.values) {
         const formValues = ref.current?.values;
+        // set customerEmail
+        setCustomerEmail(formValues.email);
+        setCustomerName(formValues.firstname)
+
         const employer = employers.find(
           (employer) => employer._id === formValues.employername
         );
@@ -869,7 +875,6 @@ const LoanForm = () => {
                                           </option>
                                         );
                                       })}
-                                  
                                     </SelectField>
                                   </div>
                                 </div>
@@ -1356,6 +1361,8 @@ const LoanForm = () => {
                     <CreateAccount
                       handleSubmit={handleSubmit}
                       phoneNumber={ref.current?.values.phonenumber}
+                      customerEmail={customerEmail}
+                      customerName={customerName}
                     />
                   </div>
                 )}

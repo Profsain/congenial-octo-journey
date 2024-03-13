@@ -7,6 +7,11 @@ import PageLoader from "../../shared/PageLoader";
 import updateSalaryHistory from "./updateSalaryHistory.js";
 import "./Remita.css";
 
+import sendSMS from "../../../../../utilities/sendSms.js";
+import sendEmail from "../../../../../utilities/sendEmail.js";
+import EmailTemplate from "../../../shared/EmailTemplate.jsx";
+import ReactDOMServer from "react-dom/server";
+
 const LoanDetailModel = (props) => {
   const customer = props.customer;
   const userType = props.usertype;
@@ -16,6 +21,23 @@ const LoanDetailModel = (props) => {
   // close model box
   const handleClose = () => {
     props.onHide();
+  };
+
+
+  // send email notification
+  const handleSendEmail = () => {
+    const emailTemplateHtml = ReactDOMServer.renderToString(
+      <EmailTemplate
+        firstName={customer.firstname }
+        content=" Your loan application has been approved."
+      />
+    );
+    const options = {
+      email: customer.email,
+      subject: "Loan Application Notification",
+      html: emailTemplateHtml,
+    };
+    sendEmail(options);
   };
 
   // submit update to api endpoint
@@ -53,6 +75,15 @@ const LoanDetailModel = (props) => {
         "approved",
         disbursement.data
       );
+
+      // send sms notification to customer
+      sendSMS(
+        customer.phone,
+        `Dear ${customer.firstname}, your loan application has been approved.`
+      );
+
+      // send email notification to customer
+      handleSendEmail();
     }
 
     setIsLoading(false);
