@@ -9,6 +9,11 @@ import {
   signInWithPhoneNumber,
 } from "firebase/auth";
 
+import sendSMS from "../../../../utilities/sendSms";
+import EmailTemplate from "../../shared/EmailTemplate";
+import sendEmail from "../../../../utilities/sendEmail";
+import ReactDOMServer from "react-dom/server";
+
 const styles = {
   error: {
     color: "#f64f4f",
@@ -23,6 +28,8 @@ const styles = {
 
 const PhoneOtp = (props) => {
   const number = props.phonenumber;
+  const emailAddress = props.customerEmail;
+  const customerName = props.customerName;
   const handleSubmit = props.handleSubmit;
   const [confirmOtp, setConfirmOtp] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
@@ -65,6 +72,22 @@ const PhoneOtp = (props) => {
   };
 
 
+  // send email notification
+  const handleSendEmail = () => {
+    const emailTemplateHtml = ReactDOMServer.renderToString(
+      <EmailTemplate
+        firstName={customerName}
+        content="Your loan application has been received. We will get back to you shortly."
+      />
+    );
+    const options = {
+      email: emailAddress,
+      subject: "Loan Application Notification",
+      html: emailTemplateHtml,
+    };
+    sendEmail(options);
+  };
+
   // handle otp verification
   const verifyOtp = async (e) => {
     e.preventDefault();
@@ -76,6 +99,11 @@ const PhoneOtp = (props) => {
       props.onHide(false);
       // submit customer details
       handleSubmit();
+
+      // send loan application email and sms notification
+      sendSMS(number, "Your loan application has been received. We will get back to you shortly.");
+      handleSendEmail();
+
       navigate("/login");
     } catch (error) {
       console.error("Error verifying OTP:", error);
@@ -156,6 +184,8 @@ const PhoneOtp = (props) => {
 PhoneOtp.propTypes = {
   onHide: PropTypes.func,
   phonenumber: PropTypes.string,
+  customerEmail: PropTypes.string,
+  customerName: PropTypes.string,
   handleSubmit: PropTypes.func,
 };
 

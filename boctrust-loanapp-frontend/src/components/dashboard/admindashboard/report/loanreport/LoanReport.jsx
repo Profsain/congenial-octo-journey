@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import BocButton from "../../../shared/BocButton";
@@ -5,45 +6,47 @@ import DashboardHeadline from "../../../shared/DashboardHeadline";
 import "../Report.css";
 import NextPreBtn from "../../../shared/NextPreBtn";
 import LoanReportList from "./LoanReportList";
+import PageLoader from "../../../shared/PageLoader";
 
 // Define validation schema using Yup
 const validationSchema = Yup.object().shape({
   startDate: Yup.string().required("Start date isRequired"),
   endDate: Yup.string().required("End date is required"),
   customerId: Yup.string().required("Account number is required"),
-  loanType: Yup.string().required("Loan type is required"),
-  loanStatus: Yup.string().required("Select loan status")
 });
 
 const initialValues = {
   customerId: "",
   startDate: "",
   endDate: "",
-  loanType: "",
-  loanStatus: ""
 };
 
 const LoanReport = () => {
-  const handleSubmit = (values) => {
-    // Handle form submission logic here
-    console.log(values);
+  const apiUrl = import.meta.env.VITE_BASE_URL;
+  const [loanReport, setLoanReport] = useState([]);
+  const [processing, setProcessing] = useState(false);
+
+  const handleSubmit = async (values) => {
+    setProcessing(true);
+
+    try {
+      // call api to get balance details
+      const customerDetails = await fetch(
+        `${apiUrl}/api/bankone/getLoanByAccount/${values.customerId}`
+      );
+      const customerData = await customerDetails.json();
+
+      if (customerData.status === "error") {
+        setProcessing(false);
+        return;
+      }
+      setLoanReport(customerData);
+      setProcessing(false);
+    } catch (error) {
+      setProcessing(false);
+      throw new Error(error);
+    }
   };
-
-  const loanTypes = [
-    {label: "business loan", value: "Business Loan"},
-    {label: "salary advance", value: "Salary Advance"},
-    {label: "sme loan", value: "SME Loan"},
-    {label: "car loan", value: "car Loan"},
-    {label: "travel loan", value: "Travel Loan"},
-  ];
-
-  const loanStatus = [
-    {label: "with md", value: "With COO"},
-    {label: "completed", value: "Completed"},
-    {label: "booked", value: "Booked"},
-    {label: "with credit", value: "With Credit"},
-    {label: "completed", value: "Completed"},
-  ]
 
   return (
     <div>
@@ -78,7 +81,7 @@ const LoanReport = () => {
                 <ErrorMessage name="endDate" component="div" />
               </div>
               <div className="FieldGroup">
-                <label htmlFor="customerId">Customer ID</label>
+                <label htmlFor="customerId">Account Number</label>
                 <Field
                   type="text"
                   name="customerId"
@@ -88,58 +91,22 @@ const LoanReport = () => {
                 <ErrorMessage name="customerId" component="div" />
               </div>
             </div>
-            <div className="FieldRow">
-              <div className="FieldGroup">
-                <label htmlFor="loanType">Loan Type</label>
-                <Field
-                  as="select"
-                  name="loanType"
-                  id="loanType"
-                  className="Select"
-                >
-                  <option value="" label="Select Loan Type" />
-                  {loanTypes.map((option) => (
-                    <option
-                      key={option.value}
-                      value={option.value}
-                      label={option.label}
-                    />
-                  ))}
-                </Field>
-                <ErrorMessage name="loanType" component="div" />
-              </div>
-              <div className="FieldGroup">
-                <label htmlFor="loanStatus">Loan Status</label>
-                <Field
-                  as="select"
-                  name="loanStatus"
-                  id="loanStatus"
-                  className="Select"
-                >
-                  <option value="" label="Select Loan Status" />
-                  {loanStatus.map((option) => (
-                    <option
-                      key={option.value}
-                      value={option.value}
-                      label={option.label}
-                    />
-                  ))}
-                </Field>
-                <ErrorMessage name="loanStatus" component="div" />
-              </div>
-            </div>
 
             <div className="BtnRow">
               <div className="BtnContainer">
-                <BocButton
-                  margin="0"
-                  fontSize="1.6rem"
-                  type="submit"
-                  bgcolor="#ecaa00"
-                  bradius="18px"
-                >
-                  Submit
-                </BocButton>
+                {processing ? (
+                  <PageLoader />
+                ) : (
+                  <BocButton
+                    margin="0"
+                    fontSize="1.6rem"
+                    type="submit"
+                    bgcolor="#ecaa00"
+                    bradius="18px"
+                  >
+                    Submit
+                  </BocButton>
+                )}
               </div>
             </div>
           </Form>
@@ -157,7 +124,7 @@ const LoanReport = () => {
       </div>
       <div className="ReportCon">
         {/* report table  */}
-        <LoanReportList />
+        <LoanReportList loanReport={loanReport} />
 
         {/* next prev btn  */}
         <NextPreBtn />

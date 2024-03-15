@@ -1,10 +1,13 @@
+import PropTypes from "prop-types"
 import { Link } from "react-router-dom";
 import FacebookIcon from "@mui/icons-material/Facebook";
 import TwitterIcon from "@mui/icons-material/Twitter";
 import { LinkedIn } from "@mui/icons-material";
 import "./Footer.css";
 
-const Footer = () => {
+const Footer = ({ settings }) => {
+  const { address, copyrightText, email, phoneNumber1, phoneNumber2, footerText } = settings;
+
   return (
     <footer className="container-fluid Footer">
       <div className="row FooterTop">
@@ -12,25 +15,29 @@ const Footer = () => {
           <h6 className="FooterHeadline">Quick Links</h6>
           <ul>
             <li>
-              <Link className="Link" to="/">
+              <Link className="Link" to="/privacy">
                 Privacy Policy
               </Link>
             </li>
             <li>
-              <Link className="Link" to="/">
+              <Link className="Link" to="/terms">
                 Terms and Condition
               </Link>
             </li>
             <li>
-              <img src="images/ssl.png" alt="ssl-cert"  style={{marginLeft: "-25px"}}/>
+              <img
+                src="images/ssl.png"
+                alt="ssl-cert"
+                style={{ marginLeft: "-25px" }}
+              />
             </li>
           </ul>
 
           <h6 className="FooterHeadline">About</h6>
           <p>
-            BOCTRUST MICROFINANCE BANK Limited is a financial institution licensed by
-            Central Bank of Nigeria to gives social and economic Support to the
-            lower middle class, working class and the economically active poor.
+            {footerText
+              ? footerText
+              : "BOCTRUST MICROFINANCE BANK Limited is a financial institution licensed by Central Bank of Nigeria to gives social and economic Support to the lower middle class, working class and the economically active poor."}
           </p>
         </div>
         <div className="col-md-6 col-sm-12 Link CompanyLinks">
@@ -91,17 +98,19 @@ const Footer = () => {
           <h6 className="FooterHeadline">Contact Info</h6>
           <p>
             Address:
-            <br /> 1st floor, 26 Moloney street, Onikan.
+            <br />
+            {address ? address : "1st floor, 26 Moloney street, Onikan."}
           </p>
           <p>
             Phone:
             <br />
-            08177773196 <br />
-            08076710000
+            {phoneNumber1 ? phoneNumber1 : "08177773196"} <br />
+            {phoneNumber2 ? phoneNumber2 : "08076710000"}
           </p>
           <p>
             Email:
-            <br /> enquiry@boctrustmfb.com
+            <br />
+            {email ? email : "enquiry@boctrustmfb.com"}
           </p>
           <div>
             <p>Connect On Social Media</p>
@@ -139,11 +148,18 @@ const Footer = () => {
       </div>
       <div className="FooterBottom row">
         <p>
-          Copyright BOCTRUST Microfinance Bank Limited All rights reserved 2023.
+          {copyrightText
+            ? copyrightText
+            : " Copyright BOCTRUST Microfinance Bank Limited All rights reserved."}{" "}
+          {new Date().getFullYear()}
         </p>
       </div>
     </footer>
   );
 };
+
+Footer.propTypes = {
+  settings: PropTypes.any
+}
 
 export default Footer;

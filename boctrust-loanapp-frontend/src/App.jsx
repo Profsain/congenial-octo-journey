@@ -1,5 +1,8 @@
 import { Route, Routes } from "react-router-dom";
-import CookieConsent, { Cookies } from "react-cookie-consent";
+import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";   
+import { fetchSetting } from "./redux/reducers/settingReducer";
+import CookieConsent from "react-cookie-consent";
 import Footer from "./components/footer/Footer";
 import Home from "./components/homepage/Home";
 import About from "./components/aboutpage/About";
@@ -37,9 +40,28 @@ import LoanForm from "./components/loanapplication/loanform/LoanForm";
 import Login from "./components/dashboard/login/Login";
 
 function App() {
+  // fetch settings
+  const dispatch = useDispatch();
+  useEffect(() => {
+    dispatch(fetchSetting());
+  }, [dispatch]);
+
+  const settings = useSelector(
+    (state) => state?.settingReducer?.settings?.settings
+  );
+  const [appSettings, setAppSettings] = useState({});
+  useEffect(() => {
+    if (settings) {
+      setAppSettings(settings[0]);
+    } else {
+      setAppSettings({});
+    }
+  }, [settings]);
+
+
   return (
     <>
-      <TopNav />
+      <TopNav settings={appSettings} />
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
@@ -84,7 +106,7 @@ function App() {
         <Route path="*" element={<NotFound />} />
       </Routes>
 
-      <Footer />
+      <Footer settings={appSettings} />
       <ScrollToTop />
       <CookieConsent
         // debug={true}
@@ -109,10 +131,8 @@ function App() {
       >
         Welcome to Boctrust Micro Finance Bank! To provide you with the best
         possible experience, our website uses cookies. By clicking &#34;Accept
-        All&#34; you agree to our <a href="/privacy">Privacy Policy</a> 
+        All&#34; you agree to our <a href="/privacy">Privacy Policy</a>
       </CookieConsent>
-
-      
     </>
   );
 }

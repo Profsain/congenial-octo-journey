@@ -1,4 +1,4 @@
-import {  useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchAllCustomer } from "../../../../redux/reducers/customerReducer";
 import { Table } from "react-bootstrap";
@@ -6,12 +6,13 @@ import DashboardHeadline from "../../shared/DashboardHeadline";
 import NextPreBtn from "../../shared/NextPreBtn";
 import PageLoader from "../../shared/PageLoader";
 import "./Remita.css";
-import LoanDetailModel from "./LoanDetailModel";import ViewBySection from "./ViewBySection.jsx";
+import LoanDetailModel from "./LoanDetailModel";
+import ViewBySection from "./ViewBySection.jsx";
 import NoResult from "../../../shared/NoResult.jsx";
 
-import useSearch from "../../../../../utilities/useSearchName.js";
-import useSearchByDate from "../../../../../utilities/useSearchByDate.js";
-import useSearchByDateRange from "../../../../../utilities/useSearchByDateRange.js";
+// import useSearch from "../../../../../utilities/useSearchName.js";
+// import useSearchByDate from "../../../../../utilities/useSearchByDate.js";
+// import useSearchByDateRange from "../../../../../utilities/useSearchByDateRange.js";
 
 import getDateOnly from "../../../../../utilities/getDate";
 
@@ -56,96 +57,84 @@ const RemitaDashboard = () => {
     },
   };
 
-  // fetch all customer
   const dispatch = useDispatch();
+
+  // State variables
+  const [openModel, setOpenModel] = useState(false);
+  const [currentCustomer, setCurrentCustomer] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [dateRange, setDateRange] = useState({ fromDate: "", toDate: "" });
+  const [customerList, setCustomerList] = useState([]);
+  const [filteredData, setFilteredData] = useState([]);
+  const [filteredDateData, setFilteredDateData] = useState([]);
+  const [status, setStatus] = useState("loading");
+
+  // Redux selectors
   const customers = useSelector(
     (state) => state.customerReducer.customers.customer
   );
-
-  const status = useSelector((state) => state.customerReducer.status);
-
-  // current login admin user
   const currentUser = useSelector((state) => state.adminAuth.user);
   const userType = currentUser.userType;
 
-  const [openModel, setOpenModel] = useState(false);
-  const [currentCustomer, setCurrentCustomer] = useState("");
-
+  // Fetch all customers on component mount and when openModel changes
   useEffect(() => {
-    dispatch(fetchAllCustomer());
+    dispatch(fetchAllCustomer()).then(() => setStatus("idle"));
   }, [dispatch, openModel]);
 
-  // filter customer by remitaStatus
-  const remitaCustomers = customers.filter((customer) => {
-    try {
-      // Check if 'customer', 'remita', and 'remitaStatus' properties exist before accessing them
-      return customer?.remita?.remitaStatus === "processed";
-    } catch (error) {
-      return false; 
-    }
-  });
+  // Search by date function
+  const searchByDate = () => {
+    setCustomerList(filteredDateData);
+  };
 
-  // handle view details
+  // Filter customers by remitaStatus
+  const remitaCustomers = customers.filter(
+    (customer) => customer?.remita?.remitaStatus === "processed"
+  );
+
+  // Handle view details
   const handleView = (id) => {
     const customer = customers.find((customer) => customer._id === id);
     setCurrentCustomer(customer);
     setOpenModel(true);
   };
 
-  // handle search by
-  const [customerList, setCustomerList] = useState(remitaCustomers);
-  const { searchTerm, setSearchTerm, filteredData } = useSearch(
-    remitaCustomers,
-    "firstname"
-  );
-
-  const [dateRange, setDateRange] = useState({
-    fromDate: "",
-    toDate: "",
-  });
-
+  // Filter customer list by search term
   useEffect(() => {
-    setCustomerList(filteredData);
-  }, [searchTerm, filteredData]);
+    setFilteredData(
+      remitaCustomers.filter((customer) =>
+        customer.firstname.toLowerCase().includes(searchTerm.toLowerCase())
+      )
+    );
+  }, [searchTerm]);
 
-  // handle search by date
-  const { filteredDateData } = useSearchByDate(remitaCustomers, "createdAt");
-  const searchByDate = () => {
-    setCustomerList(filteredDateData);
-  };
+  // Filter customer list by date
+  useEffect(() => {
+    setFilteredDateData(
+      remitaCustomers.filter(
+        (customer) =>
+          customer.createdAt >= dateRange.fromDate &&
+          customer.createdAt <= dateRange.toDate
+      )
+    );
+  }, [dateRange]);
 
-  // handle list reload
+  // Update customer list based on search term and date filters
+  useEffect(() => {
+    const filteredList =
+      searchTerm && filteredData.length > 0 ? filteredData : filteredDateData;
+    setCustomerList(filteredList);
+  }, [searchTerm, filteredData, filteredDateData]);
+
+  // Handle list reload
   const handleReload = () => {
-    setDateRange({
-      fromDate: "",
-      toDate: "",
-    });
+    setDateRange({ fromDate: "", toDate: "" });
+    setStatus("loading");
     dispatch(fetchAllCustomer());
-    setCustomerList(remitaCustomers);
   };
-
-  // handle search by date range
-  const { searchData } = useSearchByDateRange(
-    remitaCustomers,
-    dateRange,
-    "createdAt"
-  );
-
-  useEffect(() => {
-    try {
-      if (searchData) {
-        setCustomerList(searchData);
-      }
-    } catch (error) {
-      console.error("Error updating customer list:", error);
-      // Handle the error as appropriate for your application
-    }
-  }, [searchData]);
 
   return (
     <>
       <div className="DetailSection DCard" style={styles.container}>
-
         {/* view by section */}
         <ViewBySection
           setSearch={setSearchTerm}
@@ -184,7 +173,7 @@ const RemitaDashboard = () => {
               <tbody>
                 <tr>
                   <td colSpan="10">
-                    {customerList?.length === 0 && <NoResult name="Customer"/>}
+                    {customerList?.length === 0 && <NoResult name="Customer" />}
                   </td>
                 </tr>
 

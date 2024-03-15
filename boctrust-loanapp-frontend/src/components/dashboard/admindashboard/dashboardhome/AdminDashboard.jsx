@@ -57,6 +57,9 @@ import CheckRepayment from "../loan/CheckRepayment";
 import LoanStatement from "../loan/LoanStatement";
 import LoanBalance from "../loan/LoanBalance";
 import PostJobs from "../website/PostJobs";
+import GeneralSettings from "../generalSetting/GeneralSettings";
+import EmailSetting from "../generalSetting/EmailSetting";
+import SMSSetting from "../generalSetting/SMSSetting";
 
 const AdminDashboard = () => {
   const [showSidebar, setShowSidebar] = useState(false);
@@ -246,6 +249,15 @@ const AdminDashboard = () => {
       case "revenuereport":
         setCurrentTitle("Revenue Report");
         break;
+      case "general":
+        setCurrentTitle("General Settings");
+        break;
+      case "email":
+        setCurrentTitle("Email Template");
+        break;
+      case "sms":
+        setCurrentTitle("SMS Settings");
+        break;
       default:
         setCurrentTitle("Dashboard");
         break;
@@ -360,6 +372,12 @@ const AdminDashboard = () => {
         return <ExpenseReport />;
       case "revenuereport":
         return <RevenueReport />;
+      case "general":
+        return <GeneralSettings />;
+      case "email":
+        return <EmailSetting />;
+      case "sms":
+        return <SMSSetting />;
       default:
         return null;
     }

@@ -13,6 +13,10 @@ import searchList from "../../../../../utilities/searchListFunc";
 import LoanDetails from "./LoanDetails";
 import NoResult from "../../../shared/NoResult";
 import DisbursementModal from "./DisbursementModal";
+import sendSMS from "../../../../../utilities/sendSms";
+import sendEmail from "../../../../../utilities/sendEmail";
+import EmailTemplate from "../../../shared/EmailTemplate";
+import ReactDOMServer from "react-dom/server";
 
 const LoanDisbursement = () => {
   const styles = {
@@ -144,7 +148,30 @@ const LoanDisbursement = () => {
       const disbursedData = await newDisbursement.json();
 
       // Check if disbursement is successful and update loan status to disbursed
-      updateLoanStatus(id, "approved");
+      if (disbursedData.status === "success") {
+        // Send SMS to customer
+        const message = `Your loan application has been approved. Your loan of N${loan.loanamount} has been disbursed to your account. Thank you for choosing Bank of Credit.`;
+        sendSMS(loan.phonenumber, message);
+
+        // Send email to customer
+        const emailTemplate = ReactDOMServer.renderToStaticMarkup(
+          <EmailTemplate
+            firstName={loan.firstname}
+            content={`Your loan application has been approved. Your loan of N${loan.loanamount} has been disbursed to your account. Thank you for choosing Bank of Credit.`}
+          />
+        );
+        const option = {
+          email: loan.email,
+          subject: "Loan Application Approved",
+          html: emailTemplate,
+        };
+
+        sendEmail(option);
+
+        // Update loan status to approved
+        updateLoanStatus(id, "approved");
+        
+      }
 
       console.log("Disbursement", disbursedData);
       dispatch(fetchAllCustomer());
