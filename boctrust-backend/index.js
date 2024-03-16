@@ -32,6 +32,7 @@ const tempDataRoutes = require("./routes/tempData");
 const bvnVerificationRoutes = require("./routes/bvnVerification");
 const career = require("./routes/career");
 const settings = require("./routes/settings");
+const googleAnalytics = require("./routes/googleAnalytics");
 
 // configure dotenv
 dotenv.config();
@@ -109,6 +110,9 @@ mongoose
 
         // settings routes
         app.use('/api/settings', settings);
+
+        // google analytics routes
+        app.use('/api/googleanalytics', googleAnalytics);
 
         app.listen(process.env.PORT || 3030, () => console.log("Server running on port 3030"));
     })
