@@ -210,7 +210,7 @@ const customerSchema = new mongoose.Schema({
   kyc: {
      loanstatus: {
       type: String,
-      default: "booked"
+      default: "with_operations"
     },
     isFacialMatch: {
       type: Boolean,

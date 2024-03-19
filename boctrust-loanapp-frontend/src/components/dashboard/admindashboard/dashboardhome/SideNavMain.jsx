@@ -409,7 +409,8 @@ const SideNavMain = ({ onMenuItemClick }) => {
               <li id="email" onClick={onMenuItemClick}>
                 Email
               </li>
-              <li id="googleanalytic" onClick={onMenuItemClick}>
+              <li id="
+              " onClick={onMenuItemClick}>
                 Google Analytics
               </li>
             </ul>
