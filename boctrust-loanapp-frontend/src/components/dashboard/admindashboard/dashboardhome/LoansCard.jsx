@@ -34,7 +34,7 @@ const LoansCard = ({img, title, stat, bgcolor}) => {
 LoansCard.propTypes = {
   bgcolor: PropTypes.string,
   img: PropTypes.string,
-  stat: PropTypes.string,
+  stat: PropTypes.any,
   title: PropTypes.string
 }
 

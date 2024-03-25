@@ -59,7 +59,7 @@ import LoanBalance from "../loan/LoanBalance";
 import PostJobs from "../website/PostJobs";
 import GeneralSettings from "../generalSetting/GeneralSettings";
 import EmailSetting from "../generalSetting/EmailSetting";
-import SMSSetting from "../generalSetting/SMSSetting";
+import GoogleAnalytics from "../generalSetting/GoogleAnalytics";
 
 const AdminDashboard = () => {
   const [showSidebar, setShowSidebar] = useState(false);
@@ -255,8 +255,8 @@ const AdminDashboard = () => {
       case "email":
         setCurrentTitle("Email Template");
         break;
-      case "sms":
-        setCurrentTitle("SMS Settings");
+      case "googleanalytic":
+        setCurrentTitle("Google Analytics");
         break;
       default:
         setCurrentTitle("Dashboard");
@@ -376,8 +376,8 @@ const AdminDashboard = () => {
         return <GeneralSettings />;
       case "email":
         return <EmailSetting />;
-      case "sms":
-        return <SMSSetting />;
+      case "googleanalytic":
+        return <GoogleAnalytics />;
       default:
         return null;
     }

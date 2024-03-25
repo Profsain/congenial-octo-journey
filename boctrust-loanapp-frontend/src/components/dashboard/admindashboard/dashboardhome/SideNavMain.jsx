@@ -389,9 +389,6 @@ const SideNavMain = ({ onMenuItemClick }) => {
               <li id="loanreporting" onClick={onMenuItemClick}>
                 Loan Report
               </li>
-              {/* <li id="transactionreport" onClick={onMenuItemClick}>
-                Transaction Report
-              </li> */}
             </ul>
           </div>
         ) : null}
@@ -412,9 +409,10 @@ const SideNavMain = ({ onMenuItemClick }) => {
               <li id="email" onClick={onMenuItemClick}>
                 Email
               </li>
-              {/* <li id="sms" onClick={onMenuItemClick}>
-                SMS
-              </li> */}
+              <li id="
+              " onClick={onMenuItemClick}>
+                Google Analytics
+              </li>
             </ul>
           </div>
         ) : null}
