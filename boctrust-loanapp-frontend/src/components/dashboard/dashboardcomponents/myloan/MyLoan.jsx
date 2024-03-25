@@ -1,9 +1,12 @@
+import { useSelector } from "react-redux";
 import Table from "react-bootstrap/Table";
 import BocButton from "../../shared/BocButton";
 import "../../Dashboard.css";
 import DashboardHeadline from "../../shared/DashboardHeadline";
 
 const MyLoan = () => {
+  const user = useSelector((state) => state.adminAuth.user);
+  console.log("user", user)
   const styles = {
     head: {
       color: "#fff",
@@ -21,7 +24,13 @@ const MyLoan = () => {
         mspacer="2rem 2rem -2.55rem -2rem"
         bgcolor="#145098"
       ></DashboardHeadline>
-      <Table borderless hover responsive="sm" style={styles.table} className="DTable">
+      <Table
+        borderless
+        hover
+        responsive="sm"
+        style={styles.table}
+        className="DTable"
+      >
         <thead style={styles.head}>
           <tr>
             <th>Loan ID</th>
@@ -36,9 +45,9 @@ const MyLoan = () => {
         </thead>
         <tbody>
           <tr>
-            <td>1010</td>
-            <td>Personal Loan</td>
-            <td>N220000</td>
+            <td>{user.banking.accountDetails.Message.CustomerID || ""}</td>
+            <td>{user.loanpurpose[0] || ""}</td>
+            <td>N{user.loanamount || ""}</td>
             <td>N280000</td>
             <td>N0.00</td>
             <td>N22300</td>

@@ -58,6 +58,7 @@ function App() {
     }
   }, [settings]);
 
+  console.log("setting", appSettings)
 
   return (
     <>

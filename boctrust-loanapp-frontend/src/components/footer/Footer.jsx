@@ -6,7 +6,7 @@ import { LinkedIn } from "@mui/icons-material";
 import "./Footer.css";
 
 const Footer = ({ settings }) => {
-  const { address, copyrightText, email, phoneNumber1, phoneNumber2, footerText } = settings;
+  // const { address, copyrightText, email, phoneNumber1, phoneNumber2, footerText } = settings;
 
   return (
     <footer className="container-fluid Footer">
@@ -35,8 +35,8 @@ const Footer = ({ settings }) => {
 
           <h6 className="FooterHeadline">About</h6>
           <p>
-            {footerText
-              ? footerText
+            {settings.footerText
+              ? settings.footerText
               : "BOCTRUST MICROFINANCE BANK Limited is a financial institution licensed by Central Bank of Nigeria to gives social and economic Support to the lower middle class, working class and the economically active poor."}
           </p>
         </div>
@@ -99,18 +99,18 @@ const Footer = ({ settings }) => {
           <p>
             Address:
             <br />
-            {address ? address : "1st floor, 26 Moloney street, Onikan."}
+            {settings.address ? settings.address : "1st floor, 26 Moloney street, Onikan."}
           </p>
           <p>
             Phone:
             <br />
-            {phoneNumber1 ? phoneNumber1 : "08177773196"} <br />
-            {phoneNumber2 ? phoneNumber2 : "08076710000"}
+            {settings.phoneNumber1 ? settings.phoneNumber1 : "08177773196"} <br />
+            {settings.phoneNumber2 ? settings.phoneNumber2 : "08076710000"}
           </p>
           <p>
             Email:
             <br />
-            {email ? email : "enquiry@boctrustmfb.com"}
+            {settings.email ? settings.email : "enquiry@boctrustmfb.com"}
           </p>
           <div>
             <p>Connect On Social Media</p>
@@ -148,8 +148,8 @@ const Footer = ({ settings }) => {
       </div>
       <div className="FooterBottom row">
         <p>
-          {copyrightText
-            ? copyrightText
+          {settings.copyrightText
+            ? settings.copyrightText
             : " Copyright BOCTRUST Microfinance Bank Limited All rights reserved."}{" "}
           {new Date().getFullYear()}
         </p>

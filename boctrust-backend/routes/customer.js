@@ -153,7 +153,7 @@ router.get('/customer/:customerId', async (req, res) => {
     if (!customer) {
       return res.status(404).json({ error: 'Customer not found' });
     }
-    res.json(customer);
+    res.status(200).json(customer);
   } catch (error) {
     res.status(500).json({ error: 'Unable to fetch customer' });
   }
