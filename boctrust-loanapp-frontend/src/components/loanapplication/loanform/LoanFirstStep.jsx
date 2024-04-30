@@ -129,6 +129,12 @@ const LoanFirstStep = ({ data }) => {
       });
   };
 
+  const loanCalRef = useRef(null); // Create a ref for loanCal section
+  // Scroll to loanCal section whenever calculateRepayment is called
+  const scrollToLoanCal = () => {
+    loanCalRef.current.scrollIntoView({ behavior: "smooth"});
+  };
+
   return (
     <div className="container-fluid FormContainer">
       <div>
@@ -229,7 +235,10 @@ const LoanFirstStep = ({ data }) => {
                               <div className="ButtonContainer">
                                 <button
                                   type="button"
-                                  onClick={calculateRepayment}
+                                  onClick={() => {
+                                    calculateRepayment
+                                    scrollToLoanCal();
+                                  }}
                                   className="BtnAction BtnSecondary"
                                 >
                                   Calculate Repayment
@@ -237,7 +246,7 @@ const LoanFirstStep = ({ data }) => {
                               </div>
 
                               {/* loan cal result */}
-                              <div className="LoanCal">
+                              <div className="LoanCal" ref={loanCalRef}>
                                 <Headline
                                   fontSize="22px"
                                   align="left"
@@ -274,73 +283,6 @@ const LoanFirstStep = ({ data }) => {
                                     : Number(monthlyPay).toLocaleString()}
                                 </h4>
                               </div>
-                              {/* <div className="Purpose">
-                                <Headline
-                                  fontSize="24px"
-                                  spacer="28px 0 0 0"
-                                  align="left"
-                                  color="#000"
-                                  text="Purpose of Loan"
-                                />
-
-                                <div className="CheckboxContainer">
-                                  <label className="CheckboxGroup">
-                                    <Field
-                                      type="checkbox"
-                                      name="loanpurpose"
-                                      value="school fees"
-                                    />
-                                    School Fees
-                                  </label>
-                                  <label className="CheckboxGroup">
-                                    <Field
-                                      type="checkbox"
-                                      name="loanpurpose"
-                                      value="business support"
-                                    />
-                                    Business Support
-                                  </label>
-                                  <label className="CheckboxGroup">
-                                    <Field
-                                      type="checkbox"
-                                      name="loanpurpose"
-                                      value="travel"
-                                    />
-                                    Travel
-                                  </label>
-                                </div>
-                                <div className="CheckboxContainer">
-                                  <label className="CheckboxGroup">
-                                    <Field
-                                      type="checkbox"
-                                      name="loanpurpose"
-                                      value="car"
-                                    />
-                                    Car
-                                  </label>
-                                  <label className="CheckboxGroup">
-                                    <Field
-                                      type="checkbox"
-                                      name="loanpurpose"
-                                      value="personal"
-                                    />
-                                    Personal
-                                  </label>
-                                  <label className="CheckboxGroup">
-                                    <Field type="checkbox" name="other" />
-                                    Other
-                                  </label>
-                                </div>
-                                {values.other && (
-                                  <div>
-                                    <TextInput
-                                      label="Please specify"
-                                      name="otherpurpose"
-                                      type="text"
-                                    />
-                                  </div>
-                                )}
-                              </div> */}
                             </div>
                             {/* next form page btn */}
                             <div className="ButtonContainer">
