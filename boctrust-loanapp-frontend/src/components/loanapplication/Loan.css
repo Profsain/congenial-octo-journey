@@ -41,7 +41,7 @@
 
 .Field {
     width: 80%;
-    padding: 4px 28px;
+    padding: 4px 48px;
     border: none;
     border-radius: 6px;
     box-shadow: 0px 0px 3px 0px #6f6f6f;
@@ -56,10 +56,10 @@
 .NairaIcon {
     position: relative;
     top: 46px !important;
-    right: 268px;
+    right: 248px;
     width: 20px;
     height: 20px;
-    margin-right: 12px;
+    margin-right: 28px !important;
 }
 
 .ErrorMsg {

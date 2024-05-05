@@ -5,7 +5,6 @@ import PropTypes from "prop-types";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchProduct } from "../../../redux/reducers/productReducer";
 import { fetchEmployers } from "../../../redux/reducers/employersManagerReducer";
-
 // formik and yup for form data management
 import { Formik, Form, Field } from "formik";
 import validationSchema from "./formvalidation";
@@ -52,13 +51,16 @@ const LoanForm = () => {
   const [customerEmail, setCustomerEmail] = useState("");
   const [customerName, setCustomerName] = useState("");
 
-  useEffect(() => {
-    // set showReconfirmBvn modal after 30 seconds
-    setTimeout(() => {
-      setShowReconfirmBvn(true);
-    }, 30000);
-  }, []);
+ useEffect(() => {
+   // set showReconfirmBvn modal after 30 seconds
+   const timer = setTimeout(() => {
+     setShowReconfirmBvn(true);
+   }, 30000);
 
+   // Cleanup function to clear the timer
+   return () => clearTimeout(timer);
+ }, []);
+  
   // fetch first form data here
   useEffect(() => {
     if (firstStepData) {
@@ -276,28 +278,70 @@ const LoanForm = () => {
     setShowForm(false);
   };
 
+  // todo: fetch banks and code
+  // todo: make Bank code a selector for user to select 
+
+  // func to check if individual field is valid
+ const isFieldValid = (fieldName, ref) => {
+   const { isValid, errors} = ref.current;
+   return isValid || !errors[fieldName];
+ };
+
   // handle next step, check validation schema and move to next step
-  const handleNext = () => {
+const handleNext = () => {
+  // Check that fields are valid
+  if (
+    isFieldValid("title", ref) &&
+    isFieldValid("firstname", ref) &&
+    isFieldValid("lastname", ref) &&
+    isFieldValid("phonenumber", ref) &&
+    isFieldValid("dob", ref) &&
+    isFieldValid("email", ref) &&
+    isFieldValid("maritalstatus", ref) &&
+    isFieldValid("noofdependent", ref) &&
+    isFieldValid("educationlevel", ref) &&
+    isFieldValid("howdidyouhearaboutus", ref) &&
+    isFieldValid("houseaddress", ref) &&
+    isFieldValid("stateofresidence", ref) &&
+    isFieldValid("lga", ref) &&
+    isFieldValid("stateoforigin", ref) &&
+    isFieldValid("nkinfirstname", ref) &&
+    isFieldValid("nkinlastname", ref) &&
+    isFieldValid("nkinphonenumber", ref) &&
+    isFieldValid("nkinrelationship", ref) &&
+    isFieldValid("nkinresidentialaddress", ref)
+  ) {
     if (step === 1) {
-      if (careertype.toLowerCase() === "government employee") {
-        setStep(2);
-        setStepImg("https://i.imgur.com/mObbs26.png");
-      } else {
-        setStep(3);
-        setStepImg("https://i.imgur.com/kDbL3XN.png");
-      }
-    } else if (step === 2) {
+      setStep(2);
+      setStepImg("https://i.imgur.com/DPMDjLy.png");
+    } else if (
+      step === 2 &&
+      isFieldValid("employername", ref) &&
+      isFieldValid("employeraddress", ref) &&
+      isFieldValid("employmentstartdate", ref) &&
+      isFieldValid("netmonthlyincome", ref) &&
+      isFieldValid("totalannualincome", ref) &&
+      isFieldValid("officialemail", ref)
+      
+    ) {
       setStep(3);
-      setStepImg("https://i.imgur.com/kDbL3XN.png");
-    } else if (step === 3) {
+      setStepImg("https://i.imgur.com/DPMDjLy.png");
+    } else if (
+      step === 3 &&
+      isFieldValid("salarybankname", ref) &&
+      isFieldValid("salaryaccountnumber", ref)
+    ) {
       setStep(4);
-      setStepImg("https://i.imgur.com/SCIwWO7.png");
+      setStepImg("https://i.imgur.com/DPMDjLy.png");
     } else if (step === 4) {
       setStep(5);
-      setStepImg("https://i.imgur.com/SCIwWO7.png");
+      setStepImg("https://i.imgur.com/DPMDjLy.png");
     }
-  };
-
+  } else {
+    // console.log(ref.current)
+    console.log("Input validation error")
+  }
+};
   // handle previous step
   const handlePrevious = () => {
     if (step === 2) {
@@ -853,11 +897,6 @@ const LoanForm = () => {
                                       </label>
                                     </div>
                                   </div>
-                                  <TextInput
-                                    label="Bank Code"
-                                    name="bankcode"
-                                    type="text"
-                                  />
                                   <div>
                                     {/* dropdown list */}
                                     <SelectField
@@ -865,6 +904,7 @@ const LoanForm = () => {
                                       name="bankcode"
                                     >
                                       <option value="">Select</option>
+                                      <option value="000">No Bank</option>
                                       {banks.data?.map((bank) => {
                                         return (
                                           <option

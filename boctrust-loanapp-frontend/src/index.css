@@ -93,7 +93,11 @@ p {
 
   .NairaIcon {
     top: 34px;
-    right: 110px;
+    right: 90px;
+  }
+
+  #careertype {
+    width: 80% !important;
   }
 
   .FinNaira2 {
