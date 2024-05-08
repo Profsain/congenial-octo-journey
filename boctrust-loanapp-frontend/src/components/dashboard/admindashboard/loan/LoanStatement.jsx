@@ -150,6 +150,8 @@ const LoanStatement = () => {
           </div>
         </DashboardHeadline>
       </div>
+
+      <div className="bSection">
       {/* data loader */}
       {status === "loading" && <PageLoader />}
       <DashboardHeadline
@@ -226,6 +228,7 @@ const LoanStatement = () => {
       {show && (
         <LoanDetails show={show} handleClose={handleClose} loanObj={loanObj} />
       )}
+      </div>
     </>
   );
 };

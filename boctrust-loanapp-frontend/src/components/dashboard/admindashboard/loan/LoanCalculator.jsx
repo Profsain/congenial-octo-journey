@@ -77,7 +77,7 @@ const LoanCalculator = () => {
 
   return (
     <div className="TransContainer">
-      <DashboardHeadline>Loan Calcualator</DashboardHeadline>
+      <DashboardHeadline>Loan Calculator</DashboardHeadline>
       <Formik
         initialValues={initialValues}
         validationSchema={validationSchema}

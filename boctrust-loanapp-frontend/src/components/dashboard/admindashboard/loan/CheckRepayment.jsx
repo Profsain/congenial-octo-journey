@@ -141,6 +141,8 @@ const CheckRepayment = () => {
           </div>
         </DashboardHeadline>
       </div>
+
+      <div className="bSection">
       {/* data loader */}
       {status === "loading" && <PageLoader />}
       <DashboardHeadline
@@ -213,6 +215,7 @@ const CheckRepayment = () => {
       {show && (
         <LoanDetails show={show} handleClose={handleClose} loanObj={loanObj} />
       )}
+      </div>
     </>
   );
 };

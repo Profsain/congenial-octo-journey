@@ -170,7 +170,6 @@ const LoanDisbursement = () => {
 
         // Update loan status to approved
         updateLoanStatus(id, "approved");
-        
       }
 
       console.log("Disbursement", disbursedData);
@@ -257,114 +256,123 @@ const LoanDisbursement = () => {
         </DashboardHeadline>
       </div>
       {/* data loader */}
-      {status === "loading" && <PageLoader />}
-      <DashboardHeadline
-        height="52px"
-        mspacer="2rem 0 -2.5rem -1rem"
-        bgcolor="#145098"
-      ></DashboardHeadline>
-      <div style={styles.table}>
-        <Table borderless hover responsive="sm">
-          <thead style={styles.head}>
-            <tr>
-              <th>Loan ID</th>
-              <th>Loan Product</th>
-              <th>Borrower</th>
-              <th>A/C Number</th>
-              <th>Date</th>
-              <th>Applied Amount</th>
-              <th>Status</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {customerList?.length === 0 && <NoResult name="customer" />}
-            {customerList?.map((customer) => {
-              return (
-                <tr key={customer._id}>
-                  <td>{customer.banking.accountDetails.Message.Id}</td>
-                  <td>{customer.loanProduct || "General Loan"}</td>
-                  <td>{customer.banking.accountDetails.Message.FullName}</td>
-                  <td>
-                    {customer?.banking?.accountDetails?.Message?.AccountNumber}
-                  </td>
-                  <td>{getDateOnly(customer.createdAt)}</td>
-                  <td>N{customer.loanamount}</td>
+      <div className="bSection">
+        {status === "loading" && <PageLoader />}
+        <DashboardHeadline
+          height="52px"
+          mspacer="2rem 0 -2.5rem -1rem"
+          bgcolor="#145098"
+        ></DashboardHeadline>
+        <div style={styles.table}>
+          <Table borderless hover responsive="sm">
+            <thead style={styles.head}>
+              <tr>
+                <th>Loan ID</th>
+                <th>Loan Product</th>
+                <th>Borrower</th>
+                <th>A/C Number</th>
+                <th>Date</th>
+                <th>Applied Amount</th>
+                <th>Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {customerList?.length === 0 && <NoResult name="customer" />}
+              {customerList?.map((customer) => {
+                return (
+                  <tr key={customer._id}>
+                    <td>{customer.banking.accountDetails.Message.Id}</td>
+                    <td>{customer.loanProduct || "General Loan"}</td>
+                    <td>{customer.banking.accountDetails.Message.FullName}</td>
+                    <td>
+                      {
+                        customer?.banking?.accountDetails?.Message
+                          ?.AccountNumber
+                      }
+                    </td>
+                    <td>{getDateOnly(customer.createdAt)}</td>
+                    <td>N{customer.loanamount}</td>
 
-                  <td>
-                    {customer.disbursementstatus === "pending" ? (
-                      <p style={styles.pending}>Pending</p>
-                    ) : customer.disbursementstatus === "approved" ? (
-                      <p style={styles.approved}>Disbursed</p>
-                    ) : customer.disbursementstatus === "stopped" ? (
-                      <p style={styles.pending}>Stopped</p>
-                    ) : (
-                      <p style={styles.completed}>Rejected</p>
-                    )}
-                  </td>
-                  <td>
-                    <div>
+                    <td>
                       {customer.disbursementstatus === "pending" ? (
-                        <div>
-                          {processing && <PageLoader width="12px" />}
-                          <BocButton
-                            func={() => handleRejection(customer._id)}
-                            bradius="12px"
-                            fontSize="12px"
-                            width="80px"
-                            margin="4px"
-                            bgcolor="#ecaa00"
-                          >
-                            Reject
-                          </BocButton>
-                          <BocButton
-                            func={() => handleApproval(customer._id)}
-                            bradius="12px"
-                            fontSize="12px"
-                            width="80px"
-                            margin="4px"
-                            bgcolor="#ecaa00"
-                          >
-                            Approve
-                          </BocButton>
-                        </div>
+                        <p style={styles.pending}>Pending</p>
+                      ) : customer.disbursementstatus === "approved" ? (
+                        <p style={styles.approved}>Disbursed</p>
+                      ) : customer.disbursementstatus === "stopped" ? (
+                        <p style={styles.pending}>Stopped</p>
                       ) : (
-                        <BocButton
-                          func={() => handleView(customer._id)}
-                          bradius="12px"
-                          fontSize="12px"
-                          width="80px"
-                          margin="4px"
-                          bgcolor="#ecaa00"
-                        >
-                          View
-                        </BocButton>
+                        <p style={styles.completed}>Rejected</p>
                       )}
-                    </div>
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </Table>
+                    </td>
+                    <td>
+                      <div>
+                        {customer.disbursementstatus === "pending" ? (
+                          <div>
+                            {processing && <PageLoader width="12px" />}
+                            <BocButton
+                              func={() => handleRejection(customer._id)}
+                              bradius="12px"
+                              fontSize="12px"
+                              width="80px"
+                              margin="4px"
+                              bgcolor="#ecaa00"
+                            >
+                              Reject
+                            </BocButton>
+                            <BocButton
+                              func={() => handleApproval(customer._id)}
+                              bradius="12px"
+                              fontSize="12px"
+                              width="80px"
+                              margin="4px"
+                              bgcolor="#ecaa00"
+                            >
+                              Approve
+                            </BocButton>
+                          </div>
+                        ) : (
+                          <BocButton
+                            func={() => handleView(customer._id)}
+                            bradius="12px"
+                            fontSize="12px"
+                            width="80px"
+                            margin="4px"
+                            bgcolor="#ecaa00"
+                          >
+                            View
+                          </BocButton>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </Table>
+        </div>
+        <NextPreBtn />
+
+        {/* show loan details model */}
+        {show && (
+          <LoanDetails
+            show={show}
+            handleClose={handleClose}
+            loanObj={loanObj}
+          />
+        )}
+
+        {/* show disbursement modal */}
+        {show && (
+          <DisbursementModal
+            show={showDisburse}
+            handleClose={handleCloseDisburse}
+            loanObj={loanObj}
+            handleApproval={() => handleApproval(loanObj._id)}
+            handleRejection={() => handleRejection(loanObj._id)}
+          />
+        )}
       </div>
-      <NextPreBtn />
-
-      {/* show loan details model */}
-      {show && (
-        <LoanDetails show={show} handleClose={handleClose} loanObj={loanObj} />
-      )}
-
-      {/* show disbursement modal */}
-      {show && (
-        <DisbursementModal
-          show={showDisburse}
-          handleClose={handleCloseDisburse}
-          loanObj={loanObj}
-          handleApproval={() => handleApproval(loanObj._id)}
-          handleRejection={() => handleRejection(loanObj._id)}
-        />
-      )}
     </>
   );
 };

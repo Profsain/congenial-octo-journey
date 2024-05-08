@@ -14,7 +14,7 @@ import TextInput from "./formcomponents/TextInput";
 import "./Form.css";
 import calculatorfunc from "../../shared/calculatorfunc";
 import bvnVerification from "./bvnVerification";
-
+import {getPartialDetailsWithBvn} from "./getBvnDetails"
 // loan form component
 const LoanFirstStep = ({ data }) => {
   // fetch loan product
@@ -100,6 +100,20 @@ const LoanFirstStep = ({ data }) => {
 
   // handle bvn verification
   // const [showLoanForm, setShowLoanForm] = useState(false);
+  const [bvnPartialDetails, setBvnPartialDetails] = useState(null);
+  const [bvnDetailsError, setBvnDetailsError] = useState(null);
+
+  // handle bvn details search
+  const handleBvnSearch = async (bvn) => {
+    try {
+      const data = await getPartialDetailsWithBvn(bvn);
+      console.log("BVN Data", data)
+      setBvnPartialDetails(data);
+    } catch (error) {
+      setBvnDetailsError(error.message);
+      console.log("BVN Error", error.message)
+    }
+  };
 
   const handleBvnVerification = async () => {
     const apiUrl = import.meta.env.VITE_BASE_URL;
@@ -127,10 +141,9 @@ const LoanFirstStep = ({ data }) => {
       .then((result) => {
         console.log(result);
 
-        // redirect to bvn verification page
-        bvnVerification();
-        // open loan form
-        // setShowLoanForm(true);
+        // search for bvn details and verify
+        // bvnVerification();
+        handleBvnSearch(bvn);
       });
   };
 
