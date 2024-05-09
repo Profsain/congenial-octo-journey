@@ -376,7 +376,7 @@ const AdminDashboard = () => {
         return <GeneralSettings />;
       case "email":
         return <EmailSetting />;
-      case "googleanalytic":
+      case "googleanalytics":
         return <GoogleAnalytics />;
       default:
         return null;

@@ -1,13 +1,16 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchAllCustomer } from "../../../../redux/reducers/customerReducer";
-import Headline from "../../../shared/Headline";
 import { Table } from "react-bootstrap";
-import BocButton from "../../shared/BocButton";
 import DashboardHeadline from "../../shared/DashboardHeadline";
 import NextPreBtn from "../../shared/NextPreBtn";
 import PageLoader from "../../shared/PageLoader";
 import "./Kyc.css";
+import ViewBySection from "../remita/ViewBySection";
+import useSearch from "../../../../../utilities/useSearchName";
+import useSearchByDate from "../../../../../utilities/useSearchByDate";
+import useSearchByDateRange from "../../../../../utilities/useSearchByDateRange";
+
 
 const ReviewSignature = () => {
   const styles = {
@@ -16,12 +19,11 @@ const ReviewSignature = () => {
       justifyContent: "center",
     },
     table: {
-      //   margin: "0 2rem 0 3rem",
-      fontSize: "14px",
+      fontSize: "12px",
     },
     head: {
       color: "#fff",
-      fontSize: "1rem",
+      fontSize: "0.8rem",
     },
     approved: {
       color: "#5cc51c",
@@ -45,22 +47,68 @@ const ReviewSignature = () => {
     dispatch(fetchAllCustomer());
   }, [dispatch]);
 
+  // update searchCustomer state
+  const [searchCustomer, setSearchCustomer] = useState([]);
+  useEffect(() => {
+    if (customers?.length > 0) {
+      setSearchCustomer(customers);
+    } else {
+      setSearchCustomer([]);
+    }
+  }, [customers]);
+
+  // handle search by
+  const { searchTerm, setSearchTerm, filteredData } = useSearch(
+    customers,
+    "firstname"
+  );
+
+  const [dateRange, setDateRange] = useState({
+    fromDate: "",
+    toDate: "",
+  });
+
+  useEffect(() => {
+    setSearchCustomer(filteredData);
+  }, [searchTerm, filteredData]);
+
+  // handle search by date
+  const { filteredDateData } = useSearchByDate(customers, "createdAt");
+  const searchByDate = () => {
+    setSearchCustomer(filteredDateData);
+  };
+
+  // handle list reload
+  const handleReload = () => {
+    setDateRange({
+      fromDate: "",
+      toDate: "",
+    });
+    dispatch(fetchAllCustomer());
+    setSearchCustomer(customers);
+  };
+
+  // handle search by date range
+  const { searchData } = useSearchByDateRange(
+    customers,
+    dateRange,
+    "createdAt"
+  );
+
+  useEffect(() => {
+    setSearchCustomer(searchData);
+  }, [searchData]);
 
   return (
     <div>
       <div>
-        <Headline text="View by:" />
-        <div style={styles.btnBox} className="VBox">
-          <BocButton margin="8px 18px" bgcolor="#ecaa00" bradius="25px">
-            Recent Application
-          </BocButton>
-          <BocButton margin="8px 18px" bgcolor="#ecaa00" bradius="25px">
-            Date Range
-          </BocButton>
-          <BocButton margin="8px 18px" bgcolor="#ecaa00" bradius="25px">
-            Specific User
-          </BocButton>
-        </div>
+        <ViewBySection
+          setSearch={setSearchTerm}
+          setDateRange={setDateRange}
+          dateRange={dateRange}
+          searchDateFunc={searchByDate}
+          handleReload={handleReload}
+        />
       </div>
 
       {/* data loader */}
@@ -70,7 +118,7 @@ const ReviewSignature = () => {
       <div className="Section RBox DCard">
         <DashboardHeadline
           height="52px"
-          mspacer="2rem 0 -2.55rem -1rem"
+          mspacer="2rem 0 -2rem -1rem"
           bgcolor="#145098"
         ></DashboardHeadline>
         <div style={styles.table}>
@@ -79,15 +127,22 @@ const ReviewSignature = () => {
               <tr>
                 <th>Customer ID</th>
                 <th>Full Name</th>
-                <th>Is there a match</th>
+                <th>Is match</th>
                 <th>Valid ID Submitted</th>
-                <th>Facial Capture Done</th>
+                <th>Facial Capture</th>
                 <th>Valid Signature</th>
                 <th>KYC Approved</th>
               </tr>
             </thead>
             <tbody>
-              {customers?.map((customer) => (
+              {searchCustomer?.length === 0 && (
+                <tr>
+                  <td colSpan="4" style={{ textAlign: "center" }}>
+                    No data available
+                  </td>
+                </tr>
+              )}
+              {searchCustomer?.map((customer) => (
                 <tr key={customer._id}>
                   <td>{customer.customerId}</td>
                   <td>{customer.firstname + " " + customer.lastname}</td>
