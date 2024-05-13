@@ -1,58 +1,42 @@
-const getBvnDetails = () => {
-    // Step 2: After the customer is redirected back to callback URL with a temporary code,
-  // extract the code and exchange it for an access token
-    // const clientSecret = 'R6EuiPa8sLsrdbNMVoxMadTOFlbuEXfdEOTabq82';
-    // const grantType = 'authorization_code';
-    //  const clientId = '8e7cd2fe-35b5-4e25-9a98-0a555f1c23cd';
-    //  const redirectUri = 'https://www.boctrustmfb.com/app/nibbs-login';
+// apiService.js
 
-    // Simulate receiving the temporary code (replace with the actual code received)
-    const urlSearchParams = new URLSearchParams(window.location.search);
-    console.log(urlSearchParams)
-    const code = urlSearchParams.get('code');
-    console.log("code", code)
-    const serverUrl = import.meta.env.VITE_BASE_URL;
+const clientId = '0a8580c1-7254-4774-8b63-048092e8e1b3'; // New Client ID
+const clientSecret = 'h9JqBpVYmx14D1oGtdbFmIBza70ft0BM7GgwlYfS'; // New Secret
+const accessTokenUrl = 'https://id.nibss-plc.com.ng/oxauth/restv1/token';
+const endpoint = 'https://api.nibss-plc.com.ng/bvnconsent/v1/getPartialDetailsWithBvn';
 
-    const exchangeCodeForToken = async () => {
-        try {
-        // Exchange the code for an access token
-        if (!code) {
-            throw new Error('Authorization code not found in the URL');
-        }
-        const response = await fetch(`${serverUrl}/api/bvn/getAccessToken`);
+const getAccessToken = async () => {
+  try {
+    const response = await fetch(accessTokenUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        client_id: clientId,
+        client_secret: clientSecret,
+        grant_type: 'client_credentials',
+      }),
+    });
+    const data = await response.json();
+    return data.access_token;
+  } catch (error) {
+    throw new Error('Failed to get access token');
+  }
+};
 
-        if (!response.ok) {
-            throw new Error(`Token request failed with status ${response.status}`);
-        }
-
-        const data = await response.json();
-        console.log("data", data);
-        const accessToken = data.access_token;
-        console.log(`Access Token: ${accessToken}`);
-
-        // Step 3: Use the access token to call the API endpoints
-        const apiEndpoint = 'https://api.nibss-plc.com.ng/bvnconsent/v1/getPartialDetailsWithBvn';
-
-        const apiResponse = await fetch(apiEndpoint, {
-            method: 'GET',
-            headers: {
-            'Authorization': `Bearer ${accessToken}`,
-            },
-        });
-
-        if (!apiResponse.ok) {
-            throw new Error(`API request failed with status ${apiResponse.status}`);
-        }
-
-        const apiData = await apiResponse.json();
-        console.log('API Response:', apiData);
-        } catch (error) {
-        console.error('Error:', error.message);
-        }
-    };
-
-    // Call the function to exchange the code for an access token
-    exchangeCodeForToken();
-}
-
-export default getBvnDetails;
+export const getPartialDetailsWithBvn = async (bvn) => {
+  try {
+    const accessToken = await getAccessToken();
+    const response = await fetch(`${endpoint}?bvn=${bvn}`, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+    const data = await response.json();
+    return data;
+  } catch (error) {
+      console.log(error)
+    throw new Error('Failed to fetch partial details with BVN');
+  }
+};

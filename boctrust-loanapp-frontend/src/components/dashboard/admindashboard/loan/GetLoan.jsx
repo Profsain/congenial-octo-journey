@@ -142,6 +142,8 @@ const GetLoan = () => {
           </div>
         </DashboardHeadline>
       </div>
+
+      <div className="bSection">
       {/* data loader */}
       {status === "loading" && <PageLoader />}
       <DashboardHeadline
@@ -214,6 +216,7 @@ const GetLoan = () => {
       {show && (
         <GetLoanDetails show={show} handleClose={handleClose} loanObj={loanObj} />
       )}
+      </div>
     </>
   );
 };

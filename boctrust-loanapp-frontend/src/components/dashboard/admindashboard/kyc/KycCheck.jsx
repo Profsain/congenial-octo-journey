@@ -13,6 +13,11 @@ import "./Kyc.css";
 import getDateOnly from "../../../../../utilities/getDate";
 import getTime from "../../../../../utilities/getTime";
 import OtherDocuments from "./OtherDocuments";
+import ViewBySection from "../remita/ViewBySection";
+import useSearch from "../../../../../utilities/useSearchName";
+import useSearchByDate from "../../../../../utilities/useSearchByDate";
+import useSearchByDateRange from "../../../../../utilities/useSearchByDateRange";
+
 
 const KycCheck = () => {
   const styles = {
@@ -40,7 +45,7 @@ const KycCheck = () => {
   };
 
   const apiUrl = import.meta.env.VITE_BASE_URL;
-  
+
   // fetch all customer
   const dispatch = useDispatch();
   const customers = useSelector(
@@ -48,6 +53,7 @@ const KycCheck = () => {
   );
   const status = useSelector((state) => state.customerReducer.status);
   // component state
+  const [searchCustomer, setSearchCustomer] = useState([]);
   const [customerId, setCustomerId] = useState("");
   const [currentCustomer, setCurrentCustomer] = useState({});
   const [showKycDetails, setShowKycDetails] = useState(false);
@@ -65,6 +71,15 @@ const KycCheck = () => {
   useEffect(() => {
     dispatch(fetchAllCustomer());
   }, [dispatch, showKycDetails]);
+
+  // update searchCustomer state
+  useEffect(() => {
+    if (customers?.length > 0) {
+      setSearchCustomer(customers);
+    } else {
+      setSearchCustomer([]);
+    }
+  }, [customers]);
 
   // scroll to top
   useEffect(() => {
@@ -154,38 +169,72 @@ const KycCheck = () => {
         isAccountCreated: true,
         accountDetails: account.data,
       };
-      
-      await fetch(
-        `${apiUrl}/api/updatecustomer/banking/${customerId}`,
-        {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(accountData),
-        }
-      );
 
-     }
+      await fetch(`${apiUrl}/api/updatecustomer/banking/${customerId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(accountData),
+      });
+    }
     setShowKycDetails(false);
     setProgress(false);
   };
+
+  // handle search by
+  const { searchTerm, setSearchTerm, filteredData } = useSearch(
+    customers,
+    "firstname"
+  );
+
+  const [dateRange, setDateRange] = useState({
+    fromDate: "",
+    toDate: "",
+  });
+
+  useEffect(() => {
+    setSearchCustomer(filteredData);
+  }, [searchTerm, filteredData]);
+
+  // handle search by date
+  const { filteredDateData } = useSearchByDate(customers, "createdAt");
+  const searchByDate = () => {
+    setSearchCustomer(filteredDateData);
+  };
+
+  // handle list reload
+  const handleReload = () => {
+    setDateRange({
+      fromDate: "",
+      toDate: "",
+    });
+    dispatch(fetchAllCustomer());
+    setSearchCustomer(customers);
+  };
+
+  // handle search by date range
+  const { searchData } = useSearchByDateRange(
+    customers,
+    dateRange,
+    "createdAt"
+  );
+
+  useEffect(() => {
+    setSearchCustomer(searchData);
+  }, [searchData]);
 
   return (
     <>
       {!showOtherDocs && (
         <div>
           <div>
-            <Headline text="View by:" />
-            <div style={styles.btnBox} className="VBox">
-              <BocButton margin="8px 18px" bgcolor="#ecaa00" bradius="25px">
-                Recent Application
-              </BocButton>
-              <BocButton margin="8px 18px" bgcolor="#ecaa00" bradius="25px">
-                Date Range
-              </BocButton>
-              <BocButton margin="8px 18px" bgcolor="#ecaa00" bradius="25px">
-                Specific User
-              </BocButton>
-            </div>
+            {/* view by section */}
+            <ViewBySection
+              setSearch={setSearchTerm}
+              setDateRange={setDateRange}
+              dateRange={dateRange}
+              searchDateFunc={searchByDate}
+              handleReload={handleReload}
+            />
           </div>
 
           {/* data loader */}
@@ -209,7 +258,15 @@ const KycCheck = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {customers?.map((customer) => (
+                  {searchCustomer?.length === 0 && (
+                    <tr>
+                      <td colSpan="4" style={{ textAlign: "center" }}>
+                        No data available
+                      </td>
+                    </tr>
+                  
+                  )}
+                  {searchCustomer?.map((customer) => (
                     <tr key={customer._id}>
                       <td>{customer.phonenumber.slice(1)}</td>
                       <td>{customer.firstname + " " + customer.lastname}</td>

@@ -1,5 +1,5 @@
-import PropTypes from "prop-types"
-import { useState,  useEffect } from "react";
+import PropTypes from "prop-types";
+import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchAllCustomer } from "../../../../redux/reducers/customerReducer";
 import Table from "react-bootstrap/Table";
@@ -14,25 +14,25 @@ import NoResult from "../../../shared/NoResult";
 import CheckCustomerDetails from "./CheckCustomerDetails";
 
 const CheckCustomer = () => {
- const styles = {
-   table: {
-     //   margin: "0 2rem 0 3rem",
-     fontSize: "14px",
-   },
-   head: {
-     color: "#fff",
-     fontSize: "1rem",
-   },
-   approved: {
-     color: "#5cc51c",
-   },
-   completed: {
-     color: "#ecaa00 ",
-   },
-   pending: {
-     color: "#f64f4f",
-   },
- };
+  const styles = {
+    table: {
+      //   margin: "0 2rem 0 3rem",
+      fontSize: "14px",
+    },
+    head: {
+      color: "#fff",
+      fontSize: "1rem",
+    },
+    approved: {
+      color: "#5cc51c",
+    },
+    completed: {
+      color: "#ecaa00 ",
+    },
+    pending: {
+      color: "#f64f4f",
+    },
+  };
 
   // fetch all customer
   const dispatch = useDispatch();
@@ -79,14 +79,13 @@ const CheckCustomer = () => {
     const customerData = await customerDetails.json();
 
     if (customerData) {
-         setLoanObj(customerData);
+      setLoanObj(customerData);
     }
     // set is processing to false
     setTimeout(() => {
       setIsProcessing(false);
       setShow(true);
     }, 5000);
-
   };
 
   // search customer list
@@ -142,67 +141,76 @@ const CheckCustomer = () => {
           </div>
         </DashboardHeadline>
       </div>
-      {/* data loader */}
-      {status === "loading" && <PageLoader />}
-      <DashboardHeadline
-        height="52px"
-        mspacer="2rem 0 -2.5rem -1rem"
-        bgcolor="#145098"
-      ></DashboardHeadline>
-      <div style={styles.table}>
-        <Table borderless hover responsive="sm">
-          <thead style={styles.head}>
-            <tr>
-              <th>Loan ID</th>
-              <th>Loan Product</th>
-              <th>Borrower</th>
-              <th>A/C Number</th>
-              <th>Date</th>
-              <th>Applied Amount</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {customerList?.length === 0 && <NoResult name="customer" />}
-            {customerList?.map((customer) => {
-              return (
-                <tr key={customer._id}>
-                  <td>{customer.banking.accountDetails.Message.Id}</td>
-                  <td>{customer.loanProduct || "General Loan"}</td>
-                  <td>{customer.banking.accountDetails.Message.FullName}</td>
-                  <td>
-                    {customer?.banking?.accountDetails?.Message?.AccountNumber}
-                  </td>
-                  <td>{getDateOnly(customer.createdAt)}</td>
-                  <td>N{customer.loanamount}</td>
-                  
-                  <td>
-                    <div>
-                      {isProcessing && <PageLoader width="12px" />}
-                      <BocButton
-                        func={() => handleCheckBalance(customer._id)}
-                        bradius="12px"
-                        fontSize="12px"
-                        width="80px"
-                        margin="4px"
-                        bgcolor="#ecaa00"
-                      >
-                        Check
-                      </BocButton>
-                    </div>
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </Table>
-      </div>
-      <NextPreBtn />
+      <div className="bSection">
+        {/* data loader */}
+        {status === "loading" && <PageLoader />}
+        <DashboardHeadline
+          height="52px"
+          mspacer="2rem 0 -2.5rem -1rem"
+          bgcolor="#145098"
+        ></DashboardHeadline>
+        <div style={styles.table}>
+          <Table borderless hover responsive="sm">
+            <thead style={styles.head}>
+              <tr>
+                <th>Loan ID</th>
+                <th>Loan Product</th>
+                <th>Borrower</th>
+                <th>A/C Number</th>
+                <th>Date</th>
+                <th>Applied Amount</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {customerList?.length === 0 && <NoResult name="customer" />}
+              {customerList?.map((customer) => {
+                return (
+                  <tr key={customer._id}>
+                    <td>{customer.banking.accountDetails.Message.Id}</td>
+                    <td>{customer.loanProduct || "General Loan"}</td>
+                    <td>{customer.banking.accountDetails.Message.FullName}</td>
+                    <td>
+                      {
+                        customer?.banking?.accountDetails?.Message
+                          ?.AccountNumber
+                      }
+                    </td>
+                    <td>{getDateOnly(customer.createdAt)}</td>
+                    <td>N{customer.loanamount}</td>
 
-      {/* show loan details model */}
-      {show && (
-        <CheckCustomerDetails show={show} handleClose={handleClose} loanObj={loanObj} />
-      )}
+                    <td>
+                      <div>
+                        {isProcessing && <PageLoader width="12px" />}
+                        <BocButton
+                          func={() => handleCheckBalance(customer._id)}
+                          bradius="12px"
+                          fontSize="12px"
+                          width="80px"
+                          margin="4px"
+                          bgcolor="#ecaa00"
+                        >
+                          Check
+                        </BocButton>
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </Table>
+        </div>
+        <NextPreBtn />
+
+        {/* show loan details model */}
+        {show && (
+          <CheckCustomerDetails
+            show={show}
+            handleClose={handleClose}
+            loanObj={loanObj}
+          />
+        )}
+      </div>
     </>
   );
 };
@@ -212,8 +220,7 @@ CheckCustomer.propTypes = {
   showCount: PropTypes.number,
 };
 
-export default CheckCustomer
-
+export default CheckCustomer;
 
 // const CheckCustomer = () => {
 //   return (

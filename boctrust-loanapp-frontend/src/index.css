@@ -452,4 +452,25 @@ p {
     .DescriptionJob {
       margin-top: 48px !important;
     }
+
+    /* my loan  */
+    .ResultContainer {
+      margin-top: 6rem !important;
+      margin-left: -1rem !important;
+      margin-bottom: -4rem !important;
+    }
+
+    .bSection {
+      margin-top: 12rem !important;
+    }
+
+    .appForm {
+      margin-top: 3rem !important;
+    }
+
+    .mGroup {
+      margin-left: -2rem !important;
+      margin-bottom: -3.5rem !important;
+    }
 }
+
