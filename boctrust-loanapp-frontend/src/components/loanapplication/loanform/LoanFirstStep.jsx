@@ -104,15 +104,17 @@ const LoanFirstStep = ({ data }) => {
   const [bvnDetailsError, setBvnDetailsError] = useState(null);
 
   // handle bvn details search
-  // const handleBvnSearch = async (bvn) => {
-  //   try {
-  //     const data = await getPartialDetailsWithBvn(bvn);
-  //     setBvnPartialDetails(data);
-  //   } catch (error) {
-  //     setBvnDetailsError(error.message);
-  //     console.log("BVN Error", error.message)
-  //   }
-  // };
+  const handleBvnSearch = async (bvn) => {
+    try {
+      const data = await getPartialDetailsWithBvn(bvn);
+      setBvnPartialDetails(data);
+    } catch (error) {
+      setBvnDetailsError(error.message);
+      console.log("BVN Error", error.message);
+    }
+  };
+
+  console.log("BVN Details", bvnPartialDetails);
 
   const handleBvnVerification = async () => {
     const apiUrl = import.meta.env.VITE_BASE_URL;
@@ -139,9 +141,9 @@ const LoanFirstStep = ({ data }) => {
       .then((response) => response.json())
       .then((result) => {
         // search for bvn details and verify
-        // bvnVerification();
+        bvnVerification();
         // handleBvnSearch(bvn);
-        setShowLoanForm(true);
+        // setShowLoanForm(true);
       });
   };
 
@@ -153,218 +155,214 @@ const LoanFirstStep = ({ data }) => {
 
   return (
     <>
-      {showLoanForm ? (
-        <LoanForm />
-      ) : (
-        <div className="container-fluid FormContainer">
+      <div className="container-fluid FormContainer">
+        <div>
+          {/* formik form */}
           <div>
-            {/* formik form */}
-            <div>
-              <Formik
-                initialValues={initialValues(loanamount, careertype)}
-                validationSchema={validationSchema}
-                //   onSubmit={handleSubmit}
-                innerRef={ref}
-                encType="multipart/form-data"
-              >
-                {({ isSubmitting }) => (
-                  <>
-                    <div className="container">
-                      <div className="row">
-                        {/* left loan form section */}
-                        <div className="col-sm-12 col-md-8 FormInputBox">
-                          <Form>
-                            {/* loan first step section */}
-                            {step === 1 && (
-                              <>
-                                <div id="Step1">
-                                  <Headline
-                                    spacer="12px 0"
-                                    color="#000"
-                                    text="Select loan amount and duration"
+            <Formik
+              initialValues={initialValues(loanamount, careertype)}
+              validationSchema={validationSchema}
+              //   onSubmit={handleSubmit}
+              innerRef={ref}
+              encType="multipart/form-data"
+            >
+              {({ isSubmitting }) => (
+                <>
+                  <div className="container">
+                    <div className="row">
+                      {/* left loan form section */}
+                      <div className="col-sm-12 col-md-8 FormInputBox">
+                        <Form>
+                          {/* loan first step section */}
+                          {step === 1 && (
+                            <>
+                              <div id="Step1">
+                                <Headline
+                                  spacer="12px 0"
+                                  color="#000"
+                                  text="Select loan amount and duration"
+                                />
+                                <Headline
+                                  spacer="0"
+                                  fontSize="16px"
+                                  text="This is required to process this application"
+                                />
+                                <img
+                                  src="images/naira.png"
+                                  alt=""
+                                  className="NairaI"
+                                />
+                                <div>
+                                  <label htmlFor="loanamount">
+                                    How much you want to borrow
+                                  </label>
+                                  <Field
+                                    type="text"
+                                    name="loanamount"
+                                    className="TextInput"
+                                    value={currentLoanAmount}
+                                    onChange={(e) =>
+                                      setCurrentLoanAmount(e.target.value)
+                                    }
                                   />
-                                  <Headline
-                                    spacer="0"
-                                    fontSize="16px"
-                                    text="This is required to process this application"
-                                  />
-                                  <img
-                                    src="images/naira.png"
-                                    alt=""
-                                    className="NairaI"
-                                  />
-                                  <div>
-                                    <label htmlFor="loanamount">
-                                      How much you want to borrow
-                                    </label>
-                                    <Field
-                                      type="text"
-                                      name="loanamount"
-                                      className="TextInput"
-                                      value={currentLoanAmount}
-                                      onChange={(e) =>
-                                        setCurrentLoanAmount(e.target.value)
-                                      }
-                                    />
-                                    {currentLoanAmount === "" ? (
-                                      <p className="ErrorMsg">Required</p>
-                                    ) : null}
-                                    {parseInt(
-                                      currentLoanAmount.replace(/,/g, "")
-                                    ) < 10000 ||
-                                    parseInt(
-                                      currentLoanAmount.replace(/,/g, "")
-                                    ) > 5000000 ? (
-                                      <p className="ErrorMsg">
-                                        Enter loan amount between 10000 to
-                                        2000000 Naira only
-                                      </p>
-                                    ) : null}
-                                  </div>
-
-                                  {/* repayments months */}
-                                  <div>
-                                    <TextInput
-                                      label="Enter Number of Repayment Months"
-                                      name="numberofmonth"
-                                      type="number"
-                                    />
-                                  </div>
-
-                                  {/* loan product */}
-                                  <div>
-                                    <label htmlFor="loanproduct">
-                                      Select Loan Product
-                                    </label>
-                                    {/* select loan product list */}
-                                    <Field
-                                      as="select"
-                                      name="loanproduct"
-                                      className="TextInput"
-                                    >
-                                      <option value=""></option>
-                                      {loanProducts?.map((product) => (
-                                        <option
-                                          key={product._id}
-                                          value={product._id}
-                                        >
-                                          {product.productName}
-                                        </option>
-                                      ))}
-                                    </Field>
-                                  </div>
-                                  {/* calculate repayment btn */}
-                                  <div className="ButtonContainer">
-                                    <button
-                                      type="button"
-                                      onClick={() => {
-                                        calculateRepayment();
-                                        scrollToLoanCal();
-                                      }}
-                                      className="BtnAction BtnSecondary"
-                                    >
-                                      Calculate Repayment
-                                    </button>
-                                  </div>
-
-                                  {/* loan cal result */}
-                                  <div className="LoanCal" ref={loanCalRef}>
-                                    <Headline
-                                      fontSize="22px"
-                                      align="left"
-                                      text="Loan:"
-                                    />
-                                    <h4>
-                                      <span className="CalNaira">
-                                        <img src="images/naira.png" alt="" />
-                                      </span>
-                                      {isNaN(loanTotal)
-                                        ? 0
-                                        : loanTotal.toLocaleString() ||
-                                          loanamount}{" "}
-                                      <span> for </span>
-                                      {noofmonth}
-                                      {noofmonth > 1 ? (
-                                        <span> months</span>
-                                      ) : (
-                                        <span> month</span>
-                                      )}
-                                    </h4>
-                                    <Headline
-                                      fontSize="22px"
-                                      align="left"
-                                      text="Monthly Repayment:"
-                                    />
-                                    <h4>
-                                      <span className="CalNaira">
-                                        <img src="images/naira.png" alt="" />
-                                      </span>
-
-                                      {isNaN(monthlyPay)
-                                        ? 0
-                                        : Number(monthlyPay).toLocaleString()}
-                                    </h4>
-                                  </div>
+                                  {currentLoanAmount === "" ? (
+                                    <p className="ErrorMsg">Required</p>
+                                  ) : null}
+                                  {parseInt(
+                                    currentLoanAmount.replace(/,/g, "")
+                                  ) < 10000 ||
+                                  parseInt(
+                                    currentLoanAmount.replace(/,/g, "")
+                                  ) > 5000000 ? (
+                                    <p className="ErrorMsg">
+                                      Enter loan amount between 10000 to 2000000
+                                      Naira only
+                                    </p>
+                                  ) : null}
                                 </div>
 
-                                {/* next form page btn */}
+                                {/* repayments months */}
+                                <div>
+                                  <TextInput
+                                    label="Enter Number of Repayment Months"
+                                    name="numberofmonth"
+                                    type="number"
+                                  />
+                                </div>
+
+                                {/* loan product */}
+                                <div>
+                                  <label htmlFor="loanproduct">
+                                    Select Loan Product
+                                  </label>
+                                  {/* select loan product list */}
+                                  <Field
+                                    as="select"
+                                    name="loanproduct"
+                                    className="TextInput"
+                                  >
+                                    <option value=""></option>
+                                    {loanProducts?.map((product) => (
+                                      <option
+                                        key={product._id}
+                                        value={product._id}
+                                      >
+                                        {product.productName}
+                                      </option>
+                                    ))}
+                                  </Field>
+                                </div>
+                                {/* calculate repayment btn */}
                                 <div className="ButtonContainer">
                                   <button
                                     type="button"
-                                    disabled={isSubmitting}
-                                    onClick={handleNext}
+                                    onClick={() => {
+                                      calculateRepayment();
+                                      scrollToLoanCal();
+                                    }}
                                     className="BtnAction BtnSecondary"
                                   >
-                                    Next
+                                    Calculate Repayment
                                   </button>
                                 </div>
-                              </>
-                            )}
 
-                            {/* customer details section */}
-                            {step === 2 && (
-                              <>
-                                <div id="Step2">
+                                {/* loan cal result */}
+                                <div className="LoanCal" ref={loanCalRef}>
                                   <Headline
-                                    spacer="12px 0"
-                                    color="#000"
-                                    text="Start your application process"
+                                    fontSize="22px"
+                                    align="left"
+                                    text="Loan:"
                                   />
-                                  <div id="BvnVarification">
-                                    <TextInput
-                                      label="Please enter your BVN to proceed"
-                                      name="bvnnumber"
-                                      type="text"
-                                    />
-                                    <div className="ButtonContainer">
-                                      <button
-                                        className="BtnAction BtnPrimary"
-                                        type="button"
-                                        onClick={handleBvnVerification}
-                                      >
-                                        Verify your BVN
-                                      </button>
-                                    </div>
+                                  <h4>
+                                    <span className="CalNaira">
+                                      <img src="images/naira.png" alt="" />
+                                    </span>
+                                    {isNaN(loanTotal)
+                                      ? 0
+                                      : loanTotal.toLocaleString() ||
+                                        loanamount}{" "}
+                                    <span> for </span>
+                                    {noofmonth}
+                                    {noofmonth > 1 ? (
+                                      <span> months</span>
+                                    ) : (
+                                      <span> month</span>
+                                    )}
+                                  </h4>
+                                  <Headline
+                                    fontSize="22px"
+                                    align="left"
+                                    text="Monthly Repayment:"
+                                  />
+                                  <h4>
+                                    <span className="CalNaira">
+                                      <img src="images/naira.png" alt="" />
+                                    </span>
+
+                                    {isNaN(monthlyPay)
+                                      ? 0
+                                      : Number(monthlyPay).toLocaleString()}
+                                  </h4>
+                                </div>
+                              </div>
+
+                              {/* next form page btn */}
+                              <div className="ButtonContainer">
+                                <button
+                                  type="button"
+                                  disabled={isSubmitting}
+                                  onClick={handleNext}
+                                  className="BtnAction BtnSecondary"
+                                >
+                                  Next
+                                </button>
+                              </div>
+                            </>
+                          )}
+
+                          {/* customer details section */}
+                          {step === 2 && (
+                            <>
+                              <div id="Step2">
+                                <Headline
+                                  spacer="12px 0"
+                                  color="#000"
+                                  text="Start your application process"
+                                />
+                                <div id="BvnVarification">
+                                  <TextInput
+                                    label="Please enter your BVN to proceed"
+                                    name="bvnnumber"
+                                    type="text"
+                                  />
+                                  <div className="ButtonContainer">
+                                    <button
+                                      className="BtnAction BtnPrimary"
+                                      type="button"
+                                      onClick={handleBvnVerification}
+                                    >
+                                      Verify your BVN
+                                    </button>
                                   </div>
                                 </div>
-                              </>
-                            )}
-                          </Form>
-                        </div>
+                              </div>
+                            </>
+                          )}
+                        </Form>
+                      </div>
 
-                        {/* right loan step section */}
-                        <div className="col-sm-12 col-md-4 Step">
-                          <img src={stepImg} alt={step} />
-                        </div>
+                      {/* right loan step section */}
+                      <div className="col-sm-12 col-md-4 Step">
+                        <img src={stepImg} alt={step} />
                       </div>
                     </div>
-                  </>
-                )}
-              </Formik>
-            </div>
+                  </div>
+                </>
+              )}
+            </Formik>
           </div>
         </div>
-      )}
+      </div>
     </>
   );
 };
