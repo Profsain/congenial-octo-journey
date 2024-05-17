@@ -10,11 +10,13 @@ import { useDispatch, useSelector } from "react-redux";
 import { fetchProduct } from "../../../redux/reducers/productReducer";
 import Headline from "../../shared/Headline";
 import TextInput from "./formcomponents/TextInput";
-import LoanForm from "./LoanForm";
+// import LoanForm from "./LoanForm";
 import "./Form.css";
 import calculatorfunc from "../../shared/calculatorfunc";
-import bvnVerification from "./bvnVerification";
-import { getPartialDetailsWithBvn } from "./getBvnDetails";
+
+// bvn verification function
+import { bvnVerification, getBvnDetails } from "./bvnVerification";
+
 // loan form component
 const LoanFirstStep = ({ data }) => {
   // fetch loan product
@@ -99,22 +101,8 @@ const LoanFirstStep = ({ data }) => {
   const product = loanProducts?.find((product) => product._id === productId);
 
   // handle bvn verification
-  const [showLoanForm, setShowLoanForm] = useState(false);
-  const [bvnPartialDetails, setBvnPartialDetails] = useState(null);
-  const [bvnDetailsError, setBvnDetailsError] = useState(null);
-
-  // handle bvn details search
-  const handleBvnSearch = async (bvn) => {
-    try {
-      const data = await getPartialDetailsWithBvn(bvn);
-      setBvnPartialDetails(data);
-    } catch (error) {
-      setBvnDetailsError(error.message);
-      console.log("BVN Error", error.message);
-    }
-  };
-
-  console.log("BVN Details", bvnPartialDetails);
+  // const [showLoanForm, setShowLoanForm] = useState(false);
+  
 
   const handleBvnVerification = async () => {
     const apiUrl = import.meta.env.VITE_BASE_URL;
@@ -142,8 +130,6 @@ const LoanFirstStep = ({ data }) => {
       .then((result) => {
         // search for bvn details and verify
         bvnVerification();
-        // handleBvnSearch(bvn);
-        // setShowLoanForm(true);
       });
   };
 
