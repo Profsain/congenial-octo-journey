@@ -24,9 +24,26 @@ import dataURItoBlob from "../../../../utilities/dataURItoBlob";
 import generateCustomerId from "../../dashboard/admindashboard/customers/generateCustomerId";
 import ReconfirmBvn from "./ReconfirmBvn";
 import fetchAllBanks from "./fetchBanks";
+import { getBvnDetails } from "./bvnVerification";
 
 // loan form component
 const LoanForm = () => {
+  // Function to initialize the bvn details extraction after redirect to clallback url
+  const initializeApp = () => {
+    const urlSearchParams = new URLSearchParams(window.location.search);
+    const code = urlSearchParams.get("code");
+
+    if (code) {
+      getBvnDetails(); // Call this function if there's an authorization code in the URL
+    } else {
+      // Optionally, handle other initialization tasks here
+      console.log("No authorization code found. Proceed with the normal flow.");
+    }
+  };
+
+  // Call the initializeApp function when the window loads
+  window.onload = initializeApp;
+
   // fetch loan product
   const dispatch = useDispatch();
   useEffect(() => {
@@ -51,16 +68,16 @@ const LoanForm = () => {
   const [customerEmail, setCustomerEmail] = useState("");
   const [customerName, setCustomerName] = useState("");
 
- useEffect(() => {
-   // set showReconfirmBvn modal after 30 seconds
-   const timer = setTimeout(() => {
-     setShowReconfirmBvn(true);
-   }, 30000);
+  useEffect(() => {
+    // set showReconfirmBvn modal after 30 seconds
+    const timer = setTimeout(() => {
+      setShowReconfirmBvn(true);
+    }, 30000);
 
-   // Cleanup function to clear the timer
-   return () => clearTimeout(timer);
- }, []);
-  
+    // Cleanup function to clear the timer
+    return () => clearTimeout(timer);
+  }, []);
+
   // fetch first form data here
   useEffect(() => {
     if (firstStepData) {
@@ -147,7 +164,7 @@ const LoanForm = () => {
         const formValues = ref.current?.values;
         // set customerEmail
         setCustomerEmail(formValues.email);
-        setCustomerName(formValues.firstname)
+        setCustomerName(formValues.firstname);
 
         const employer = employers.find(
           (employer) => employer._id === formValues.employername
@@ -279,69 +296,68 @@ const LoanForm = () => {
   };
 
   // todo: fetch banks and code
-  // todo: make Bank code a selector for user to select 
+  // todo: make Bank code a selector for user to select
 
   // func to check if individual field is valid
- const isFieldValid = (fieldName, ref) => {
-   const { isValid, errors} = ref.current;
-   return isValid || !errors[fieldName];
- };
+  const isFieldValid = (fieldName, ref) => {
+    const { isValid, errors } = ref.current;
+    return isValid || !errors[fieldName];
+  };
 
   // handle next step, check validation schema and move to next step
-const handleNext = () => {
-  // Check that fields are valid
-  if (
-    isFieldValid("title", ref) &&
-    isFieldValid("firstname", ref) &&
-    isFieldValid("lastname", ref) &&
-    isFieldValid("phonenumber", ref) &&
-    isFieldValid("dob", ref) &&
-    isFieldValid("email", ref) &&
-    isFieldValid("maritalstatus", ref) &&
-    isFieldValid("noofdependent", ref) &&
-    isFieldValid("educationlevel", ref) &&
-    isFieldValid("howdidyouhearaboutus", ref) &&
-    isFieldValid("houseaddress", ref) &&
-    isFieldValid("stateofresidence", ref) &&
-    isFieldValid("lga", ref) &&
-    isFieldValid("stateoforigin", ref) &&
-    isFieldValid("nkinfirstname", ref) &&
-    isFieldValid("nkinlastname", ref) &&
-    isFieldValid("nkinphonenumber", ref) &&
-    isFieldValid("nkinrelationship", ref) &&
-    isFieldValid("nkinresidentialaddress", ref)
-  ) {
-    if (step === 1) {
-      setStep(2);
-      setStepImg("https://i.imgur.com/DPMDjLy.png");
-    } else if (
-      step === 2 &&
-      isFieldValid("employername", ref) &&
-      isFieldValid("employeraddress", ref) &&
-      isFieldValid("employmentstartdate", ref) &&
-      isFieldValid("netmonthlyincome", ref) &&
-      isFieldValid("totalannualincome", ref) &&
-      isFieldValid("officialemail", ref)
-      
+  const handleNext = () => {
+    // Check that fields are valid
+    if (
+      isFieldValid("title", ref) &&
+      isFieldValid("firstname", ref) &&
+      isFieldValid("lastname", ref) &&
+      isFieldValid("phonenumber", ref) &&
+      isFieldValid("dob", ref) &&
+      isFieldValid("email", ref) &&
+      isFieldValid("maritalstatus", ref) &&
+      isFieldValid("noofdependent", ref) &&
+      isFieldValid("educationlevel", ref) &&
+      isFieldValid("howdidyouhearaboutus", ref) &&
+      isFieldValid("houseaddress", ref) &&
+      isFieldValid("stateofresidence", ref) &&
+      isFieldValid("lga", ref) &&
+      isFieldValid("stateoforigin", ref) &&
+      isFieldValid("nkinfirstname", ref) &&
+      isFieldValid("nkinlastname", ref) &&
+      isFieldValid("nkinphonenumber", ref) &&
+      isFieldValid("nkinrelationship", ref) &&
+      isFieldValid("nkinresidentialaddress", ref)
     ) {
-      setStep(3);
-      setStepImg("https://i.imgur.com/DPMDjLy.png");
-    } else if (
-      step === 3 &&
-      isFieldValid("salarybankname", ref) &&
-      isFieldValid("salaryaccountnumber", ref)
-    ) {
-      setStep(4);
-      setStepImg("https://i.imgur.com/DPMDjLy.png");
-    } else if (step === 4) {
-      setStep(5);
-      setStepImg("https://i.imgur.com/DPMDjLy.png");
+      if (step === 1) {
+        setStep(2);
+        setStepImg("https://i.imgur.com/DPMDjLy.png");
+      } else if (
+        step === 2 &&
+        isFieldValid("employername", ref) &&
+        isFieldValid("employeraddress", ref) &&
+        isFieldValid("employmentstartdate", ref) &&
+        isFieldValid("netmonthlyincome", ref) &&
+        isFieldValid("totalannualincome", ref) &&
+        isFieldValid("officialemail", ref)
+      ) {
+        setStep(3);
+        setStepImg("https://i.imgur.com/DPMDjLy.png");
+      } else if (
+        step === 3 &&
+        isFieldValid("salarybankname", ref) &&
+        isFieldValid("salaryaccountnumber", ref)
+      ) {
+        setStep(4);
+        setStepImg("https://i.imgur.com/DPMDjLy.png");
+      } else if (step === 4) {
+        setStep(5);
+        setStepImg("https://i.imgur.com/DPMDjLy.png");
+      }
+    } else {
+      // console.log(ref.current)
+      console.log("Input validation error");
     }
-  } else {
-    // console.log(ref.current)
-    console.log("Input validation error")
-  }
-};
+  };
   // handle previous step
   const handlePrevious = () => {
     if (step === 2) {
