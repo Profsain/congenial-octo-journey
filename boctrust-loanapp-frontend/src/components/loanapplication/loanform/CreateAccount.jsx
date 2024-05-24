@@ -52,17 +52,6 @@ const CreateAccount = ({
     }
   };
 
-  // const key = import.meta.env.VITE_GOOGLE_RECAPTCHA_KEY;
-  // const handleRecaptcha = (value) => {
-  //   if (value) {
-  //     setIsValid(true);
-  //     setErrorMsg("");
-  //   } else {
-  //     setIsValid(false);
-  //     setErrorMsg("Please complete the recaptcha");
-  //   }
-  // };
-
   useEffect(() => {
     validPassword();
   }, [password]);

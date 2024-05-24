@@ -10,7 +10,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { fetchProduct } from "../../../redux/reducers/productReducer";
 import Headline from "../../shared/Headline";
 import TextInput from "./formcomponents/TextInput";
-// import LoanForm from "./LoanForm";
+import LoanForm from "./LoanForm";
 import "./Form.css";
 import calculatorfunc from "../../shared/calculatorfunc";
 
@@ -101,7 +101,7 @@ const LoanFirstStep = ({ data }) => {
   const product = loanProducts?.find((product) => product._id === productId);
 
   // handle bvn verification
-  // const [showLoanForm, setShowLoanForm] = useState(false);
+  const [showLoanForm, setShowLoanForm] = useState(false);
   
 
   const handleBvnVerification = async () => {
@@ -129,7 +129,10 @@ const LoanFirstStep = ({ data }) => {
       .then((response) => response.json())
       .then((result) => {
         // search for bvn details and verify
-        bvnVerification();
+        // bvnVerification();
+
+        // set show loan form to true
+        setShowLoanForm(true);
       });
   };
 
@@ -141,7 +144,7 @@ const LoanFirstStep = ({ data }) => {
 
   return (
     <>
-      <div className="container-fluid FormContainer">
+      {showLoanForm ? (<LoanForm />) : ( <div className="container-fluid FormContainer">
         <div>
           {/* formik form */}
           <div>
@@ -348,7 +351,8 @@ const LoanFirstStep = ({ data }) => {
             </Formik>
           </div>
         </div>
-      </div>
+      </div>)}
+     
     </>
   );
 };
