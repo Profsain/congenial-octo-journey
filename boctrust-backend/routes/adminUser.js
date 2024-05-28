@@ -203,7 +203,7 @@ router.post('/forgot-password', async (req, res) => {
       from: 'ebusiness@boctrustmfb.com', 
       to: user.email,
       subject: 'Boctrust MFB Password Reset',
-      text: `Click the following link to reset your password: http://your-app-url/reset-password/${resetToken}`,
+      text: `Click the following link to reset your password: https://boctrustmfb.com/reset-password/${resetToken}`,
     };
 
     transporter.sendMail(mailOptions, (error, info) => {
@@ -213,6 +213,33 @@ router.post('/forgot-password', async (req, res) => {
 
       res.status(200).json({ message: 'Reset email sent successfully' });
     });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+// Reset Password Endpoint
+router.post('/reset-password', async (req, res) => {
+  try {
+    const { token, newPassword } = req.body;
+
+    // Find the user with the provided token
+    const user = await User.findOne({ token });
+
+    if (!user) {
+      return res.status(400).json({ message: 'Invalid or expired token' });
+    }
+
+    // Hash the new password
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    // Update the user's password and clear the token
+    user.password = hashedPassword;
+    user.token = null; // Clear the token
+    await user.save();
+
+    res.status(200).json({ message: 'Password has been reset successfully' });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Internal server error' });

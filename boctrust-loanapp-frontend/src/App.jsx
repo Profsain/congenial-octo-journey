@@ -38,6 +38,7 @@ import TermsCondition from "./components/terms&condition/TermsCondition";
 import TopNav from "./components/navigation/TopNav";
 import LoanForm from "./components/loanapplication/loanform/LoanForm";
 import Login from "./components/dashboard/login/Login";
+import PasswordReset from "./components/dashboard/login/PasswordReset";
 
 function App() {
   // fetch settings
@@ -58,14 +59,13 @@ function App() {
     }
   }, [settings]);
 
-  console.log("setting", appSettings)
-
   return (
     <>
       <TopNav settings={appSettings} />
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/reset-password/:token" element={<PasswordReset />} />
         <Route path="/about" element={<About />} />
         <Route path="/board" element={<OurBoardPage />} />
         <Route path="/regular-savings" element={<RegularSavings />} />

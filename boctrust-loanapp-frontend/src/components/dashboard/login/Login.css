@@ -49,3 +49,14 @@
 .radio {
     margin-right: 0.8rem;
 }
+
+.reveal-btn {
+    background-color: transparent  !important;
+    border: none;
+    color: #145098;
+    font-size: 0.8rem;
+    cursor: pointer;
+    position: relative;
+    top: -3rem;
+    left: 15rem;
+}
