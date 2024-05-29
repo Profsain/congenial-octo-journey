@@ -1,13 +1,13 @@
-const forgotPassword = async (username, email) => {
+const resetCustomerPass = async (newPassword, token) => {
     const apiUrl = import.meta.env.VITE_BASE_URL;
     
     const forgotData = {
-        username,
-        email,
+        newPassword,
+        token,
     };
 
     try {
-        const response = await fetch(`${apiUrl}/api/admin/forgot-password`, {
+        const response = await fetch(`${apiUrl}/api/customer/reset-password`, {
         method: 'POST',
         mode: 'cors',
         headers: {
@@ -23,8 +23,9 @@ const forgotPassword = async (username, email) => {
         const data = await response.json();
         return data;
     } catch (error) {
-        return { success: false, error: 'Login failed' };
+        console.error('Error Reset Field:', error.message);
+        return { success: false, error: 'Reset failed' };
     }
 }
 
-export default forgotPassword;
+export default resetCustomerPass;

@@ -1,14 +1,14 @@
 import { useEffect, useState } from "react";
-import {useNavigate} from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import PropTypes from "prop-types";
 import { useDispatch, useSelector } from "react-redux";
 import { loginUser } from "../../../redux/reducers/adminAuthReducer";
-import { Modal } from "react-bootstrap";
+import { Modal, Form, Button } from "react-bootstrap";
 // import { login } from "../../../redux/reducers/userSlice";
-import { Form, Button } from "react-bootstrap";
 import loginUserOnServer from "./loginUserOnServer";
 import loginCustomerOnServer from "./loginCustomerOnServer";
 import forgotPassword from "./forgotPassword";
+import forgotPassCustomer from "./forgotPassCustomer";
 import HeadLine from "../../shared/Headline";
 import "./Login.css";
 
@@ -20,6 +20,7 @@ const Login = () => {
     loginAs: "",
   });
   const [errorMessage, setErrorMessage] = useState("");
+  const [revealPassword, setRevealPassword] = useState(false);
 
   //   modal
   const [forgotUsername, setForgotUsername] = useState("");
@@ -32,14 +33,38 @@ const Login = () => {
   // handle forgot password submit
   const handleForgotPasswordSubmit = async (e) => {
     e.preventDefault();
-    if (formData.loginAs === "staff") {
-      console.log("staff");
-      const response = await forgotPassword(forgotUsername, forgotEmail);
-      console.log(response)
 
+    const { loginAs } = formData;
 
-    } else if (formData.loginAs === "customer") {
+    if (loginAs === "staff") {
+      const response = await forgotPassword(
+        forgotUsername,
+        forgotEmail,
+      );
+      if (response.success) {
+        // clear fields
+        setForgotUsername("");
+        setForgotEmail("");
+
+        // close modal
+        setShow(false);
+        setShowEmailSent(true);
+      }
+    } else if (loginAs === "customer") {
       console.log("customer");
+      const response = await forgotPassCustomer(
+        forgotUsername,
+        forgotEmail,
+      );
+      if (response.success) {
+        // clear fields
+        setForgotUsername("");
+        setForgotEmail("");
+
+        // close modal
+        setShow(false);
+        setShowEmailSent(true);
+      }
     }
 
     // clear fields
@@ -49,7 +74,12 @@ const Login = () => {
     // close modal
     setShow(false);
     setShowEmailSent(true);
-   };
+
+    // setShowEmailSent to false after 5 seconds
+    setTimeout(() => {
+      setShowEmailSent(false);
+    }, 5000);
+  };
 
   //   handle on change
   const handleChange = (e) => {
@@ -79,7 +109,6 @@ const Login = () => {
       if (response.success) {
         clearField();
         // Dispatch the login action with the user data.
-    
         dispatch(loginUser(response));
         // setLogin(true);
       } else {
@@ -105,9 +134,9 @@ const Login = () => {
   const currentUser = useSelector((state) => state.adminAuth.user);
   useEffect(() => {
     if (currentUser) {
-       navigate('/dashboard')
+      navigate("/dashboard");
     } else {
-      navigate('/login')
+      navigate("/login");
     }
   }, [currentUser, navigate]);
 
@@ -127,14 +156,21 @@ const Login = () => {
             />
           </Form.Group>
 
-          <Form.Group className="mb-3">
+          <Form.Group className="mb-3 password-group">
             <Form.Control
-              type="password"
+              type={revealPassword ? "text" : "password"}
               placeholder="Password"
               name="password"
               value={formData.password}
               onChange={handleChange}
             />
+            <Button
+              variant="outline-secondary"
+              onClick={() => setRevealPassword(!revealPassword)}
+              className="reveal-btn"
+            >
+              {revealPassword ? "Hide" : "Show"}
+            </Button>
           </Form.Group>
           <Form.Group className="mb-3">
             <p className="asText">Login as:</p>
@@ -166,16 +202,17 @@ const Login = () => {
             Login
           </Button>
         </Form>
-        {!showEmailSent ? (
+        <div>
           <p className="Forget" onClick={handleForgotPassword}>
             Forgot Password
           </p>
-        ) : (
-          <p className="Forget" style={{ width: "290px" }}>
-            A password reset link has been sent to your email. Click on the link
-            to resent your password
-          </p>
-        )}
+          {showEmailSent && (
+            <p className="Forget" style={{ width: "290px" }}>
+              A password reset link has been sent to your email. Click on the
+              link to reset your password.
+            </p>
+          )}
+        </div>
       </div>
 
       {/* popup modal for forgot password */}
@@ -208,8 +245,8 @@ const Login = () => {
                 onChange={(e) => setForgotEmail(e.target.value)}
               />
             </Form.Group>
-              <p>I am a</p>
-            <div className="asBox" style={{marginBottom: "18px"}}>
+            <p>I am a</p>
+            <div className="asBox" style={{ marginBottom: "18px" }}>
               <div>
                 <input
                   type="radio"

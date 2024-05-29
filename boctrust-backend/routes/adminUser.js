@@ -1,10 +1,14 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const crypto = require('crypto');
+const nodemailer = require('nodemailer');
 const multer = require('multer');
 const User = require('../models/AdminUser');
 const express = require('express');
 const router = express.Router();
 // const adminUserVerification = require('../middleware/AuthMiddleware');
+
+const password = process.env.EMAIL_PASSWORD;
 
 // Set up Multer storage to define where to save the uploaded images
 const storage = multer.diskStorage({
@@ -191,28 +195,58 @@ router.post('/forgot-password', async (req, res) => {
 
     // Send an email with the password reset link
     const transporter = nodemailer.createTransport({
-      // Configure your email service here
-      service: 'Bluehost SMTP',
-      auth: {
-        user: 'ebusiness@boctrustmfb.com', 
-        pass: ' eBiz-9945@', 
-      },
-    });
+            host: "smtp-relay.brevo.com",
+            port: 587,
+            secure: false,
+            auth: {
+                user: 'boctrustebusiness@gmail.com',
+                pass: password
+            },
+        });
+            
 
     const mailOptions = {
       from: 'ebusiness@boctrustmfb.com', 
-      to: user.email,
+      to: email,
       subject: 'Boctrust MFB Password Reset',
-      text: `Click the following link to reset your password: http://your-app-url/reset-password/${resetToken}`,
+      text: `Click the following link to reset your password: https://boctrustmfb.com/reset-password/${resetToken}`,
     };
 
-    transporter.sendMail(mailOptions, (error, info) => {
+    await transporter.sendMail(mailOptions, (error, info) => {
       if (error) {
         return res.status(500).json({ message: 'Failed to send reset email' });
       }
 
       res.status(200).json({ message: 'Reset email sent successfully' });
     });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+// Reset Password Endpoint
+router.post('/reset-password', async (req, res) => {
+  try {
+    const { token, newPassword } = req.body;
+    console.log(token, newPassword)
+
+    // Find the user with the provided token
+    const user = await User.findOne({ token });
+    console.log("User find", user)
+    if (!user) {
+      return res.status(400).json({ message: 'Invalid or expired token' });
+    }
+
+    // Hash the new password
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    // Update the user's password and clear the token
+    user.password = hashedPassword;
+    user.token = null; // Clear the token
+    await user.save();
+
+    res.status(200).json({ message: 'Password has been reset successfully' });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Internal server error' });

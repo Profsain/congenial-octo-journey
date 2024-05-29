@@ -895,24 +895,27 @@ const LoanForm = () => {
                                 </div>
 
                                 <div className="InputRow">
-                                  <div id="Disbursement">
+                                  <div>
                                     <Headline
                                       align="left"
-                                      fontSize="18px"
-                                      spacer="35px 128px -16px 0"
+                                      fontSize="22px"
+                                      spacer="35px 0 -16px 0"
                                       color="#000"
                                       text="Disbursement Account Details"
                                     />
-                                    <div className="CheckboxContainer">
-                                      <label className="CheckboxGroup">
+                                    <div className="CheckboxGroup">
+                                      <label className="CheckInput">
                                         <Field
                                           type="checkbox"
                                           name="sameasaboveaccount"
+      
                                         />
-                                        Same as above Account
+                                        Same as above
                                       </label>
                                     </div>
                                   </div>
+                                  
+
                                   <div>
                                     {/* dropdown list */}
                                     <SelectField
@@ -938,14 +941,14 @@ const LoanForm = () => {
                                 {!values.sameasaboveaccount && (
                                   <div className="InputRow">
                                     <TextInput
-                                      label="Bank Code"
-                                      name="disbursementbankname"
+                                      label="Bank Name"
+                                      name="disbursmentbankname"
                                       type="text"
                                     />
                                     <div className="Space"></div>
                                     <TextInput
                                       label="Account Number"
-                                      name="disbursementaccountnumber"
+                                      name="disbursmentaccountnumber"
                                       type="text"
                                     />
                                   </div>
@@ -1097,7 +1100,7 @@ const LoanForm = () => {
                                         <div>
                                           <label>
                                             <Field
-                                              type="checkbox"
+                                              type="radio"
                                               name="deductions"
                                               value="remita"
                                             />
@@ -1108,7 +1111,7 @@ const LoanForm = () => {
                                         <div>
                                           <label>
                                             <Field
-                                              type="checkbox"
+                                              type="radio"
                                               name="deductions"
                                               value="ippis"
                                             />
@@ -1121,7 +1124,7 @@ const LoanForm = () => {
                                       <div>
                                         <label>
                                           <Field
-                                            type="checkbox"
+                                            type="radio"
                                             name="deductions"
                                             value="cheque"
                                           />
@@ -1142,7 +1145,7 @@ const LoanForm = () => {
                                     <div>
                                       <label>
                                         <Field
-                                          type="checkbox"
+                                          type="radio"
                                           name="guarantee"
                                           value="guranteeofemployer"
                                         />
@@ -1152,7 +1155,7 @@ const LoanForm = () => {
                                     <div>
                                       <label>
                                         <Field
-                                          type="checkbox"
+                                          type="radio"
                                           name="guarantee"
                                           value="individualguarantee"
                                         />
@@ -1429,13 +1432,13 @@ const LoanForm = () => {
       </div>
 
       {/*  reconfirm modal */}
-      {showReconfirmBvn && (
+      {/* {showReconfirmBvn && (
         <ReconfirmBvn
           show={showReconfirmBvn}
           setShow={setShowReconfirmBvn}
           setFirstStepData={setFirstStepData}
         />
-      )}
+      )} */}
     </div>
   );
 };
