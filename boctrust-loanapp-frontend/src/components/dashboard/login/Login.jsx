@@ -8,6 +8,7 @@ import { Modal, Form, Button } from "react-bootstrap";
 import loginUserOnServer from "./loginUserOnServer";
 import loginCustomerOnServer from "./loginCustomerOnServer";
 import forgotPassword from "./forgotPassword";
+import forgotPassCustomer from "./forgotPassCustomer";
 import HeadLine from "../../shared/Headline";
 import "./Login.css";
 
@@ -32,8 +33,14 @@ const Login = () => {
   // handle forgot password submit
   const handleForgotPasswordSubmit = async (e) => {
     e.preventDefault();
-    if (formData.loginAs === "staff") {
-      const response = await forgotPassword(forgotUsername, forgotEmail);
+
+    const { loginAs } = formData;
+
+    if (loginAs === "staff") {
+      const response = await forgotPassword(
+        forgotUsername,
+        forgotEmail,
+      );
       if (response.success) {
         // clear fields
         setForgotUsername("");
@@ -43,8 +50,21 @@ const Login = () => {
         setShow(false);
         setShowEmailSent(true);
       }
-    } else if (formData.loginAs === "customer") {
+    } else if (loginAs === "customer") {
       console.log("customer");
+      const response = await forgotPassCustomer(
+        forgotUsername,
+        forgotEmail,
+      );
+      if (response.success) {
+        // clear fields
+        setForgotUsername("");
+        setForgotEmail("");
+
+        // close modal
+        setShow(false);
+        setShowEmailSent(true);
+      }
     }
 
     // clear fields
@@ -54,6 +74,11 @@ const Login = () => {
     // close modal
     setShow(false);
     setShowEmailSent(true);
+
+    // setShowEmailSent to false after 5 seconds
+    setTimeout(() => {
+      setShowEmailSent(false);
+    }, 5000);
   };
 
   //   handle on change
@@ -177,16 +202,17 @@ const Login = () => {
             Login
           </Button>
         </Form>
-        {!showEmailSent ? (
+        <div>
           <p className="Forget" onClick={handleForgotPassword}>
             Forgot Password
           </p>
-        ) : (
-          <p className="Forget" style={{ width: "290px" }}>
-            A password reset link has been sent to your email. Click on the link
-            to reset your password.
-          </p>
-        )}
+          {showEmailSent && (
+            <p className="Forget" style={{ width: "290px" }}>
+              A password reset link has been sent to your email. Click on the
+              link to reset your password.
+            </p>
+          )}
+        </div>
       </div>
 
       {/* popup modal for forgot password */}

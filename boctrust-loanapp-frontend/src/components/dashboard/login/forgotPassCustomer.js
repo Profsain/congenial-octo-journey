@@ -1,4 +1,4 @@
-const forgotPassword = async (username, email) => {
+const forgotPassCustomer = async (username, email) => {
     const apiUrl = import.meta.env.VITE_BASE_URL;
     
     const forgotData = {
@@ -7,7 +7,7 @@ const forgotPassword = async (username, email) => {
     };
 
     try {
-        const response = await fetch(`${apiUrl}/api/admin/forgot-password`, {
+        const response = await fetch(`${apiUrl}/api/customer/forgot-password`, {
         method: 'POST',
         mode: 'cors',
         headers: {
@@ -27,4 +27,4 @@ const forgotPassword = async (username, email) => {
     }
 }
 
-export default forgotPassword;
+export default forgotPassCustomer;

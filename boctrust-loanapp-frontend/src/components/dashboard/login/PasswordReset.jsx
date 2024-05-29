@@ -8,18 +8,31 @@ import HeadLine from "../../shared/Headline";
 import "./Login.css";
 
 import resetAdminPass from "./resetAdminPass";
+import resetCustomerPass from "./resetCustomerPass";
 
 const PasswordReset = () => {
   const { token } = useParams();
   console.log("token", token);
+
   const [formData, setFormData] = useState({
     newPassword: "",
     confirmPassword: "",
     loginAs: "",
   });
+
   const [errorMessage, setErrorMessage] = useState("");
   const [revealPassword, setRevealPassword] = useState(false);
 
+  // handle form validation
+  useEffect(() => {
+    if (formData.newPassword.length < 6) {
+      setErrorMessage("Password must be at least 6 characters");
+    } else if (formData.newPassword !== formData.confirmPassword) {
+      setErrorMessage("Passwords do not match");
+    } else {
+      setErrorMessage("");
+    }
+  }, [formData.newPassword, formData.confirmPassword]);
   //   handle on change
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -44,12 +57,8 @@ const PasswordReset = () => {
     const { newPassword, loginAs } = formData;
 
     if (loginAs === "staff") {
-      console.log("staff");
-      // change password at the backend
-      // redirect to login page
-      // clear fields
       const response = await resetAdminPass(newPassword, token);
-      if (response.success) {
+      if (response.message) {
         clearField();
         navigate("/login");
       } else {
@@ -57,6 +66,14 @@ const PasswordReset = () => {
       }
     } else if (loginAs === "customer") {
       console.log("customer");
+      const response = await resetCustomerPass(newPassword, token);
+      console.log(response);
+      if (response.message) {
+        clearField();
+        navigate("/login");
+      } else {
+        setErrorMessage(response.error + " or Token expired");
+      }
     }
   };
 
@@ -132,6 +149,13 @@ const PasswordReset = () => {
             Change Password
           </Button>
         </Form>
+
+        {/* remember password login */}
+        <div className="Remember">
+          <p>
+            Remember your password? <a href="/login">Login</a>
+          </p>
+        </div>
       </div>
     </div>
   );

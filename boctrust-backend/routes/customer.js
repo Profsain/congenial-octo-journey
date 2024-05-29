@@ -1,14 +1,19 @@
 const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcrypt');
+const crypto = require('crypto');
+const nodemailer = require('nodemailer');
 const dotenv = require('dotenv');
 const jwt = require('jsonwebtoken');
 const multer = require('multer');
 const path = require('path');
 const CustomerModel = require('../models/Customer'); // Import customer model
+const Customer = require('../models/Customer');
 
 // configure dotenv
 dotenv.config();
+
+const password = process.env.EMAIL_PASSWORD;
 
 
 // Set up Multer storage to define where to save the uploaded images
@@ -203,5 +208,83 @@ router.delete('/customer/:customerId', async (req, res) => {
     res.status(500).json({ error: 'Unable to delete customer' });
   }
 });
+
+// forget password logic
+router.post('/forgot-password', async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    // Check if the email exists in the database
+    const user = await Customer.findOne({ email });
+
+    if (!user) {
+      return res.status(404).json({ message: 'Email not found' });
+    }
+
+    // Generate a password reset token
+    const resetToken = crypto.randomBytes(20).toString('hex');
+    user.token = resetToken;
+    await user.save();
+
+    // Send an email with the password reset link
+    const transporter = nodemailer.createTransport({
+            host: "smtp-relay.brevo.com",
+            port: 587,
+            secure: false,
+            auth: {
+                user: 'boctrustebusiness@gmail.com',
+                pass: password
+            },
+        });
+            
+
+    const mailOptions = {
+      from: 'ebusiness@boctrustmfb.com', 
+      to: email,
+      subject: 'Boctrust MFB Password Reset',
+      text: `Click the following link to reset your password: https://boctrustmfb.com/reset-password/${resetToken}`,
+    };
+
+    await transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        return res.status(500).json({ message: 'Failed to send reset email' });
+      }
+
+      res.status(200).json({ message: 'Reset email sent successfully' });
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+// Reset Password Endpoint
+router.post('/reset-password', async (req, res) => {
+  try {
+    const { token, newPassword } = req.body;
+    console.log("customer", token, newPassword)
+
+    // Find the user with the provided token
+    const customer = await Customer.findOne({ token });
+    console.log("Find customer", customer)
+    if (!customer) {
+      return res.status(400).json({ message: 'Invalid or expired token' });
+    }
+
+    // Hash the new password
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    // Update the user's password and clear the token
+    customer.password = hashedPassword;
+    customer.token = null; // Clear the token
+    await customer.save();
+
+    res.status(200).json({ message: 'Password has been reset successfully' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
 
 module.exports = router;
