@@ -18,7 +18,7 @@ const AccountOverviewTable = () => {
             <th>Account Number</th>
             <th>Account Type</th>
             <th>Balance</th>
-            <th>Loan Guarantee</th>
+            <th>Loan</th>
             <th>Current Balance</th>
           </tr>
         </thead>
