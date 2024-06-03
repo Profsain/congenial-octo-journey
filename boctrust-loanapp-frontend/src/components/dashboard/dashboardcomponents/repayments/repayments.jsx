@@ -1,22 +1,27 @@
+import { useSelector } from "react-redux";
+import { useState } from "react";
 import BocButton from "../../shared/BocButton";
 import DashboardHeadline from "../../shared/DashboardHeadline";
 import Table from "react-bootstrap/Table";
 
 const LoanPayment = () => {
-    const styles = {
-      container: {
-        paddingBottom: "3rem",
-        marginRight: "4rem",
-      },
-      table: {
-        marginLeft: "2rem",
-      },
+  const styles = {
+    container: {
+      paddingBottom: "3rem",
+      marginRight: "4rem",
+    },
+    table: {
+      marginLeft: "2rem",
+    },
     head: {
       color: "#145098",
       fontWeight: "bold",
       fontSize: "1.2rem",
     },
   };
+
+  const user = useSelector((state) => state.adminAuth.user);
+  const [upcomingLoanPayment, setUpcomingLoanPayment] = useState([]);
 
   return (
     <div style={styles.container} className="RepaymentCon SecCon">
@@ -38,45 +43,49 @@ const LoanPayment = () => {
           </tr>
         </thead>
         <tbody>
-          <tr>
-            <td>1023</td>
-            <td>2023-25-03</td>
-            <td>
-              <BocButton>Due</BocButton>
-            </td>
-            <td>N21340</td>
-            <td>
-              <BocButton cursor="pointer" bgcolor="#ecaa00" bradius="18px">
-                Pay Now
-              </BocButton>
-            </td>
-          </tr>
-          <tr>
-            <td>1024</td>
-            <td>2023-25-04</td>
-            <td>
-              <BocButton>Due</BocButton>
-            </td>
-            <td>N19340</td>
-            <td>
-              <BocButton cursor="pointer" bgcolor="#ecaa00" bradius="18px">
-                Pay Now
-              </BocButton>
-            </td>
-          </tr>
-          <tr>
-            <td>1030</td>
-            <td>2023-25-05</td>
-            <td>
-              <BocButton>Due</BocButton>
-            </td>
-            <td>N10340</td>
-            <td>
-              <BocButton cursor="pointer" bgcolor="#ecaa00" bradius="18px">
-                Pay Now
-              </BocButton>
-            </td>
-          </tr>
+          {upcomingLoanPayment.length === 0 ? (
+            <tr>
+              <td colSpan="5" style={{ textAlign: "center" }}>
+                No upcoming loan payment
+              </td>
+            </tr>
+          ) : (
+            <div>
+              <tr>
+                <td>1023</td>
+                <td>2023-25-03</td>
+                <td>Completed</td>
+                <td>N2134</td>
+                <td>
+                  <BocButton cursor="pointer" bgcolor="#145098" bradius="18px">
+                    View
+                  </BocButton>
+                </td>
+              </tr>
+              <tr>
+                <td>1023</td>
+                <td>2023-25-03</td>
+                <td>Completed</td>
+                <td>N2134</td>
+                <td>
+                  <BocButton cursor="pointer" bgcolor="#145098" bradius="18px">
+                    View
+                  </BocButton>
+                </td>
+              </tr>
+              <tr>
+                <td>1023</td>
+                <td>2023-25-03</td>
+                <td>Completed</td>
+                <td>N2134</td>
+                <td>
+                  <BocButton cursor="pointer" bgcolor="#145098" bradius="18px">
+                    View
+                  </BocButton>
+                </td>
+              </tr>
+            </div>
+          )}
         </tbody>
       </Table>
     </div>
