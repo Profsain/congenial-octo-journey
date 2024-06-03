@@ -241,6 +241,24 @@ const customerSchema = new mongoose.Schema({
       default: Date.now
     }
   },
+  transactions: {
+    type: Array,
+    default: []
+  },
+  myLoansBalance: {
+    type: String,
+    default: "0.00"
+  },
+  totalLoanBalance: {
+    type: String,
+    default: "0.00"
+  },
+  allLoans: [
+    {
+      type: Object,
+      default: {}
+    }
+  ],
   banking: {
     isAccountCreated: {
       type: Boolean,

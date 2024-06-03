@@ -79,6 +79,37 @@ const SideNavMain = ({ onMenuItemClick }) => {
           Dashboard
         </p>
       </div>
+
+      {/* NIBSS Menu with sub item */}
+      <div onMouseOver={openSubItem} onMouseLeave={closeSubItem}>
+        <div className="IconBox">
+          <img src="images/dwithdraw.png" alt="nibss" />
+          <p>NIBSS Direct</p>
+        </div>
+        {isOpen ? (
+          <div className="SubItem">
+            <ul>
+              <li id="debitTransactions" onClick={onMenuItemClick}>
+                Debit Transactions
+              </li>
+              {admin || adminRoles.includes("manage_nibss") ? (
+                <li id="collectionsSummary" onClick={onMenuItemClick}>
+                  Collections Summary
+                </li>
+              ) : null}
+              <li id="debitMandates" onClick={onMenuItemClick}>
+                Debit Mandates
+              </li>
+              {admin || adminRoles.includes("manage_nibss") ? (
+                <li id="stopRestartCollections" onClick={onMenuItemClick}>
+                  Stop/Restart Collections
+                </li>
+              ) : null}
+            </ul>
+          </div>
+        ) : null}
+      </div>
+
       <div id="branches" className="IconBox" onClick={onMenuItemClick}>
         <img
           id="branches"
@@ -393,7 +424,7 @@ const SideNavMain = ({ onMenuItemClick }) => {
           </div>
         ) : null}
       </div>
-      
+
       <div onMouseOver={openSubSetting} onMouseLeave={closeSubSetting}>
         <div className="IconBox">
           <img src="images/dreport.png" alt="report" />

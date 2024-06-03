@@ -1432,13 +1432,13 @@ const LoanForm = () => {
       </div>
 
       {/*  reconfirm modal */}
-      {/* {showReconfirmBvn && (
+      {showReconfirmBvn && (
         <ReconfirmBvn
           show={showReconfirmBvn}
           setShow={setShowReconfirmBvn}
           setFirstStepData={setFirstStepData}
         />
-      )} */}
+      )}
     </div>
   );
 };

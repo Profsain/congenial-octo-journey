@@ -10,6 +10,7 @@ const ViewBySection = ({
   dateRange,
   searchDateFunc,
   handleReload,
+  printBtn,
 }) => {
   const styles = {
     btnBox: {
@@ -107,6 +108,8 @@ const ViewBySection = ({
         >
           Reload
         </BocButton>
+
+        {printBtn}
       </div>
       <div style={styles.btnBox} className="searchByBox">
         {showSearchName && (
@@ -150,6 +153,7 @@ ViewBySection.propTypes = {
   dateRange: PropTypes.object,
   searchDateFunc: PropTypes.func,
   handleReload: PropTypes.func,
+  printBtn: PropTypes.element,
 };
 
 export default ViewBySection;

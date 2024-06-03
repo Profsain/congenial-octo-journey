@@ -10,7 +10,7 @@ import AccountTypes from "../account/AccountTypes";
 import CreditBureauDashboard from "../creditbureau/CreditBureauDashboard";
 import CustomersDashboard from "../customers/CustomersDashboard";
 import AddCustomer from "../customers/AddCustomer";
-import CustomersRequest from "../customers/CustomersRequest"
+import CustomersRequest from "../customers/CustomersRequest";
 import HomeDashboard from "./HomeDashboard";
 import Branches from "../branches/Branches";
 import MdasEmployers from "../employersmanager/MdasEmployers";
@@ -60,6 +60,10 @@ import PostJobs from "../website/PostJobs";
 import GeneralSettings from "../generalSetting/GeneralSettings";
 import EmailSetting from "../generalSetting/EmailSetting";
 import GoogleAnalytics from "../generalSetting/GoogleAnalytics";
+import DebitTransactions from "../nibssDirectDebit/DebitTransactions";
+import CollectionSummary from "../nibssDirectDebit/CollectionSummary";
+import DebitMandates from "../nibssDirectDebit/DebitMandates";
+import StopRestartCollections from "../nibssDirectDebit/StopRestartCollections";
 
 const AdminDashboard = () => {
   const [showSidebar, setShowSidebar] = useState(false);
@@ -86,6 +90,18 @@ const AdminDashboard = () => {
     switch (id) {
       case "dashboard":
         setCurrentTitle("Dashboard");
+        break;
+      case "debitTransactions":
+        setCurrentTitle("Loan Repayment - Debit Transactions");
+        break;
+      case "collectionsSummary":
+        setCurrentTitle("Loan Repayment - Collections Summary");
+        break;
+      case "debitMandates":
+        setCurrentTitle("Debit Mandate Rule");
+        break;
+      case "stopRestartCollections":
+        setCurrentTitle("Stop/Restart Collections");
         break;
       case "branches":
         setCurrentTitle("Branches");
@@ -270,6 +286,14 @@ const AdminDashboard = () => {
     switch (currentComponent) {
       case "dashboard":
         return <HomeDashboard />;
+      case "debitTransactions":
+        return <DebitTransactions />;
+      case "collectionsSummary":
+        return <CollectionSummary />;
+      case "debitMandates":
+        return <DebitMandates />;
+      case "stopRestartCollections":
+        return <StopRestartCollections />;
       case "branches":
         return <Branches />;
       case "customer":
