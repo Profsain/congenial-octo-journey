@@ -1,8 +1,13 @@
+import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchProduct } from "../../../../redux/reducers/productReducer";
+
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import DashboardHeadline from "../../shared/DashboardHeadline";
 import "../transferdashboard/Transfer.css";
 import BocButton from "../../shared/BocButton";
+import interestRate from "../../../shared/calculatorfunc";
 
 // Define validation schema using Yup
 const validationSchema = Yup.object().shape({
@@ -14,11 +19,6 @@ const validationSchema = Yup.object().shape({
   note: Yup.string().required("Note is required"),
 });
 
-const loanProductOptions = [
-  { value: "car loan", label: "Car Loan" },
-  { value: "salary advance", label: "Salary Advance" },
-  // Add more options as needed
-];
 
 const initialValues = {
   loanProduct: "",
@@ -28,9 +28,95 @@ const initialValues = {
 };
 
 const ApplyLoan = () => {
-  const handleSubmit = (values) => {
+  const [message, setMessage] = useState("");
+
+  // fetch loan product
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(fetchProduct());
+  }, [dispatch]);
+
+  const loanProducts = useSelector(
+    (state) => state.productReducer.products.products
+  );
+
+  const baseUrl = import.meta.env.VITE_BASE_URL;
+
+   // get current login user
+  const user = useSelector((state) => state.adminAuth.user);
+  const isAccountCreated = user?.banking.isAccountCreated;
+
+  // update message
+  const updateMessage = (message) => { 
+    setMessage(
+      message
+    );
+    setTimeout(() => {
+      setMessage("");
+    }, 3000);
+  };
+
+  // handle loan submission
+  const handleSubmit = async (values, { resetForm }) => {
+    const customerId = user._id;
+
+    if (!isAccountCreated) {
+      updateMessage(
+        "Your account is being processed. You would be contacted when it is activated"
+      );
+      return;
+    }
+
+    // find selected product using id
+    const selectedProduct = loanProducts.find(
+      (product) => product._id === values.loanProduct
+    );
+    const rate = selectedProduct.interestRate;
+    const loanProductName = selectedProduct.productName;
+    const principal = parseInt(values.amount);
+    const time = parseInt(values.duration) * 30;
+    
+    // calculate total repayment
+    const totalRepayment = interestRate(principal, time, rate);
+
     // Handle form submission logic here
-    console.log(values);
+    // create a new loan application object
+    const loanApplication = {
+      loanId: Math.floor(Math.random() * 1000),
+      loanProduct: values.loanProduct,
+      loanProductName: loanProductName,
+      interestRate: rate,
+      duration: values.duration,
+      amount: values.amount,
+      note: values.note,
+      loanStatus: "pending",
+      isLoanApproved: false,
+      totalRepayment: totalRepayment + principal,
+    };
+    // send the object to the backend
+    try {
+      const response = await fetch(
+        `${baseUrl}/api/customer/${customerId}/new-loans`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(loanApplication),
+        }
+      );
+      const data = await response.json();
+
+      // reset form
+      resetForm();
+      updateMessage("Loan application submitted successfully");
+
+      return data;
+    } catch (error) {
+      updateMessage("An error occurred. Please try again");
+      throw new Error(error);
+    }
   };
 
   return (
@@ -43,7 +129,7 @@ const ApplyLoan = () => {
       >
         <Form>
           <div className="FieldRow">
-            <div className="FieldGroup">
+            <div className="FieldGroup" style={{marginBottom: "18px"}}>
               <label htmlFor="loanProduct">Loan Product</label>
               <Field
                 as="select"
@@ -52,11 +138,11 @@ const ApplyLoan = () => {
                 className="Select"
               >
                 <option value="" label="Select a product" />
-                {loanProductOptions.map((option) => (
+                {loanProducts.map((option) => (
                   <option
-                    key={option.value}
-                    value={option.value}
-                    label={option.label}
+                    key={option._id}
+                    value={option._id}
+                    label={option.productName}
                   />
                 ))}
               </Field>
@@ -87,6 +173,8 @@ const ApplyLoan = () => {
               <ErrorMessage name="note" component="div" />
             </div>
           </div>
+
+          {message && <div style={{color: "orange", textAlign: "center"}}>{message}</div>}
           <div className="BtnContainer">
             <BocButton
               fontSize="1.6rem"

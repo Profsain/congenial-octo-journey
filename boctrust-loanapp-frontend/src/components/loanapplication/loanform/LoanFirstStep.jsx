@@ -10,12 +10,12 @@ import { useDispatch, useSelector } from "react-redux";
 import { fetchProduct } from "../../../redux/reducers/productReducer";
 import Headline from "../../shared/Headline";
 import TextInput from "./formcomponents/TextInput";
-import LoanForm from "./LoanForm";
+// import LoanForm from "./LoanForm";
 import "./Form.css";
 import calculatorfunc from "../../shared/calculatorfunc";
 
 // bvn verification function
-import { bvnVerification, getBvnDetails } from "./bvnVerification";
+import { bvnVerification } from "./bvnVerification";
 
 // loan form component
 const LoanFirstStep = ({ data }) => {

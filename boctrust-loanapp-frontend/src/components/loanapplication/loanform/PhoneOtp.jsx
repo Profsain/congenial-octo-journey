@@ -66,7 +66,7 @@ const PhoneOtp = (props) => {
       setConfirmOtp(response);
       setFlag(true);
     } catch (error) {
-      setErrorMsg(`Invalid phone number: ${error.message}`);
+      // setErrorMsg(`Invalid phone number: ${error.message}`);
       throw new Error("Error setting up reCAPTCHA:", error);
     }
   };

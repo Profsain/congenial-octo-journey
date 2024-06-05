@@ -14,13 +14,14 @@ const DashboardHome = () => {
     <div className={`DashboardHome ${!isAccountCreated ? "overlay" : ""}`}>
       <TopCardSec user={user} />
       <div className="PCont">
-        <AccountOverviewTable user={user}/>
-        <UpcomingLoanPayment user={user}/>
-        <RecentTransaction user={user}/>
+        <AccountOverviewTable user={user} />
+        <UpcomingLoanPayment user={user} />
+        <RecentTransaction user={user} />
       </div>
       {!isAccountCreated && (
         <div className="overlay-message">
-          Your account is currently being process. Check back later.
+          Your account is being processed. You would be contacted when it is
+          activated
         </div>
       )}
     </div>

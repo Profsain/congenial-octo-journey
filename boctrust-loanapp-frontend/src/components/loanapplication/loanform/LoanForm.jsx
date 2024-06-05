@@ -649,10 +649,10 @@ const LoanForm = () => {
                                         />
                                       </div>
                                     )}
-                                    <hr />
+                                    <hr className="hLine"/>
                                   </div>
 
-                                  {/* Next off kin information */}
+                                  {/* Next of kin information */}
                                   <div className="NextOfKin">
                                     <Headline
                                       fontSize="24px"
