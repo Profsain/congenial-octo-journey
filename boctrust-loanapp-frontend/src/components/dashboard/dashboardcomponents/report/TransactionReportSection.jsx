@@ -1,3 +1,4 @@
+import { useSelector } from "react-redux";
 import BocButton from "../../shared/BocButton";
 import DashboardHeadline from "../../shared/DashboardHeadline";
 import Table from "react-bootstrap/Table";
@@ -14,10 +15,15 @@ const TransactionReportSection = () => {
     },
   };
 
+  // current user
+  const user = useSelector((state) => state.adminAuth.user);
+
+  const transactions = user?.transactions || [];
+
   return (
     <div>
       <DashboardHeadline mspacer="0 3rem 0 0">
-        Recent Transaction
+        Recent Transactions
       </DashboardHeadline>
       <div className="TReport">
         <Table borderless hover responsive="sm" className="DTable">
@@ -33,45 +39,67 @@ const TransactionReportSection = () => {
             </tr>
           </thead>
           <tbody>
-            <tr>
-              <td>2023-25-03</td>
-              <td>1234567891</td>
-              <td>N2134</td>
-              <td>Dr</td>
-              <td>Loan Repayment</td>
-              <td style={styles.completed}>Completed</td>
-              <td>
-                <BocButton cursor="pointer" bgcolor="#145098" bradius="18px">
-                  View
-                </BocButton>
-              </td>
-            </tr>
-            <tr>
-              <td>2023-25-03</td>
-              <td>1234567891</td>
-              <td>N2134</td>
-              <td>Dr</td>
-              <td>Loan Repayment</td>
-              <td style={styles.completed}>Completed</td>
-              <td>
-                <BocButton cursor="pointer" bgcolor="#145098" bradius="18px">
-                  View
-                </BocButton>
-              </td>
-            </tr>
-            <tr>
-              <td>2023-25-05</td>
-              <td>1234567891</td>
-              <td>N1134</td>
-              <td>Cr</td>
-              <td>Loan Repayment</td>
-              <td style={styles.completed}>Completed</td>
-              <td>
-                <BocButton cursor="pointer" bgcolor="#145098" bradius="18px">
-                  View
-                </BocButton>
-              </td>
-            </tr>
+            {transactions.length === 0 ? (
+              <tr>
+                <td colSpan="7" style={{ textAlign: "center" }}>
+                  No transaction record
+                </td>
+              </tr>
+            ) : (
+              <div>
+                <tr>
+                  <td>2023-03</td>
+                  <td>1234567891</td>
+                  <td>N2134</td>
+                  <td>Dr</td>
+                  <td>Loan Repayment</td>
+                  <td style={styles.completed}>Completed</td>
+                  <td>
+                    <BocButton
+                      cursor="pointer"
+                      bgcolor="#145098"
+                      bradius="18px"
+                    >
+                      View
+                    </BocButton>
+                  </td>
+                </tr>
+                <tr>
+                  <td>2023-25-03</td>
+                  <td>1234567891</td>
+                  <td>N2134</td>
+                  <td>Dr</td>
+                  <td>Loan Repayment</td>
+                  <td style={styles.completed}>Completed</td>
+                  <td>
+                    <BocButton
+                      cursor="pointer"
+                      bgcolor="#145098"
+                      bradius="18px"
+                    >
+                      View
+                    </BocButton>
+                  </td>
+                </tr>
+                <tr>
+                  <td>2023-25-05</td>
+                  <td>1234567891</td>
+                  <td>N1134</td>
+                  <td>Cr</td>
+                  <td>Loan Repayment</td>
+                  <td style={styles.completed}>Completed</td>
+                  <td>
+                    <BocButton
+                      cursor="pointer"
+                      bgcolor="#145098"
+                      bradius="18px"
+                    >
+                      View
+                    </BocButton>
+                  </td>
+                </tr>
+              </div>
+            )}
           </tbody>
         </Table>
       </div>

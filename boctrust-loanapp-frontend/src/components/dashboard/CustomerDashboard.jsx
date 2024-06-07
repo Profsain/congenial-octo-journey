@@ -73,7 +73,7 @@ const CustomerDashboard = () => {
         setCurrentTitle("Withdraw Money");
         break;
       case "transaction":
-        setCurrentTitle("Account Transaction");
+        setCurrentTitle("Account Transactions");
         break;
       case "remita":
         setCurrentTitle("Remita History");

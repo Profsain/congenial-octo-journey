@@ -52,7 +52,7 @@ const SidebarMain = ({ onMenuItemClick }) => {
             alt="loan"
           />
           <p id="myloan" onClick={onMenuItemClick}>
-            My Loans
+            Loans
           </p>
         </div>
         {isLoanOpen ? (
@@ -121,7 +121,7 @@ const SidebarMain = ({ onMenuItemClick }) => {
           alt="account"
         />
         <p id="transaction" onClick={onMenuItemClick}>
-          Account Transaction
+          Account Transactions
         </p>
       </div>
 

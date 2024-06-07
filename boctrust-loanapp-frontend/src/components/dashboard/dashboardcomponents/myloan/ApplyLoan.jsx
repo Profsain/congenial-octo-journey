@@ -38,7 +38,7 @@ const ApplyLoan = () => {
   }, [dispatch]);
 
   const loanProducts = useSelector(
-    (state) => state.productReducer.products.products
+    (state) => state?.productReducer?.products?.products
   );
 
   const baseUrl = import.meta.env.VITE_BASE_URL;
@@ -138,7 +138,7 @@ const ApplyLoan = () => {
                 className="Select"
               >
                 <option value="" label="Select a product" />
-                {loanProducts.map((option) => (
+                {loanProducts?.map((option) => (
                   <option
                     key={option._id}
                     value={option._id}
