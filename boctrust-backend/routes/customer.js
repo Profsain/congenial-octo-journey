@@ -286,5 +286,84 @@ router.post('/reset-password', async (req, res) => {
   }
 });
 
+// add new loan operations
+// Endpoint to add a new loan to the allLoans array of a customer
+router.post('/:customerId/new-loans', async (req, res) => {
+    const { customerId } = req.params;
+    const newLoan = req.body; // Assuming the loan object is sent in the request body
+
+    try {
+        // Find the customer by ID
+        const customer = await Customer.findById(customerId);
+
+        if (!customer) {
+            return res.status(404).json({ error: 'Customer not found' });
+        }
+
+        // Add the new loan to the allLoans array
+        customer.allLoans.push(newLoan);
+
+        // Save the updated customer document
+        await customer.save();
+
+        res.status(201).json({ message: 'Loan added successfully', loan: newLoan });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// Endpoint to fetch all loans for a customer
+router.get('/:customerId/all-loans', async (req, res) => {
+    const { customerId } = req.params;
+
+    try {
+        // Find the customer by ID
+        const customer = await Customer.findById(customerId);
+
+        if (!customer) {
+            return res.status(404).json({ error: 'Customer not found' });
+        }
+
+        // Return the allLoans array
+        res.status(200).json(customer.allLoans);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// Endpoint to update a loan object in the allLoans array
+router.put('/:customerId/loans/:loanId', async (req, res) => {
+    const { customerId, loanId } = req.params;
+    const loanUpdates = req.body;
+
+    try {
+        // Find the customer by ID
+        const customer = await Customer.findById(customerId);
+
+        if (!customer) {
+            return res.status(404).json({ error: 'Customer not found' });
+        }
+
+        // Find the loan by ID within the allLoans array
+        const loanIndex = customer.allLoans.findIndex(loan => loan._id.toString() === loanId);
+
+        if (loanIndex === -1) {
+            return res.status(404).json({ error: 'Loan not found' });
+        }
+
+        // Update the loan properties
+        customer.allLoans[loanIndex] = {
+            ...customer.allLoans[loanIndex].toObject(), // Convert Mongoose document to plain object
+            ...loanUpdates // Merge updates
+        };
+
+        // Save the updated customer document
+        await customer.save();
+
+        res.status(200).json({ message: 'Loan updated successfully', loan: customer.allLoans[loanIndex] });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
 
 module.exports = router;

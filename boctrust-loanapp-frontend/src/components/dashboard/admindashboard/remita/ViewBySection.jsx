@@ -4,7 +4,7 @@ import Headline from "../../../shared/Headline";
 import BocButton from "../../shared/BocButton";
 
 const ViewBySection = ({
-  firstBtn = "Applicant Today",
+  firstBtn = "Applications Today",
   setSearch,
   setDateRange,
   dateRange,

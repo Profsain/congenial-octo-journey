@@ -44,6 +44,11 @@ const ReportDetails = () => {
           </thead>
           <tbody>
             <tr>
+              <td colSpan="7" style={{ textAlign: "center" }}>
+                No transactions record
+              </td>
+            </tr>
+            {/* <tr>
               <td>2023-25-03</td>
               <td>Debit on A/c - 746232329 to ---</td>
               <td>N2134</td>
@@ -57,41 +62,7 @@ const ReportDetails = () => {
               <td></td>
               <td>N212234</td>
             </tr>
-            <tr>
-              <td>2023-25-03</td>
-              <td>Debit on A/c - 746232329 to ---</td>
-              <td>N2134</td>
-              <td></td>
-              <td>N212234</td>
-            </tr>
-            <tr>
-              <td>2023-25-03</td>
-              <td>Credit on A/c - 74606565 from ---</td>
-              <td></td>
-              <td>N2134</td>
-              <td>N12234</td>
-            </tr>
-            <tr>
-              <td>2023-25-03</td>
-              <td>Credit on A/c - 74606565 from ---</td>
-              <td></td>
-              <td>N2134</td>
-              <td>N14234</td>
-            </tr>
-            <tr>
-              <td>2023-25-03</td>
-              <td>Debit on A/c - 746232329 to ---</td>
-              <td>N1234</td>
-              <td></td>
-              <td>N18234</td>
-            </tr>
-            <tr>
-              <td>2023-25-03</td>
-              <td>Debit on A/c - 746232329 to ---</td>
-              <td>N2134</td>
-              <td></td>
-              <td>N12234</td>
-            </tr>
+             */}
           </tbody>
         </Table>
       </div>

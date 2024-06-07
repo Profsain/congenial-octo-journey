@@ -8,8 +8,6 @@ const CheckSalaryDetails = ({ customerObj }) => {
   const customerData =
     customerObj?.data?.data || customerObj?.remita?.remitaDetails?.data?.data;
   
-  console.log( "customerData", customerData)
-  
 
   // check if customerData is empty
   if (!customerData) {

@@ -46,8 +46,6 @@ const AddBranch = ({ func }) => {
       setMessage("");
     }, 3000);
 
-    // set open add branch component to true
-    // func(false);
   };
 
   return (
