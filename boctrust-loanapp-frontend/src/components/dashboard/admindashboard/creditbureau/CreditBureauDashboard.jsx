@@ -12,6 +12,10 @@ import NextPreBtn from "../../shared/NextPreBtn";
 import PageLoader from "../../shared/PageLoader";
 import "../customers/Customer.css";
 import "../remita/Remita.css";
+import ViewBySection from "../remita/ViewBySection";
+import useSearch from "../../../../../utilities/useSearchName";
+import useSearchByDate from "../../../../../utilities/useSearchByDate";
+import useSearchByDateRange from "../../../../../utilities/useSearchByDateRange";
 
 const styles = {
   btnBox: {
@@ -43,6 +47,7 @@ const styles = {
 
 const CreditBureauDashboard = () => {
   const [customerId, setCustomerId] = useState("");
+  const [searchCustomer, setSearchCustomer] = useState([]);
   const [showCreditCheckForm, setShowCreditCheckForm] = useState(false);
   const [show, setShow] = useState(false);
   const [creditAnalyst, setCreditAnalyst] = useState("");
@@ -65,6 +70,48 @@ const CreditBureauDashboard = () => {
     dispatch(fetchAllCustomer());
   }, [dispatch]);
 
+  // handle search by
+  const { searchTerm, setSearchTerm, filteredData } = useSearch(
+    customers,
+    "firstname"
+  );
+
+  const [dateRange, setDateRange] = useState({
+    fromDate: "",
+    toDate: "",
+  });
+
+  useEffect(() => {
+    setSearchCustomer(filteredData);
+  }, [searchTerm, filteredData]);
+
+  // handle search by date
+  const { filteredDateData } = useSearchByDate(customers, "createdAt");
+  const searchByDate = () => {
+    setSearchCustomer(filteredDateData);
+  };
+
+  // handle list reload
+  const handleReload = () => {
+    setDateRange({
+      fromDate: "",
+      toDate: "",
+    });
+    dispatch(fetchAllCustomer());
+    setSearchCustomer(customers);
+  };
+
+  // handle search by date range
+  const { searchData } = useSearchByDateRange(
+    customers,
+    dateRange,
+    "createdAt"
+  );
+
+  useEffect(() => {
+    setSearchCustomer(searchData);
+  }, [searchData]);
+
   // check if login admin is coo or credit analyst
   // if coo, show all customers
   // if credit analyst, show only customers assigned to him/her
@@ -72,14 +119,16 @@ const CreditBureauDashboard = () => {
 
   const filterCustomers = () => {
     if (admin.role === "credit analyst") {
-      const filteredCustomers = customers?.filter((customer) => {
+      const filteredCustomers = searchCustomer?.filter((customer) => {
         return (
-          customer.creditCheck.assignment.isCreditAnalystAssigned === false || customer.creditCheck.assignment.creditAnalyst === adminName && customer.kyc.isKycCompleted === true
+          customer.creditCheck.assignment.isCreditAnalystAssigned === false ||
+          (customer.creditCheck.assignment.creditAnalyst === adminName &&
+            customer.kyc.isKycCompleted === true)
         );
       });
       setFilteredCustomersData(filteredCustomers);
     } else {
-      const filteredCustomers = customers?.filter((customer) => {
+      const filteredCustomers = searchCustomer?.filter((customer) => {
         return customer.kyc.isKycApproved === true;
       });
 
@@ -89,8 +138,7 @@ const CreditBureauDashboard = () => {
 
   useEffect(() => {
     filterCustomers();
-  }, [customers]);
-
+  }, [searchCustomer]);
 
   // handle credit check start btn
   const handleStartCheck = (id) => {
@@ -113,19 +161,16 @@ const CreditBureauDashboard = () => {
   const assignCustomer = async () => {
     const apiUrl = import.meta.env.VITE_BASE_URL;
     setCreditAnalyst(adminName);
-    await fetch(
-      `${apiUrl}/api/updatecustomer/assignto/${customerId}`,
-      {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          creditAnalyst,
-          isCreditAnalystAssigned: true,
-        }),
-      }
-    );
+    await fetch(`${apiUrl}/api/updatecustomer/assignto/${customerId}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        creditAnalyst,
+        isCreditAnalystAssigned: true,
+      }),
+    });
   };
 
   const handleProceed = () => {
@@ -143,18 +188,14 @@ const CreditBureauDashboard = () => {
       {!showCreditCheckForm ? (
         <div>
           <div>
-            <Headline text="View by:" />
-            <div style={styles.btnBox} className="VBox">
-              <BocButton margin="8px 18px" bgcolor="#ecaa00" bradius="25px">
-                Applicantion Today
-              </BocButton>
-              <BocButton margin="8px 18px" bgcolor="#ecaa00" bradius="25px">
-                Date Range
-              </BocButton>
-              <BocButton margin="8px 18px" bgcolor="#ecaa00" bradius="25px">
-                Specific User
-              </BocButton>
-            </div>
+            {/* view by section */}
+            <ViewBySection
+              setSearch={setSearchTerm}
+              setDateRange={setDateRange}
+              dateRange={dateRange}
+              searchDateFunc={searchByDate}
+              handleReload={handleReload}
+            />
           </div>
 
           {/* table section */}
@@ -179,6 +220,14 @@ const CreditBureauDashboard = () => {
                   </tr>
                 </thead>
                 <tbody>
+                  {/* show no record if no customer is available */}
+                  {filteredCustomersData.length === 0 && (
+                    <tr>
+                      <td colSpan="7" style={{ textAlign: "center" }}>
+                        No record available
+                      </td>
+                    </tr>
+                  )}
                   {filteredCustomersData?.map((customer) => (
                     <tr key={customer._id}>
                       <td>{customer.customerId}</td>

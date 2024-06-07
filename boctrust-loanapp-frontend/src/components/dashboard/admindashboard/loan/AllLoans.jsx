@@ -1,5 +1,5 @@
-import PropTypes from "prop-types"
-import { useState,  useEffect } from "react";
+import PropTypes from "prop-types";
+import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchAllCustomer } from "../../../../redux/reducers/customerReducer";
 import Table from "react-bootstrap/Table";
@@ -14,7 +14,7 @@ import searchList from "../../../../../utilities/searchListFunc";
 import LoanDetails from "./LoanDetails";
 import NoResult from "../../../shared/NoResult";
 
-const AllLoans = ({showCount, searchTerms}) => {
+const AllLoans = ({ showCount, searchTerms }) => {
   const styles = {
     table: {
       //   margin: "0 2rem 0 3rem",
@@ -35,6 +35,9 @@ const AllLoans = ({showCount, searchTerms}) => {
     },
   };
 
+  const [show, setShow] = useState(false);
+  const [loanObj, setLoanObj] = useState({});
+
   // fetch all customer
   const dispatch = useDispatch();
   const customers = useSelector(
@@ -44,15 +47,14 @@ const AllLoans = ({showCount, searchTerms}) => {
 
   useEffect(() => {
     dispatch(fetchAllCustomer());
-  }, [dispatch]);
+  }, [dispatch, show]);
 
   // filtere customer by isKycApproved
   const filteredCustomers = customers?.filter(
-    (customer) => customer.kyc.isKycApproved === true &&  customer.deductions !== "remita"
+    (customer) =>
+      customer.kyc.isKycApproved === true && customer.deductions !== "remita"
   );
 
-  const [show, setShow] = useState(false);
-  const [loanObj, setLoanObj] = useState({});
   // handle close loan details
   const handleClose = () => {
     setLoanObj({});
@@ -161,7 +163,7 @@ const AllLoans = ({showCount, searchTerms}) => {
 
 AllLoans.propTypes = {
   searchTerms: PropTypes.string,
-  showCount: PropTypes.number
-}
+  showCount: PropTypes.number,
+};
 
 export default AllLoans;

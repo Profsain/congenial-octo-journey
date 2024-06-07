@@ -289,7 +289,6 @@ router.post('/reset-password', async (req, res) => {
 // add new loan operations
 // Endpoint to add a new loan to the allLoans array of a customer
 router.post('/:customerId/new-loans', async (req, res) => {
-  console.log("Body", req.body)
     const { customerId } = req.params;
     const newLoan = req.body; // Assuming the loan object is sent in the request body
 

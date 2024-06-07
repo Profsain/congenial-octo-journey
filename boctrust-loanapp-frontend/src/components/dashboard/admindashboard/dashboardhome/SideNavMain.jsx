@@ -80,36 +80,6 @@ const SideNavMain = ({ onMenuItemClick }) => {
         </p>
       </div>
 
-      {/* NIBSS Menu with sub item */}
-      <div onMouseOver={openSubItem} onMouseLeave={closeSubItem}>
-        <div className="IconBox">
-          <img src="images/dwithdraw.png" alt="nibss" />
-          <p>NIBSS Direct</p>
-        </div>
-        {isOpen ? (
-          <div className="SubItem">
-            <ul>
-              <li id="debitTransactions" onClick={onMenuItemClick}>
-                Debit Transactions
-              </li>
-              {admin || adminRoles.includes("manage_nibss") ? (
-                <li id="collectionsSummary" onClick={onMenuItemClick}>
-                  Collections Summary
-                </li>
-              ) : null}
-              <li id="debitMandates" onClick={onMenuItemClick}>
-                Debit Mandates
-              </li>
-              {admin || adminRoles.includes("manage_nibss") ? (
-                <li id="stopRestartCollections" onClick={onMenuItemClick}>
-                  Stop/Restart Collections
-                </li>
-              ) : null}
-            </ul>
-          </div>
-        ) : null}
-      </div>
-
       <div id="branches" className="IconBox" onClick={onMenuItemClick}>
         <img
           id="branches"
@@ -144,11 +114,12 @@ const SideNavMain = ({ onMenuItemClick }) => {
         ) : null}
       </div>
 
+      {/* loans menu */}
       {admin || adminRoles.includes("my_loan") ? (
         <div onMouseOver={openSubLoan} onMouseLeave={closeSubLoan}>
           <div className="IconBox">
             <img src="images/dmyloan.png" alt="loan" />
-            <p>My Loans</p>
+            <p>Loans</p>
           </div>
           {isLoanOpen ? (
             <div className="SubItem">
@@ -196,6 +167,7 @@ const SideNavMain = ({ onMenuItemClick }) => {
         </div>
       ) : null}
 
+        {/* repayment menu */}
       <div id="repayment" className="IconBox" onClick={onMenuItemClick}>
         <img
           id="repayment"
@@ -208,6 +180,7 @@ const SideNavMain = ({ onMenuItemClick }) => {
         </p>
       </div>
 
+      {/* account menu */}
       <div onMouseOver={openSubAccount} onMouseLeave={closeSubAccount}>
         <div className="IconBox">
           <img src="images/daccount.png" alt="accounts" />
@@ -227,6 +200,7 @@ const SideNavMain = ({ onMenuItemClick }) => {
         ) : null}
       </div>
 
+        {/* disbursement menu */}
       <div id="withdraw" className="IconBox" onClick={onMenuItemClick}>
         <img
           id="withdraw"
@@ -235,7 +209,7 @@ const SideNavMain = ({ onMenuItemClick }) => {
           alt="withdrawer"
         />
         <p id="withdraw" onClick={onMenuItemClick}>
-          Disbursement
+          Disbursements
         </p>
       </div>
 
@@ -249,6 +223,36 @@ const SideNavMain = ({ onMenuItemClick }) => {
         <p id="transaction" onClick={onMenuItemClick}>
           Transactions
         </p>
+      </div>
+
+      {/* NIBSS Menu with sub item */}
+      <div onMouseOver={openSubItem} onMouseLeave={closeSubItem}>
+        <div className="IconBox">
+          <img src="images/dwithdraw.png" alt="nibss" />
+          <p>NIBSS Direct</p>
+        </div>
+        {isOpen ? (
+          <div className="SubItem">
+            <ul>
+              <li id="debitTransactions" onClick={onMenuItemClick}>
+                Debit Transactions
+              </li>
+              {admin || adminRoles.includes("manage_nibss") ? (
+                <li id="collectionsSummary" onClick={onMenuItemClick}>
+                  Collections Summary
+                </li>
+              ) : null}
+              <li id="debitMandates" onClick={onMenuItemClick}>
+                Debit Mandates
+              </li>
+              {admin || adminRoles.includes("manage_nibss") ? (
+                <li id="stopRestartCollections" onClick={onMenuItemClick}>
+                  Stop/Restart Collections
+                </li>
+              ) : null}
+            </ul>
+          </div>
+        ) : null}
       </div>
 
       <div onMouseOver={openSubRemita} onMouseLeave={closeSubRemita}>

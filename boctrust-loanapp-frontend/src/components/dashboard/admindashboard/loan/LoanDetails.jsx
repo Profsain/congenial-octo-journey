@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 import PropTypes from "prop-types";
 import { Modal, Button } from "react-bootstrap";
 import Headline from "../../../shared/Headline";
@@ -10,6 +11,38 @@ const LoanDetails = ({
   handleApproval,
   currentPage,
 }) => {
+
+  // handle delete
+  const apiUrl = import.meta.env.VITE_BASE_URL;
+  const deleteCustomer = async (id) => {
+    try {
+      const response = await fetch(`${apiUrl}/api/customer/customer/${id}`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      const data = await response.json();
+
+      if (data.message === "Customer deleted successfully") {
+        // close modal
+        handleClose();
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleDelete = () => {
+    const id = loanObj._id;
+
+    // show confirmation dialog
+    const confirmDelete = window.confirm("Are you sure you want to delete this loan?");
+    if (confirmDelete) {
+      deleteCustomer(id);
+    }
+  };
+
   return (
     <>
       <Modal
@@ -49,6 +82,9 @@ const LoanDetails = ({
         <Modal.Footer>
           <Button variant="secondary" onClick={handleClose}>
             Close
+          </Button>
+          <Button variant="danger" onClick={handleDelete} >
+            Delete
           </Button>
           {currentPage === "pending" && (
             <Button onClick={handleApproval} variant="primary">

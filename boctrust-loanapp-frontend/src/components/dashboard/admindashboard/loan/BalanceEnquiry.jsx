@@ -80,7 +80,6 @@ const BalanceEnquiry = () => {
       `${apiUrl}/api/bankone/balanceEnquiry/${loanAccountNumber}`
     );
     const loanBalanceData = await loanBalance.json();
-    console.log("Loan Balance Result", loanBalanceData);
 
     // set is processing to false
     setTimeout(() => {

@@ -17,6 +17,7 @@ import ViewBySection from "../remita/ViewBySection";
 import useSearch from "../../../../../utilities/useSearchName";
 import useSearchByDate from "../../../../../utilities/useSearchByDate";
 import useSearchByDateRange from "../../../../../utilities/useSearchByDateRange";
+import sortByCreatedAt from "../../shared/sortedByDate";
 
 
 const KycCheck = () => {
@@ -253,12 +254,13 @@ const KycCheck = () => {
                   <tr>
                     <th>Customer ID</th>
                     <th>Full Name</th>
+                    <th>Date</th>
                     <th>View Document</th>
                     <th>Do Review</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {searchCustomer?.length === 0 && (
+                  {sortByCreatedAt(searchCustomer)?.length === 0 && (
                     <tr>
                       <td colSpan="4" style={{ textAlign: "center" }}>
                         No data available
@@ -270,6 +272,7 @@ const KycCheck = () => {
                     <tr key={customer._id}>
                       <td>{customer.phonenumber.slice(1)}</td>
                       <td>{customer.firstname + " " + customer.lastname}</td>
+                      <td>{getDateOnly(customer.createdAt)}</td>
                       <td
                         onClick={() => handleViewDocs(customer._id)}
                         style={styles.padding}
