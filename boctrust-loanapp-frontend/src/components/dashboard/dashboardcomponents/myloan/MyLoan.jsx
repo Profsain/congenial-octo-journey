@@ -8,7 +8,7 @@ const MyLoan = () => {
   const user = useSelector((state) => state.adminAuth.user);
   const allLoans = user?.allLoans || [];
 
-  console.log("user my loan", allLoans)
+  // console.log("user my loan", allLoans)
 
   const styles = {
     head: {

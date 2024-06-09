@@ -12,6 +12,7 @@ const AccountOverviewTable = ({ user }) => {
 
   // all loans record
   const allLoans = user?.allLoans || [];
+  // console.log("All loan", allLoans)
 
   return (
     <div>
@@ -40,38 +41,11 @@ const AccountOverviewTable = ({ user }) => {
               </td>
             </tr>
           ) : (
-            // allLoans.map((loan) => (
-            //   <tr key={loan.id}>
-            //     <td>{loan.accountNumber}</td>
-            //     <td>{loan.accountType}</td>
-            //     <td>{loan.balance}</td>
-            //     <td>{loan.loan}</td>
-            //     <td>{loan.currentBalance}</td>
-            //   </tr>
-            // ))
-            <div>
-              <tr>
-                <td>7657547661</td>
-                <td>Current Account</td>
-                <td>N12123</td>
-                <td>N2134</td>
-                <td>N132900</td>
-              </tr>
-              <tr>
-                <td>7647676673</td>
-                <td>Savings Account</td>
-                <td>N12123</td>
-                <td>N2134</td>
-                <td>N132900</td>
-              </tr>
-              <tr>
-                <td>7647676689</td>
-                <td>Fixed Deposit</td>
-                <td>N12123</td>
-                <td>N2134</td>
-                <td>N132900</td>
-              </tr>
-            </div>
+            <tr>
+              <td colSpan="5" style={{ textAlign: "center" }}>
+                No account overview
+              </td>
+            </tr>
           )}
         </tbody>
       </Table>
