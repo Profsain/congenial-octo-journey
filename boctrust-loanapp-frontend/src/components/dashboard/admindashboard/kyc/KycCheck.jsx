@@ -221,18 +221,6 @@ const KycCheck = () => {
   useEffect(() => {
     setSearchCustomer(searchData);
   }, [searchData]);
-  
-  const sortByCreatedAtDescending = (data) => {
-  // Create a copy of the array to avoid mutating the original
-  const dataCopy = [...data];
-
-  return dataCopy.sort((a, b) => {
-    const dateA = new Date(a.createdAt);
-    const dateB = new Date(b.createdAt);
-    return dateB - dateA; // For descending order
-  });
-}
-  console.log("searchData", sortByCreatedAt(searchData));
 
   return (
     <>
@@ -271,53 +259,54 @@ const KycCheck = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {searchCustomer?.length === 0 && (
+                  {searchCustomer?.length === 0 ? (
                     <tr>
                       <td colSpan="4" style={{ textAlign: "center" }}>
                         No data available
                       </td>
                     </tr>
-                  )}
-                  {sortByCreatedAt(searchData)?.map((customer) => (
-                    <tr key={customer._id}>
-                      <td>{customer.phonenumber.slice(1)}</td>
-                      <td>{customer.firstname + " " + customer.lastname}</td>
-                      <td>{getDateOnly(customer.createdAt)}</td>
-                      <td
-                        onClick={() => handleViewDocs(customer._id)}
-                        style={styles.padding}
-                        className="viewDocs"
-                      >
-                        View
-                      </td>
-                      <td>
-                        <div>
-                          {customer.kyc.isKycApproved ? (
-                            <BocButton
-                              bradius="12px"
-                              fontSize="14px"
-                              margin="0 4px"
-                              bgcolor="#5cc51c"
-                            >
-                              Done
-                            </BocButton>
-                          ) : (
-                            <a href="#kycSection">
+                  ) : (
+                    sortByCreatedAt(searchData)?.map((customer) => (
+                      <tr key={customer._id}>
+                        <td>{customer.phonenumber.slice(1)}</td>
+                        <td>{customer.firstname + " " + customer.lastname}</td>
+                        <td>{getDateOnly(customer.createdAt)}</td>
+                        <td
+                          onClick={() => handleViewDocs(customer._id)}
+                          style={styles.padding}
+                          className="viewDocs"
+                        >
+                          View
+                        </td>
+                        <td>
+                          <div>
+                            {customer.kyc.isKycApproved ? (
                               <BocButton
                                 bradius="12px"
                                 fontSize="14px"
                                 margin="0 4px"
-                                bgcolor="#f64f4f"
-                                func={() => handleStartCheck(customer._id)}
+                                bgcolor="#5cc51c"
                               >
-                                Check
+                                Done
                               </BocButton>
-                            </a>
-                          )}
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
+                            ) : (
+                              <a href="#kycSection">
+                                <BocButton
+                                  bradius="12px"
+                                  fontSize="14px"
+                                  margin="0 4px"
+                                  bgcolor="#f64f4f"
+                                  func={() => handleStartCheck(customer._id)}
+                                >
+                                  Check
+                                </BocButton>
+                              </a>
+                            )}
+                          </div>
+                        </td>
+                      </tr>
+                    ))
+                  )}
                 </tbody>
               </Table>
             </div>
