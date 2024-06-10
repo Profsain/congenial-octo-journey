@@ -19,7 +19,6 @@ import useSearchByDate from "../../../../../utilities/useSearchByDate";
 import useSearchByDateRange from "../../../../../utilities/useSearchByDateRange";
 import sortByCreatedAt from "../../shared/sortedByDate";
 
-
 const KycCheck = () => {
   const styles = {
     btnBox: {
@@ -222,6 +221,18 @@ const KycCheck = () => {
   useEffect(() => {
     setSearchCustomer(searchData);
   }, [searchData]);
+  
+  const sortByCreatedAtDescending = (data) => {
+  // Create a copy of the array to avoid mutating the original
+  const dataCopy = [...data];
+
+  return dataCopy.sort((a, b) => {
+    const dateA = new Date(a.createdAt);
+    const dateB = new Date(b.createdAt);
+    return dateB - dateA; // For descending order
+  });
+}
+  console.log("searchData", sortByCreatedAt(searchData));
 
   return (
     <>
@@ -260,15 +271,14 @@ const KycCheck = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {sortByCreatedAt(searchCustomer)?.length === 0 && (
+                  {searchCustomer?.length === 0 && (
                     <tr>
                       <td colSpan="4" style={{ textAlign: "center" }}>
                         No data available
                       </td>
                     </tr>
-                  
                   )}
-                  {searchCustomer?.map((customer) => (
+                  {sortByCreatedAt(searchData)?.map((customer) => (
                     <tr key={customer._id}>
                       <td>{customer.phonenumber.slice(1)}</td>
                       <td>{customer.firstname + " " + customer.lastname}</td>
