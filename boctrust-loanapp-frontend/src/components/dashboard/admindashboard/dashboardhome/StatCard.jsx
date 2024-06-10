@@ -43,7 +43,7 @@ const StatCard = ({ day, date, stat, datecolor }) => {
 StatCard.propTypes = {
   date: PropTypes.string,
   day: PropTypes.string,
-  stat: PropTypes.number,
+  stat: PropTypes.string,
   datecolor: PropTypes.string,
 };
 

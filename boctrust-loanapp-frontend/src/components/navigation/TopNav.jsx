@@ -1,4 +1,5 @@
 /* eslint-disable no-undef */
+import { useEffect } from "react";
 import PropTypes from "prop-types"
 import { useDispatch, useSelector } from "react-redux";
 import { logoutUser } from "../../redux/reducers/adminAuthReducer";
@@ -8,12 +9,6 @@ import { Link } from "react-router-dom";
 
 const TopNav = ({ settings }) => {
 
-  // change navbar color on scroll
-  window.addEventListener("scroll", function () {
-    const nav = document.querySelector(".Nav");
-    nav.classList.toggle("Sticky", window.scrollY > 0);
-  });
-
   // handle logout
   const dispatch = useDispatch();
   const handleLogout = () => {
@@ -22,6 +17,23 @@ const TopNav = ({ settings }) => {
 
   // get current admin
   const currentUser = useSelector((state) => state.adminAuth.user);
+
+  // change navbar color on scroll
+  useEffect(() => {
+    const handleScroll = () => {
+      const nav = document.querySelector(".Nav");
+      if (nav) {
+        nav.classList.toggle("Sticky", window.scrollY > 0);
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+
+    // Cleanup event listener on component unmount
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, []);
 
   return (
     <div className="TopNavContainer">
