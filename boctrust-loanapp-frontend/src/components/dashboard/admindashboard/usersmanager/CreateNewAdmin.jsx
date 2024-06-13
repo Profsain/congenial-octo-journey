@@ -229,7 +229,7 @@ const CreateNewAdmin = ({ func }) => {
 
             <div className="CheckboxContainer">
               {adminRoles.map((option) => (
-                <div key={option.value} className="CheckboxGroup">
+                <div key={option.value} className="CheckboxGrou">
                   <input
                     type="checkbox"
                     name="adminRoles"
@@ -237,7 +237,7 @@ const CreateNewAdmin = ({ func }) => {
                     value={option.value}
                     onChange={formik.handleChange}
                   />
-                  <label htmlFor={option.value}>{option.label}</label>
+                  <label htmlFor={option.value}  className="checkboxLabel">{option.label}</label>
                 </div>
               ))}
             </div>

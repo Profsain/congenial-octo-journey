@@ -13,6 +13,7 @@ import capitalizeEachWord from "../../../../../utilities/capitalizeFirstLetter";
 import searchList from "../../../../../utilities/searchListFunc";
 import LoanDetails from "./LoanDetails";
 import NoResult from "../../../shared/NoResult";
+import sortByCreatedAt from "../../shared/sortedByDate";
 
 const AllLoans = ({ showCount, searchTerms }) => {
   const styles = {
@@ -116,7 +117,7 @@ const AllLoans = ({ showCount, searchTerms }) => {
           </thead>
           <tbody>
             {customerList?.length === 0 && <NoResult name="customer" />}
-            {customerList?.map((customer) => {
+            {sortByCreatedAt(customerList)?.map((customer) => {
               return (
                 <tr key={customer._id}>
                   <td>{customer.banking.accountDetails.Message.Id}</td>

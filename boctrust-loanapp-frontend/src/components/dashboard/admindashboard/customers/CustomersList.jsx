@@ -11,6 +11,7 @@ import LoanDetails from "../loan/LoanDetails";
 import NoResult from "../../../shared/NoResult";
 import capitalizeEachWord from "../../../../../utilities/capitalizeFirstLetter";
 import searchList from "../../../../../utilities/searchListFunc";
+import sortByCreatedAt from "../../shared/sortedByDate";
 
 
 const CustomersList = ({ showCount, searchTerms }) => {
@@ -111,7 +112,7 @@ const CustomersList = ({ showCount, searchTerms }) => {
             </thead>
             <tbody>
               {customerList?.length === 0 && <NoResult name="customer" />}
-              {customerList?.map((customer) => (
+              {sortByCreatedAt(customerList)?.map((customer) => (
                 <tr key={customer._id}>
                   <td>
                     <img
