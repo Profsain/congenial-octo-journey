@@ -125,7 +125,7 @@ const BranchesList = ({ showCount, searchTerms, admin, adminRoles }) => {
             </thead>
             <tbody>
               {branchesList?.length === 0 && <NoResult name="branches" />}
-              {sortByCreatedAt(branchesList)?.map((branch) => (
+              {branchesList?.map((branch) => (
                 <tr key={branch._id}>
                   <td>{branch.branchId}</td>
                   <td>{branch.branchName}</td>
