@@ -6,6 +6,7 @@ import DashboardHeadline from "../../shared/DashboardHeadline";
 import BocButton from "../../shared/BocButton";
 import NextPreBtn from "../../shared/NextPreBtn";
 import handleAdminRoles from "../../../../../utilities/getAdminRoles";
+import sortByCreatedAt from "../../shared/sortedByDate";
 
 const RepaymentList = () => {
   const styles = {
@@ -64,6 +65,9 @@ const RepaymentList = () => {
           </thead>
           <tbody>
             <tr>
+              <td>No Record </td>
+            </tr>
+            {/* <tr>
               <td>1001</td>
               <td>24-03-2023</td>
               <td>N12333.3</td>
@@ -292,7 +296,7 @@ const RepaymentList = () => {
                   </BocButton>
                 </div>
               </td>
-            </tr>
+            </tr> */}
           </tbody>
         </Table>
       </div>

@@ -11,6 +11,7 @@ import NoResult from "../../../shared/NoResult";
 import NextPreBtn from "../../shared/NextPreBtn";
 // function
 import searchList from "../../../../../utilities/searchListFunc";
+import sortByCreatedAt from "../../shared/sortedByDate";
 
 const BranchesList = ({ showCount, searchTerms, admin, adminRoles }) => {
   // styles
@@ -124,7 +125,7 @@ const BranchesList = ({ showCount, searchTerms, admin, adminRoles }) => {
             </thead>
             <tbody>
               {branchesList?.length === 0 && <NoResult name="branches" />}
-              {branchesList?.map((branch) => (
+              {sortByCreatedAt(branchesList)?.map((branch) => (
                 <tr key={branch._id}>
                   <td>{branch.branchId}</td>
                   <td>{branch.branchName}</td>

@@ -10,6 +10,7 @@ import DashboardHeadline from "../../shared/DashboardHeadline";
 import "../customers/Customer.css";
 import NextPreBtn from "../../shared/NextPreBtn";
 import PageLoader from "../../shared/PageLoader";
+import sortByCreatedAt from "../../shared/sortedByDate";
 
 const ActiveLoans = () => {
   const styles = {
@@ -81,7 +82,7 @@ const ActiveLoans = () => {
             </tr>
           </thead>
           <tbody>
-            {filteredCustomers?.map((customer) => {
+            {sortByCreatedAt(filteredCustomers)?.map((customer) => {
               return (
                 <tr key={customer._id}>
                   <td>{customer.banking.accountDetails.Message.Id}</td>

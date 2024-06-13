@@ -17,6 +17,7 @@ import sendSMS from "../../../../../utilities/sendSms";
 import sendEmail from "../../../../../utilities/sendEmail";
 import EmailTemplate from "../../../shared/EmailTemplate";
 import ReactDOMServer from "react-dom/server";
+import sortByCreatedAt from "../../shared/sortedByDate";
 
 const LoanDisbursement = () => {
   const styles = {
@@ -172,7 +173,6 @@ const LoanDisbursement = () => {
         updateLoanStatus(id, "approved");
       }
 
-      console.log("Disbursement", disbursedData);
       dispatch(fetchAllCustomer());
     } catch (error) {
       console.error("Error:", error.message);
@@ -182,7 +182,6 @@ const LoanDisbursement = () => {
   };
 
   const handleRejection = async (id) => {
-    console.log("Processing loan approval");
     // process loan rejection
     const loan = filteredCustomers.find((customer) => customer._id === id);
     setLoanObj(loan);
@@ -279,7 +278,7 @@ const LoanDisbursement = () => {
             </thead>
             <tbody>
               {customerList?.length === 0 && <NoResult name="customer" />}
-              {customerList?.map((customer) => {
+              {sortByCreatedAt(customerList)?.map((customer) => {
                 return (
                   <tr key={customer._id}>
                     <td>{customer.banking.accountDetails.Message.Id}</td>

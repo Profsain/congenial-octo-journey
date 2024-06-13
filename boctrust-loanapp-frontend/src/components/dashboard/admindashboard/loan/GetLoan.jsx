@@ -12,6 +12,7 @@ import getDateOnly from "../../../../../utilities/getDate";
 import searchList from "../../../../../utilities/searchListFunc";
 import NoResult from "../../../shared/NoResult";
 import GetLoanDetails from "./GetLoanDetails";
+import sortByCreatedAt from "../../shared/sortedByDate";
 
 const GetLoan = () => {
   const styles = {
@@ -167,7 +168,7 @@ const GetLoan = () => {
           </thead>
           <tbody>
             {customerList?.length === 0 && <NoResult name="customer" />}
-            {customerList?.map((customer) => {
+            {sortByCreatedAt(customerList)?.map((customer) => {
               return (
                 <tr key={customer._id}>
                   <td>{customer.banking.accountDetails.Message.Id}</td>

@@ -4,6 +4,7 @@ import Table from "react-bootstrap/Table";
 import "../../Dashboard.css";
 import DashboardHeadline from "../../shared/DashboardHeadline";
 import handleAdminRoles from "../../../../../utilities/getAdminRoles";
+import sortByCreatedAt from "../../shared/sortedByDate";
 
 const TransactionList = () => {
   const styles = {
@@ -64,6 +65,9 @@ const TransactionList = () => {
           </thead>
           <tbody>
             <tr>
+              <td>No transaction records</td>
+            </tr>
+            {/* <tr>
               <td>25-03-2023</td>
               <td>Kola Abiola</td>
               <td>7460615677</td>
@@ -142,7 +146,7 @@ const TransactionList = () => {
                   ) : null}
                 </select>
               </td>
-            </tr>
+            </tr> */}
           </tbody>
         </Table>
       </div>

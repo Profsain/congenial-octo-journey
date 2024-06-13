@@ -13,7 +13,9 @@
 }
 
 .CheckboxGroup label {
-    margin-bottom: 1.8rem;
+    margin-bottom: 1.8rem;   
+}
 
-    
+.checkboxLabel {
+    margin-left: 12px;
 }

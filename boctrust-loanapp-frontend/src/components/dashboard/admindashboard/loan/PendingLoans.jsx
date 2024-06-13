@@ -13,6 +13,7 @@ import searchList from "../../../../../utilities/searchListFunc";
 import LoanDetails from "./LoanDetails";
 import NotificationBox from "../../shared/NotificationBox";
 import NoResult from "../../../shared/NoResult";
+import sortByCreatedAt from "../../shared/sortedByDate";
 
 const PaddingLoans = () => {
   const styles = {
@@ -241,7 +242,7 @@ const PaddingLoans = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {customerList?.length === 0 && <NoResult name="customer" />}
+                  {sortByCreatedAt(customerList)?.length === 0 && <NoResult name="customer" />}
                   {customerList?.map((customer) => {
                     return (
                       <tr key={customer.id}>
