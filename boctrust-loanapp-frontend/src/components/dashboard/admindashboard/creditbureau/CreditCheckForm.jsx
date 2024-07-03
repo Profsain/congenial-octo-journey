@@ -11,11 +11,18 @@ import FirstCentralPdfReport from "./firstCentralPdfReport";
 import FirstCentralCommercialPdf from "./FirstCentralCommercialPdf";
 import CRCBasicReportPDF from "./CRCBasicReportPDF";
 import CRCCooporateReport from "./CRCCooporateReport";
+import { toast, ToastContainer } from "react-toastify";
+
+// toast styles
+import "react-toastify/dist/ReactToastify.css";
+import { useDispatch, useSelector } from "react-redux";
+
+import { fetchSingleCustomer } from "../../../../redux/reducers/customerReducer";
 
 const creditBureauOptions = [
   { value: "first_central", label: "First Central" },
   { value: "crc_bureau", label: "CRC" },
-  { value: "credit_register", label: "Credit Register" },
+  { value: "credit_register", label: "Credit Registry" },
   // Add more options as needed
 ];
 
@@ -28,10 +35,11 @@ const searchTypes = [
   // Add more options as needed
 ];
 
-const CreditCheckhtmlForm = ({ customerId }) => {
+const CreditCheckhtmlForm = ({ setShowCreditCheckForm, customerId }) => {
   const [reportOptions, setReportOptions] = useState([
     { value: "", label: "Choose..." },
   ]);
+
   const [isCreditDbCheck, setIsCreditDbCheck] = useState(false);
   const [searchType, setSearchType] = useState("");
   const [searchBy, setSearchBy] = useState("");
@@ -46,13 +54,111 @@ const CreditCheckhtmlForm = ({ customerId }) => {
   const [reportTitle, setReportTitle] = useState("");
   const [dbSearchReport, setDbSearchReport] = useState("");
 
-  const [isBureauChecked, setIsBureauChecked] = useState(false);
   const [isDeductCheck, setIsDeductCheck] = useState(false);
   const [deductSearchReport, setDeductSearchReport] = useState("");
-  const [bureauSearchReport, setBureauSearchReport] = useState("");
+  const [bureauSearchReport, setBureauSearchReport] = useState({
+    firstUpload: "",
+    secondUpload: "",
+  });
   const [noReport, setNoReport] = useState(false);
   const [noCRC, setNoCRC] = useState(false);
   const [isUpdateLoading, setIsUpdateLoading] = useState(false);
+
+  // PaySlip form state
+  const [formState, setFormState] = useState({
+    netPay: "",
+    numOfExtraLenders: 0,
+    extraLenders: [],
+    monthlyLoanRepayment: 0,
+    dateOfBirth: "",
+    dateOfAppointment: "",
+    uploadPaySlip: "",
+    benchmark: 0,
+  });
+
+  // {
+  //   extraLenderName: "",
+  //   extraLenderDeduction: 0,
+  // },
+
+  const [reportConfirmation, setReportConfirmation] = useState({
+    isApplicantCivilianPolice: false,
+    isPaySlipContainsMoreThenFiveLenders: false,
+    monthlyDeductionBelowPercentageBenchmark: false,
+    takeHomePayNotLessThanBenchmark: false,
+    takeHomePayNotLessThan20PercentGross: false,
+    netPayNotLessThanBenchmark: false,
+  });
+
+  const dispatch = useDispatch();
+
+  const { selectedCustomer, customerApprovalEnum } = useSelector(
+    (state) => state.customerReducer
+  );
+
+  useEffect(() => {
+    const getData = async () => {
+      try {
+        await dispatch(fetchSingleCustomer(customerId));
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    getData();
+  }, []);
+
+  useEffect(() => {
+    if (selectedCustomer) {
+      setReportConfirmation({
+        isApplicantCivilianPolice:
+          selectedCustomer?.paySlipAnalysis?.isApplicantCivilianPolice || false,
+        isPaySlipContainsMoreThenFiveLenders:
+          selectedCustomer?.paySlipAnalysis
+            ?.isPaySlipContainsMoreThenFiveLenders || false,
+        monthlyDeductionBelowPercentageBenchmark:
+          selectedCustomer?.paySlipAnalysis
+            ?.monthlyDeductionBelowPercentageBenchmark || false,
+        netPayNotLessThanBenchmark:
+          selectedCustomer?.paySlipAnalysis?.netPayNotLessThanBenchmark ||
+          false,
+        takeHomePayNotLessThan20PercentGross:
+          selectedCustomer?.paySlipAnalysis
+            ?.takeHomePayNotLessThan20PercentGross || false,
+        takeHomePayNotLessThanBenchmark:
+          selectedCustomer?.paySlipAnalysis?.takeHomePayNotLessThanBenchmark ||
+          false,
+      });
+
+      setFormState({
+        netPay: selectedCustomer?.paySlipAnalysis?.netPay || "",
+        numOfExtraLenders:
+          selectedCustomer?.paySlipAnalysis?.numOfExtraLenders || 0,
+        extraLenders: selectedCustomer?.paySlipAnalysis?.extraLenders || [],
+        monthlyLoanRepayment:
+          selectedCustomer?.paySlipAnalysis?.monthlyLoanRepayment || 0,
+        dateOfBirth: selectedCustomer?.paySlipAnalysis?.dateOfBirth || "",
+        dateOfAppointment:
+          selectedCustomer?.paySlipAnalysis?.dateOfAppointment || "",
+        uploadPaySlip: selectedCustomer?.paySlipAnalysis?.uploadPaySlip || "",
+        benchmark: selectedCustomer?.paySlipAnalysis?.benchmark || 0,
+      });
+
+      setDbSearchReport(
+        selectedCustomer?.creditCheck?.creditDbSearch?.dbSearchReport || ""
+      );
+      setDeductSearchReport(
+        selectedCustomer?.creditCheck?.deductCheck?.deductSearchReport || ""
+      );
+      setBureauSearchReport(
+        selectedCustomer?.bureauSearchReport?.creditCheck
+          ?.creditBureauResult || {
+          firstUpload: "",
+          secondUpload: "",
+        }
+      );
+    }
+  }, []);
 
   const handleChange = () => {
     setIsCreditDbCheck(!isCreditDbCheck);
@@ -60,49 +166,78 @@ const CreditCheckhtmlForm = ({ customerId }) => {
   const handleDbChange = () => {
     setIsDeductCheck(!isDeductCheck);
   };
-  const handleBureauChange = () => {
-    setIsBureauChecked(!isBureauChecked);
+
+  //  Toast Notifications callback
+  const notify = (msg) => {
+    toast.error(msg, {
+      position: "bottom-right",
+    });
   };
 
   // handle file update
-  const handleFileUpdate = async (e) => {
+  const handleFileUpdate = async () => {
     setIsUpdateLoading(true);
-    e.preventDefault();
-    const formData = new FormData();
 
-    if (isCreditDbCheck) {
-      formData.append("dbSearchReport", dbSearchReport);
-      await fetch(`${apiUrl}/api/updatecustomer/creditDbSearch/${customerId}`, {
-        method: "PUT",
-        enctype: "multipart/form-data",
-        body: formData,
-      });
-      setDbSearchReport("");
-      setIsCreditDbCheck(false);
-    }
-    if (isDeductCheck) {
-      formData.append("deductSearchReport", deductSearchReport);
-      await fetch(`${apiUrl}/api/updatecustomer/deductcheck/${customerId}`, {
-        method: "PUT",
-        enctype: "multipart/form-data",
-        body: formData,
-      });
-      setDeductSearchReport("");
-      setIsDeductCheck(false);
-    }
-    if (isBureauChecked) {
-      formData.append("bureauSearchReport", bureauSearchReport);
-      await fetch(
-        `${apiUrl}/api/updatecustomer/creditBureauSearch/${customerId}`,
-        {
+    try {
+      const formData = new FormData();
+
+      if (isCreditDbCheck) {
+        formData.append("dbSearchReport", dbSearchReport);
+        await fetch(
+          `${apiUrl}/api/updatecustomer/creditDbSearch/${customerId}`,
+          {
+            method: "PUT",
+            enctype: "multipart/form-data",
+            body: formData,
+          }
+        );
+        setDbSearchReport("");
+        setIsCreditDbCheck(false);
+      }
+      if (isDeductCheck) {
+        formData.append("deductSearchReport", deductSearchReport);
+        await fetch(`${apiUrl}/api/updatecustomer/deductcheck/${customerId}`, {
           method: "PUT",
           enctype: "multipart/form-data",
           body: formData,
-        }
-      );
-      setBureauSearchReport("");
+        });
+        setDeductSearchReport("");
+        setIsDeductCheck(false);
+      }
+      if (bureauSearchReport.firstUpload || bureauSearchReport.secondUpload) {
+        bureauSearchReport.firstUpload &&
+          formData.append(
+            "bureauSearchReport1",
+            bureauSearchReport?.firstUpload
+          );
+        bureauSearchReport.secondUpload &&
+          formData.append(
+            "bureauSearchReport2",
+            bureauSearchReport?.secondUpload
+          );
+        await fetch(
+          `${apiUrl}/api/updatecustomer/creditBureauSearch/${customerId}`,
+          {
+            method: "PUT",
+            enctype: "multipart/form-data",
+            body: formData,
+          }
+        );
+        setBureauSearchReport({
+          firstUpload: "",
+          secondUpload: "",
+        });
+      } else if (
+        !bureauSearchReport.firstUpload ||
+        !bureauSearchReport.secondUpload
+      ) {
+        notify("Please Provide at Least one Bureau search report");
+      }
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setIsUpdateLoading(false);
     }
-    setIsUpdateLoading(false);
   };
 
   // clear report
@@ -112,7 +247,7 @@ const CreditCheckhtmlForm = ({ customerId }) => {
     setFirstCentralCommercialReport({});
     setPDFContent("");
     setBureauReport("");
-    setCrcClassicReport("");
+
     setCrcCooporateReport("");
   };
   // clear form fields
@@ -216,7 +351,6 @@ const CreditCheckhtmlForm = ({ customerId }) => {
   };
 
   const [bureauReport, setBureauReport] = useState(""); // crc basic report
-  const [crcClassicReport, setCrcClassicReport] = useState("");
   const [crcCooporateReport, setCrcCooporateReport] = useState("");
   const [crcTitle, setCrcTitle] = useState("");
   const [bureauLoading, setBureauLoading] = useState(false);
@@ -329,7 +463,7 @@ const CreditCheckhtmlForm = ({ customerId }) => {
           clearReport();
           setCrcCooporateReport(data.data.CommercialSearchResultResponse);
         }
-        
+
         // set bureau loading
         setBureauLoading(false);
         // updateBureauLoading("success");
@@ -373,13 +507,106 @@ const CreditCheckhtmlForm = ({ customerId }) => {
     }
   };
 
-  console.log("Report", crcCooporateReport);
+  // submit Paylslip form data to backend
+  const uploadPaySlipAnalysis = async () => {
+    setIsUpdateLoading(true);
+
+    try {
+      if (!selectedCustomer) return;
+
+      const actualNetPay = selectedCustomer?.buyoverloanactivated
+        ? selectedCustomer?.liquidationbalance + formState.netPay
+        : formState.netPay;
+
+      const formData = new FormData(); // create a new FormData object
+      formData.append("netPay", actualNetPay); // add the fields to formData
+
+      formData.append(
+        "extraLenders",
+        JSON.stringify(
+          formState.extraLenders.map((item) => ({
+            name: item.name,
+            deductions: item.deductions,
+          }))
+        )
+      );
+      formData.append("monthlyLoanRepayment", formState.monthlyLoanRepayment);
+      formData.append("dateOfBirth", formState.dateOfBirth);
+      formData.append("dateOfAppointment", formState.dateOfAppointment);
+      formData.append(
+        "isApplicantCivilianPolice",
+        reportConfirmation.isApplicantCivilianPolice
+      );
+      formData.append("uploadPaySlip", formState.uploadPaySlip);
+      formData.append(
+        "isPaySlipContainsMoreThenFiveLenders",
+        reportConfirmation.isPaySlipContainsMoreThenFiveLenders
+      );
+      formData.append("benchmark", formState.benchmark);
+      formData.append(
+        "monthlyDeductionBelowPercentageBenchmark",
+        reportConfirmation.monthlyDeductionBelowPercentageBenchmark
+      );
+      formData.append(
+        "takeHomePayNotLessThanBenchmark",
+        reportConfirmation.takeHomePayNotLessThanBenchmark
+      );
+      formData.append(
+        "takeHomePayNotLessThan20PercentGross",
+        reportConfirmation.takeHomePayNotLessThan20PercentGross
+      );
+      formData.append(
+        "netPayNotLessThanBenchmark",
+        reportConfirmation.netPayNotLessThanBenchmark
+      );
+
+      // send formData object to backend
+      await fetch(
+        `${apiUrl}/api/updatecustomer/paySlipAnalysis/${customerId}`,
+        {
+          method: "PUT",
+          enctype: "multipart/form-data",
+          body: formData,
+        }
+      );
+
+      // clear form fields
+      setFormState({
+        netPay: "",
+        numOfExtraLenders: 0,
+        extraLenders: [],
+        monthlyLoanRepayment: 0,
+        dateOfBirth: "",
+        dateOfAppointment: "",
+        uploadPaySlip: "",
+        benchmark: 0,
+      });
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setIsUpdateLoading(false);
+    }
+  };
+
   // handle next prev form step start
   const [formStep, setFormStep] = useState(1);
-  const handleNext = () => {
+  const handleNext = async () => {
     if (formStep === 1) {
+      if (!bureauSearchReport.firstUpload && !bureauSearchReport.secondUpload) {
+        return notify("Please Provide at Least one Bureau search report");
+      }
+
+      await handleFileUpdate();
       setFormStep(2);
     } else if (formStep === 2) {
+      if (!formState.uploadPaySlip) {
+        return notify("Please Provide a Payslip");
+      }
+      if (!formState.netPay || !formState.monthlyLoanRepayment) {
+        return notify("Please Provide a Valid Netpay and Monthly Repayment");
+      }
+
+      await uploadPaySlipAnalysis();
       setFormStep(3);
     } else {
       setFormStep(3);
@@ -409,7 +636,7 @@ const CreditCheckhtmlForm = ({ customerId }) => {
           {/* step 1 */}
           <div className="row">
             {/* credit DB check */}
-            <div className="col-sm-12 col-md-4">
+            <div className="col-sm-12 mb-5 col-md-4">
               <h6 className="creditTitle">Do Credit DB Check</h6>
               <form onSubmit={handleDbCheck}>
                 <div className="row mb-3">
@@ -485,7 +712,7 @@ const CreditCheckhtmlForm = ({ customerId }) => {
                     ></textarea>
                   </div>
                 </div>
-                <div className="row mx-5 align-items-center">
+                <div className="row mx-md-5 align-items-center">
                   <button type="submit" className="btn btn-warning mt-3">
                     Generate Manual Report
                   </button>
@@ -494,7 +721,7 @@ const CreditCheckhtmlForm = ({ customerId }) => {
             </div>
 
             {/* deduct check */}
-            <div className="col-sm-12 col-md-4 midBorder">
+            <div className="col-sm-12 mb-5 col-md-4 midBorder">
               <h6 className="creditTitle">Do Deduct Check</h6>
               <form onSubmit={handleDeductCheck}>
                 <div className="row mb-3">
@@ -550,7 +777,7 @@ const CreditCheckhtmlForm = ({ customerId }) => {
                     ></textarea>
                   </div>
                 </div>
-                <div className="row mx-5 align-items-center">
+                <div className="row mx-md-5 align-items-center">
                   <button type="submit" className="btn btn-warning mt-3">
                     Generate Manual Report
                   </button>
@@ -559,7 +786,7 @@ const CreditCheckhtmlForm = ({ customerId }) => {
             </div>
 
             {/* credit bureau check */}
-            <div className="col-sm-12 col-md-4">
+            <div className="col-sm-12 mb-sm-5 col-md-4">
               <h6 className="creditTitle">Do Credit Bureau Check</h6>
               <form onSubmit={handleBureauCheck}>
                 <div className="row mb-3">
@@ -660,7 +887,7 @@ const CreditCheckhtmlForm = ({ customerId }) => {
                   </div>
                 </div>
 
-                <div className="row mx-5 align-items-center">
+                <div className="row mx-md-5 align-items-center">
                   <button type="submit" className="btn btn-warning mt-3">
                     Generate Report
                   </button>
@@ -685,7 +912,8 @@ const CreditCheckhtmlForm = ({ customerId }) => {
           <div className="row m-5">
             {noReport && <h4>No First Central Report</h4>}
             {/* generated pdf report component */}
-            {Object.keys(firstCentralReport).length > 0 && (
+
+            {firstCentralReport?.length > 0 && (
               <FirstCentralPdfReport report={firstCentralReport} />
             )}
             {Object.keys(firstCentralCommercialReport).length > 0 && (
@@ -700,11 +928,18 @@ const CreditCheckhtmlForm = ({ customerId }) => {
             {noCRC && <h4>No CRC Report</h4>}
             {/* generated pdf report component */}
             {bureauReport && (
-              <CRCBasicReportPDF report={bureauReport} formData={bureauData} title={crcTitle} />
+              <CRCBasicReportPDF
+                report={bureauReport}
+                formData={bureauData}
+                title={crcTitle}
+              />
             )}
 
             {crcCooporateReport && (
-              <CRCCooporateReport report={crcCooporateReport} formData={bureauData} />
+              <CRCCooporateReport
+                report={crcCooporateReport}
+                formData={bureauData}
+              />
             )}
           </div>
 
@@ -722,9 +957,9 @@ const CreditCheckhtmlForm = ({ customerId }) => {
           </div>
 
           {/* attach report */}
-          <div className="row m-5">
+          <div className="row">
             <h4>Upload Reports</h4>
-            <form onSubmit={handleFileUpdate} encType="multipart/form-data">
+            <form encType="multipart/form-data">
               <div className="row reportRow">
                 <div className="col-sm-8 col-md-4">
                   <label
@@ -797,7 +1032,7 @@ const CreditCheckhtmlForm = ({ customerId }) => {
                     className="form-check-label"
                     htmlFor="flexSwitchCheckChecked"
                   >
-                    Is there a Credit Bureau Report?
+                    Please Provide at leat one Credit Bureau Report
                   </label>
                 </div>
 
@@ -806,27 +1041,49 @@ const CreditCheckhtmlForm = ({ customerId }) => {
                     className="form-check-input"
                     type="checkbox"
                     role="switch"
-                    checked={isBureauChecked}
-                    onChange={handleBureauChange}
+                    checked={true}
+                    readOnly
                   />
-                  <label className="form-check-label mx-3 checked">
-                    {isBureauChecked ? "Yes" : "No"}
+                  <label
+                    style={{ fontSize: "0.6rem" }}
+                    className="form-check-label text-danger mx-3 checked"
+                  >
+                    **required
                   </label>
                 </div>
                 <div className="col-sm-12 col-md-6 mt-2">
-                  <div className="input-group">
-                    <input
-                      type="file"
-                      className="form-control"
-                      id="inputGroupFile01"
-                      value={bureauSearchReport}
-                      onChange={(e) => setBureauSearchReport(e.target.value)}
-                    />
+                  <div className="d-flex flex-column gap-2">
+                    <div className="input-group">
+                      <input
+                        type="file"
+                        className="form-control"
+                        id="inputGroupFile01"
+                        onChange={(e) =>
+                          setBureauSearchReport({
+                            ...bureauSearchReport,
+                            firstUpload: e.target.files[0],
+                          })
+                        }
+                      />
+                    </div>
+                    <div className="input-group">
+                      <input
+                        type="file"
+                        className="form-control"
+                        id="inputGroupFile01"
+                        onChange={(e) =>
+                          setBureauSearchReport({
+                            ...bureauSearchReport,
+                            secondUpload: e.target.files[0],
+                          })
+                        }
+                      />
+                    </div>
                   </div>
                 </div>
               </div>
 
-              <div className="row mx-5 align-items-center">
+              {/* <div className="row mx-5 align-items-center">
                 <div className="col-sm-12 col-md-3"></div>
                 {isUpdateLoading ? (
                   <PageLoader width="34px" />
@@ -840,29 +1097,50 @@ const CreditCheckhtmlForm = ({ customerId }) => {
                 )}
 
                 <div className="col-sm-12 col-md-3"></div>
-              </div>
+              </div> */}
             </form>
           </div>
         </div>
       )}
       {/* pay slip analysis component */}
-      {formStep === 2 && <PaySlipAnalysis customerId={customerId} />}
-      {/* decision summary */} {formStep === 3 && <DecisionSummary />}
+      {formStep === 2 && (
+        <PaySlipAnalysis
+          customerId={customerId}
+          formState={formState}
+          setFormState={setFormState}
+          reportConfirmation={reportConfirmation}
+          setReportConfirmation={setReportConfirmation}
+        />
+      )}
+      {/* decision summary */}{" "}
+      {formStep === 3 && <DecisionSummary customerId={customerId} />}
       {/* next prev button */}
-      <div className="row justify-content-center">
+      <div className="row d-flex justify-content-center">
         <button className="btn btn-warning btn-prev" onClick={handlePrev}>
           Prev
         </button>
-        <button className="btn btn-primary btn-next" onClick={handleNext}>
-          Next
-        </button>
+        {selectedCustomer?.creditCheck.decisionSummary
+          .creditOfficerApprovalStatus === customerApprovalEnum.pending ? (
+          <button className="btn btn-primary btn-next" onClick={handleNext}>
+            {isUpdateLoading ? <PageLoader width="16px" /> : "Next"}
+          </button>
+        ) : (
+          <button
+            onClick={() => setShowCreditCheckForm(false)}
+            className="btn btn-success btn-next"
+          >
+            Process Completed
+          </button>
+        )}
       </div>
+      <ToastContainer />
     </>
   );
 };
 
 CreditCheckhtmlForm.propTypes = {
   customerId: PropTypes.string,
+  setShowCreditCheckForm: PropTypes.func,
 };
 
 export default CreditCheckhtmlForm;

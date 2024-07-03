@@ -1,4 +1,5 @@
 import Header from "../shared/Header";
+import "./OurBoardPage.css";
 
 const OurBoardPage = () => {
   const container = {
@@ -95,7 +96,7 @@ const OurBoardPage = () => {
               aria-expanded="false"
               aria-controls="flush-collapseTwo"
             >
-              Mr Segun Odusanya - Director
+              Dr Kunle Alonge - Director
             </button>
           </h2>
           <div
@@ -103,28 +104,37 @@ const OurBoardPage = () => {
             className="accordion-collapse collapse"
             data-bs-parent="#accordionFlushExample"
           >
-            <div className="accordion-body px-5">
-              <p>
-                Has over 27years(with twelve at senior executive management
-                levels) experience in banking (Corporate and Retail), Corporate
-                Finance, SME, etc, in Nigeria and Africa. Previously served as
-                Managing Director/Regional Head of Commercial Clients for Africa
-                at Standard Chartered Bank Africa - covering countries in West,
-                East and Southern Africa. Prior to that, served as Deputy CEO at
-                FCMB, and Regional Director Client Relationships at Standard
-                Chartered Bank East Africa - covering Kenya, Uganda and
-                Tanzania.
-              </p>
-              <p>
-                He also served at various middle and senior level positions in
-                Standard Chartered Bank Nigeria, Zenith Bank and erstwhile
-                Chartered Bank Nigeria Limited Segun was a University of Lagos
-                Scholar, graduating with both Bachelors and Masters of Science
-                degrees in Banking and Finance from the University. He has
-                attended various leadership and specialized courses in top notch
-                universities such as HARVARD BUSINESS SCHOOL, OXFORD UNIVERSITY
-                (SAID BUSINESS SCHOOL) AND LONDON BUSINESS SCHOOL.
-              </p>
+            <div className="BoardMember">
+              <div className="BoardMemberImg">
+                <img
+                  className="w-100"
+                  src="/images/board/DrKunle.jpg"
+                  alt=" Dr. Kunle Alonge"
+                />
+              </div>
+              <div className="accordion-body px-5">
+                <p>
+                  Has over 27years(with twelve at senior executive management
+                  levels) experience in banking (Corporate and Retail),
+                  Corporate Finance, SME, etc, in Nigeria and Africa. Previously
+                  served as Managing Director/Regional Head of Commercial
+                  Clients for Africa at Standard Chartered Bank Africa -
+                  covering countries in West, East and Southern Africa. Prior to
+                  that, served as Deputy CEO at FCMB, and Regional Director
+                  Client Relationships at Standard Chartered Bank East Africa -
+                  covering Kenya, Uganda and Tanzania.
+                </p>
+                <p>
+                  He also served at various middle and senior level positions in
+                  Standard Chartered Bank Nigeria, Zenith Bank and erstwhile
+                  Chartered Bank Nigeria Limited Segun was a University of Lagos
+                  Scholar, graduating with both Bachelors and Masters of Science
+                  degrees in Banking and Finance from the University. He has
+                  attended various leadership and specialized courses in top
+                  notch universities such as HARVARD BUSINESS SCHOOL, OXFORD
+                  UNIVERSITY (SAID BUSINESS SCHOOL) AND LONDON BUSINESS SCHOOL.
+                </p>
+              </div>
             </div>
           </div>
         </div>
@@ -140,7 +150,8 @@ const OurBoardPage = () => {
               aria-expanded="false"
               aria-controls="flush-collapseThree"
             >
-              Oludotun RANSOME-KUTI - Director
+              Odunmbaku Akinlawon Olamide (HND, PGD, CPD, MBA, EMBA, MCIB, ACA.)
+              - Director
             </button>
           </h2>
           <div
@@ -148,18 +159,54 @@ const OurBoardPage = () => {
             className="accordion-collapse collapse"
             data-bs-parent="#accordionFlushExample"
           >
-            <div className="accordion-body px-5">
-              <p>
-                Oludotun Ransome-Kuti is a Doctor of Veterinary Medicine
-                graduate of Ahmadu Bello University Zaria with more than three
-                decades in veterinary services and animal hospitality. He was
-                Head, veterinary Services (Dog section) of the Nigeria Police
-                Force Obalende, Lagos and was with Daily Veterinary Ambulatory
-                Services before establishing Ransom-Kuti Veterinary Consultants
-                Limited, a Veterinary Clinic, as the Managing Director/Chief
-                Executive. He is a great communicator with analytical and
-                inter-personal skills and loves swimming, football and music.
-              </p>
+            <div className="BoardMember">
+              <div className="BoardMemberImg">
+                <img
+                  className="w-100"
+                  src="/images/board/OlamideOdunmbaku.jpg"
+                  alt=" Dr. Kunle Alonge"
+                />
+              </div>
+              <div className="accordion-body px-5">
+                <p>
+                  Mr. Olamide A. Odunmbaku officially joined BOCTRUST MFB March
+                  2024, as the MD/CEO.
+                </p>
+                <p>
+                  He is an astute professional with over 17 years’ core
+                  experience in Credit Analysis and management, Credit
+                  Restructuring, financial analysis and interpretation, facility
+                  structuring, people management, Management of Key risk
+                  indicators of the organization, Risk register, compliance to
+                  major regulatory provisions et al.
+                </p>
+                <p>
+                  In the course of his professional journey, Mr. Odunmbaku has
+                  worked in the following organizations: Integrated Microfinance
+                  Bank Limited, Fina Trust Microfinance Bank Limited, Personal
+                  Trust Microfinance Bank Limited, Purplemoney Microfinance Bank
+                  Limited, IBILE Microfinance Bank Limited and Moneyfield
+                  Microfinance Bank Limited.
+                </p>
+                <p>
+                  Mr. Odunmbaku is a graduate of Biochemistry from Yaba College
+                  of Technology - YABATECH Lagos and holds a Post Graduate
+                  Diploma (PGD) in Accounting and a Master of Business
+                  Administration (Finance) from Ladoke Akintola University of
+                  Technology, Ogbomosho Oyo State. He also holds a Certified
+                  Professional Diploma (CPD) in Credit Management from
+                  Postgraduate School of Credit and Financial Management.
+                  Olamide is an Associate Member of Institute of Chartered
+                  Accountant of Nigeria (ICAN), an Affiliate Member of Global
+                  Association of Risk Professionals (GARP), a Member of
+                  Chartered Institute of Loan and Risk Management of Nigeria
+                  (CILRMN) and a Certified Microfinance Professional (MCP).
+                </p>
+                <p>
+                  He recently (May 2023) bagged an Executive MBA from Quantic
+                  School of Business and Technology, Washington DC, USA
+                </p>
+              </div>
             </div>
           </div>
         </div>
@@ -175,7 +222,7 @@ const OurBoardPage = () => {
               aria-expanded="false"
               aria-controls="flush-collapseFive"
             >
-              Adekunle Olushola Alonge FCA - Director
+              Nkolika Nebechi Okoli (Ms) - Director
             </button>
           </h2>
           <div
@@ -183,17 +230,45 @@ const OurBoardPage = () => {
             className="accordion-collapse collapse"
             data-bs-parent="#accordionFlushExample"
           >
-            <div className="accordion-body px-5">
-              <p>
-                Mr Alonge is the current Managing Director of Sonora Capital and
-                Investment Limited, Lagos. He has over 23 years banking
-                experience spanning Treasury, Operations and Internal Audit He
-                worked with Oceanic Bank Nigeria, Wells Fargo Bank, KPMG as an
-                auditor and JP Morgan Chase (all in the United States). He is a
-                graduate of Accounting from Obafemi Awolowo University, ile ife,
-                holds MSc in Finance from Texas Tech University, Texas USA. He
-                is a Chartered Accountant.
-              </p>
+            <div className="BoardMember">
+              <div className="BoardMemberImg">
+                <img
+                  className="w-100"
+                  src="/images/board/Nkoli.jpg"
+                  alt=" Dr. Kunle Alonge"
+                />
+              </div>
+              <div className="accordion-body px-5">
+                <p>
+                  With experience in the Financial services sector spanning over
+                  25 years, Nkoli has had a distinguished career in Banking with
+                  expertise in Retail (Consumer and SME) and Commercial banking,
+                  Credit, Operations and Strategy. With an MBA (Distinction)
+                  from the University of Durham Business School, United Kingdom;
+                  Nkoli’s wide career experience encompasses 15 years in
+                  Executive Management, 18 years in relationship management
+                  across various customer segments as well as customer services,
+                  product development/management and corporate governance.
+                </p>
+                <p>
+                  She has served on the board of Stanbicibtc Insurance Brokers
+                  as a Non-Executive Director and as the Country Head (Nigeria),
+                  Personal Banking Business, Stanbicibtc Bank where she was
+                  responsible for the Profit and Loss as well as driving
+                  strategic decisions of the banks Personal Banking Business.
+                </p>
+                <p>
+                  Prior to this, she was the Group Head, Retail (Personal & SME)
+                  bank, for a leading Tier 2 bank where she collaborated with
+                  IFC specialists to develop a 5 year strategy to drive the
+                  banks Retail business.
+                </p>
+                <p>
+                  Nkolika is passionate about social impact and loves supporting
+                  orphanages and other groups focused on children’s education
+                  and medical aid to the underprivileged.
+                </p>
+              </div>
             </div>
           </div>
         </div>
@@ -209,7 +284,7 @@ const OurBoardPage = () => {
               aria-expanded="false"
               aria-controls="flush-collapseSix"
             >
-              FEMI ALONGE , MBA, HCIB - MD/CEO
+              Abiola Olowude - Director
             </button>
           </h2>
           <div
@@ -217,26 +292,47 @@ const OurBoardPage = () => {
             className="accordion-collapse collapse"
             data-bs-parent="#accordionFlushExample"
           >
-            <div className="accordion-body px-5">
-              <p>
-                Mr Alonge, a chartered banker, is the current MD/CEO and
-                oversees the day-to-day management of the bank. with over 20
-                years local and international banking experience spanning
-                Retail, Commercial and Corporate Banking. Worked with Guaranty
-                Trust Bank, Lead Bank and Standard Chartered Bank where he spent
-                over 16 years and held various positions such as Senior Credit
-                Analyst, Area Manager. Head, Asset Backed Financing West Africa,
-                Executive Director Corporate and Institutional Banking Tanzania
-                as an International staff. In 2017, he was appointed CEO Africa
-                Northstar Finance Services Mauritius.
-              </p>
-              <p>
-                He is an Engineering graduate from Obafemi Awolowo University
-                and an MBA graduate from the University of Bangor U.K. He is a
-                member of Chartered institute of Bankers Nigeria and an
-                affiliate member of international compliance association London
-                UK.
-              </p>
+            <div className="BoardMember">
+              <div className="BoardMemberImg">
+                <img
+                  className="w-100"
+                  src="/images/board/Olowude.jpg"
+                  alt=" Dr. Kunle Alonge"
+                />
+              </div>
+              <div className="accordion-body px-5">
+                <p>
+                  Abiola Olowude is a seasoned Wealth and Fund Management
+                  Consultant whose career journey exemplifies versatility and
+                  excellence.
+                </p>
+                <p>
+                  Her professional path began in the field of education, where
+                  she dedicated a decade to teaching at both secondary and
+                  tertiary levels.
+                </p>
+                <p>
+                  She then transitioned seamlessly into the banking sector,
+                  where she honed her skills across various domains, including
+                  Banking Operations, Retail and Commercial Banking, and Funds &
+                  Relationship Management, over the course of two decades.
+                </p>
+                <p>
+                  During her tenure in banking, Abiola rose to the Senior
+                  Management echelon within a leading commercial bank before
+                  embarking on a new chapter at Radix Capital, an esteemed
+                  independent Investment Banking institution.
+                </p>
+                <p>
+                  At Radix Capital, she distinguished herself by overseeing the
+                  Private Funds and Wealth Management Unit, demonstrating her
+                  adeptness in financial strategy and client engagement.
+                </p>
+                <p>
+                  Mrs. Olowude currently consults for private clients on growing
+                  and managing wealth and real estate.
+                </p>
+              </div>
             </div>
           </div>
         </div>

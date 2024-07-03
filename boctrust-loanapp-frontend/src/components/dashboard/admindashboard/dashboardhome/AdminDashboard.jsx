@@ -42,8 +42,8 @@ import RevenueReport from "../report/revenuereport/RevenueReport";
 import TransactionDashboard from "../transaction/TransactionDashboard";
 import UserManagerDashboard from "../usersmanager/UserManagerDashboard";
 import WebsiteManagerDashboard from "../website/WebsiteManagerDashboard";
-import WithdrawRequestDashboard from "../withdraw/WithdrawRequestDashboard";
-import WithdrawMethodDashboard from "../withdrawmethod/WithdrawMethodDashboard";
+// import WithdrawRequestDashboard from "../withdraw/WithdrawRequestDashboard";
+// import WithdrawMethodDashboard from "../withdrawmethod/WithdrawMethodDashboard";
 import AddWiki from "../website/AddWiki";
 import CustomerAsk from "../website/CustomerAsk";
 import StatementRules from "../employersmanager/StatementRules";
@@ -64,6 +64,9 @@ import DebitTransactions from "../nibssDirectDebit/DebitTransactions";
 import CollectionSummary from "../nibssDirectDebit/CollectionSummary";
 import DebitMandates from "../nibssDirectDebit/DebitMandates";
 import StopRestartCollections from "../nibssDirectDebit/StopRestartCollections";
+import EmploymentLetterRule from "../employersmanager/EmploymentLetterRule";
+import ManageUserRole from "../usersmanager/ManageUserRole";
+import ManageAccessControl from "../usersmanager/ManageAccessControl";
 
 const AdminDashboard = () => {
   const [showSidebar, setShowSidebar] = useState(false);
@@ -163,9 +166,9 @@ const AdminDashboard = () => {
       case "accounttypes":
         setCurrentTitle("Account Types");
         break;
-      case "withdraw":
-        setCurrentTitle("Disbursement");
-        break;
+      // case "withdraw":
+      //   setCurrentTitle("Disbursement");
+      //   break;
       case "transaction":
         setCurrentTitle("Transaction History");
         break;
@@ -199,8 +202,17 @@ const AdminDashboard = () => {
       case "statementrules":
         setCurrentTitle("Employers/MDAs Manager");
         break;
+      case "employmentletter":
+        setCurrentTitle("Employers/MDAs Manager");
+        break;
       case "kyc":
         setCurrentTitle("Check Customer KYC Details");
+        break;
+      case "employmentLetters":
+        setCurrentTitle("Check Customer Employment Letters");
+        break;
+      case "bankStatements":
+        setCurrentTitle("Check Customer Bank Statements");
         break;
       case "governmentid":
         setCurrentTitle("Check Government ID card Details");
@@ -232,17 +244,17 @@ const AdminDashboard = () => {
       case "contactForm":
         setCurrentTitle("Contact Us Record");
         break;
-      case "withdrawmethod":
-        setCurrentTitle("Disbursement Methods");
-        break;
-      case "usermanager":
+      // case "withdrawmethod":
+      //   setCurrentTitle("Disbursement Methods");
+      //   break;
+      case "allusers":
         setCurrentTitle("User Manager");
         break;
-      case "userroles":
+      case "userrole":
         setCurrentTitle("User Roles");
         break;
-      case "accesscontrols":
-        setCurrentTitle("Access Controls");
+      case "accesscontrol":
+        setCurrentTitle(" Access Control");
         break;
       case "report":
         setCurrentTitle("Account Statement");
@@ -332,8 +344,8 @@ const AdminDashboard = () => {
         return <AccountDashboard />;
       case "accounttypes":
         return <AccountTypes />;
-      case "withdraw":
-        return <WithdrawRequestDashboard />;
+      // case "withdraw":
+      //   return <WithdrawRequestDashboard />;
       case "transaction":
         return <TransactionDashboard />;
       case "remita":
@@ -356,7 +368,13 @@ const AdminDashboard = () => {
         return <MandateRules />;
       case "statementrules":
         return <StatementRules />;
+      case "employmentletter":
+        return <EmploymentLetterRule />;
       case "kyc":
+        return <KycCheck />;
+      case "employmentLetters":
+        return <KycCheck />;
+      case "bankStatements":
         return <KycCheck />;
       case "governmentid":
         return <GovernmentID />;
@@ -378,10 +396,14 @@ const AdminDashboard = () => {
         return <ContactForm />;
       case "website":
         return <AllWebsitePages />;
-      case "usermanager":
+      case "allusers":
         return <UserManagerDashboard />;
-      case "withdrawmethod":
-        return <WithdrawMethodDashboard />;
+      case "userrole":
+        return <ManageUserRole />;
+      case "accesscontrol":
+        return <ManageAccessControl />;
+      // case "withdrawmethod":
+      //   return <WithdrawMethodDashboard />;
       case "report":
         return <AccountStatement />;
       case "accountbalance":
@@ -433,9 +455,9 @@ const AdminDashboard = () => {
               )}
             </div>
           </div>
-          <div className="col-10">
-            <div className="TopNavber">
-              <TopNavber title={currentTitle} user={adminName} />
+          <div className="col-10 ">
+            <div className="TopNavber mr-3">
+              <TopNavber title={currentTitle} user={adminName}  />
               {renderComponent()}
             </div>
           </div>

@@ -85,11 +85,11 @@ const ActiveLoans = () => {
             {sortByCreatedAt(filteredCustomers)?.map((customer) => {
               return (
                 <tr key={customer._id}>
-                  <td>{customer.banking.accountDetails.Message.Id}</td>
+                  <td>{customer.banking?.accountDetails?.Message.Id}</td>
                   <td>{customer.loanProduct || "General Loan"}</td>
-                  <td>{customer.banking.accountDetails.Message.FullName}</td>
+                  <td>{customer.banking?.accountDetails?.Message.FullName}</td>
                   <td>
-                    {customer.banking.accountDetails.Message.AccountNumber}
+                    {customer.banking?.accountDetails?.Message.AccountNumber}
                   </td>
                   <td>{getDateOnly(customer.createdAt)}</td>
                   <td>N{customer.loanamount}</td>

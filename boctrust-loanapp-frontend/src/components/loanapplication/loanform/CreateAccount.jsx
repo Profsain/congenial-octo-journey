@@ -7,6 +7,8 @@ import Headline from "../../shared/Headline";
 import PhoneOtp from "./PhoneOtp";
 import "./Form.css";
 
+const passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/;
+
 const CreateAccount = ({
   handleSubmit,
   phoneNumber,
@@ -26,39 +28,23 @@ const CreateAccount = ({
     setFieldValue(fieldName, event.target.value);
   };
 
-  const validPassword = () => {
-    // check if password is at least 8 characters with at least 1 number
-    // 1 uppercase letter, 1 lowercase letter, and 1 special character
-    const passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/;
-    if (passwordRegex.test(password)) {
-      setIsValid(true);
-      setPasswordError("");
+  useEffect(() => {
+    if (password && passwordRegex.test(password)) {
+      if (confirmpassword && password === confirmpassword) {
+        setIsValid(true);
+        setPasswordError("");
+        setErrorMsg("");
+      } else {
+        setIsValid(false);
+        setErrorMsg("Passwords do not match");
+      }
     } else {
       setIsValid(false);
       setPasswordError(
         "Password must be at least 8 characters with at least 1 number, 1 uppercase letter, 1 lowercase letter, and 1 special character"
       );
     }
-  };
-
-  const handleValidation = () => {
-    // Check if the passwords match
-    if (password === confirmpassword) {
-      setIsValid(true);
-      setErrorMsg("");
-    } else {
-      setIsValid(false);
-      setErrorMsg("Passwords do not match");
-    }
-  };
-
-  useEffect(() => {
-    validPassword();
-  }, [password]);
-
-  useEffect(() => {
-    handleValidation();
-  }, [confirmpassword]);
+  }, [password, confirmpassword]);
 
   const handleCreateAccount = () => {
     setModalShow(true);

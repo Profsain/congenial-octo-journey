@@ -19,7 +19,7 @@ const UpcomingLoanPayment = ({ user }) => {
   // fetch upcoming loan payment
   const fetchUpcomingLoanPayment = async () => {
     const response = await fetch(
-      `${api_user}/api/bankone/getLoanRepaymentSchedule/${user.banking.accountDetails.Message.AccountNumber}`
+      `${api_user}/api/bankone/getLoanRepaymentSchedule/${user?.banking.accountDetails.Message.AccountNumber}`
     );
     const data = await response.json();
     console.log(data);
@@ -27,6 +27,7 @@ const UpcomingLoanPayment = ({ user }) => {
 
   useEffect(() => {
     fetchUpcomingLoanPayment();
+    setUpcomingLoanPayment([])
   }, []);
 
   return (

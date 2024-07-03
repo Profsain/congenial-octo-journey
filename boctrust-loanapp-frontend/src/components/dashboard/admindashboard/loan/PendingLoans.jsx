@@ -17,13 +17,8 @@ import sortByCreatedAt from "../../shared/sortedByDate";
 
 const PaddingLoans = () => {
   const styles = {
-    table: {
-      // margin: "0 2rem -2rem 3rem",
-      fontSize: "10px",
-    },
     head: {
       color: "#fff",
-      fontSize: "1rem",
     },
     approved: {
       color: "#5cc51c",
@@ -42,7 +37,7 @@ const PaddingLoans = () => {
     btnBox: {
       display: "flex",
       justifyContent: "space-between",
-    }
+    },
   };
 
   const [currentAdmin, setCurrentAdmin] = useState("");
@@ -128,7 +123,6 @@ const PaddingLoans = () => {
       // );
       // const disbursedData = await newDisbursement.json
       // console.log("Disbursement", disbursedData)
-
     } else if (currentAdmin === "coo") {
       updateLoanStatus(id, "with operation");
     } else if (currentAdmin === "operation") {
@@ -242,25 +236,30 @@ const PaddingLoans = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {sortByCreatedAt(customerList)?.length === 0 && <NoResult name="customer" />}
+                  {sortByCreatedAt(customerList)?.length === 0 && (
+                    <NoResult name="customer" />
+                  )}
                   {customerList?.map((customer) => {
                     return (
                       <tr key={customer.id}>
-                        <td>{customer.banking.accountDetails.Message.Id}</td>
-                        <td>{customer.loanProduct || "General Loan"}</td>
                         <td>
-                          {customer.banking.accountDetails.Message.FullName}
+                          {customer?.banking?.accountDetails?.Message?.Id ||
+                            "N/A"}
+                        </td>
+                        <td>{customer?.loanProduct || "General Loan"}</td>
+                        <td>
+                          {customer?.banking?.accountDetails?.Message
+                            ?.FullName ||
+                            `${customer?.firstname} ${customer?.lastname}`}
                         </td>
                         <td>
-                          {
-                            customer.banking.accountDetails.Message
-                              .AccountNumber
-                          }
+                          {customer?.banking?.accountDetails?.Message
+                            .AccountNumber || "N/A"}
                         </td>
-                        <td>{getDateOnly(customer.createdAt)}</td>
-                        <td>N{customer.loanamount}</td>
+                        <td>{getDateOnly(customer?.createdAt)}</td>
+                        <td>N{customer?.loanamount}</td>
                         <td style={styles.padding}>
-                          {capitalizeEachWord(customer.kyc.loanstatus)}
+                          {capitalizeEachWord(customer?.kyc.loanstatus)}
                         </td>
                         <td>
                           <div style={styles.btnBox}>
@@ -268,7 +267,8 @@ const PaddingLoans = () => {
                               func={() => handleShow(customer._id)}
                               bradius="12px"
                               fontSize="10px"
-                              width="50px"
+                              width="60px"
+                              height="30px"
                               margin="2px"
                               bgcolor="#ecaa00"
                             >
@@ -278,7 +278,8 @@ const PaddingLoans = () => {
                               func={() => handleApproval(customer._id)}
                               bradius="12px"
                               fontSize="10px"
-                              width="50px"
+                              width="60px"
+                              height="30px"
                               margin="2px"
                               bgcolor="#7dd50e"
                             >
@@ -288,7 +289,8 @@ const PaddingLoans = () => {
                               func={() => handleRejected(customer._id)}
                               bradius="12px"
                               fontSize="10px"
-                              width="50px"
+                              width="60px"
+                              height="30px"
                               margin="2px"
                               bgcolor="#f64f4f"
                             >

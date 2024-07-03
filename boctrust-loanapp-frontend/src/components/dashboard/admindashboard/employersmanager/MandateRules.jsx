@@ -6,6 +6,12 @@ import * as Yup from "yup";
 import DashboardHeadline from "../../shared/DashboardHeadline";
 import "../../dashboardcomponents/transferdashboard/Transfer.css";
 import BocButton from "../../shared/BocButton";
+import { IoMdCloseCircle } from "react-icons/io";
+import { toast } from "react-toastify";
+
+// toast styles
+import "react-toastify/dist/ReactToastify.css";
+
 
 // Define validation schema using Yup
 const validationSchema = Yup.object().shape({
@@ -72,44 +78,87 @@ const secondaryDuration = [
 
 const MandateRules = () => {
   const [message, setMessage] = useState(null);
+  const [selectedEmployers, setSelectedEmployers] = useState(null);
+  const [employerOptions, setEmployerOptions] = useState([]);
+  // Get employers from redux store
+  const employers = useSelector(
+    (state) => state.employersManagerReducer.employers.employers
+  );
+
   // Fetch employers from redux store
   const dispatch = useDispatch();
   useEffect(() => {
     dispatch(fetchEmployers());
   }, [dispatch]);
 
-  // Get employers from redux store
-  const employers = useSelector(
-    (state) => state.employersManagerReducer.employers.employers
-  );
+  useEffect(() => {
+    if (!employers) return;
+    setEmployerOptions(
+      employers?.map((employer) => ({
+        value: employer._id,
+        label: employer.employersName,
+      }))
+    );
+  }, [employers]);
 
-  const employerOptions = employers?.map((employer) => ({
-    value: employer._id,
-    label: employer.employersName,
-  }));
+  const hanleSelectEmployer = (employerOptn) => {
+    let tempEmployerOptions = [...employerOptions];
+    tempEmployerOptions = tempEmployerOptions.filter(
+      (employer) => employer?.value != employerOptn?.value
+    );
+    setEmployerOptions(tempEmployerOptions);
+    if (selectedEmployers && selectedEmployers.includes(employerOptn)) return;
+    else if (selectedEmployers && selectedEmployers.length > 0) {
+      setSelectedEmployers([...selectedEmployers, employerOptn]);
+    } else {
+      setSelectedEmployers([employerOptn]);
+    }
+  };
 
-  const handleSubmit = async (values, { resetForm }) => {
-    const id = values.addEmployerStack;
-    const apiUrl = import.meta.env.VITE_BASE_URL;
-    // Handle form submission logic here
-    await fetch(
-      `${apiUrl}/api/agency/employers/${id}/mandateRule`,
-      {
+  const handleRemoveEmployer = (employerOptn) => {
+    setEmployerOptions([...employerOptions, employerOptn]);
+    let tempSelectedEmployers = [...selectedEmployers];
+    tempSelectedEmployers = tempSelectedEmployers.filter(
+      (employer) => employer?.value != employerOptn?.value
+    );
+    setSelectedEmployers(tempSelectedEmployers);
+  };
+
+  const addMandateRule = async ({ id, values }) => {
+    try {
+      const apiUrl = import.meta.env.VITE_BASE_URL;
+      // Handle form submission logic here
+      await fetch(`${apiUrl}/api/agency/employers/${id}/mandateRule`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(values),
-      }
-    );
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
-    // Reset form after submission
-    resetForm();
-    // Set message after successful submission
-    setMessage("Mandate rule added successfully");
-    setTimeout(() => {
-      setMessage("");
-    }, 5000);
+  const handleSubmit = async (values, { resetForm }) => {
+    try {
+      if (selectedEmployers && selectedEmployers.length > 0) {
+        selectedEmployers.forEach(async (employer) => {
+          await addMandateRule({ id: employer.value, values });
+        });
+      }
+      // Reset form after submission
+      resetForm();
+      setSelectedEmployers(null);
+      // Set message after successful submission
+      setMessage("Mandate rule added successfully");
+      toast.success("Mandate rule added successfully");
+      setTimeout(() => {
+        setMessage("");
+      }, 5000);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (
@@ -255,30 +304,48 @@ const MandateRules = () => {
               </div>
             </div>
 
-            <div className="FieldRow">
-              <div className="FieldGroup">
-                <label htmlFor="addEmployerStack">
-                  Add Employer for Rule Stacking
-                </label>
-                <Field
-                  as="select"
-                  name="addEmployerStack"
-                  id="addEmployerStack"
-                  className="Select"
-                >
-                  <option value="" label="Select employers" />
-                  {employerOptions?.map((option) => (
-                    <option
-                      key={option.value}
-                      value={option.value}
-                      label={option.label}
-                    />
-                  ))}
-                </Field>
-                <ErrorMessage name="addEmployerStack" component="div" />
+            <div>
+              <div className="FieldRow">
+                <div className="FieldGroup">
+                  <label htmlFor="addEmployerStack">
+                    Add Employer for Rule Stacking
+                  </label>
+                  <Field
+                    as="select"
+                    name="addEmployerStack"
+                    id="addEmployerStack"
+                    className="Select"
+                  >
+                    <option value="" label="Select employers" />
+                    {employerOptions?.map((option) => (
+                      <option
+                        onClick={() => hanleSelectEmployer(option)}
+                        key={option.value}
+                        value={option.value}
+                        label={option.label}
+                      />
+                    ))}
+                  </Field>
+                  <ErrorMessage name="addEmployerStack" component="div" />
+                </div>
               </div>
+              {selectedEmployers && (
+                <div className="selected__employer">
+                  {selectedEmployers.map((employer) => (
+                    <div key={employer.value} className="d-flex gap-2">
+                      {employer.label}
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveEmployer(employer)}
+                        className="btn btn-danger remove__employer"
+                      >
+                        <IoMdCloseCircle />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
-
             {message && (
               <div style={{ textAlign: "center", color: "#145098" }}>
                 {message}

@@ -99,9 +99,9 @@ const AccountList = ({showCount, searchTerms}) => {
 
             {sortByCreatedAt(customerList)?.map((customer) => (
               <tr key={customer._id}>
-                <td>{customer.banking.accountDetails.Message.AccountNumber}</td>
-                <td>{customer.banking.accountDetails.Message.FullName}</td>
-                <td>{customer.banking.accountDetails.Message.Id}</td>
+                <td>{customer.banking?.accountDetails?.Message.AccountNumber}</td>
+                <td>{customer.banking?.accountDetails?.Message.FullName}</td>
+                <td>{customer.banking?.accountDetails?.Message.Id}</td>
                 <td>{customer.agentname || "Boctrust"}</td>
                 <td style={styles.completed}>Active</td>
                 {/* <td>

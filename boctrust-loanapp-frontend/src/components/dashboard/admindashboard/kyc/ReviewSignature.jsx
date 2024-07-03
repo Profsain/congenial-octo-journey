@@ -42,7 +42,7 @@ const ReviewSignature = () => {
     (state) => state.customerReducer.customers.customer
   );
   const status = useSelector((state) => state.customerReducer.status);
-
+  console.log(customers, "customers")
   useEffect(() => {
     dispatch(fetchAllCustomer());
   }, [dispatch]);
