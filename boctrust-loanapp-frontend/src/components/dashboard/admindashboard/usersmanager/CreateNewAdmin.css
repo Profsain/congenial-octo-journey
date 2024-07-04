@@ -20,27 +20,40 @@
   margin-left: 12px;
 }
 
-.manage__accessControl{
-    display: flex;
-    flex-direction: column;
-    gap: 3rem;
+.manage__accessControl {
+  display: flex;
+  flex-direction: column;
+  gap: 3rem;
+}
+
+.manage__accessControl label,
+.modal__container label {
+  margin-top: 0 !important;
 }
 
 .manage__accessControl input {
   margin: 0 !important;
   padding: 8px;
 }
+.manage__accessControl .form-check {
+  margin-bottom: 1rem;
+}
 .manage__accessControl input.form-check-input {
   width: 20px !important;
 }
 
 .manage__accessControl .permission__control {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
 }
 
 .manage__accessControl .permission__control h5 {
   padding: 1rem 0;
-    border-bottom: 1px solid gray;
+  border-bottom: 1px solid gray;
+}
+
+
+select:disabled{
+  opacity: 0.5;
 }

@@ -1,67 +1,66 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
-import {
-  allPermisions,
-  allUserRoles,
-} from "../../components/dashboard/admindashboard/usersmanager/adminRoles";
 
 //fetch admin
 const apiUrl = import.meta.env.VITE_BASE_URL;
 
-const API_ENDPOINT = `${apiUrl}/api/admin/users`;
-
 // Thunk to fetch admin from the API
 export const fetchAdmins = createAsyncThunk("admin/fetchAdmins", async () => {
-  const response = await axios.get(API_ENDPOINT);
+  const response = await axios.get(`${apiUrl}/api/admin/users`);
   return response.data;
 });
-// Thunk to fetch admin from the API
-export const fetchRoles = createAsyncThunk("admin/fetRoles", async () => {
-  return [
-    { _id: 2, value: "md", label: "MD", description: " ROle" },
-    { _id: 3, value: "coo", label: "COO", description: " ROle" },
-    {
-      _id: 4,
-      value: "credit_head",
-      label: "Credit Head",
-      description: " ROle",
-    },
-    {
-      _id: 5,
-      value: "credit_analyst",
-      label: "Credit Analyst",
-      description: " ROle",
-    },
-    {
-      _id: 6,
-      value: "operation_staff",
-      label: "Operation Staff",
-      description: " ROle",
-    },
-    {
-      _id: 7,
-      value: "loan_officer",
-      label: "Loan Officer",
-      description: " ROle",
-    },
-    {
-      _id: 8,
-      value: "marketing_staff",
-      label: "Marketing staff",
-      description: " ROle",
-    },
-  ];
-});
+
 export const fetchRolesAndPermisions = createAsyncThunk(
   "admin/fetchRolesAndPermisions",
-  async () => {
-    return allUserRoles;
+  async (_, thunkAPI) => {
+    try {
+      const response = await axios.get(`${apiUrl}/api/role`);
+
+      return response.data;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(
+        error.response?.data?.message || "Something went wrong"
+      );
+    }
   }
 );
+
 export const fetchPermissions = createAsyncThunk(
   "admin/fetchPermissions",
-  async () => {
-    return allPermisions;
+  async (_, thunkAPI) => {
+    try {
+      const response = await axios.get(`${apiUrl}/api/role/permission`);
+      return response.data;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(
+        error.response?.data?.message || "Something went wrong"
+      );
+    }
+  }
+);
+
+export const addNewRole = createAsyncThunk(
+  "admin/addNewRole",
+  async (payload, thunkAPI) => {
+    try {
+      await axios.post(`${apiUrl}/api/role`, payload);
+    } catch (error) {
+      return thunkAPI.rejectWithValue(
+        error.response?.data?.error || "Something went wrong"
+      );
+    }
+  }
+);
+export const updateRole = createAsyncThunk(
+  "admin/updateRole",
+  async ({ payload, roleId }, thunkAPI) => {
+    try {
+      await axios.put(`${apiUrl}/api/role/${roleId}`, payload);
+    } catch (error) {
+      return thunkAPI.rejectWithValue(
+        error.response?.data?.message || "Something went wrong"
+      );
+    }
   }
 );
 
@@ -70,7 +69,6 @@ const adminSlice = createSlice({
   name: "admin",
   initialState: {
     admins: [],
-    roles: [],
     rolesAndPermission: null,
     allPermisions: null,
     status: "idle",
@@ -91,17 +89,6 @@ const adminSlice = createSlice({
         state.error = action.error.message;
       })
 
-      .addCase(fetchRoles.pending, (state) => {
-        state.status = "loading";
-      })
-      .addCase(fetchRoles.fulfilled, (state, action) => {
-        state.status = "succeeded";
-        state.roles = action.payload;
-      })
-      .addCase(fetchRoles.rejected, (state, action) => {
-        state.status = "failed";
-        state.error = action.error.message;
-      })
       .addCase(fetchRolesAndPermisions.pending, (state) => {
         state.status = "loading";
       })
@@ -124,8 +111,16 @@ const adminSlice = createSlice({
         state.status = "failed";
         state.error = action.error.message;
       })
-      
-      ;
+      .addCase(addNewRole.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(addNewRole.fulfilled, (state) => {
+        state.status = "succeeded";
+      })
+      .addCase(addNewRole.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.error.message;
+      });
   },
 });
 

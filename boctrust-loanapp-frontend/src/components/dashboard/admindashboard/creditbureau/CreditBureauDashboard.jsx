@@ -306,7 +306,7 @@ const CreditBureauDashboard = () => {
                               fontSize="14px"
                               width="80px"
                               margin="0 4px"
-                              bgcolor="#f64f4f"
+                              bgcolor="#028a0f"
                               func={() => handleStartCheck(customer._id)}
                             >
                               Done

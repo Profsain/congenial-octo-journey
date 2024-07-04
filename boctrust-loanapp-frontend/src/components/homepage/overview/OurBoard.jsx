@@ -38,46 +38,88 @@ const OurBoard = () => {
                 </Typography>
               </AccordionSummary>
               <AccordionDetails>
+              <Typography>
+                Isaac Orolugbagbe (FCA) is the Chairman, Board of Directors,
+                BOCTRUST Microfinance Bank Limited, Nigeria’s reputable Bank for
+                the active poor. He is also the Chief Executive Officer of Isaac
+                Development Company, a leading company with expertise in
+                Management, Strategy, Leadership & Organization Development and
+                Business Incubation Consultancy. He sits on the Board of Sifax
+                Group Nigeria a company with interests in Ports & Cargo,
+                Aviation Handling, Shipping, Haulage, Oil & Gas and Marine. His
+                other Directorship/Board appointments include Red Star Express
+                Plc., Beta Computers Limited; Western Cape Wines Limited and
+                Obafemi Awolowo University Advancement Board and was on the
+                Board of Thomas Wyatt Nigeria Plc., Isaac is a graduate of
+                Chemistry from University of Ife (now Obafemi Awolowo
+                University), Nigeria; Fellow of the Institute of Chartered
+                Accountants of Nigeria (FCA), Fellow, Institute of Directors
+                (FIoD), an Associate of the Nigerian Institute of management
+                (ANIMN) & Chartered Institute of Taxation of Nigeria (ACITN) and
+                a Member of the Society for Corporate Governance Nigeria (SCGN).
+              </Typography>
+              <Typography>
+                He is an alumna of the Master of Business Leadership (MBL),
+                University of South Africa, South Africa, a Business Strategy
+                Instructor of the Society for Corporate Governance Lagos
+                Business School and an Adjunct Faculty (Business
+                Strategy/Governance) of Strathmore Business School, Nairobi
+                Kenya. An erudite Executive trained in FedEx EMEA Brussels, Wits
+                Business School, Johannesburg and Lagos Business School amongst
+                others. Over the course of his sterling career, he has garnered
+                diverse expertise in Accounting and Internal Controls, Auditing
+                & Taxation Services, Treasury and Financial Management,
+                Corporate Governance, Corporate Strategy Development and
+                Implementation, Corporate Finance and Business/Financial
+                Advisory.
+              </Typography>
+              <Typography>
+                He transformed Red Star Express Plc (FEDEX) from a revenue of
+                N180m to N3b between 1997 and 2007 and eventual listing of the
+                company on the floor of the Nigeria Stock Exchange (NSE) as
+                Managing Director/CEO. He was the MD/CEO Skyway Aviation
+                Handling Company Limited (SAHCOL) January 2010 to December, 2011
+                and Executive Director, Projects & Group Services SIFAX Group
+                Nigeria between January 2012 and October, 2013 He is happily
+                married with four wonderful children.
+              </Typography>
+              </AccordionDetails>
+            </Accordion>
+            <Accordion
+              expanded={expanded === "panel1"}
+              onChange={handleChange("panel1")}
+            >
+              <AccordionSummary
+                expandIcon={<ExpandMoreIcon />}
+                aria-controls="panel1bh-content"
+                id="panel1bh-header"
+              >
+                <Typography sx={{ width: "53%", flexShrink: 0 }}>
+                  FEMI ALONGE, MBA, HCIB
+                </Typography>
+                <Typography sx={{ color: "text.secondary" }}>
+                  - Director
+                </Typography>
+              </AccordionSummary>
+              <AccordionDetails>
                 <Typography>
-                  Isaac Orolugbagbe (FCA) is the Chairman, Board of Directors,
-                  BOCTRUST Microfinance Bank Limited, Nigeria’s reputable Bank
-                  for the active poor. He is also the Chief Executive Officer of
-                  Isaac Development Company, a leading company with expertise in
-                  Management, Strategy, Leadership & Organization Development
-                  and Business Incubation Consultancy. He sits on the Board of
-                  Sifax Group Nigeria a company with interests in Ports & Cargo,
-                  Aviation Handling, Shipping, Haulage, Oil & Gas and Marine.
-                  His other Directorship/Board appointments include Red Star
-                  Express Plc., Beta Computers Limited; Western Cape Wines
-                  Limited and Obafemi Awolowo University Advancement Board and
-                  was on the Board of Thomas Wyatt Nigeria Plc., Isaac is a
-                  graduate of Chemistry from University of Ife (now Obafemi
-                  Awolowo University), Nigeria; Fellow of the Institute of
-                  Chartered Accountants of Nigeria (FCA), Fellow, Institute of
-                  Directors (FIoD), an Associate of the Nigerian Institute of
-                  management (ANIMN) & Chartered Institute of Taxation of
-                  Nigeria (ACITN) and a Member of the Society for Corporate
-                  Governance Nigeria (SCGN). He is an alumna of the Master of
-                  Business Leadership (MBL), University of South Africa, South
-                  Africa, a Business Strategy Instructor of the Society for
-                  Corporate Governance Lagos Business School and an Adjunct
-                  Faculty (Business Strategy/Governance) of Strathmore Business
-                  School, Nairobi Kenya. An erudite Executive trained in FedEx
-                  EMEA Brussels, Wits Business School, Johannesburg and Lagos
-                  Business School amongst others. Over the course of his
-                  sterling career, he has garnered diverse expertise in
-                  Accounting and Internal Controls, Auditing & Taxation
-                  Services, Treasury and Financial Management, Corporate
-                  Governance, Corporate Strategy Development and Implementation,
-                  Corporate Finance and Business/Financial Advisory. He
-                  transformed Red Star Express Plc (FEDEX) from a revenue of
-                  N180m to N3b between 1997 and 2007 and eventual listing of the
-                  company on the floor of the Nigeria Stock Exchange (NSE) as
-                  Managing Director/CEO. He was the MD/CEO Skyway Aviation
-                  Handling Company Limited (SAHCOL) January 2010 to December,
-                  2011 and Executive Director, Projects & Group Services SIFAX
-                  Group Nigeria between January 2012 and October, 2013 He is
-                  happily married with four wonderful children.
+                  Mr Alonge, a chartered banker, is the current MD/CEO and
+                  oversees the day-to-day management of the bank. with over 20
+                  years local and international banking experience spanning
+                  Retail, Commercial and Corporate Banking. Worked with Guaranty
+                  Trust Bank, Lead Bank and Standard Chartered Bank where he
+                  spent over 16 years and held various positions such as Senior
+                  Credit Analyst, Area Manager. Head, Asset Backed Financing
+                  West Africa, Executive Director Corporate and Institutional
+                  Banking Tanzania as an International staff. In 2017, he was
+                  appointed CEO Africa Northstar Finance Services Mauritius.
+                </Typography>
+                <Typography>
+                  He is an Engineering graduate from Obafemi Awolowo University
+                  and an MBA graduate from the University of Bangor U.K. He is a
+                  member of Chartered institute of Bankers Nigeria and an
+                  affiliate member of international compliance association
+                  London UK.
                 </Typography>
               </AccordionDetails>
             </Accordion>
@@ -140,7 +182,7 @@ const OurBoard = () => {
                   Odunmbaku Akinlawon Olamide
                 </Typography>
                 <Typography sx={{ color: "text.secondary" }}>
-                  - Director
+                  - Managing Director
                 </Typography>
               </AccordionSummary>
               <AccordionDetails>

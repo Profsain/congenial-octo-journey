@@ -137,7 +137,7 @@ const UsersList = ({ count, searchTerms }) => {
                   <td>{user.phone}</td>
                   <td>{user.username}</td>
                   <td>{user.userType}</td>
-                  <td>{user.jobRole}</td>
+                  <td>{user?.userRole?.label || "All"}</td>
                   <td >
                     <span className="badge bg-success">
                       {user.status.toUpperCase()}

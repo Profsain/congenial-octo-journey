@@ -1,7 +1,7 @@
 import PropTypes from "prop-types";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchRoles } from "../../../../redux/reducers/adminUserReducer";
+import { fetchRolesAndPermisions } from "../../../../redux/reducers/adminUserReducer";
 import Table from "react-bootstrap/Table";
 import "../../Dashboard.css";
 // import DashboardHeadline from "../../shared/DashboardHeadline";
@@ -14,7 +14,7 @@ import EditUser from "./EditUser";
 import searchList from "../../../../../utilities/searchListFunc";
 import handleAdminRoles from "../../../../../utilities/getAdminRoles";
 
-const RoleList = ({ count, searchTerms }) => {
+const RoleList = ({ count, searchTerms, setIsEditMode }) => {
   const styles = {
     head: {
       color: "#fff",
@@ -30,11 +30,11 @@ const RoleList = ({ count, searchTerms }) => {
     },
   };
 
-  const { roles } = useSelector((state) => state.adminUserReducer);
+  const { rolesAndPermission } = useSelector((state) => state.adminUserReducer);
   const status = useSelector((state) => state.adminUserReducer.status);
 
   // local state
-  const [rolesList, setRoleList] = useState(roles);
+  const [rolesList, setRoleList] = useState(rolesAndPermission);
   const [show, setShow] = useState(false);
   const [action, setAction] = useState(false);
   const [roleId, setRoleId] = useState("");
@@ -44,17 +44,17 @@ const RoleList = ({ count, searchTerms }) => {
 
   const dispatch = useDispatch();
   useEffect(() => {
-    dispatch(fetchRoles());
+    dispatch(fetchRolesAndPermisions());
   }, [dispatch]);
 
-  // update rolesList to show 10 roles on page load
+  // update rolesList to show 10 rolesAndPermission on page load
   useEffect(() => {
-    setRoleList(roles?.slice(0, count));
-  }, [roles, count]);
+    setRoleList(rolesAndPermission?.slice(0, count));
+  }, [rolesAndPermission, count]);
 
   // update rolesList on search
   const handleSearch = () => {
-    const currSearch = searchList(roles, searchTerms, "label");
+    const currSearch = searchList(rolesAndPermission, searchTerms, "label");
     setRoleList(currSearch);
   };
 
@@ -68,7 +68,7 @@ const RoleList = ({ count, searchTerms }) => {
     const id = e.target.id;
 
     // find selected role by id
-    const role = roles.find((role) => role._id === id);
+    const role = rolesAndPermission.find((role) => role._id === id);
     setRoleObj(role);
     setRoleId(id);
 
@@ -89,7 +89,7 @@ const RoleList = ({ count, searchTerms }) => {
   // handle delete
   const handleDelete = async () => {
     const apiUrl = import.meta.env.VITE_BASE_URL;
-    await fetch(`${apiUrl}/api/admin/roles/${roleId}`, {
+    await fetch(`${apiUrl}/api/admin/rolesAndPermission/${roleId}`, {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
@@ -97,52 +97,64 @@ const RoleList = ({ count, searchTerms }) => {
     });
 
     // remove role from rolesList
-    dispatch(fetchRoles());
+    dispatch(fetchRolesAndPermisions());
     setAction(false);
   };
 
   return (
     <>
       {status === "loading" && <PageLoader />}
-
-      <div className="ListSec">
-        <div style={styles.table}>
-          <Table hover responsive="sm">
-            <thead style={styles.head}>
-              <tr>
-                <th>S/N</th>
-                <th>Name</th>
-                <th>Description</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              {rolesList?.length === 0 && <NoResult name="role" />}
-              {rolesList?.map((role, index) => (
-                <tr key={role._id} className="">
-                  <td>{index + 1}</td>
-                  <td>{role.label}</td>
-                  <td>{role.description}</td>
-
-                  <td>
-                    <select
-                      name="action"
-                      className="action"
-                      id={role._id}
-                      onChange={handleAction}
-                    >
-                      <option value="">Action</option>
-                      <option value="edit">Edit</option>
-                      <option value="view">View</option>
-                      <option value="delete">Delete</option>
-                    </select>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </Table>
+      {status !== "loading" && rolesList && rolesList.length === 0 && (
+        <div className="d-flex justify-content-center align-items-center p-3">
+          <h4 className="fw-bold">No Role to Display </h4>
         </div>
-      </div>
+      )}
+
+      {status !== "loading" && rolesList && rolesList.length > 0 && (
+        <div className="ListSec">
+          <div style={styles.table}>
+            <Table hover responsive="sm">
+              <thead style={styles.head}>
+                <tr>
+                  <th>S/N</th>
+                  <th>Name</th>
+                  <th>Description</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {rolesList?.length === 0 && <NoResult name="role" />}
+                {rolesList?.map((role, index) => (
+                  <tr key={role._id} className="">
+                    <td>{index + 1}</td>
+                    <td>{role.label}</td>
+                    <td>{role.description}</td>
+
+                    <td>
+                      <select
+                        name="action"
+                        className="action"
+                        id={role._id}
+                        onChange={handleAction}
+                      >
+                        <option value="">Action</option>
+                        <option
+                          onClick={() => setIsEditMode(role)}
+                          value="edit"
+                        >
+                          Edit
+                        </option>
+                        <option value="view">View</option>
+                        <option value="delete">Delete</option>
+                      </select>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </Table>
+          </div>
+        </div>
+      )}
 
       {/* edit role popup model */}
       {show && (
@@ -168,6 +180,7 @@ const RoleList = ({ count, searchTerms }) => {
 RoleList.propTypes = {
   count: PropTypes.number,
   searchTerms: PropTypes.string,
+  setIsEditMode: PropTypes.func,
 };
 
 export default RoleList;

@@ -108,7 +108,7 @@ const SideNavMain = ({ onMenuItemClick }) => {
               <li id="customer" onClick={onMenuItemClick}>
                 All Customers
               </li>
-              {admin || adminRoles.includes("customer_request") ? (
+              {admin || adminRoles?.includes("customer_request") ? (
                 <li id="customerrequest" onClick={onMenuItemClick}>
                   Customer Request
                 </li>
@@ -119,7 +119,7 @@ const SideNavMain = ({ onMenuItemClick }) => {
       </div>
 
       {/* loans menu */}
-      {admin || adminRoles.includes("my_loan") ? (
+      {admin || adminRoles?.includes("my_loan") ? (
         <div onMouseOver={openSubLoan} onMouseLeave={closeSubLoan}>
           <div className="IconBox">
             <img src="images/dmyloan.png" alt="loan" />
@@ -241,7 +241,7 @@ const SideNavMain = ({ onMenuItemClick }) => {
               <li id="debitTransactions" onClick={onMenuItemClick}>
                 Debit Transactions
               </li>
-              {admin || adminRoles.includes("manage_nibss") ? (
+              {admin || adminRoles?.includes("manage_nibss") ? (
                 <li id="collectionsSummary" onClick={onMenuItemClick}>
                   Collections Summary
                 </li>
@@ -249,7 +249,7 @@ const SideNavMain = ({ onMenuItemClick }) => {
               <li id="debitMandates" onClick={onMenuItemClick}>
                 Debit Mandates
               </li>
-              {admin || adminRoles.includes("manage_nibss") ? (
+              {admin || adminRoles?.includes("manage_nibss") ? (
                 <li id="stopRestartCollections" onClick={onMenuItemClick}>
                   Stop/Restart Collections
                 </li>
@@ -267,7 +267,7 @@ const SideNavMain = ({ onMenuItemClick }) => {
         {isRemitaOpen ? (
           <div className="SubItem">
             <ul>
-              {admin || adminRoles.includes("get_salary_history") ? (
+              {admin || adminRoles?.includes("get_salary_history") ? (
                 <li id="checksalaryhistory" onClick={onMenuItemClick}>
                   Check Salary History
                 </li>
@@ -283,7 +283,7 @@ const SideNavMain = ({ onMenuItemClick }) => {
               <li id="mandatehistory" onClick={onMenuItemClick}>
                 Mandate History
               </li>
-              {admin || adminRoles.includes("stop_remita_loan") ? (
+              {admin || adminRoles?.includes("stop_remita_loan") ? (
                 <li id="stopcollections" onClick={onMenuItemClick}>
                   Stop Collections
                 </li>
@@ -305,7 +305,7 @@ const SideNavMain = ({ onMenuItemClick }) => {
         </p>
       </div>
 
-      {admin || adminRoles.includes("employer_manager") ? (
+      {admin || adminRoles?.includes("employer_manager") ? (
         <div onMouseOver={openSubEmployer} onMouseLeave={closeSubEmployer}>
           <div className="IconBox">
             <img src="images/dmda.png" alt="mdas" />
@@ -335,7 +335,7 @@ const SideNavMain = ({ onMenuItemClick }) => {
         </div>
       ) : null}
 
-      {admin || adminRoles.includes("kyc_review") ? (
+      {admin || adminRoles?.includes("kyc_review") ? (
         <div onMouseOver={openSubKyc} onMouseLeave={closeSubKyc}>
           <div className="IconBox">
             <img src="images/dkyc.png" alt="kyc" />

@@ -78,10 +78,10 @@ const TransactionList = () => {
               <td>
                 <select name="action" id="action">
                   <option value="">Action</option>
-                  {admin || adminRoles.includes("manage_transaction") ? (
+                  {admin || adminRoles?.includes("manage_transaction") ? (
                     <option value="">Approve</option>
                   ) : null}
-                  {admin || adminRoles.includes("manage_transaction") ? (
+                  {admin || adminRoles?.includes("manage_transaction") ? (
                     <option value="">Delete</option>
                   ) : null}
                 </select>
@@ -98,7 +98,7 @@ const TransactionList = () => {
               <td>
                 <select name="action" id="action">
                   <option value="">Action</option>
-                  {admin || adminRoles.includes("manage_transaction") ? (
+                  {admin || adminRoles?.includes("manage_transaction") ? (
                     <div>
                       <option value="">Approve</option>
                       <option value="">Delete</option>
@@ -118,7 +118,7 @@ const TransactionList = () => {
               <td>
                 <select name="action" id="action">
                   <option value="">Action</option>
-                  {admin || adminRoles.includes("manage_transaction") ? (
+                  {admin || adminRoles?.includes("manage_transaction") ? (
                     <div>
                       <option value="">Approve</option>
                       <option value="">Delete</option>
@@ -138,7 +138,7 @@ const TransactionList = () => {
               <td>
                 <select name="action" id="action">
                   <option value="">Action</option>
-                  {admin || adminRoles.includes("manage_transaction") ? (
+                  {admin || adminRoles?.includes("manage_transaction") ? (
                     <div>
                       <option value="">Approve</option>
                       <option value="">Delete</option>

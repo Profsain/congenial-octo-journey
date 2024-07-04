@@ -37,6 +37,9 @@ import PasswordReset from "./components/dashboard/login/PasswordReset";
 import BaseLayout from "./layouts/BaseLayout";
 import { ToastContainer } from "react-toastify";
 
+// toast styles
+import "react-toastify/dist/ReactToastify.css";
+
 function App() {
   // fetch settings
 
