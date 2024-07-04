@@ -6,9 +6,6 @@ import { fetchSingleCustomer } from "../../../../redux/reducers/customerReducer"
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
 
-// toast styles
-import "react-toastify/dist/ReactToastify.css";
-
 import axios from "axios";
 import PageLoader from "../../shared/PageLoader";
 

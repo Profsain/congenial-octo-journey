@@ -40,7 +40,7 @@ export const allUserRoles = {
       "readloans",
       "loanManagement",
     ],
-    cannot: [
+    shouldNotSee: [
       "creaditAssessment",
       "employerManament",
       "userManagement",
@@ -49,7 +49,7 @@ export const allUserRoles = {
   },
   marketing_staff: {
     can: ["readothers"],
-    cannot: [
+    shouldNotSee: [
       "creaditAssessment",
       "employerManament",
       "userManagement",
@@ -58,7 +58,7 @@ export const allUserRoles = {
   },
   credit_analyst: {
     can: ["creaditAssessment", "salaryHistoryCheck"],
-    cannot: [
+    shouldNotSee: [
       "websiteManagement",
       "employerManament",
       "userManagement",
@@ -75,31 +75,6 @@ export const allUserRoles = {
       "manageRemitaCollections",
       "loadDisbursment",
     ],
-    cannot: ["systemSetting"],
+    shouldNotSee: ["systemSetting"],
   },
-};
-
-export const allPermisions = {
-  kyc: ["kycReviewManagement", "viewKycReview"],
-  loan: [
-    "readLoans",
-    "loanManagement",
-    "loadDisbursment",
-    "bookLoans",
-    "approveTransactions",
-  ],
-  remita: [
-    "viewRemitaCollections",
-    "manageRemitaCollections",
-    "salaryHistoryCheck",
-  ],
-  credit: [
-    "creaditAssessment",
-    "viewCreaditAssessment",
-    "approveCreditAssesment",
-  ],
-  employer: ["employerManament", "viewEmployers"],
-  webManager: ["websiteManagement", "viewWebsiteManagement"],
-  user: ["userManagement", "viewUsers"],
-  setting: ["systemSettingManagement", "viewSystemSetting"],
 };

@@ -1,16 +1,100 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import BocButton from "../../shared/BocButton";
 import DashboardHeadline from "../../shared/DashboardHeadline";
 import "../customers/Customer.css";
 import NextPreBtn from "../../shared/NextPreBtn";
 import RoleList from "./RoleList";
 import { Modal, Button } from "react-bootstrap";
+import { useDispatch } from "react-redux";
+import {
+  addNewRole,
+  fetchRolesAndPermisions,
+  updateRole,
+} from "../../../../redux/reducers/adminUserReducer";
+import PageLoader from "../../shared/PageLoader";
+import { toast } from "react-toastify";
+
+// toast styles
+import "react-toastify/dist/ReactToastify.css";
+
+const roleInputInit = {
+  label: "",
+  description: "",
+};
 
 const ManageUserRole = () => {
   const [showAddNew, setShowAddNew] = useState(false);
   const [showCount, setShowCount] = useState(10);
+  const [selectedRole, setSelectedRole] = useState(null);
   const [searchTerms, setSearchTerms] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [newRoleInput, setNewRoleInput] = useState(roleInputInit);
+
   const handleAddNew = () => setShowAddNew(true);
+
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    if (selectedRole) {
+      setNewRoleInput({
+        label: selectedRole.label,
+        description: selectedRole?.description || "",
+      });
+    }
+  }, [selectedRole]);
+
+  const handleAddRole = async () => {
+    try {
+      setIsLoading(true);
+
+      const res = await dispatch(
+        addNewRole({
+          ...newRoleInput,
+          value: newRoleInput.label.trim().split(" ").join("_").toLowerCase(),
+        })
+      );
+
+      if (res.type.includes("rejected")) {
+        return toast.error(res?.payload || "Something went wrong");
+      }
+
+      await dispatch(fetchRolesAndPermisions());
+      toast.success("Role has been Added");
+      setNewRoleInput(roleInputInit);
+      setShowAddNew(false);
+    } catch (error) {
+      toast.error("Something Went Wrong");
+      console.log(error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleUpdateRole = async () => {
+    try {
+      setIsLoading(true);
+
+      await dispatch(
+        updateRole({
+          payload: {
+            ...newRoleInput,
+            value: newRoleInput.label.split(" ").join("_").toLowerCase(),
+          },
+          roleId: selectedRole._id,
+        })
+      );
+
+      await dispatch(fetchRolesAndPermisions());
+      toast.success("Role has been updated");
+      setNewRoleInput(roleInputInit);
+      setSelectedRole(null);
+      setShowAddNew(false);
+    } catch (error) {
+      toast.error(error?.reponse?.data?.error || "Something Went Wrong");
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <div className="MainBox">
@@ -57,7 +141,14 @@ const ManageUserRole = () => {
         </div>
         <div>
           {/* users list  */}
-          <RoleList count={showCount} searchTerms={searchTerms} />
+          <RoleList
+            count={showCount}
+            setIsEditMode={(role) => {
+              setSelectedRole(role);
+              setShowAddNew(true);
+            }}
+            searchTerms={searchTerms}
+          />
           {/* next and previous button  */}
           <NextPreBtn />
         </div>
@@ -78,6 +169,13 @@ const ManageUserRole = () => {
                   type="text"
                   className="form-control"
                   id="name"
+                  value={newRoleInput.label}
+                  onChange={(e) =>
+                    setNewRoleInput({
+                      ...newRoleInput,
+                      label: e.target.value,
+                    })
+                  }
                   aria-describedby="name"
                 />
               </div>
@@ -88,16 +186,32 @@ const ManageUserRole = () => {
                 <textarea
                   className="form-control"
                   aria-label="description"
+                  value={newRoleInput.description}
+                  onChange={(e) =>
+                    setNewRoleInput({
+                      ...newRoleInput,
+                      description: e.target.value,
+                    })
+                  }
                 ></textarea>
               </div>
             </form>
           </Modal.Body>
           <Modal.Footer>
-            <Button variant="secondary" onClick={() => setShowAddNew(false)}>
+            <Button
+              variant="secondary"
+              onClick={() => {
+                setShowAddNew(false);
+                setNewRoleInput(roleInputInit);
+              }}
+            >
               Cancel
             </Button>
-            <Button variant="primary" onClick={() => setShowAddNew(true)}>
-              Save
+            <Button
+              variant="primary"
+              onClick={selectedRole ? handleUpdateRole : handleAddRole}
+            >
+              {isLoading ? <PageLoader width="16px" /> : "Save"}
             </Button>
           </Modal.Footer>
         </Modal>

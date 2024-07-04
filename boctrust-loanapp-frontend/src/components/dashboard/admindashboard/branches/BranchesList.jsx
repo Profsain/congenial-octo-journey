@@ -141,7 +141,7 @@ const BranchesList = ({ showCount, searchTerms, admin, adminRoles }) => {
                     >
                       <option value="">Action</option>
                       <option value="view">View</option>
-                      {admin || adminRoles.includes("manage_branch") ? (
+                      {admin || adminRoles?.includes("manage_branch") ? (
                             <>
                               <option value="edit">Edit</option>
                               <option value="delete">Delete</option>

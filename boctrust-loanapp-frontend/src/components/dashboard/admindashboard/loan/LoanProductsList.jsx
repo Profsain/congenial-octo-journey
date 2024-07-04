@@ -139,12 +139,12 @@ const LoanProductsList = ({ count, searchTerm, admin, adminRoles }) => {
                         >
                           <option value="">Action</option>
                           {admin ||
-                          adminRoles.includes("update_loan_product") ? (
+                          adminRoles?.includes("update_loan_product") ? (
                             <option value="edit">Edit</option>
                           ) : null}
 
                           {admin ||
-                          adminRoles.includes("delete_loan_product") ? (
+                          adminRoles?.includes("delete_loan_product") ? (
                             <option value="delete">Delete</option>
                           ) : null}
                         </select>

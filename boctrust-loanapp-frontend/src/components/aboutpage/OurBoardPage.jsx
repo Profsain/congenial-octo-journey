@@ -96,11 +96,55 @@ const OurBoardPage = () => {
               aria-expanded="false"
               aria-controls="flush-collapseTwo"
             >
-              Dr Kunle Alonge - Director
+              FEMI ALONGE, MBA, HCIB - Director
             </button>
           </h2>
           <div
             id="flush-collapseTwo"
+            className="accordion-collapse collapse"
+            data-bs-parent="#accordionFlushExample"
+          >
+            <div className="BoardMember">
+              <div className="accordion-body px-5">
+                <p>
+                  Mr Alonge, a chartered banker, is the current MD/CEO and
+                  oversees the day-to-day management of the bank. with over 20
+                  years local and international banking experience spanning
+                  Retail, Commercial and Corporate Banking. Worked with Guaranty
+                  Trust Bank, Lead Bank and Standard Chartered Bank where he
+                  spent over 16 years and held various positions such as Senior
+                  Credit Analyst, Area Manager. Head, Asset Backed Financing
+                  West Africa, Executive Director Corporate and Institutional
+                  Banking Tanzania as an International staff. In 2017, he was
+                  appointed CEO Africa Northstar Finance Services Mauritius.
+                </p>
+                <p>
+                  He is an Engineering graduate from Obafemi Awolowo University
+                  and an MBA graduate from the University of Bangor U.K. He is a
+                  member of Chartered institute of Bankers Nigeria and an
+                  affiliate member of international compliance association
+                  London UK.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+        {/* ================================== */}
+        <div className="accordion-item">
+          <h2 className="accordion-header">
+            <button
+              className="accordion-button collapsed"
+              type="button"
+              data-bs-toggle="collapse"
+              data-bs-target="#flush-collapseThree"
+              aria-expanded="false"
+              aria-controls="flush-collapseThree"
+            >
+              Dr Kunle Alonge - Director
+            </button>
+          </h2>
+          <div
+            id="flush-collapseThree"
             className="accordion-collapse collapse"
             data-bs-parent="#accordionFlushExample"
           >
@@ -146,23 +190,23 @@ const OurBoardPage = () => {
               className="accordion-button collapsed"
               type="button"
               data-bs-toggle="collapse"
-              data-bs-target="#flush-collapseThree"
+              data-bs-target="#flush-collapseFour"
               aria-expanded="false"
-              aria-controls="flush-collapseThree"
+              aria-controls="flush-collapseFour"
             >
               Odunmbaku Akinlawon Olamide (HND, PGD, CPD, MBA, EMBA, MCIB, ACA.)
-              - Director
+              - Managing Director
             </button>
           </h2>
           <div
-            id="flush-collapseThree"
+            id="flush-collapseFour"
             className="accordion-collapse collapse"
             data-bs-parent="#accordionFlushExample"
           >
             <div className="BoardMember">
               <div className="BoardMemberImg">
                 <img
-                  className="w-100"
+                  className="w-100 "
                   src="/images/board/OlamideOdunmbaku.jpg"
                   alt=" Dr. Kunle Alonge"
                 />

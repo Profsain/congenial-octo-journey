@@ -7,6 +7,10 @@ import DashboardHeadline from "../../shared/DashboardHeadline";
 import "../customers/Customer.css";
 import "./CreateNewAdmin.css";
 import validationSchema from "./validationSchema";
+import { userTypes } from "../../../../lib/userRelated";
+import { useSelector } from "react-redux";
+import PageLoader from "../../shared/PageLoader";
+import { toast } from "react-toastify";
 
 const initialValues = {
   fullName: "",
@@ -19,57 +23,58 @@ const initialValues = {
   userType: "",
 };
 
-const userRoles = [
-  { value: "admin", label: "Admin" },
-  { value: "md", label: "MD" },
-  { value: "coo", label: "COO" },
-  { value: "credit_head", label: "Credit Head" },
-  { value: "credit_analyst", label: "Credit Analyst" },
-  { value: "operation_staff", label: "Operation Staff" },
-  { value: "loan_officer", label: "Loan Officer" },
-];
-const userTypes = [
-  { value: "super_admin", label: "Super Admin" },
-  { value: "staff", label: "Staff" },
-];
-
 const CreateNewAdmin = ({ func }) => {
   const [notification, setNotification] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+
+  const { rolesAndPermission } = useSelector((state) => state.adminUserReducer);
 
   const handleSubmit = async (values, { resetForm }) => {
     const apiUrl = import.meta.env.VITE_BASE_URL;
+    console.log(values, "Values");
+    try {
+      setIsLoading(true);
 
-    // Handle form submission logic here
-    const formData = new FormData();
-    formData.append("fullName", values.fullName);
-    formData.append("photo", values.photo);
-    formData.append("email", values.email.toLowerCase());
-    formData.append("phone", values.phone);
-    formData.append("username", values.username.toLowerCase());
-    formData.append("password", values.password);
-    formData.append("userRole", values.userRole);
-    formData.append("userType", values.userType);
+      if (values.userType !== "super_admin" && !values.userRole) {
+        return toast.error("Please provide a User Role");
+      }
 
-    await fetch(`${apiUrl}/api/admin/register`, {
-      method: "POST",
-      enctype: "multipart/form-data",
-      body: formData,
-    });
+      // Handle form submission logic here
+      const formData = new FormData();
+      formData.append("fullName", values.fullName);
+      formData.append("photo", values.photo);
+      formData.append("email", values.email.toLowerCase());
+      formData.append("phone", values.phone);
+      formData.append("username", values.username.toLowerCase());
+      formData.append("password", values.password);
+      formData.append("userRole", values.userRole);
+      formData.append("userType", values.userType);
 
-    // clear fields
-    resetForm();
+      const res = await fetch(`${apiUrl}/api/admin/register`, {
+        method: "POST",
+        enctype: "multipart/form-data",
+        body: formData,
+      });
 
-    // clear checkbox
-    const checkboxes = document.querySelectorAll('input[type="checkbox"]');
-    checkboxes.forEach((checkbox) => {
-      checkbox.checked = false;
-    });
+      if (res.ok) {
+        // clear fields
+        resetForm();
 
-    setNotification("New admin user added successfully");
+        setNotification("New admin user added successfully");
 
-    setTimeout(() => {
-      setNotification("");
-    }, 3000);
+        setTimeout(() => {
+          setNotification("");
+        }, 3000);
+        toast.success("New admin user added successfully");
+      } else {
+        const errorResponse = await res.json();
+        toast.error(errorResponse?.error || "Something Went Wrong");
+      }
+    } catch (error) {
+      toast.error(error?.reponse?.data?.error || "Something Went Wrong");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleClose = () => {
@@ -80,7 +85,6 @@ const CreateNewAdmin = ({ func }) => {
     initialValues,
     validationSchema,
     onSubmit: handleSubmit,
-
   });
 
   return (
@@ -187,6 +191,8 @@ const CreateNewAdmin = ({ func }) => {
             </div>
           </div>
 
+          {console.log(formik.errors)}
+
           <div className="FieldRow">
             <div className="FieldGroup">
               <label htmlFor="userType">User Type</label>
@@ -208,26 +214,31 @@ const CreateNewAdmin = ({ func }) => {
               ) : null}
             </div>
 
-            <div className="FieldGroup">
-              <label htmlFor="userRole">User Role</label>
-              <select
-                name="userRole"
-                disabled={formik.values.userType === "super_admin"}
-                id="userRole"
-                className="Input"
-                onChange={formik.handleChange}
-              >
-                <option value="">Select Role</option>
-                {userRoles.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
-              {formik.errors.userRole && formik.touched.userRole ? (
-                <div className="Error">{formik.errors.userRole}</div>
-              ) : null}
-            </div>
+            {rolesAndPermission && (
+              <div className="FieldGroup">
+                <label htmlFor="userRole">User Roles</label>
+                <select
+                  name="userRole"
+                  disabled={
+                    !formik.values.userType ||
+                    formik.values.userType === "super_admin"
+                  }
+                  onChange={formik.handleChange}
+                  id="userRole"
+                  className="Input"
+                >
+                  <option value="">Select Role</option>
+                  {rolesAndPermission.map((option) => (
+                    <option key={option._id} value={option._id}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+                {formik.errors.userRole && formik.touched.userRole ? (
+                  <div className="Error">{formik.errors.userRole}</div>
+                ) : null}
+              </div>
+            )}
           </div>
 
           {/* adminRoles checkbox options section */}
@@ -235,7 +246,7 @@ const CreateNewAdmin = ({ func }) => {
             <label htmlFor="adminRoles">Admin Roles</label>
 
             <div className="CheckboxContainer">
-              {adminRoles.map((option) => (
+              {adminRoles?.map((option) => (
                 <div key={option.value} className="CheckboxGrou">
                   <input
                     type="checkbox"
@@ -281,7 +292,7 @@ const CreateNewAdmin = ({ func }) => {
                 bradius="18px"
                 width={"200px"}
               >
-                Submit
+                {isLoading ? <PageLoader width="16px" /> : "Submit"}
               </BocButton>
             </div>
           </div>

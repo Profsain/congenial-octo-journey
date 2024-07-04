@@ -72,7 +72,7 @@ const TopNav = ({ settings }) => {
                 </Nav.Link>
 
                 {/* about dropdown */}
-                <NavDropdown title="About" id="basic-nav-dropdown">
+                <NavDropdown title="About" id="basic-nav-dropdown" className="mx-4">
                   <div className="DropSpace"></div>
                   <NavDropdown.Item className="DropItem" href="/about">
                     Company Overview

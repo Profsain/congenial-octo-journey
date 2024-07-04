@@ -93,7 +93,7 @@ const RepaymentList = () => {
                   >
                     View
                   </BocButton>
-                  {admin || adminRoles.includes("delete_loan_repayment") ? (
+                  {admin || adminRoles?.includes("delete_loan_repayment") ? (
                     <BocButton
                       bradius="12px"
                       fontSize="14px"

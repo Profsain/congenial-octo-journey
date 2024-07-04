@@ -1,27 +1,32 @@
 /* eslint-disable react/prop-types */
 import { useState, useEffect } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { fetchAdmins } from "../../../../redux/reducers/adminUserReducer";
 import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
 import "./CreateNewAdmin.css";
-import adminRoles from "./adminRoles";
+import { userTypes } from "../../../../lib/userRelated";
+import PageLoader from "../../shared/PageLoader";
+import { toast } from "react-toastify";
 
 const EditUser = (props) => {
   const dispatch = useDispatch();
   const user = props.userobj;
-  const roles = props.adminRoles;
+
   const viewEdit = props.viewEdit;
 
   // form state
   const [editFullName, setEditFullName] = useState("");
   const [editEmail, setEditEmail] = useState("");
   const [editPhone, setEditPhone] = useState("");
-  const [editUsername, setEditUsername] = useState(""); 
+  const [editUsername, setEditUsername] = useState("");
   const [editPassword, setEditPassword] = useState("");
   const [editUserType, setEditUserType] = useState("");
-  const [editJobRole, setEditJobRole] = useState("");
   const [editAdminRoles, setEditAdminRoles] = useState([]);
+
+  const [isLoading, setIsLoading] = useState(false);
+
+  const { rolesAndPermission } = useSelector((state) => state.adminUserReducer);
 
   // pass object data to form
   const updateFormObject = () => {
@@ -30,8 +35,7 @@ const EditUser = (props) => {
     setEditPhone(user.phone);
     setEditUsername(user.username);
     setEditUserType(user.userType);
-    setEditJobRole(user.jobRole);
-    setEditAdminRoles(roles);
+    setEditAdminRoles(user?.userRole);
   };
 
   useEffect(() => {
@@ -46,8 +50,8 @@ const EditUser = (props) => {
     setEditUsername("");
     setEditPassword("");
     setEditUserType("");
-    setEditJobRole("");
-    setEditAdminRoles([]);
+
+    setEditAdminRoles("");
     dispatch(fetchAdmins());
   };
 
@@ -56,43 +60,56 @@ const EditUser = (props) => {
     props.onHide();
     clearForm();
   };
-  
+
   // submit update to api endpoint
   const handleSubmit = async (e) => {
-    e.preventDefault();
+    try {
+      setIsLoading(true);
+
+      e.preventDefault();
 
       const apiUrl = import.meta.env.VITE_BASE_URL;
-    const updatedBranch = {
-      fullName: editFullName,
-      email: editEmail,
-      phone: editPhone,
-      username: editUsername,
-      password: editPassword,
-      userType: editUserType,
-      jobRole: editJobRole,
-      adminRoles: editAdminRoles,
+      const updatedUser = {
+        fullName: editFullName,
+        email: editEmail,
+        phone: editPhone,
+        username: editUsername,
+        password: editPassword,
+        userType: editUserType,
+        userRole: editAdminRoles,
+      };
 
-    };
+      const res = await fetch(`${apiUrl}/api/admin/update/${user._id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(updatedUser),
+      });
 
-    await fetch(`${apiUrl}/api/admin/update/${user._id}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(updatedBranch),
-    });
-
-    clearForm();
-    handleClose();
+      if (res.ok) {
+        clearForm();
+        handleClose();
+        toast.success("User has been updated");
+      } else {
+        const errorResponse = await res.json();
+        toast.error(errorResponse?.error || "Something Went Wrong");
+      }
+    } catch (error) {
+      toast.error(error?.reponse?.data?.error || "Something Went Wrong");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
     <Modal
       {...props}
       size="lg"
-      aria-labelledby="contained-modal-title-vcenter"
+      aria-labelledby="contained-modal-title-vcenter "
       centered
       backdrop="static"
+      className="modal__container"
       keyboard={false}
     >
       <Modal.Header>
@@ -156,37 +173,54 @@ const EditUser = (props) => {
           </div>
 
           <div className="FieldGroup">
-            <label htmlFor="userType" style={{ marginTop: "-1rem" }}>
-              User Role Type
-            </label>
-            <input
-              type="text"
-              style={{ width: "100%" }}
-              className="Input"
+            <label htmlFor="userType">User Type</label>
+            <select
+              name="userType"
+              id="userType"
+              className="Input w-100"
+              disabled={viewEdit !== "edit"}
               value={editUserType}
               onChange={(e) => setEditUserType(e.target.value)}
-            />
+            >
+              {userTypes.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
           </div>
 
-          <div className="FieldGroup">
-            <label htmlFor="jobRole" style={{ marginTop: "-1rem" }}>
-              Job Role
-            </label>
-            <input
-              type="text"
-              style={{ width: "100%" }}
-              className="Input"
-              value={editJobRole}
-              onChange={(e) => setEditJobRole(e.target.value)}
-            />
-          </div>
+          {rolesAndPermission && (
+            <div className="FieldGroup">
+              <label htmlFor="userRole">User Roles</label>
+              <select
+                name="userRole"
+                value={editAdminRoles?._id}
+                disabled={viewEdit !== "edit" || !editUserType || editUserType === "super_admin"}  
+                id="userRole"
+                className="Input  w-100"
+              >
+                <option value="">Select Role</option>
+                {rolesAndPermission.map((option) => (
+                  <option
+                    onClick={() => setEditAdminRoles(option._id)}
+                    key={option._id}
+                    value={option._id}
+                  >
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
 
           {/* adminRoles checkbox options section */}
-          <div className="AdminRoles">
+
+          {/* <div className="AdminRoles">
             <label htmlFor="adminRoles">Admin Roles</label>
 
             <div className="CheckboxContainer">
-              {adminRoles.map((option) => (
+              {adminRoles?.map((option) => (
                 <div key={option.value} className="CheckboxGroup">
                   <input
                     type="checkbox"
@@ -211,7 +245,7 @@ const EditUser = (props) => {
                 </div>
               ))}
             </div>
-          </div>
+          </div> */}
         </form>
       </Modal.Body>
       <Modal.Footer>
@@ -221,7 +255,7 @@ const EditUser = (props) => {
 
         {viewEdit === "edit" && (
           <Button variant="primary" type="button" onClick={handleSubmit}>
-            Update
+            {isLoading ? <PageLoader width="16px" /> : "Update"}
           </Button>
         )}
       </Modal.Footer>
