@@ -4,7 +4,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { fetchAllCustomer } from "../../../../redux/reducers/customerReducer";
 import { Modal, Button } from "react-bootstrap";
 import CreditCheckForm from "./CreditCheckForm";
-import Headline from "../../../shared/Headline";
 import { Table } from "react-bootstrap";
 import BocButton from "../../shared/BocButton";
 import DashboardHeadline from "../../shared/DashboardHeadline";
@@ -16,6 +15,7 @@ import ViewBySection from "../remita/ViewBySection";
 import useSearch from "../../../../../utilities/useSearchName";
 import useSearchByDate from "../../../../../utilities/useSearchByDate";
 import useSearchByDateRange from "../../../../../utilities/useSearchByDateRange";
+import KycViewDetails from "../kyc/KycViewDetails";
 
 const styles = {
   btnBox: {
@@ -42,7 +42,7 @@ const styles = {
   yes: {
     color: "#5cc51c",
     fontWeight: "bold",
-  }
+  },
 };
 
 const CreditBureauDashboard = () => {
@@ -50,21 +50,27 @@ const CreditBureauDashboard = () => {
   const [searchCustomer, setSearchCustomer] = useState([]);
   const [showCreditCheckForm, setShowCreditCheckForm] = useState(false);
   const [show, setShow] = useState(false);
-  const [creditAnalyst, setCreditAnalyst] = useState("");
+  const [showError, setShowError] = useState(false);
+
+  const [customerInfo, setCustomerInfo] = useState(null);
 
   // fetch all customer
   const dispatch = useDispatch();
   const customers = useSelector(
     (state) => state.customerReducer.customers.customer
   );
+  const { customerApprovalEnum } = useSelector(
+    (state) => state.customerReducer
+  );
   const status = useSelector((state) => state.customerReducer.status);
 
   // get current login admin
   const admin = useSelector((state) => state.adminAuth.user);
   const [adminName, setAdminName] = useState("");
+
   useEffect(() => {
     setAdminName(admin.fullName);
-  }, [admin]);
+  }, [admin, showCreditCheckForm]);
 
   useEffect(() => {
     dispatch(fetchAllCustomer());
@@ -141,9 +147,13 @@ const CreditBureauDashboard = () => {
   }, [searchCustomer]);
 
   // handle credit check start btn
-  const handleStartCheck = (id) => {
-    setCustomerId(id);
-    setShow(true);
+  const handleStartCheck = (customer) => {
+    setCustomerId(customer._id);
+    if (!customer.creditCheck.assignment.isCreditAnalystAssigned) {
+      setShow(true);
+    } else {
+      setShowError(true);
+    }
   };
 
   // handle cancel check
@@ -160,17 +170,19 @@ const CreditBureauDashboard = () => {
   // handle assignment and start credit check
   const assignCustomer = async () => {
     const apiUrl = import.meta.env.VITE_BASE_URL;
-    setCreditAnalyst(adminName);
+
     await fetch(`${apiUrl}/api/updatecustomer/assignto/${customerId}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        creditAnalyst,
+        creditAnalyst: adminName,
         isCreditAnalystAssigned: true,
       }),
     });
+
+    dispatch(fetchAllCustomer());
   };
 
   const handleProceed = () => {
@@ -181,11 +193,12 @@ const CreditBureauDashboard = () => {
 
   const handleClose = () => {
     setShow(false);
+    setShowError(false);
   };
 
   return (
     <>
-      {!showCreditCheckForm ? (
+      {!showCreditCheckForm && !customerInfo ? (
         <div>
           <div>
             {/* view by section */}
@@ -241,16 +254,26 @@ const CreditBureauDashboard = () => {
                       )}
 
                       <td>N{customer.loanamount}</td>
-                      <td>Full Details</td>
+                      <td
+                        className="cursor-pointer"
+                        onClick={() => {
+                          setCustomerInfo(customer);
+                        }}
+                      >
+                        Full Details
+                      </td>
                       {customer.creditCheck.assignment
                         .isCreditAnalystAssigned ? (
-                        <td style={styles.yes}>Yes</td>
+                        <td style={styles.yes}>
+                          Yes({customer?.creditCheck.assignment.creditAnalyst})
+                        </td>
                       ) : (
                         <td style={styles.completed}>No</td>
                       )}
 
-                      {!customer.creditCheck.decisionSummary
-                        .isCreditOfficerApproved ? (
+                      {customer?.creditCheck?.decisionSummary
+                        ?.creditOfficerApprovalStatus ===
+                      customerApprovalEnum.pending ? (
                         <td>
                           <div>
                             <BocButton
@@ -258,8 +281,18 @@ const CreditBureauDashboard = () => {
                               fontSize="14px"
                               width="80px"
                               margin="0 4px"
-                              bgcolor="#f64f4f"
-                              func={() => handleStartCheck(customer._id)}
+                              bgcolor="#FFBF00"
+                              func={() => {
+                                if (
+                                  customer?.creditCheck.assignment
+                                    .creditAnalyst === admin.fullName
+                                ) {
+                                  setCustomerId(customer._id);
+                                  setShowCreditCheckForm(true);
+                                } else {
+                                  handleStartCheck(customer);
+                                }
+                              }}
                             >
                               Start
                             </BocButton>
@@ -289,27 +322,36 @@ const CreditBureauDashboard = () => {
             <NextPreBtn />
           </div>
         </div>
-      ) : (
+      ) : showCreditCheckForm ? (
         <div>
           {/* credit check form  */}
-          <CreditCheckForm customerId={customerId} />
-          <div className="row justify-content-right">
-            <div className="col-md-4"></div>
+          <CreditCheckForm
+            setShowCreditCheckForm={setShowCreditCheckForm}
+            customerId={customerId}
+          />
+          <div className="  d-flex justify-content-center">
             <button
-              className="btn col-sm-12 col-md-4 btn-danger"
+              className="btn  col-md-4   btn-danger"
               onClick={handleCancelCheck}
             >
               Cancel Check
             </button>
           </div>
         </div>
+      ) : (
+        customerInfo && (
+          <KycViewDetails
+            customer={customerInfo}
+            setShowInfo={setCustomerInfo}
+          />
+        )
       )}
 
       {/* pop up modal */}
       <div>
         <Modal show={show} backdrop="static" keyboard={false}>
           <Modal.Header>
-            <Modal.Title> Assign Customer Notification</Modal.Title>
+            <Modal.Title>{"Assign Customer Notification"}</Modal.Title>
           </Modal.Header>
           <Modal.Body>
             This customer will be assigned to you for credit check. Do you want
@@ -321,6 +363,22 @@ const CreditBureauDashboard = () => {
             </Button>
             <Button variant="primary" onClick={handleProceed}>
               Assign/Proceed
+            </Button>
+          </Modal.Footer>
+        </Modal>
+      </div>
+      {/* Error pop up modal */}
+      <div>
+        <Modal show={showError} backdrop="static" keyboard={false}>
+          <Modal.Header>
+            <Modal.Title> Error in Process</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            This customer has already been assigned to another staff
+          </Modal.Body>
+          <Modal.Footer>
+            <Button variant="secondary" onClick={handleClose}>
+              Cancel
             </Button>
           </Modal.Footer>
         </Modal>

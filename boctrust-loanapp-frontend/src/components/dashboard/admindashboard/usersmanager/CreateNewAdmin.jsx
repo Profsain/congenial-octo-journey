@@ -7,7 +7,6 @@ import DashboardHeadline from "../../shared/DashboardHeadline";
 import "../customers/Customer.css";
 import "./CreateNewAdmin.css";
 import validationSchema from "./validationSchema";
-import adminRoles from "./adminRoles";
 
 const initialValues = {
   fullName: "",
@@ -16,12 +15,11 @@ const initialValues = {
   phone: "",
   username: "",
   password: "",
+  userRole: "",
   userType: "",
-  jobRole: "",
-  adminRoles: [],
 };
 
-const userTypes = [
+const userRoles = [
   { value: "admin", label: "Admin" },
   { value: "md", label: "MD" },
   { value: "coo", label: "COO" },
@@ -29,6 +27,10 @@ const userTypes = [
   { value: "credit_analyst", label: "Credit Analyst" },
   { value: "operation_staff", label: "Operation Staff" },
   { value: "loan_officer", label: "Loan Officer" },
+];
+const userTypes = [
+  { value: "super_admin", label: "Super Admin" },
+  { value: "staff", label: "Staff" },
 ];
 
 const CreateNewAdmin = ({ func }) => {
@@ -45,9 +47,8 @@ const CreateNewAdmin = ({ func }) => {
     formData.append("phone", values.phone);
     formData.append("username", values.username.toLowerCase());
     formData.append("password", values.password);
+    formData.append("userRole", values.userRole);
     formData.append("userType", values.userType);
-    formData.append("jobRole", values.jobRole);
-    formData.append("adminRoles", values.adminRoles);
 
     await fetch(`${apiUrl}/api/admin/register`, {
       method: "POST",
@@ -79,11 +80,12 @@ const CreateNewAdmin = ({ func }) => {
     initialValues,
     validationSchema,
     onSubmit: handleSubmit,
+
   });
 
   return (
     <div className="TransContainer">
-      <DashboardHeadline>Add New Method</DashboardHeadline>
+      <DashboardHeadline>Add New User</DashboardHeadline>
       <div className="FormCon">
         <form onSubmit={formik.handleSubmit}>
           <div className="FieldRow">
@@ -187,30 +189,14 @@ const CreateNewAdmin = ({ func }) => {
 
           <div className="FieldRow">
             <div className="FieldGroup">
-              <label htmlFor="jobRole">Job Role</label>
-              <input
-                type="text"
-                name="jobRole"
-                placeholder="Enter job role"
-                id="jobRole"
-                className="Input"
-                onChange={formik.handleChange}
-                value={formik.values.jobRole}
-              />
-              {formik.errors.jobRole && formik.touched.jobRole ? (
-                <div className="Error">{formik.errors.jobRole}</div>
-              ) : null}
-            </div>
-
-            <div className="FieldGroup">
-              <label htmlFor="userType">Admin Type</label>
+              <label htmlFor="userType">User Type</label>
               <select
                 name="userType"
                 id="userType"
                 className="Input"
                 onChange={formik.handleChange}
               >
-                <option value="">Select Role</option>
+                <option value="">Select Type</option>
                 {userTypes.map((option) => (
                   <option key={option.value} value={option.value}>
                     {option.label}
@@ -221,10 +207,31 @@ const CreateNewAdmin = ({ func }) => {
                 <div className="Error">{formik.errors.userType}</div>
               ) : null}
             </div>
+
+            <div className="FieldGroup">
+              <label htmlFor="userRole">User Role</label>
+              <select
+                name="userRole"
+                disabled={formik.values.userType === "super_admin"}
+                id="userRole"
+                className="Input"
+                onChange={formik.handleChange}
+              >
+                <option value="">Select Role</option>
+                {userRoles.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+              {formik.errors.userRole && formik.touched.userRole ? (
+                <div className="Error">{formik.errors.userRole}</div>
+              ) : null}
+            </div>
           </div>
 
           {/* adminRoles checkbox options section */}
-          <div className="AdminRoles">
+          {/* <div className="AdminRoles">
             <label htmlFor="adminRoles">Admin Roles</label>
 
             <div className="CheckboxContainer">
@@ -237,14 +244,16 @@ const CreateNewAdmin = ({ func }) => {
                     value={option.value}
                     onChange={formik.handleChange}
                   />
-                  <label htmlFor={option.value}  className="checkboxLabel">{option.label}</label>
+                  <label htmlFor={option.value} className="checkboxLabel">
+                    {option.label}
+                  </label>
                 </div>
               ))}
             </div>
             {formik.errors.adminRoles && formik.touched.adminRoles ? (
               <div className="Error">{formik.errors.adminRoles}</div>
             ) : null}
-          </div>
+          </div> */}
 
           {/* notification message */}
           <div className="Notification">
@@ -254,21 +263,23 @@ const CreateNewAdmin = ({ func }) => {
           <div className="BtnRow">
             <div className="BtnContainer">
               <BocButton
-                fontSize="1.6rem"
+                fontSize="1.3rem"
                 type="button"
                 bgcolor="gray"
                 bradius="18px"
                 func={handleClose}
+                width={"200px"}
               >
                 Cancel
               </BocButton>
             </div>
             <div className="BtnContainer">
               <BocButton
-                fontSize="1.6rem"
+                fontSize="1.3rem"
                 type="submit"
                 bgcolor="#ecaa00"
                 bradius="18px"
+                width={"200px"}
               >
                 Submit
               </BocButton>

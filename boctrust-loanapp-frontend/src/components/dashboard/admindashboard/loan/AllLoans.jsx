@@ -5,7 +5,6 @@ import { fetchAllCustomer } from "../../../../redux/reducers/customerReducer";
 import Table from "react-bootstrap/Table";
 import "../../Dashboard.css";
 import DashboardHeadline from "../../shared/DashboardHeadline";
-import BocButton from "../../shared/BocButton";
 import NextPreBtn from "../../shared/NextPreBtn";
 import PageLoader from "../../shared/PageLoader";
 import getDateOnly from "../../../../../utilities/getDate";
@@ -44,6 +43,7 @@ const AllLoans = ({ showCount, searchTerms }) => {
   const customers = useSelector(
     (state) => state.customerReducer.customers.customer
   );
+  const { loanStatusEnum } = useSelector((state) => state.customerReducer);
   const status = useSelector((state) => state.customerReducer.status);
 
   useEffect(() => {
@@ -52,8 +52,7 @@ const AllLoans = ({ showCount, searchTerms }) => {
 
   // filtere customer by isKycApproved
   const filteredCustomers = customers?.filter(
-    (customer) =>
-      customer.kyc.isKycApproved === true && customer.deductions !== "remita"
+    (customer) => customer.kyc.isKycApproved === true
   );
 
   // handle close loan details
@@ -120,30 +119,36 @@ const AllLoans = ({ showCount, searchTerms }) => {
             {sortByCreatedAt(customerList)?.map((customer) => {
               return (
                 <tr key={customer._id}>
-                  <td>{customer.banking.accountDetails.Message.Id}</td>
+                  <td>{customer.banking?.accountDetails?.Message.Id}</td>
                   <td>{customer.loanProduct || "General Loan"}</td>
-                  <td>{customer.banking.accountDetails.Message.FullName}</td>
+                  <td>
+                    {customer.banking?.accountDetails?.Message.FullName ??
+                      `${customer?.firstname} ${customer?.lastname}`}
+                  </td>
                   <td>
                     {customer?.banking?.accountDetails?.Message?.AccountNumber}
                   </td>
                   <td>{getDateOnly(customer.createdAt)}</td>
                   <td>N{customer.loanamount}</td>
-                  <td style={styles.padding}>
+                  <td
+                    style={styles.padding}
+                    className={
+                      customer?.kyc?.loanstatus === loanStatusEnum.completed
+                        ? "text-success"
+                        : "text-warning"
+                    }
+                  >
                     {" "}
                     {capitalizeEachWord(customer.kyc.loanstatus)}
                   </td>
                   <td>
                     <div>
-                      <BocButton
-                        func={() => handleShow(customer._id)}
-                        bradius="12px"
-                        fontSize="12px"
-                        width="80px"
-                        margin="4px"
-                        bgcolor="#ecaa00"
+                      <button
+                        onClick={() => handleShow(customer._id)}
+                       className="btn btn-info text-white"
                       >
                         Details
-                      </BocButton>
+                      </button>
                     </div>
                   </td>
                 </tr>

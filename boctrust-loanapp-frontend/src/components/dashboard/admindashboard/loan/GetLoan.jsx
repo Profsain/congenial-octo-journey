@@ -171,9 +171,9 @@ const GetLoan = () => {
             {sortByCreatedAt(customerList)?.map((customer) => {
               return (
                 <tr key={customer._id}>
-                  <td>{customer.banking.accountDetails.Message.Id}</td>
+                  <td>{customer.banking?.accountDetails?.Message.Id}</td>
                   <td>{customer.loanProduct || "General Loan"}</td>
-                  <td>{customer.banking.accountDetails.Message.FullName}</td>
+                  <td>{customer.banking?.accountDetails?.Message.FullName}</td>
                   <td>
                     {customer?.banking?.accountDetails?.Message?.AccountNumber}
                   </td>

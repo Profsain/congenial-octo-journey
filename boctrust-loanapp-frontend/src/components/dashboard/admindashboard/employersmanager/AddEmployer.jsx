@@ -33,7 +33,7 @@ const AddEmployer = () => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify(values),
-    })
+    });
 
     // Reset form after submission
     resetForm();
@@ -42,7 +42,6 @@ const AddEmployer = () => {
     setTimeout(() => {
       setMessage("");
     }, 5000);
-
   };
 
   return (

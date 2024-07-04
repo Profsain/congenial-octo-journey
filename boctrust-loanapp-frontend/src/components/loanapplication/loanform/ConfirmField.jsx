@@ -1,7 +1,10 @@
 import PropTypes from "prop-types";
+import { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 
 const ConfirmField = ({
   labelName,
+  readOnly,
   placeholderText,
   fieldName,
   type,
@@ -9,16 +12,31 @@ const ConfirmField = ({
   func,
 }) => {
   const value = values[fieldName];
+  const [fieldValue, setFieldValue] = useState(value);
+  const employers = useSelector(
+    (state) => state.employersManagerReducer.employers.employers
+  );
+
+  useEffect(() => {
+    if (fieldName === "employername") {
+      const employerInfo = employers.find((employer) => employer._id === value);
+      setFieldValue(employerInfo ? employerInfo.employersName : value);
+    }
+  }, [employers, fieldName, value]);
 
   return (
     <div>
       <label htmlFor={fieldName}>{labelName}</label>
       <input
+        readOnly={readOnly}
         type={type}
         name={fieldName}
-        value={value}
+        value={fieldValue}
         placeholder={placeholderText}
-        onChange={(e) => func(fieldName, e)}
+        onChange={(e) => {
+          setFieldValue(e.target.value);
+          func(fieldName, e);
+        }}
         className="TextInput"
       />
     </div>
@@ -29,6 +47,7 @@ ConfirmField.propTypes = {
   fieldName: PropTypes.string,
   func: PropTypes.func,
   labelName: PropTypes.string,
+  readOnly: PropTypes.bool,
   placeholderText: PropTypes.string,
   type: PropTypes.any,
   values: PropTypes.shape({

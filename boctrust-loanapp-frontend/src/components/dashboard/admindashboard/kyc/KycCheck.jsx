@@ -18,6 +18,7 @@ import useSearch from "../../../../../utilities/useSearchName";
 import useSearchByDate from "../../../../../utilities/useSearchByDate";
 import useSearchByDateRange from "../../../../../utilities/useSearchByDateRange";
 import sortByCreatedAt from "../../shared/sortedByDate";
+import KycViewDetails from "./KycViewDetails";
 
 const KycCheck = () => {
   const styles = {
@@ -65,6 +66,7 @@ const KycCheck = () => {
   const [isOtherDocsValidated, setIsOtherDocsValidated] = useState(null);
   const [isKycApproved, setIsKycApproved] = useState(null);
   const [showOtherDocs, setShowOtherDocs] = useState(false);
+  const [showInfo, setShowInfo] = useState(false);
   // processing bar state
   const [progress, setProgress] = useState(false);
 
@@ -122,6 +124,15 @@ const KycCheck = () => {
     setShowOtherDocs(true);
   };
 
+  const handleViewInfo = (id) => {
+    setCustomerId(id);
+
+    // filter customer by id and update current customer state
+    const customer = customers.filter((customer) => customer._id === id);
+    setCurrentCustomer(customer[0]);
+    setShowInfo(true);
+  };
+
   // handle credit check start btn
   const handleStartCheck = (id) => {
     setCustomerId(id);
@@ -136,7 +147,7 @@ const KycCheck = () => {
   const handleSaveCheck = async () => {
     setProgress(true);
     const data = {
-      loanstatus: "with coo",
+      loanstatus: "with credit",
       isFacialMatch,
       isIdCardValid,
       isPhotoCaptured,
@@ -152,30 +163,7 @@ const KycCheck = () => {
       body: JSON.stringify(data),
     });
 
-    // create bankone account for customer
-    if (isKycApproved) {
-      const newAccount = await fetch(
-        `${apiUrl}/api/bankone/createCustomerAccount`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(currentCustomer),
-        }
-      );
-      const account = await newAccount.json();
-
-      // update customer data with account details
-      const accountData = {
-        isAccountCreated: true,
-        accountDetails: account.data,
-      };
-
-      await fetch(`${apiUrl}/api/updatecustomer/banking/${customerId}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(accountData),
-      });
-    }
+    await dispatch(fetchAllCustomer());
     setShowKycDetails(false);
     setProgress(false);
   };
@@ -224,7 +212,7 @@ const KycCheck = () => {
 
   return (
     <>
-      {!showOtherDocs && (
+      {!showOtherDocs && !showInfo && (
         <div>
           <div>
             {/* view by section */}
@@ -246,15 +234,17 @@ const KycCheck = () => {
               height="52px"
               mspacer="2rem 0 -2.55rem -1rem"
               bgcolor="#145098"
-            ></DashboardHeadline>
+            />
             <div style={styles.table}>
               <Table borderless hover responsive="sm">
                 <thead style={styles.head}>
                   <tr>
                     <th>Customer ID</th>
                     <th>Full Name</th>
+                    <th>Phone</th>
                     <th>Date</th>
-                    <th>View Document</th>
+                    <th>View Details</th>
+                    <th>View Documents</th>
                     <th>Do Review</th>
                   </tr>
                 </thead>
@@ -268,9 +258,17 @@ const KycCheck = () => {
                   ) : (
                     sortByCreatedAt(searchData)?.map((customer) => (
                       <tr key={customer._id}>
-                        <td>{customer.phonenumber.slice(1)}</td>
+                        <td>{customer.customerId}</td>
                         <td>{customer.firstname + " " + customer.lastname}</td>
+                        <td>{customer.phonenumber}</td>
                         <td>{getDateOnly(customer.createdAt)}</td>
+                        <td
+                          onClick={() => handleViewInfo(customer._id)}
+                          style={styles.padding}
+                          className="viewDocs"
+                        >
+                          View
+                        </td>
                         <td
                           onClick={() => handleViewDocs(customer._id)}
                           style={styles.padding}
@@ -596,7 +594,7 @@ const KycCheck = () => {
                     bgcolor="#145098"
                     func={handleSaveCheck}
                   >
-                    Valid/Create Account
+                    Valid
                   </BocButton>
                 ) : (
                   <PageLoader />
@@ -613,6 +611,9 @@ const KycCheck = () => {
           customerObj={currentCustomer}
           setShowDocs={setShowOtherDocs}
         />
+      )}
+      {showInfo && (
+        <KycViewDetails customer={currentCustomer} setShowInfo={setShowInfo} />
       )}
     </>
   );

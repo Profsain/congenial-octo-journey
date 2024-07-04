@@ -16,29 +16,48 @@ import calculatorfunc from "../../shared/calculatorfunc";
 
 // bvn verification function
 import { bvnVerification } from "./bvnVerification";
+import { ToastContainer, toast } from "react-toastify";
+
+// toast styles
+import "react-toastify/dist/ReactToastify.css";
+import { useNavigate } from "react-router-dom";
 
 // loan form component
 const LoanFirstStep = ({ data }) => {
-  // fetch loan product
-  const dispatch = useDispatch();
-
-  useEffect(() => {
-    dispatch(fetchProduct());
-  }, [dispatch]);
-
-  const loanProducts = useSelector(
-    (state) => state.productReducer.products.products
-  );
-
   // get loan amount and career type from loan home
   const loanamount = data?.loanamount;
   const careertype = data?.careertype;
   const [noofmonth, setNoofmonth] = useState(1);
   const [currentLoanAmount, setCurrentLoanAmount] = useState(loanamount);
   const [interestResult, setInterestResult] = useState(0);
+  const [initialLoanProduct, setInitialLoanProduct] = useState();
 
   const [step, setStep] = useState(1);
   const [stepImg, setStepImg] = useState("images/step1.png");
+
+  // calculate interest rate
+  const [loanRepaymentTotal, setLoanRepaymentTotal] = useState(0);
+  const [monthlyRepayment, setMonthlyRepayment] = useState(0);
+  // const [bvn, setBvn] = useState("");
+
+  // fetch loan product
+  const dispatch = useDispatch();
+
+  const loanProducts = useSelector(
+    (state) => state.productReducer.products.products
+  );
+
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    dispatch(fetchProduct());
+  }, [dispatch]);
+
+  useEffect(() => {
+    setInitialLoanProduct(
+      loanProducts?.find((item) => item.productName === "Term Loan")
+    );
+  }, [loanProducts]);
 
   // get current formik value
   const ref = useRef();
@@ -48,15 +67,22 @@ const LoanFirstStep = ({ data }) => {
     window.scrollTo(0, 0);
   }, [step]);
 
-  // calculate interest rate
-  const [loanRepaymentTotal, setLoanRepaymentTotal] = useState(0);
-  const [monthlyRepayment, setMonthlyRepayment] = useState(0);
-  // const [bvn, setBvn] = useState("");
+  useEffect(() => {
+    if (initialLoanProduct?._id && noofmonth) {
+      calculateRepayment();
+    }
+  }, [noofmonth, currentLoanAmount, initialLoanProduct]);
 
-  const calculateRepayment = () => {
+  const calculateRepayment = (userClicked) => {
     // get product id from formik values
-    const productId = ref.current?.values.loanproduct;
+    const productId =
+      ref.current?.values.loanproduct || initialLoanProduct?._id;
+
     const noOfMonths = ref.current?.values.numberofmonth;
+
+    if ((!productId || !noOfMonths) && userClicked) {
+      return notify("Please Enter All Fields ");
+    }
     setNoofmonth(noOfMonths);
 
     // find product
@@ -72,15 +98,16 @@ const LoanFirstStep = ({ data }) => {
       loanRate
     );
     setInterestResult(loanCal);
-  };
 
-  useEffect(() => {
-    calculateRepayment();
-  }, [noofmonth, currentLoanAmount]);
+    if (userClicked) {
+      scrollToLoanCal();
+    }
+  };
 
   const loanTotal =
     parseInt(currentLoanAmount.replace(/,/g, "")) + interestResult;
   const monthlyPay = (loanTotal / parseInt(noofmonth)).toFixed();
+
   // update repayment
   useEffect(() => {
     setLoanRepaymentTotal(loanTotal);
@@ -107,6 +134,9 @@ const LoanFirstStep = ({ data }) => {
     const apiUrl = import.meta.env.VITE_BASE_URL;
     const bvn = ref.current?.values.bvnnumber;
 
+    if (!bvn) {
+      return notify("Please Provide a valid bvn number");
+    }
     const raw = JSON.stringify({
       bvn,
       loanAmount: loanamount,
@@ -126,9 +156,12 @@ const LoanFirstStep = ({ data }) => {
       body: raw,
     })
       .then((response) => response.json())
-      .then((result) => {
+      .then(() => {
         // search for bvn details and verify
-        bvnVerification();
+       
+         bvnVerification();
+
+        navigate("/app/nibbs-login");
 
         // set show loan form to true
         // setShowLoanForm(true);
@@ -141,6 +174,12 @@ const LoanFirstStep = ({ data }) => {
     loanCalRef.current.scrollIntoView({ behavior: "smooth" });
   };
 
+  //  Toast Notifications callback
+  const notify = (msg) => {
+    toast.error(msg, {
+      position: "bottom-right",
+    });
+  };
   return (
     <>
       <div className="container-fluid FormContainer">
@@ -148,9 +187,9 @@ const LoanFirstStep = ({ data }) => {
           {/* formik form */}
           <div>
             <Formik
-              initialValues={initialValues(loanamount, careertype)}
+              initialValues={initialValues({ loanamount, careertype })}
               validationSchema={validationSchema}
-              //   onSubmit={handleSubmit}
+                // onSubmit={handleSubmit}
               innerRef={ref}
               encType="multipart/form-data"
             >
@@ -229,7 +268,6 @@ const LoanFirstStep = ({ data }) => {
                                     name="loanproduct"
                                     className="TextInput"
                                   >
-                                    <option value=""></option>
                                     {loanProducts?.map((product) => (
                                       <option
                                         key={product._id}
@@ -245,8 +283,7 @@ const LoanFirstStep = ({ data }) => {
                                   <button
                                     type="button"
                                     onClick={() => {
-                                      calculateRepayment();
-                                      scrollToLoanCal();
+                                      calculateRepayment(true);
                                     }}
                                     className="BtnAction BtnSecondary"
                                   >
@@ -350,6 +387,7 @@ const LoanFirstStep = ({ data }) => {
             </Formik>
           </div>
         </div>
+        <ToastContainer />
       </div>
     </>
   );

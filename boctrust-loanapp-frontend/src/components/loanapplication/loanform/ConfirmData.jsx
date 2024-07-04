@@ -1,10 +1,10 @@
-import PropTypes from "prop-types"
+import PropTypes from "prop-types";
 import { useFormikContext } from "formik";
 import ConfirmField from "./ConfirmField";
 import Headline from "../../shared/Headline";
 import "./Form.css";
 
-const ConfirmData = ({career}) => {
+const ConfirmData = ({ career }) => {
   const { values, setFieldValue } = useFormikContext();
 
   const handleInputChange = (fieldName, event) => {
@@ -205,6 +205,37 @@ const ConfirmData = ({career}) => {
           />
         </div>
 
+        {/* Loan Details */}
+
+        <div>
+          <Headline
+            align="left"
+            spacer="28px 0 -6px 0"
+            fontSize="22px"
+            text="Loan Details"
+          />
+          <hr />
+          <div className="InputRow">
+            <ConfirmField
+              labelName="Loan Amount"
+              fieldName="loanamount"
+              type="text"
+              disabled
+              values={values}
+              func={handleInputChange}
+            />
+            <div className="Space"></div>
+            <ConfirmField
+              labelName="Monthly Repayment"
+              fieldName="monthlyRepayment"
+              type="text"
+              disabled
+              values={values}
+              func={handleInputChange}
+            />
+          </div>
+        </div>
+
         {/* employment details */}
         {career.toLowerCase() === "government employee" ? (
           <div>
@@ -294,60 +325,31 @@ const ConfirmData = ({career}) => {
             />
           </div>
 
-          {/* disbursement details */}
-          {values.sameasaboveaccount ? (
-            <div>
-              <Headline
-                spacer="28px 0 -18px 0"
-                align="left"
-                fontSize="18px"
-                text="Disbursement Account"
+          {/* <div>
+            <Headline
+              spacer="28px 0 -18px 0"
+              align="left"
+              fontSize="18px"
+              text="Disbursement Account"
+            />
+            <div className="InputRow">
+              <ConfirmField
+                labelName="Bank Name"
+                fieldName="salarybankname"
+                type="text"
+                values={values}
+                func={handleInputChange}
               />
-              <div className="InputRow">
-                <ConfirmField
-                  labelName="Bank Name"
-                  fieldName="salarybankname"
-                  type="text"
-                  values={values}
-                  func={handleInputChange}
-                />
-                <div className="Space"></div>
-                <ConfirmField
-                  labelName="Account Number"
-                  fieldName="salaryaccountnumber"
-                  type="text"
-                  values={values}
-                  func={handleInputChange}
-                />
-              </div>
-            </div>
-          ) : (
-            <div>
-              <Headline
-                spacer="28px 0 -18px 0"
-                align="left"
-                fontSize="18px"
-                text="Disbursement Account"
+              <div className="Space"></div>
+              <ConfirmField
+                labelName="Account Number"
+                fieldName="salaryaccountnumber"
+                type="text"
+                values={values}
+                func={handleInputChange}
               />
-              <div className="InputRow">
-                <ConfirmField
-                  labelName="Bank Name"
-                  fieldName="disbursementbankname"
-                  type="text"
-                  values={values}
-                  func={handleInputChange}
-                />
-                <div className="Space"></div>
-                <ConfirmField
-                  labelName="Account Number"
-                  fieldName="disbursementaccountnumber"
-                  type="text"
-                  values={values}
-                  func={handleInputChange}
-                />
-              </div>
             </div>
-          )}
+          </div> */}
 
           {/* buyover loan details */}
           {values.buyoverloan === "yes" ? (
@@ -401,7 +403,7 @@ const ConfirmData = ({career}) => {
 };
 
 ConfirmData.propTypes = {
-  career: PropTypes.string
-}
+  career: PropTypes.string,
+};
 
 export default ConfirmData;

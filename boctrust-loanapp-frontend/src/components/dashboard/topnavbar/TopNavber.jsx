@@ -3,7 +3,7 @@ import "./TopNavbar.css";
 
 const TopNavber = ({ title, user="Femi Akinwade" }) => {
   return (
-    <div className="Inline">
+    <div className="Inline mb-4">
       <div>
         <h4 id="Title">{title}</h4>
       </div>

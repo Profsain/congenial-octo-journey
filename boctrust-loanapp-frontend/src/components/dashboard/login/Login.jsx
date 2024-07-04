@@ -37,10 +37,7 @@ const Login = () => {
     const { loginAs } = formData;
 
     if (loginAs === "staff") {
-      const response = await forgotPassword(
-        forgotUsername,
-        forgotEmail,
-      );
+      const response = await forgotPassword(forgotUsername, forgotEmail);
       if (response.success) {
         // clear fields
         setForgotUsername("");
@@ -52,10 +49,7 @@ const Login = () => {
       }
     } else if (loginAs === "customer") {
       console.log("customer");
-      const response = await forgotPassCustomer(
-        forgotUsername,
-        forgotEmail,
-      );
+      const response = await forgotPassCustomer(forgotUsername, forgotEmail);
       if (response.success) {
         // clear fields
         setForgotUsername("");
@@ -180,20 +174,20 @@ const Login = () => {
                   type="radio"
                   name="loginAs"
                   className="radio"
-                  value="staff"
+                  value="customer"
                   onChange={handleChange}
                 />
-                <label className="Remember">Staff </label>
+                <label className="Remember">Customer </label>
               </div>
               <div>
                 <input
                   type="radio"
                   name="loginAs"
                   className="radio"
-                  value="customer"
+                  value="staff"
                   onChange={handleChange}
                 />
-                <label className="Remember">Customer </label>
+                <label className="Remember">Staff </label>
               </div>
             </div>
           </Form.Group>

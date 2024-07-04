@@ -1,17 +1,23 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
-const customerSchema = new mongoose.Schema({
+const ExtraLenderSchema = new mongoose.Schema({
+  name: { type: String },
+  deductions: { type: Number },
+});
+
+const customerSchema = new mongoose.Schema(
+  {
     bvnnumber: {
       type: String,
-      },
+    },
     title: {
       type: String,
-      default: ''
+      default: "",
     },
     customerId: String,
     firstname: String,
     lastname: String,
-    email: {type: String, unique: true, required: true},
+    email: { type: String, unique: true, required: true },
     phonenumber: String,
     dob: String,
     maritalstatus: String,
@@ -22,8 +28,8 @@ const customerSchema = new mongoose.Schema({
     stateofresidence: String,
     lga: String,
     stateoforigin: String,
-    ippis: {type: String, default: 'nill'},
-    servicenumber: {type: String,default: 'nill'},
+    ippis: { type: String, default: "nill" },
+    servicenumber: { type: String, default: "nill" },
     valididcard: String,
     idcardnotinclude: String,
     nkinfirstname: String,
@@ -35,18 +41,18 @@ const customerSchema = new mongoose.Schema({
     numberofmonth: String,
     loantotalrepayment: String,
     loanproduct: {
-    type: Object,
-    default: {}
+      type: Object,
+      default: {},
     },
     monthlyrepayment: String,
     careertype: String,
     numberofmonth: {
-    type: String,
-    default: "0"
+      type: String,
+      default: "0",
     },
     loanpurpose: [String],
     otherpurpose: String,
-    employername: Object,
+    employername: mongoose.Schema.Types.Mixed,
     employeraddress: String,
     employmentletter: String,
     employmentstartdate: String,
@@ -54,7 +60,8 @@ const customerSchema = new mongoose.Schema({
     totalannualincome: String,
     officialemail: String,
     uploadpayslip: String,
-    
+    uploadbankstatement: String,
+
     salarybankname: String,
     salaryaccountnumber: String,
     sameasaboveaccount: String,
@@ -65,15 +72,19 @@ const customerSchema = new mongoose.Schema({
     currentmonthlyplanrepaymentamount: String,
     estimatedmonthlylivingexpense: String,
     buyoverloan: String,
+    buyoverloanactivated: {
+      type: Boolean,
+      default: false,
+    },
     beneficiaryname: String,
     beneficiarybank: String,
     beneficiaryaccountnumber: String,
     liquidationbalance: String,
     deductions: String,
     guarantee: String,
-  disbursementstatus: {
-    type: String,
-    default: "pending"
+    disbursementstatus: {
+      type: String,
+      default: "pending",
     },
     acceptterms: String,
     acceptpolicy: String,
@@ -85,7 +96,7 @@ const customerSchema = new mongoose.Schema({
     haveagent: String,
     agentname: {
       type: String,
-      default: 'Boctrust Admin'
+      default: "Boctrust Admin",
     },
     username: { type: String, unique: true, required: true },
     password: String,
@@ -96,8 +107,9 @@ const customerSchema = new mongoose.Schema({
         creditAnalyst: { type: String, default: "" },
         isCreditAnalystAssigned: {
           type: Boolean,
-          default: false
-        }
+          default: false,
+        },
+        updatedAt: Date, // Field to store the timestamp
       },
       creditDbSearch: {
         searchType: { type: String, default: "" },
@@ -107,9 +119,10 @@ const customerSchema = new mongoose.Schema({
         dbSearchReport: { type: String, default: "" },
         isCreditDbCheck: {
           type: Boolean,
-          default: false
-        }
-      }, 
+          default: false,
+        },
+        updatedAt: Date, // Field to store the timestamp
+      },
       deductCheck: {
         searchByDeduct: { type: String, default: "" },
         searchDateDeduct: { type: String, default: "" },
@@ -117,8 +130,9 @@ const customerSchema = new mongoose.Schema({
         deductSearchReport: { type: String, default: "" },
         isDeductCheck: {
           type: Boolean,
-          default: false
-        }
+          default: false,
+        },
+        updatedAt: Date, // Field to store the timestamp
       },
       creditBureauSearch: {
         bureauName: { type: String, default: "" },
@@ -126,177 +140,191 @@ const customerSchema = new mongoose.Schema({
         reportType: { type: String, default: "" },
         reportReason: { type: String, default: "" },
         bureauDate: { type: String, default: "" },
-        bureauSearchReport: { type: String, default: "" },
+        bureauSearchReport: { type: [String], default: "" },
         isCreditBureauCheck: {
           type: Boolean,
-          default: false
+          default: false,
         },
         creditBureauResult: {},
+        updatedAt: Date, // Field to store the timestamp
       },
       paySlipAnalysis: {
         netPay: { type: String, default: "" },
-        grossPay: { type: String, default: "" },
-        numberOfLenders: [Object],
+        extraLenders: {
+          type: [ExtraLenderSchema],
+          default: [],
+        },
         monthlyLoanRepayment: { type: String, default: "" },
         dateOfBirth: { type: String, default: "" },
         dateOfAppointment: { type: String, default: "" },
         isApplicantCivilianPolice: {
           type: Boolean,
-          default: false
+          default: false,
         },
         uploadPaySlip: { type: String, default: "" },
+        benchmark: { type: Number },
         isPaySlipContainsMoreThenFiveLenders: {
           type: Boolean,
-          default: false
+          default: false,
         },
-        monthlyDeductionNotMoreThan50Percent: {
+        monthlyDeductionBelowPercentageBenchmark: {
           type: Boolean,
-          default: false
+          default: false,
         },
-        takeHomePayNotLessThan20Percent: {
+        takeHomePayNotLessThanBenchmark: {
           type: Boolean,
-          default: false
+          default: false,
         },
-        takeHomePayNotLessThan30K: {
+        takeHomePayNotLessThan20PercentGross: {
           type: Boolean,
-          default: false
+          default: false,
         },
-        netPayNotLessThan30K: {
+        netPayNotLessThanBenchmark: {
           type: Boolean,
-          default: false
+          default: false,
         },
+        updatedAt: Date, // Field to store the timestamp
       },
       decisionSummary: {
-        netPay50Percent: { type: String, default: "" },
-        grossPay20Percent: { type: String, default: "" },
         customerTakeHomeAfterLoanApproval: { type: String, default: "" },
         customerHasGoodCreditHistory: {
           type: Boolean,
-          default: false
+          default: false,
         },
         isCustomerOnSoftSuit: {
           type: Boolean,
-          default: false
+          default: false,
         },
         isCustomerNextOfKinOk: {
           type: Boolean,
-          default: false
+          default: false,
         },
         isCreditCheckOk: {
           type: Boolean,
-          default: false
+          default: false,
         },
         isBvnCheckOk: {
           type: Boolean,
-          default: false
+          default: false,
         },
+        maxAmountLendable: Number,
+        totalMonthlyDeductions: Number,
         disbursementInstruction: { type: String, default: "" },
         creditOfficerReview: { type: String, default: "" },
-        isCreditOfficerApproved: {
-          type: Boolean,
-          default: false
+        creditOfficerApprovalStatus: {
+          type: String,
+          enum: ["approved", "declined", "pending"],
+          default: "pending",
         },
-        isCooApproved: {
-          type: Boolean,
-          default: false
+        headOfCreditApprovalStatus: {
+          type: String,
+          enum: ["approved", "declined", "pending"],
+          default: "pending",
         },
-
+        cooApprovalStatus: {
+          type: String,
+          enum: ["approved", "declined", "pending"],
+          default: "pending",
+        },
+        creditOfficerApprovedAt: Date, // Field to store the timestamp
       },
-  },
-  branch: {
-    type: String,
-    default: "head office"
-  },
-  kyc: {
-     loanstatus: {
+    },
+    branch: {
       type: String,
-      default: "with_operations"
+      default: "head office",
     },
-    isFacialMatch: {
-      type: Boolean,
-      default: false
+    kyc: {
+      loanstatus: {
+        type: String,
+        default: "with_operations",
+      },
+      isFacialMatch: {
+        type: Boolean,
+        default: false,
+      },
+      isIdCardValid: {
+        type: Boolean,
+        default: false,
+      },
+      isPhotoCaptured: {
+        type: Boolean,
+        default: false,
+      },
+      isSignatureValid: {
+        type: Boolean,
+        default: false,
+      },
+      isOtherDocsValidated: {
+        type: Boolean,
+        default: false,
+      },
+      isKycApproved: {
+        type: Boolean,
+        default: false,
+      },
+      timestamps: {
+        type: Date,
+        default: Date.now,
+      },
     },
-    isIdCardValid: {
-      type: Boolean,
-      default: false
+    transactions: {
+      type: Array,
+      default: [],
     },
-    isPhotoCaptured: {
-      type: Boolean,
-      default: false
-    },
-    isSignatureValid: {
-      type: Boolean,
-      default: false
-    },
-    isOtherDocsValidated: {
-      type: Boolean,
-      default: false
-    },
-    isKycApproved: {
-      type: Boolean,
-      default: false
-    },
-    timestamps: {
-      type: Date,
-      default: Date.now
-    }
-  },
-  transactions: {
-    type: Array,
-    default: []
-  },
-  myLoansBalance: {
-    type: String,
-    default: "0.00"
-  },
-  totalLoanBalance: {
-    type: String,
-    default: "0.00"
-  },
-  allLoans: [
-    {
-      type: Object,
-      default: {}
-    }
-  ],
-  banking: {
-    isAccountCreated: {
-      type: Boolean,
-      default: false
-    },
-    accountDetails: {
-    type: Object, // hold an object
-    default: {}    //  default empty object 
-    } 
-  },
-  remita: {
-    isRemitaCheck: {
-      type: Boolean,
-      default: false
-    },
-    remitaStatus: {
+    myLoansBalance: {
       type: String,
-      default: "pending"
+      default: "0.00",
     },
-    loanStatus: {
+    totalLoanBalance: {
       type: String,
-      default: "pending"
+      default: "0.00",
     },
-    stopLoanStatus: {
-      type: String,
-      default: "new"
+    allLoans: [
+      {
+        type: Object,
+        default: {},
+      },
+    ],
+    banking: {
+      isAccountCreated: {
+        type: Boolean,
+        default: false,
+      },
+      accountDetails: {
+        type: Object, // hold an object
+        default: {}, //  default empty object
+      },
     },
-    remitaDetails: {
-    type: Object, // hold an object
-    default: {}    //  default empty object 
+    remita: {
+      isRemitaCheck: {
+        type: Boolean,
+        default: false,
+      },
+      remitaStatus: {
+        type: String,
+        default: "pending",
+      },
+      loanStatus: {
+        type: String,
+        default: "pending",
+      },
+      stopLoanStatus: {
+        type: String,
+        default: "new",
+      },
+      remitaDetails: {
+        type: Object, // hold an object
+        default: {}, //  default empty object
+      },
+      disbursementDetails: {
+        type: Object, // hold an object
+        default: {}, //  default empty object
+      },
     },
-    disbursementDetails: {
-    type: Object, // hold an object
-    default: {}    //  default empty object 
-    } 
-  }
-}, { timestamps: true });
+  },
+  { timestamps: true }
+);
 
-const Customer = mongoose.model('Customer', customerSchema);
+const Customer = mongoose.model("Customer", customerSchema);
 
 module.exports = Customer;

@@ -38,7 +38,7 @@ const HomeCarousel = () => {
     top: "170px",
     left: "0",
     width: "100%",
-    marginTop: "-80px",
+    marginTop: "-165px",
   };
 
   return (

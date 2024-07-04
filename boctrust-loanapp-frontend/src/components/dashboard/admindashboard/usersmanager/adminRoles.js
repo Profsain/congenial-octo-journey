@@ -1,4 +1,4 @@
-// admin roles options 
+// admin roles options
 const adminRoles = [
   { value: "create_user", label: "Create User" },
   { value: "update_user", label: "Update User" },
@@ -27,8 +27,79 @@ const adminRoles = [
   { value: "credit_assesment_approval", label: "Credit Assesment Approval" },
   { value: "kyc_review", label: "KYC Review" },
   { value: "employer_manager", label: "Employer Manager" },
-  {  value: "manage_branch", label: "Manage Bank Branch" },
-
+  { value: "manage_branch", label: "Manage Bank Branch" },
 ];
 
 export default adminRoles;
+
+export const allUserRoles = {
+  operation_staff: {
+    can: [
+      "kycReviewManagement",
+      "readKycReview",
+      "readloans",
+      "loanManagement",
+    ],
+    cannot: [
+      "creaditAssessment",
+      "employerManament",
+      "userManagement",
+      "systemSetting",
+    ],
+  },
+  marketing_staff: {
+    can: ["readothers"],
+    cannot: [
+      "creaditAssessment",
+      "employerManament",
+      "userManagement",
+      "systemSetting",
+    ],
+  },
+  credit_analyst: {
+    can: ["creaditAssessment", "salaryHistoryCheck"],
+    cannot: [
+      "websiteManagement",
+      "employerManament",
+      "userManagement",
+      "systemSetting",
+    ],
+  },
+  coo: {
+    can: [
+      "approveTransactions",
+      "approveCreditAssesment",
+      "bookLoans",
+      "viewUsers",
+      "viewRemitaCollections",
+      "manageRemitaCollections",
+      "loadDisbursment",
+    ],
+    cannot: ["systemSetting"],
+  },
+};
+
+export const allPermisions = {
+  kyc: ["kycReviewManagement", "viewKycReview"],
+  loan: [
+    "readLoans",
+    "loanManagement",
+    "loadDisbursment",
+    "bookLoans",
+    "approveTransactions",
+  ],
+  remita: [
+    "viewRemitaCollections",
+    "manageRemitaCollections",
+    "salaryHistoryCheck",
+  ],
+  credit: [
+    "creaditAssessment",
+    "viewCreaditAssessment",
+    "approveCreditAssesment",
+  ],
+  employer: ["employerManament", "viewEmployers"],
+  webManager: ["websiteManagement", "viewWebsiteManagement"],
+  user: ["userManagement", "viewUsers"],
+  setting: ["systemSettingManagement", "viewSystemSetting"],
+};

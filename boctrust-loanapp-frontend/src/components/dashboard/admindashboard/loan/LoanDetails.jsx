@@ -11,7 +11,6 @@ const LoanDetails = ({
   handleApproval,
   currentPage,
 }) => {
-
   // handle delete
   const apiUrl = import.meta.env.VITE_BASE_URL;
   const deleteCustomer = async (id) => {
@@ -37,7 +36,9 @@ const LoanDetails = ({
     const id = loanObj._id;
 
     // show confirmation dialog
-    const confirmDelete = window.confirm("Are you sure you want to delete this loan?");
+    const confirmDelete = window.confirm(
+      "Are you sure you want to delete this loan?"
+    );
     if (confirmDelete) {
       deleteCustomer(id);
     }
@@ -53,13 +54,18 @@ const LoanDetails = ({
       >
         <Modal.Header closeButton>
           <Modal.Title>
-            <Headline text={loanObj.banking.accountDetails.Message.FullName} />
+            <Headline
+              text={
+                loanObj.banking.accountDetails?.Message.FullName ||
+                `${loanObj?.firstname} ${loanObj?.lastname}`
+              }
+            />
           </Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <RowCard
             title="Loan ID:"
-            text={loanObj.banking.accountDetails.Message.Id}
+            text={loanObj.banking.accountDetails?.Message.Id}
           />
           <hr />
           <RowCard title="Valid BVN:" text={loanObj.bvnnumber} />
@@ -83,7 +89,7 @@ const LoanDetails = ({
           <Button variant="secondary" onClick={handleClose}>
             Close
           </Button>
-          <Button variant="danger" onClick={handleDelete} >
+          <Button variant="danger" onClick={handleDelete}>
             Delete
           </Button>
           {currentPage === "pending" && (

@@ -24,6 +24,22 @@ p {
   font-family: 'Open Sans', sans-serif;
 }
 
+.cursor-pointer {
+  cursor: pointer;
+}
+
+img{
+  object-fit: contain;
+}
+
+.capitalize {
+  text-transform: capitalize;
+}
+
+.table > :not(caption) > * > *{
+  padding: 1rem .5rem !important;
+}
+
 @media screen and (max-width: 600px) {
   .Welcome {
     display: none;
@@ -196,7 +212,6 @@ p {
 
   .DashboardContainer {
     padding: 0 !important;
-    margin-top: 7rem !important;
   }
   .Inline {
     display: none;
@@ -354,9 +369,9 @@ p {
     flex-direction: column !important;
     margin-bottom: -4rem !important;
    }
-   .RBox {
+   /* .RBox {
     margin-top: 6rem !important;
-   }
+   } */
    .PCont {
     padding: 1rem !important
    }

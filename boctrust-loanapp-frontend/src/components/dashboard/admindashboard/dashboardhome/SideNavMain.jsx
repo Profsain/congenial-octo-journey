@@ -13,6 +13,7 @@ const SideNavMain = ({ onMenuItemClick }) => {
   const [isWebManagerOpen, setIsWebManagerOpen] = useState(false);
   const [isKycOpen, setIsKycOpen] = useState(false);
   const [isReportsOpen, setIsReportsOpen] = useState(false);
+  const [isUserManagerOpen, setIsUserManagerOpen] = useState(false);
   const [isSettingOpen, setIsSettingOpen] = useState(false);
 
   const openSubItem = () => setIsOpen(true);
@@ -35,6 +36,9 @@ const SideNavMain = ({ onMenuItemClick }) => {
 
   const openSubKyc = () => setIsKycOpen(true);
   const closeSubKyc = () => setIsKycOpen(false);
+
+  const openSubUserManager = () => setIsUserManagerOpen(true);
+  const closeSubUserManager = () => setIsUserManagerOpen(false);
 
   const openSubReports = () => setIsReportsOpen(true);
   const closeSubReports = () => setIsReportsOpen(false);
@@ -167,7 +171,7 @@ const SideNavMain = ({ onMenuItemClick }) => {
         </div>
       ) : null}
 
-        {/* repayment menu */}
+      {/* repayment menu */}
       <div id="repayment" className="IconBox" onClick={onMenuItemClick}>
         <img
           id="repayment"
@@ -200,8 +204,8 @@ const SideNavMain = ({ onMenuItemClick }) => {
         ) : null}
       </div>
 
-        {/* disbursement menu */}
-      <div id="withdraw" className="IconBox" onClick={onMenuItemClick}>
+      {/* disbursement menu */}
+      {/* <div id="withdraw" className="IconBox" onClick={onMenuItemClick}>
         <img
           id="withdraw"
           onClick={onMenuItemClick}
@@ -211,7 +215,7 @@ const SideNavMain = ({ onMenuItemClick }) => {
         <p id="withdraw" onClick={onMenuItemClick}>
           Disbursements
         </p>
-      </div>
+      </div> */}
 
       <div id="transaction" className="IconBox" onClick={onMenuItemClick}>
         <img
@@ -229,7 +233,7 @@ const SideNavMain = ({ onMenuItemClick }) => {
       <div onMouseOver={openSubItem} onMouseLeave={closeSubItem}>
         <div className="IconBox">
           <img src="images/dwithdraw.png" alt="nibss" />
-          <p>NIBSS Direct</p>
+          <p>NIBSS Direct Debit</p>
         </div>
         {isOpen ? (
           <div className="SubItem">
@@ -319,6 +323,9 @@ const SideNavMain = ({ onMenuItemClick }) => {
                 <li id="statementrules" onClick={onMenuItemClick}>
                   Statement Rules
                 </li>
+                <li id="employmentletter" onClick={onMenuItemClick}>
+                  Employment Letter
+                </li>
                 <li id="mdas" onClick={onMenuItemClick}>
                   All Employers
                 </li>
@@ -343,6 +350,12 @@ const SideNavMain = ({ onMenuItemClick }) => {
                 </li>
                 <li id="signature" onClick={onMenuItemClick}>
                   Review Report
+                </li>
+                <li id="employmentLetters" onClick={onMenuItemClick}>
+                  Employment Letters
+                </li>
+                <li id="bankStatements" onClick={onMenuItemClick}>
+                  Bank Statement
                 </li>
               </ul>
             </div>
@@ -382,7 +395,7 @@ const SideNavMain = ({ onMenuItemClick }) => {
         ) : null}
       </div>
 
-      <div id="withdrawmethod" className="IconBox" onClick={onMenuItemClick}>
+      {/* <div id="withdrawmethod" className="IconBox" onClick={onMenuItemClick}>
         <img
           id="withdrawmethod"
           onClick={onMenuItemClick}
@@ -392,20 +405,29 @@ const SideNavMain = ({ onMenuItemClick }) => {
         <p id="withdrawmethod" onClick={onMenuItemClick}>
           Disbursement Methods
         </p>
-      </div>
+      </div> */}
 
-      <div id="usermanager" className="IconBox" onClick={onMenuItemClick}>
-        <img
-          id="usermanager"
-          onClick={onMenuItemClick}
-          src="images/dusermanage.png"
-          alt="usermanager"
-        />
-        <p id="usermanager" onClick={onMenuItemClick}>
-          User Manager
-        </p>
+      <div onMouseOver={openSubUserManager} onMouseLeave={closeSubUserManager}>
+        <div className="IconBox">
+          <img src="images/dusermanage.png" alt="usermanager" />
+          <p>User Manager</p>
+        </div>
+        {isUserManagerOpen ? (
+          <div className="SubItem">
+            <ul>
+              <li id="allusers" onClick={onMenuItemClick}>
+                All Users
+              </li>
+              <li id="userrole" onClick={onMenuItemClick}>
+                User Roles
+              </li>
+              <li id="accesscontrol" onClick={onMenuItemClick}>
+                Access Control
+              </li>
+            </ul>
+          </div>
+        ) : null}
       </div>
-
       <div onMouseOver={openSubReports} onMouseLeave={closeSubReports}>
         <div className="IconBox">
           <img src="images/dreport.png" alt="report" />

@@ -2,20 +2,21 @@
 const clientSecret = import.meta.env.VITE_BVN_CLIENTSECRET;
 
 const clientId = import.meta.env.VITE_BVN_CLIENTID;
-const redirectUri = 'https://www.boctrustmfb.com/app/nibbs-login'
+const redirectUri = "https://www.boctrustmfb.com/app/nibbs-login";
 
 const bvnVerification = () => {
   // Step 1: Redirect the customer to the IDP page
-  const idpAuthorizeUrl = 'https://id.nibss-plc.com.ng/oxauth/restv1/authorize'
+  const idpAuthorizeUrl = "https://id.nibss-plc.com.ng/oxauth/restv1/authorize";
   // const authorizeUrl = `${idpAuthorizeUrl}?scope=icad&acr_values=otp&response_type=code&redirect_uri=${redirectUri}&client_id=${clientId}`;
   // BUG: 'icad' is not in the scope.
   // FIX: changed the scope into 'bvn'
   // SUGGETION: move 'clientSecret' , 'clientId' & 'redirectUri' into enviroment varibales
-  const authorizeUrl = `${idpAuthorizeUrl}?scope=bvn&acr_values=otp&response_type=code&redirect_uri=${redirectUri}&client_id=${clientId}`
+  const authorizeUrl = `${idpAuthorizeUrl}?scope=bvn&acr_values=otp&response_type=code&redirect_uri=${redirectUri}&client_id=${clientId}`;
 
   // Redirect the user to the IDP authorization page
-  window.location.href = authorizeUrl
-}
+  console.log("Runnning Here");
+  window.location.href = authorizeUrl;
+};
 
 const getBvnDetails = () => {
   // Step 2: After the customer is redirected back to callback URL with a temporary code,
@@ -23,67 +24,67 @@ const getBvnDetails = () => {
   // const grantType = 'authorization_code';
 
   // Simulate receiving the temporary code (replace with the actual code received)
-  const urlSearchParams = new URLSearchParams(window.location.search)
-  console.log(urlSearchParams)
-  const code = urlSearchParams.get('code')
-  console.log('code', code)
+  const urlSearchParams = new URLSearchParams(window.location.search);
+  console.log(urlSearchParams);
+  const code = urlSearchParams.get("code");
+  console.log("code", code);
 
   const exchangeCodeForToken = async () => {
     try {
       // Exchange the code for an access token
       if (!code) {
-        throw new Error('Authorization code not found in the URL')
+        throw new Error("Authorization code not found in the URL");
       }
       const response = await fetch(
         `https://id.nibss-plc.com.ng/oxauth/restv1/token`,
         {
-          method: 'POST',
+          method: "POST",
           headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
+            "Content-Type": "application/x-www-form-urlencoded",
           },
           body: new URLSearchParams({
             client_id: clientId,
             client_secret: clientSecret,
             code: code,
-            grant_type: 'authorization_code',
+            grant_type: "authorization_code",
             redirect_uri: redirectUri,
           }),
         }
-      )
+      );
 
       if (!response.ok) {
-        throw new Error(`Token request failed with status ${response.status}`)
+        throw new Error(`Token request failed with status ${response.status}`);
       }
 
-      const data = await response.json()
-      console.log('data', data)
-      const accessToken = data.access_token
-      console.log(`Access Token: ${accessToken}`)
+      const data = await response.json();
+      console.log("data", data);
+      const accessToken = data.access_token;
+      console.log(`Access Token: ${accessToken}`);
 
       // Step 3: Use the access token to call the API endpoints
       const apiEndpoint =
-        'https://api.nibss-plc.com.ng/bvnconsent/v1/getPartialDetailsWithBvn'
+        "https://api.nibss-plc.com.ng/bvnconsent/v1/getPartialDetailsWithBvn";
 
       const apiResponse = await fetch(apiEndpoint, {
-        method: 'GET',
+        method: "GET",
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
-      })
+      });
 
       if (!apiResponse.ok) {
-        throw new Error(`API request failed with status ${apiResponse.status}`)
+        throw new Error(`API request failed with status ${apiResponse.status}`);
       }
 
-      const apiData = await apiResponse.json()
-      console.log('API Response:', apiData)
+      const apiData = await apiResponse.json();
+      console.log("API Response:", apiData);
     } catch (error) {
-      console.error('Error:', error.message)
+      console.error("Error:", error.message);
     }
-  }
+  };
 
   // Call the function to exchange the code for an access token
-  exchangeCodeForToken()
-}
+  exchangeCodeForToken();
+};
 
-export { bvnVerification, getBvnDetails }
+export { bvnVerification, getBvnDetails };
