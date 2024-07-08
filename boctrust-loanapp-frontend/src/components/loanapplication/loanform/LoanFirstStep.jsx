@@ -10,7 +10,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { fetchProduct } from "../../../redux/reducers/productReducer";
 import Headline from "../../shared/Headline";
 import TextInput from "./formcomponents/TextInput";
-// import LoanForm from "./LoanForm";
+// LoanForm component to be remove after local testing
+import LoanForm from "./LoanForm";
 import "./Form.css";
 import calculatorfunc from "../../shared/calculatorfunc";
 
@@ -23,7 +24,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { useNavigate } from "react-router-dom";
 
 // loan form component
-const LoanFirstStep = ({ data }) => {
+const LoanFirstStep = ({ data }) => { 
   // get loan amount and career type from loan home
   const loanamount = data?.loanamount;
   const careertype = data?.careertype;
@@ -128,7 +129,8 @@ const LoanFirstStep = ({ data }) => {
   const product = loanProducts?.find((product) => product._id === productId);
 
   // handle bvn verification
-  // const [showLoanForm, setShowLoanForm] = useState(false);
+  // local testing
+  const [showLoanForm, setShowLoanForm] = useState(false);
 
   const handleBvnVerification = async () => {
     const apiUrl = import.meta.env.VITE_BASE_URL;
@@ -158,13 +160,14 @@ const LoanFirstStep = ({ data }) => {
       .then((response) => response.json())
       .then(() => {
         // search for bvn details and verify
-       
-         bvnVerification();
 
-        navigate("/app/nibbs-login");
+        // bvn verification commented out for local testing
+         // bvnVerification();
+        
+        // navigate("/app/nibbs-login");
 
-        // set show loan form to true
-        // setShowLoanForm(true);
+        // set show loan form to true for local testing
+        setShowLoanForm(true);
       });
   };
 
@@ -182,6 +185,8 @@ const LoanFirstStep = ({ data }) => {
   };
   return (
     <>
+{/*       conditional render LoanForm for testing */}
+      {showLoanForm ? (<LoanForm />) : (
       <div className="container-fluid FormContainer">
         <div>
           {/* formik form */}
@@ -389,6 +394,7 @@ const LoanFirstStep = ({ data }) => {
         </div>
         <ToastContainer />
       </div>
+        )}
     </>
   );
 };
