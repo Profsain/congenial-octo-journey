@@ -19,18 +19,6 @@ const Home = () => {
     });
   }, []);
 
-  // const handleSendEmail = () => {
-  //   const emailTemplateHtml = ReactDOMServer.renderToString(
-  //     <EmailTemplate firstName="Husseini Mudi" />
-  //   );
-  //   const options = {
-  //     email: "husseinimudiking@gmail.com",
-  //     subject: "Loan Application Notification",
-  //     html: emailTemplateHtml,
-  //   };
-  //   sendEmail(options);
-  // };
-
   return (
     <>
       <HomeCarousel />

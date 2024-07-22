@@ -945,7 +945,7 @@ const CreditCheckhtmlForm = ({ setShowCreditCheckForm, customerId }) => {
 
           {/* credit registry report */}
           <div className="row" style={{ width: "100vw" }}>
-            {PDFContent && (
+            {PDFContent ? (
               <div style={{ width: "80%", height: "100vh" }}>
                 <h3>Credit Registry Report</h3>
                 <embed
@@ -953,6 +953,8 @@ const CreditCheckhtmlForm = ({ setShowCreditCheckForm, customerId }) => {
                   style={{ width: "100%", height: "100%" }}
                 />
               </div>
+            ) : (
+              <h4 style={{color: "red", paddingBottom: "3rem", textAlign: "center"}}>No Credit Registry Report</h4>
             )}
           </div>
 
