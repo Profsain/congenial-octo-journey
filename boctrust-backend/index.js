@@ -38,6 +38,11 @@ const boardMemberRoutes = require("./routes/boardMember")
 const BoardMember = require("./models/BoardOfDirectors");
 const boardMembers = require("./seedData/boardMembers");
 
+// front page products
+const productsFrontPage = require("./routes/productsFrontPage");
+const productsSeedData = require("./seedData/productsFrontPageData");
+const ProductsFrontPage = require("./models/ProductsFrontPage");
+
 
 // configure dotenv
 dotenv.config();
@@ -57,6 +62,17 @@ mongoose
                 if (boardMembersData.length === 0) {
                     BoardMember.insertMany(boardMembers)
                         .then(() => console.log("Board members data seeded successfully"))
+                        .catch((err) => console.log(err));
+                }
+            })
+            .catch((err) => console.log(err));
+        
+        // seed product page data
+        ProductsFrontPage.find()
+            .then((productsData) => {
+                if (productsData.length === 0) {
+                    ProductsFrontPage.insertMany(productsSeedData)
+                        .then(() => console.log("Product page data seeded successfully"))
                         .catch((err) => console.log(err));
                 }
             })
@@ -133,6 +149,9 @@ mongoose
 
         // board member routes
         app.use('/api/board-member', boardMemberRoutes);
+
+        // front page products
+        app.use('/api/products-front-page', productsFrontPage);
 
         app.listen(process.env.PORT || 3030, () => console.log("Server running on port 3030"));
     })
