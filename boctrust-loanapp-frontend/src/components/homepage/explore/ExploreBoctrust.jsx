@@ -1,10 +1,11 @@
+import PropTypes from "prop-types"
 import { useEffect } from "react";
 // animation library
 import AOS from "aos";
 import "aos/dist/aos.css";
 import "./Explore.css";
 
-const ExploreBoctrust = () => {
+const ExploreBoctrust = ({content}) => {
   useEffect(() => {
     AOS.init({
       duration: 2000,
@@ -16,11 +17,7 @@ const ExploreBoctrust = () => {
       <div className="Explore">
         <h2>Explore Boctrust Mfb</h2>
         <p>
-          We are committed to delivering excellent services, which we constantly
-          aim to improve upon as a means to achieving optimum customer
-          satisfaction. We maintain confidentiality in all our dealings with our
-          customers. Within our short time in the industry Boctrust Mfb has
-          proven that we are a bank of now and the future.
+          {content.exploreBoctrustText || "We are committed to delivering excellent services, which we constantly aim to improve upon as a means to achieving optimum customer satisfaction. We maintain confidentiality in all our dealings with our customers. Within our short time in the industry Boctrust Mfb has proven that we are a bank of now and the future."}
         </p>
       </div>
       <div className="row">
@@ -44,5 +41,11 @@ const ExploreBoctrust = () => {
     </div>
   );
 };
+
+ExploreBoctrust.propTypes = {
+  content: PropTypes.shape({
+    exploreBoctrustText: PropTypes.string
+  })
+}
 
 export default ExploreBoctrust;

@@ -4,7 +4,6 @@ const siteContentSchema = new mongoose.Schema({
   homeCardText: {
     type: [
       {
-        id: { type: Number, default: 1 },
         title: { type: String, default: "Savings" },
         text: {
           type: String,
@@ -13,17 +12,15 @@ const siteContentSchema = new mongoose.Schema({
         },
       },
       {
-        id: { type: Number, default: 2 },
         title: { type: String, default: "Loans" },
         text: {
           type: String,
           default:
-            "Our loan products help you cater to pressing needs. If you’re ready to upgrade your home decor or merely want to improve your lifestyle efficiency with a new laptop, look no further than the Boctrust Microfinance Bank retail asset Acquisition/Leases.",
+            "Our loan products help you cater to pressing needs. If you’re ready to upgrade your home decor or merely want to improve your lifestyle efficiency with a new laptop, look no further than the Boctrust",
         },
       },
       {
-        id: { type: Number, default: 3 },
-        title: { type: String, default: "Investments" },
+        title: { type: String, default: "Investment" },
         text: {
           type: String,
           default:

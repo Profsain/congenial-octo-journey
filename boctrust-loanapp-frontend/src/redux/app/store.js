@@ -15,6 +15,7 @@ import adminUserReducer from "../reducers/adminUserReducer";
 import authReducer from "../reducers/adminAuthReducer";
 import settingReducer from "../reducers/settingReducer";
 import onboardingReducer from "../reducers/onboardingReducer";
+import siteContentReducer from "../reducers/siteContentReducer";
 
 // create a store
 const store = configureStore({
@@ -36,6 +37,7 @@ const store = configureStore({
     adminAuth: authReducer,
     settingReducer,
     onboarding: onboardingReducer,
+    siteContent: siteContentReducer,
   },
 });
 

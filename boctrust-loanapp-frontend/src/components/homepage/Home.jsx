@@ -1,4 +1,6 @@
 import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchContent } from "../../redux/reducers/siteContentReducer";
 // animation library
 import AOS from "aos";
 import "aos/dist/aos.css";
@@ -19,14 +21,24 @@ const Home = () => {
     });
   }, []);
 
+  // fetch site content
+  const dispatch = useDispatch();
+  const siteContent = useSelector((state) => state.siteContent.siteContent);
+
+  useEffect(() => {
+    dispatch(fetchContent());
+  }, [dispatch]);
+
+  console.log("siteContent", siteContent);
+
   return (
     <>
       <HomeCarousel />
       <div data-aos="fade-up">
-        <ExploreBoctrust />
+        <ExploreBoctrust content={siteContent}/>
       </div>
       <div data-aos="fade-up">
-        <Overview />
+        <Overview content={siteContent}/>
       </div>
       <div data-aos="fade-up">
         <Calculator />
