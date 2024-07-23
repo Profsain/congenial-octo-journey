@@ -1,11 +1,10 @@
 import { useState, useEffect } from "react";
-import jobs from "../../mockdatabase/jobs.json";
 // animation library
 import AOS from "aos";
 import "aos/dist/aos.css";
 // redux library operations
 import { useDispatch, useSelector } from "react-redux";
-import { fetchJobsSuccess } from "../../redux/reducers/fetchJobs";
+import { fetchCareer } from "../../redux/reducers/careerReducer";
 import { Tabs, Tab, Row } from "react-bootstrap";
 import Header from "../shared/Header";
 import Headline from "../shared/Headline";
@@ -25,29 +24,28 @@ const Career = () => {
   });
 
   // redux dispatch
-  const dispatch = useDispatch();
-  useEffect(() => {
-    dispatch(fetchJobsSuccess(jobs));
-  }, []);
+   const dispatch = useDispatch();
+   useEffect(() => {
+     dispatch(fetchCareer());
+   }, [dispatch]);
 
-  // redux state
-  const jobsData = useSelector((state) => state.fetchJobs.jobs);
+   const careers = useSelector((state) => state.careerReducer.careers.careers);
 
   const [vacancies, setVacancies] = useState([]);
   useEffect(() => {
-    setVacancies(jobsData.jobs);
-  }, [jobsData]);
+    setVacancies(careers);
+  }, [careers]);
 
   // search function
   const handleJobSearch = (e) => {
     const keyword = e.target.value;
     if (keyword !== "") {
-      const results = jobsData.jobs.filter((job) => {
+      const results = careers.filter((job) => {
         return job.jobtitle.toLowerCase().startsWith(keyword.toLowerCase());
       });
       setVacancies(results);
     } else {
-      setVacancies(jobsData.jobs);
+      setVacancies(careers);
     }
   };
 
