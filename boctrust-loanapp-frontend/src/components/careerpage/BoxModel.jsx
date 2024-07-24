@@ -1,9 +1,9 @@
-import PropTypes from "prop-types"
+import PropTypes from "prop-types";
 import { Button, Modal } from "react-bootstrap";
 import "./Career.css";
 
 const BoxModel = (props) => {
-    const { jobtitle, description, deadline, dateposted } = props.vacancy
+  const { jobtitle, description, deadline, dateposted } = props.vacancy;
 
   return (
     <Modal
@@ -13,27 +13,32 @@ const BoxModel = (props) => {
       centered
     >
       <Modal.Header closeButton>
-        <Modal.Title id="contained-modal-title-vcenter">
-          {jobtitle}
-        </Modal.Title>
+        <Modal.Title id="contained-modal-title-vcenter">{jobtitle}</Modal.Title>
       </Modal.Header>
       <Modal.Body>
-              <h4>Posted on: {dateposted} | Ending: { deadline}</h4>
-        <p>
-            {description}
-        </p>
+        <h4>
+          Posted on: {dateposted} | Ending: {deadline}
+        </h4>
+        <p>{description}</p>
       </Modal.Body>
       <Modal.Footer>
-        <Button className="BtnApply" onClick={() => alert("Application form under construction")}>Start your Application</Button>
-        <Button className="BtnClose" onClick={props.onHide}>Close</Button>
+        <Button
+          className="BtnApply"
+          onClick={() => alert("Application form under construction")}
+        >
+          Start your Application
+        </Button>
+        <Button className="BtnClose" onClick={props.onHide}>
+          Close
+        </Button>
       </Modal.Footer>
     </Modal>
   );
 };
 
 BoxModel.propTypes = {
-    onHide: PropTypes.func,
-    vacancy: PropTypes.object
-}
+  onHide: PropTypes.func,
+  vacancy: PropTypes.object,
+};
 
 export default BoxModel;
