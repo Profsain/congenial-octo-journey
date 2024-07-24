@@ -29,16 +29,14 @@ const Home = () => {
     dispatch(fetchContent());
   }, [dispatch]);
 
-  console.log("siteContent", siteContent);
-
   return (
     <>
-      <HomeCarousel />
+      <HomeCarousel content={siteContent} />
       <div data-aos="fade-up">
-        <ExploreBoctrust content={siteContent}/>
+        <ExploreBoctrust content={siteContent} />
       </div>
       <div data-aos="fade-up">
-        <Overview content={siteContent}/>
+        <Overview content={siteContent} />
       </div>
       <div data-aos="fade-up">
         <Calculator />

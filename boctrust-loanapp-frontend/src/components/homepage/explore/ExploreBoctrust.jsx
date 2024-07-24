@@ -17,7 +17,7 @@ const ExploreBoctrust = ({content}) => {
       <div className="Explore">
         <h2>Explore Boctrust Mfb</h2>
         <p>
-          {content.exploreBoctrustText || "We are committed to delivering excellent services, which we constantly aim to improve upon as a means to achieving optimum customer satisfaction. We maintain confidentiality in all our dealings with our customers. Within our short time in the industry Boctrust Mfb has proven that we are a bank of now and the future."}
+          {content?.exploreBoctrustText || "We are committed to delivering excellent services, which we constantly aim to improve upon as a means to achieving optimum customer satisfaction. We maintain confidentiality in all our dealings with our customers. Within our short time in the industry Boctrust Mfb has proven that we are a bank of now and the future."}
         </p>
       </div>
       <div className="row">
