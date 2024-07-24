@@ -19,6 +19,7 @@ const boardMembers = [
   {
     name: "Dr Kunle Alonge",
     title: "Director",
+    profileImg: "/images/board/DrKunle.jpg",
     biography: [
       "Has over 27years(with twelve at senior executive management levels) experience in banking (Corporate and Retail), Corporate Finance, SME, etc, in Nigeria and Africa. Previously served as Managing Director/Regional Head of Commercial Clients for Africa at Standard Chartered Bank Africa - covering countries in West, East and Southern Africa. Prior to that, served as Deputy CEO at FCMB, and Regional Director Client Relationships at Standard Chartered Bank East Africa - covering Kenya, Uganda and Tanzania.",
       "He also served at various middle and senior level positions in Standard Chartered Bank Nigeria, Zenith Bank and erstwhile Chartered Bank Nigeria Limited Segun was a University of Lagos Scholar, graduating with both Bachelors and Masters of Science degrees in Banking and Finance from the University. He has attended various leadership and specialized courses in top notch universities such as HARVARD BUSINESS SCHOOL, OXFORD UNIVERSITY (SAID BUSINESS SCHOOL) AND LONDON BUSINESS SCHOOL."
@@ -27,6 +28,7 @@ const boardMembers = [
   {
     name: "Odunmbaku Akinlawon Olamide",
     title: "Managing Director",
+    profileImg: "/images/board/OlamideOdunmbaku.jpg",
     biography: [
       "Mr. Olamide A. Odunmbaku officially joined BOCTRUST MFB March 2024, as the MD/CEO.",
       "He is an astute professional with over 17 years’ core experience in Credit Analysis and management, Credit Restructuring, financial analysis and interpretation, facility structuring, people management, Management of Key risk indicators of the organization, Risk register, compliance to major regulatory provisions et al.",
@@ -38,6 +40,7 @@ const boardMembers = [
   {
     name: "Nkolika Nebechi Okoli",
     title: "Director",
+    profileImg: "/images/board/Nkoli.jpg",
     biography: [
       "With experience in the Financial services sector spanning over 25 years, Nkoli has had a distinguished career in Banking with expertise in Retail (Consumer and SME) and Commercial banking, Credit, Operations and Strategy. With an MBA (Distinction) from the University of Durham Business School, United Kingdom; Nkoli’s wide career experience encompasses 15 years in Executive Management, 18 years in relationship management across various customer segments as well as customer services, product development/management and corporate governance.",
       "She has served on the board of Stanbicibtc Insurance Brokers as a Non-Executive Director and as the Country Head (Nigeria), Personal Banking Business, Stanbicibtc Bank where she was responsible for the Profit and Loss as well as driving strategic decisions of the banks Personal Banking Business.",
@@ -48,6 +51,7 @@ const boardMembers = [
   {
     name: "Abiola Olowude",
     title: "Director",
+    profileImg: "/images/board/Olowude.jpg",
     biography: [
       "Abiola Olowude is a seasoned Wealth and Fund Management Consultant whose career journey exemplifies versatility and excellence.",
       "Her professional path began in the field of education, where she dedicated a decade to teaching at both secondary and tertiary levels.",

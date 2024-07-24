@@ -1,7 +1,8 @@
+import PropTypes from "prop-types"
 import Headline from "../shared/Headline";
 import TopCard from "../shared/TopCard";
 
-const CustomerProduct = () => {
+const CustomerProduct = ({paraText}) => {
   const styles = {
     container: {
       textAlign: "left",
@@ -61,11 +62,7 @@ const CustomerProduct = () => {
             text={
               <div style={styles.container}>
                 <p>
-                  We have different classes of banking products designed to meet
-                  your personal and business needs. As a Bank for the
-                  economically active poor and young MSMEs, our products are
-                  most convenient, efficient and highly streamlined with high
-                  level of turnaround time to meet your immediate needs
+                  {paraText || "We have different classes of banking products designed to meet your personal and business needs. As a Bank for the economically active poor and young MSMEs, our products are most convenient, efficient and highly streamlined with high level of turnaround time to meet your immediate needs"}
                 </p>
                 <ul>
                   <li style={styles.link}>Investment</li>
@@ -81,5 +78,9 @@ const CustomerProduct = () => {
     </div>
   );
 };
+
+CustomerProduct.propTypes = {
+  paraText: PropTypes.string
+}
 
 export default CustomerProduct;
