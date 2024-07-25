@@ -70,6 +70,7 @@ import ManageAccessControl from "../usersmanager/ManageAccessControl";
 import HomeEditor from "../website/HomeEditor";
 import AboutEditor from "../website/AboutEditor";
 import ProductPageEditor from "../website/ProductPageEditor";
+import BoardOfDirectorEditor from "../website/BoardOfDirectorEditor";
 
 const AdminDashboard = () => {
   const [showSidebar, setShowSidebar] = useState(false);
@@ -295,6 +296,9 @@ const AdminDashboard = () => {
       case "aboutEditor":
         setCurrentTitle("About Page Editor");
         break;
+      case "boardEditor":
+        setCurrentTitle("Board of Directors Editor");
+        break;
       case "productEditor":
         setCurrentTitle("Our Products Page Editor");
         break;
@@ -408,6 +412,8 @@ const AdminDashboard = () => {
         return <HomeEditor />;
       case "aboutEditor":
         return <AboutEditor />;
+      case "boardEditor":
+        return <BoardOfDirectorEditor />;
       case "productEditor":
         return <ProductPageEditor />;
       case "contactForm":
