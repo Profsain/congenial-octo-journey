@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 import PropTypes from "prop-types";
 import { Button, Modal } from "react-bootstrap";
 import "./Career.css";

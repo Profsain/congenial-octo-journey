@@ -390,6 +390,15 @@ const SideNavMain = ({ onMenuItemClick }) => {
               <li id="career" onClick={onMenuItemClick}>
                 Career
               </li>
+              <li id="homeEditor" onClick={onMenuItemClick}>
+                Home Page
+              </li>
+              <li id="aboutEditor" onClick={onMenuItemClick}>
+                About Page
+              </li>
+              <li id="productEditor" onClick={onMenuItemClick}>
+                Products Page
+              </li>
             </ul>
           </div>
         ) : null}

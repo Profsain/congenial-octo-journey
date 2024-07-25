@@ -67,6 +67,9 @@ import StopRestartCollections from "../nibssDirectDebit/StopRestartCollections";
 import EmploymentLetterRule from "../employersmanager/EmploymentLetterRule";
 import ManageUserRole from "../usersmanager/ManageUserRole";
 import ManageAccessControl from "../usersmanager/ManageAccessControl";
+import HomeEditor from "../website/HomeEditor";
+import AboutEditor from "../website/AboutEditor";
+import ProductPageEditor from "../website/ProductPageEditor";
 
 const AdminDashboard = () => {
   const [showSidebar, setShowSidebar] = useState(false);
@@ -286,6 +289,15 @@ const AdminDashboard = () => {
       case "googleanalytic":
         setCurrentTitle("Google Analytics");
         break;
+      case "homeEditor":
+        setCurrentTitle("Home Page Editor");
+        break;
+      case "aboutEditor":
+        setCurrentTitle("About Page Editor");
+        break;
+      case "productEditor":
+        setCurrentTitle("Our Products Page Editor");
+        break;
       default:
         setCurrentTitle("Dashboard");
         break;
@@ -392,6 +404,12 @@ const AdminDashboard = () => {
         return <CustomerAsk />;
       case "career":
         return <PostJobs />;
+      case "homeEditor":
+        return <HomeEditor />;
+      case "aboutEditor":
+        return <AboutEditor />;
+      case "productEditor":
+        return <ProductPageEditor />;
       case "contactForm":
         return <ContactForm />;
       case "website":
