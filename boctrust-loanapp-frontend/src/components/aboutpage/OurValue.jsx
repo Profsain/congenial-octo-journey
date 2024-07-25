@@ -25,7 +25,7 @@ const OurValue = ({ values }) => {
       <Headline text="Our Values" color="#fff" />
       <div className="container">
         <div className="row OurValue" style={styles.value}>
-          {values.map((value) => (
+          {values?.map((value) => (
             <div className={`col-md-6 col-sm-12 px-5`} key={value._id}>
               <div>
                 <Headline

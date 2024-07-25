@@ -27,7 +27,6 @@ const About = () => {
     dispatch(fetchContent());
   }, [dispatch]);
 
-  console.log("content", siteContent);
   // destructuring site content
   const {
     whoWeAreHomeText,

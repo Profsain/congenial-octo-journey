@@ -22,8 +22,8 @@ const Overview = ({ content }) => {
 
   // destructure
   const {
-    missionStatementText,
-    visionStatementText,
+    missionStatement,
+    visionStatement,
     whoWeAreText,
     companyGoal,
     ourPeoplePara1,
@@ -80,8 +80,8 @@ const Overview = ({ content }) => {
           </Box>
           <TabPanel value={value} index={0}>
             <OurVisionMission
-              mission={missionStatementText}
-              vision={visionStatementText}
+              mission={missionStatement}
+              vision={visionStatement}
               goal={companyGoal}
             />
           </TabPanel>
@@ -105,8 +105,8 @@ const Overview = ({ content }) => {
 Overview.propTypes = {
   content: PropTypes.shape({
     companyOverviewText: PropTypes.string,
-    missionStatementText: PropTypes.string,
-    visionStatementText: PropTypes.string,
+    missionStatement: PropTypes.string,
+    visionStatement: PropTypes.string,
     whoWeAreText: PropTypes.string,
     companyGoal: PropTypes.string,
     ourPeoplePara1: PropTypes.string,
