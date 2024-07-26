@@ -52,3 +52,78 @@
     font-size: 1.1rem;
     margin-top: 1rem;
 }
+
+/* front page styles */
+.section {
+    width: 90%;
+}
+.product-section {
+  margin-bottom: 20px;
+}
+
+.heading {
+  font-size: 24px;
+  margin-bottom: 10px;
+}
+
+.text {
+  font-size: 16px;
+  color: #333;
+}
+
+.image {
+  width: 60%;
+  height: auto;
+  border-radius: 5px;
+}
+
+.button {
+  padding: 10px 20px;
+  margin: 18px 5px;
+  background-color: #007BFF;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.button-danger {
+  background-color: #dc3545;
+}
+
+.btnContainer {
+  display: flex;
+  justify-content: space-between;
+  padding-top: 8px;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+}
+
+.input, .textarea {
+  padding: 10px;
+  margin: 5px 0;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 16px;
+}
+
+.textarea {
+  min-height: 80px;
+}
+
+.list {
+  list-style-type: disc;
+  padding-left: 20px;
+}
+
+.notification {
+  padding-top: 20px;
+  border-radius: 5px;
+  color: #eeaa00;
+  font-weight: 700;
+
+}

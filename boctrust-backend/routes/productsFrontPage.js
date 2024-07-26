@@ -27,21 +27,23 @@ router.get('/fetch-one/:id', async (req, res) => {
 });
 
 // Update a product by ID
-router.patch('/update-product/:id', async (req, res) => {
-  try {
-    const ProductsFrontPage = await ProductsFrontPage.findById(req.params.id);
-    if (ProductsFrontPage) {
-      ProductsFrontPage.category = req.body.category;
-      ProductsFrontPage.productName = req.body.productName;
-      ProductsFrontPage.description = req.body.description;
-      ProductsFrontPage.image = req.body.image;
-      ProductsFrontPage.benefits = req.body.benefits;
-      ProductsFrontPage.features = req.body.features;
+router.put('/update-product/:id', async (req, res) => {
 
-      const updatedProduct = await ProductsFrontPage.save();
+  try {
+    const product = await ProductsFrontPage.findById(req.params.id);
+    
+    if (product) {
+      product.category = req.body.category;
+      product.productName = req.body.productName;
+      product.description = req.body.description;
+      product.image = req.body.image;
+      product.benefits = req.body.benefits;
+      product.features = req.body.features;
+
+      const updatedProduct = await product.save();
       res.json(updatedProduct);
     } else {
-      res.status(404).json({ message: 'ProductsFrontPage not found' });
+      res.status(404).json({ message: 'product not found' });
     }
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -50,7 +52,7 @@ router.patch('/update-product/:id', async (req, res) => {
 
 // Add a new ProductsFrontPage
 router.post('/add-product', async (req, res) => {
-  const ProductsFrontPage = new ProductsFrontPage({
+  const product = new ProductsFrontPage({
     category: req.body.category,
     productName: req.body.productName,
     description: req.body.description,
@@ -60,7 +62,7 @@ router.post('/add-product', async (req, res) => {
   });
 
   try {
-    const newProduct = await ProductsFrontPage.save();
+    const newProduct = await product.save();
     res.status(201).json(newProduct);
   } catch (err) {
     res.status(400).json({ message: err.message });
@@ -70,15 +72,15 @@ router.post('/add-product', async (req, res) => {
 // Delete a product by ID
 router.delete('/delete-product/:id', async (req, res) => {
   try {
-    const ProductsFrontPage = await ProductsFrontPage.findById(req.params.id);
-    if (ProductsFrontPage) {
-      await ProductsFrontPage.remove();
-      res.json({ message: 'ProductsFrontPage deleted' });
-    } else {
-      res.status(404).json({ message: 'ProductsFrontPage not found' });
+    const { id } = req.params;
+    const product = await ProductsFrontPage.findByIdAndDelete(id);
+
+    if (!product) {
+      return res.status(404).json({ message: "product not found" });
     }
-  } catch (err) {
-    res.status(500).json({ message: err.message });
+    res.json({ message: "product deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ message: "Error deleting product", error });
   }
 });
 
