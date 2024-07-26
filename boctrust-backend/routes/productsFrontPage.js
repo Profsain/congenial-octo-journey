@@ -26,6 +26,28 @@ router.get('/fetch-one/:id', async (req, res) => {
   }
 });
 
+// Update a product by ID
+router.patch('/update-product/:id', async (req, res) => {
+  try {
+    const ProductsFrontPage = await ProductsFrontPage.findById(req.params.id);
+    if (ProductsFrontPage) {
+      ProductsFrontPage.category = req.body.category;
+      ProductsFrontPage.productName = req.body.productName;
+      ProductsFrontPage.description = req.body.description;
+      ProductsFrontPage.image = req.body.image;
+      ProductsFrontPage.benefits = req.body.benefits;
+      ProductsFrontPage.features = req.body.features;
+
+      const updatedProduct = await ProductsFrontPage.save();
+      res.json(updatedProduct);
+    } else {
+      res.status(404).json({ message: 'ProductsFrontPage not found' });
+    }
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
 // Add a new ProductsFrontPage
 router.post('/add-product', async (req, res) => {
   const ProductsFrontPage = new ProductsFrontPage({
