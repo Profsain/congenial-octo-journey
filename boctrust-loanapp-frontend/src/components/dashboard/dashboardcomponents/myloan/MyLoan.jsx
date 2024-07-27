@@ -56,7 +56,7 @@ const MyLoan = () => {
           ) : (
             <div>
               <tr>
-                <td>{user.banking.accountDetails.Message.CustomerID || ""}</td>
+                <td>{user?.banking.accountDetails.Message.CustomerID || ""}</td>
                 <td>{user.loanpurpose[0] || ""}</td>
                 <td>N{user.loanamount || ""}</td>
                 <td>N280000</td>

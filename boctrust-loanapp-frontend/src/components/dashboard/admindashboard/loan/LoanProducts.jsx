@@ -36,7 +36,7 @@ const CustomersDashboard = () => {
     <>
       {!openAddLoanProduct ? (
         <div className="MainBox">
-          {admin || adminRoles?.includes("add_loan_product") ? (
+          {admin || adminRoles?.includes("loanManagement") ? (
             <div className="AddBtn">
               <BocButton
                 bgcolor="#ecaa00"

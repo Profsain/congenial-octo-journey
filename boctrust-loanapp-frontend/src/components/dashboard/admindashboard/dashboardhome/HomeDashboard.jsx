@@ -7,7 +7,6 @@ import StatCard from "./StatCard";
 import BocChart from "./BocChart";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchAllCustomer } from "../../../../redux/reducers/customerReducer";
 import {
   getCurrentDateFormatted,
   getYesterdayDate,
@@ -16,6 +15,7 @@ import {
   getCurrentYear,
 } from "./dashboradfunc";
 import PageLoader from "../../shared/PageLoader";
+import { fetchAllLoans } from "../../../../redux/reducers/loanReducer";
 
 const HomeDashboard = () => {
   const [customerAnalytics, setCustomerAnalytics] = useState({
@@ -28,51 +28,41 @@ const HomeDashboard = () => {
   });
   // fetch all customer data
   const dispatch = useDispatch();
-  const customers = useSelector(
-    (state) => state.customerReducer.customers.customer
-  );
+
+  const { allLoans } = useSelector((state) => state.loanReducer);
 
   useEffect(() => {
-    dispatch(fetchAllCustomer()).catch((error) =>
-      console.error("Error fetching customers:", error)
+    dispatch(fetchAllLoans()).catch((error) =>
+      console.error("Error fetching Loans:", error)
     );
   }, [dispatch]);
 
   useEffect(() => {
-    if (customers) {
+    if (allLoans) {
       setCustomerAnalytics({
         ...customerAnalytics,
-        booked:
-          customers?.filter(
-            (customer) => customer?.kyc?.loanstatus === "booked"
-          ) || [],
+        booked: allLoans?.filter((loan) => loan?.loanstatus === "booked") || [],
         kycCompleted:
-          customers?.filter(
-            (customer) => customer?.kyc?.isKycApproved === true
+          allLoans?.filter(
+            (loan) => loan?.customer?.kyc?.isKycApproved === true
           ) || [],
         withCoo:
-          customers?.filter(
-            (customer) => customer?.kyc?.loanstatus === "with coo"
+          allLoans?.filter(
+            (loan) =>
+              loan?.loanstatus === "with coo" || loan?.loanstatus === "unbooked"
           ) || [],
         withCredit:
-          customers?.filter(
-            (customer) => customer?.kyc?.loanstatus === "with credit"
-          ) || [],
+          allLoans?.filter((loan) => loan?.loanstatus === "with credit") || [],
 
         withOperations:
-          customers?.filter(
-            (customer) => customer?.kyc?.loanstatus === "with operations"
-          ) || [],
+          allLoans?.filter((loan) => loan?.loanstatus === "with operations") ||
+          [],
 
         completed:
-          customers?.filter(
-            (customer) => customer?.kyc?.loanstatus === "completed"
-          ) || [],
+          allLoans?.filter((loan) => loan?.loanstatus === "completed") || [],
       });
     }
-  }, [customers]);
-
- 
+  }, [allLoans]);
 
   // check
   return (
@@ -107,34 +97,32 @@ const HomeDashboard = () => {
         <div className="LoansStat">
           <Headline spacer="0 0 0.6rem 0" align="left" text="Loans" />
           <div className="InlineCard">
-            <div className="MStat">
-              <LoansCard
-                img="images/padding.png"
-                title="With Operations"
-                stat={customerAnalytics.withOperations?.length}
-                bgcolor="#ea5767"
-              />
-              <LoansCard
-                img="images/star.png"
-                title="With Credit"
-                stat={customerAnalytics.withCredit?.length}
-                bgcolor="#f6ab60"
-              />
-            </div>
-            <div className="MStat">
-              <LoansCard
-                img="images/thumbup.png"
-                title="With COO"
-                stat={customerAnalytics.withCoo?.length}
-                bgcolor="#32c6c7"
-              />
-              <LoansCard
-                img="images/star.png"
-                title="Booked"
-                stat={customerAnalytics.booked?.length}
-                bgcolor="#ecaa00"
-              />
-            </div>
+            <LoansCard
+              img="images/padding.png"
+              title="With Operations"
+              stat={customerAnalytics.withOperations?.length}
+              bgcolor="#ea5767"
+            />
+            <LoansCard
+              img="images/star.png"
+              title="With Credit"
+              stat={customerAnalytics.withCredit?.length}
+              bgcolor="#f6ab60"
+            />
+
+            <LoansCard
+              img="images/thumbup.png"
+              title="With COO/Unbooked"
+              stat={customerAnalytics.withCoo?.length}
+              bgcolor="#32c6c7"
+            />
+            <LoansCard
+              img="images/star.png"
+              title="Booked"
+              stat={customerAnalytics.booked?.length}
+              bgcolor="#ecaa00"
+            />
+
             <LoansCard
               img="images/active.png"
               title="Completed"

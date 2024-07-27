@@ -1,4 +1,5 @@
 const express = require("express");
+const Customer = require("../models/Customer");
 const router = express.Router();
 
 // add token to environment variable
@@ -79,15 +80,9 @@ router.post("/createLoan", async (req, res) => {
   }
 
   // get the loan creation request payload from the request body
-  const {
-    _id,
-    salaryaccountnumber,
-    disbursementaccountnumber,
-    numberofmonth,
-    loanamount,
-  } = req.body;
+  const { _id, salaryaccountnumber, numberofmonth, loanamount } = req.body;
 
-  const accountNumber = disbursementaccountnumber || salaryaccountnumber;
+  const accountNumber = salaryaccountnumber;
   const customerId = req.body.banking?.accountDetails?.Message.CustomerID;
   // convert number of month to number of days
   const tenure = Number(numberofmonth) * 30;
@@ -148,7 +143,14 @@ router.post("/createLoan", async (req, res) => {
 });
 
 // create customer and account endpoint (Done)
-router.post("/newCustomerAccount", (req, res) => {
+router.post("/newCustomerAccount/:customerId", async (req, res) => {
+  const { customerId } = req.params;
+
+  const customer = await Customer.findById(customerId);
+
+  if (!customer)
+    return res.status(500).json({ error: "No Customer with provided ID" });
+
   const options = {
     method: "POST",
     headers: {
@@ -156,7 +158,31 @@ router.post("/newCustomerAccount", (req, res) => {
       "content-type": "application/json",
     },
     body: JSON.stringify({
-      // Your request payload here
+      TransactionTrackingRef: customer._id,
+
+      AccountOpeningTrackingRef: customer._id,
+      ProductCode: "",
+      LastName: customer.firstname,
+
+      OtherNames: customer.lastname,
+
+      BVN: customer.bvnnumber,
+
+      PhoneNo: customer.phonenumber,
+
+      PlaceOfBirth: customer.stateoforigin,
+
+      DateOfBirth: customer.dob,
+
+      Address: customer.houseaddress,
+
+      NextOfKinPhoneNo: customer.nkinphonenumber,
+
+      NextOfKinName: `${customer.nkinfirstname} ${customer.nkinlastname}`,
+
+      HasSufficientInfoOnAccountInfo: true,
+
+      Email: customer.email,
     }),
   };
 
@@ -260,10 +286,8 @@ router.get("/getAllCommercialBank", async (req, res) => {
       data: result,
     });
   } catch (error) {
-    console.log(error)
-    throw new Error(
-      `HTTP error! BankOne get all banks failed. Status: ${500}`
-    );
+    console.log(error);
+    throw new Error(`HTTP error! BankOne get all banks failed. Status: ${500}`);
   }
 });
 

@@ -48,7 +48,6 @@ const Login = () => {
         setShowEmailSent(true);
       }
     } else if (loginAs === "customer") {
-      console.log("customer");
       const response = await forgotPassCustomer(forgotUsername, forgotEmail);
       if (response.success) {
         // clear fields

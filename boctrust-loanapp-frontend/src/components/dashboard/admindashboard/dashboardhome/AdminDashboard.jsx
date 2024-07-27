@@ -51,11 +51,7 @@ import AllWebsitePages from "../website/AllWebsitePages";
 import ContactForm from "../website/ContactForm";
 import LoanDisbursement from "../loan/LoanDisbursement";
 import BalanceEnquiry from "../loan/BalanceEnquiry";
-import CheckCustomer from "../loan/CheckCustomer";
-import GetLoan from "../loan/GetLoan";
-import CheckRepayment from "../loan/CheckRepayment";
 import LoanStatement from "../loan/LoanStatement";
-import LoanBalance from "../loan/LoanBalance";
 import PostJobs from "../website/PostJobs";
 import GeneralSettings from "../generalSetting/GeneralSettings";
 import EmailSetting from "../generalSetting/EmailSetting";
@@ -67,6 +63,9 @@ import StopRestartCollections from "../nibssDirectDebit/StopRestartCollections";
 import EmploymentLetterRule from "../employersmanager/EmploymentLetterRule";
 import ManageUserRole from "../usersmanager/ManageUserRole";
 import ManageAccessControl from "../usersmanager/ManageAccessControl";
+import BookLoans from "../loan/BookLoans";
+import CompletedLoans from "../loan/CompletedLoans";
+import OverdueLoans from "../loan/CompletedLoans";
 
 const AdminDashboard = () => {
   const [showSidebar, setShowSidebar] = useState(false);
@@ -124,8 +123,14 @@ const AdminDashboard = () => {
       case "pendingloans":
         setCurrentTitle("Pending Loans");
         break;
-      case "activeloans":
-        setCurrentTitle("Active Loans");
+      case "bookloans":
+        setCurrentTitle("Book Loans");
+        break;
+      case "completedloans":
+        setCurrentTitle("Completed Loans");
+        break;
+      case "overdueloans":
+        setCurrentTitle("Overdue Loans");
         break;
       case "loancalculator":
         setCurrentTitle("Loan Calculator");
@@ -139,21 +144,11 @@ const AdminDashboard = () => {
       case "balanceenquiry":
         setCurrentTitle("Balance Enquiry");
         break;
-      case "checkcustomer":
-        setCurrentTitle("Check Customer");
-        break;
-      case "getloan":
-        setCurrentTitle("Get Loan");
-        break;
-      case "checkrepayment":
-        setCurrentTitle("Check Repayment Schedule");
-        break;
+
       case "loanstatement":
         setCurrentTitle("Loan Statement");
         break;
-      case "loanbalance":
-        setCurrentTitle("Loan Balance");
-        break;
+
       case "transfer":
         setCurrentTitle("Transfer Money");
         break;
@@ -328,16 +323,15 @@ const AdminDashboard = () => {
         return <LoanDisbursement />;
       case "balanceenquiry":
         return <BalanceEnquiry />;
-      case "checkcustomer":
-        return <CheckCustomer />;
-      case "getloan":
-        return <GetLoan />;
-      case "checkrepayment":
-        return <CheckRepayment />;
+      case "bookloans":
+        return <BookLoans />;
+      case "completedloans":
+        return <CompletedLoans />;
+      case "overdueloans":
+        return <OverdueLoans />;
       case "loanstatement":
         return <LoanStatement />;
-      case "loanbalance":
-        return <LoanBalance />;
+
       case "repayment":
         return <RepaymentDashboard />;
       case "accounts":
@@ -457,7 +451,7 @@ const AdminDashboard = () => {
           </div>
           <div className="col-10 ">
             <div className="TopNavber mr-3">
-              <TopNavber title={currentTitle} user={adminName}  />
+              <TopNavber title={currentTitle} user={adminName} />
               {renderComponent()}
             </div>
           </div>

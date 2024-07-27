@@ -3,6 +3,7 @@ const router = express.Router();
 const Customer = require("../models/Customer"); // Import customer model
 const multer = require("multer");
 const path = require("path");
+const Loan = require("../models/Loan");
 
 const baseUrl = process.env.BASE_URL;
 
@@ -23,8 +24,7 @@ const upload = multer({
 const multipleUpload = upload.fields([
   { name: "dbSearchReport" },
   { name: "deductSearchReport" },
-  { name: "bureauSearchReport1" },
-  { name: "bureauSearchReport2" },
+  { name: "bureauSearchReport" },
   { name: "uploadPaySlip" },
 ]);
 // multer configuration end here
@@ -53,6 +53,8 @@ router.put("/creditDbSearch/:customerId", multipleUpload, async (req, res) => {
       },
       { new: true }
     );
+
+    console.log(customer, "creditDbSearch");
     res.json(customer);
   } catch (err) {
     console.error(err);
@@ -62,7 +64,7 @@ router.put("/creditDbSearch/:customerId", multipleUpload, async (req, res) => {
 
 // Update the deductcheck field
 router.put("/deductcheck/:customerId", multipleUpload, async (req, res) => {
-  if (req.files.deductSearchReport) {
+  if (req.files?.deductSearchReport) {
     req.body.deductSearchReport = `${baseUrl}/public/filesUpload/${req.files.deductSearchReport[0].filename}`;
   }
 
@@ -86,6 +88,8 @@ router.put("/deductcheck/:customerId", multipleUpload, async (req, res) => {
       { new: true }
     );
 
+    console.log(customer, "customer deductCheck");
+
     res.json(customer);
   } catch (err) {
     console.error(err);
@@ -100,36 +104,73 @@ router.put(
   async (req, res) => {
     try {
       const customerId = req.params.customerId;
-      let bureauSearchReportArr = [];
 
-      if (req?.files?.bureauSearchReport1) {
-        bureauSearchReportArr.push(
-          `${baseUrl}/public/filesUpload/${req?.files?.bureauSearchReport1[0].filename}`
-        );
-      }
-      if (req?.files?.bureauSearchReport2) {
-        bureauSearchReportArr.push(
-          `${baseUrl}/public/filesUpload/${req?.files?.bureauSearchReport2[0].filename}`
-        );
-      }
-
-      req.body.bureauSearchReport = bureauSearchReportArr;
       const updates = req.body;
-
-      const updateObject = Object.keys(updates).reduce((acc, key) => {
-        acc[`creditCheck.creditBureauSearch.${key}`] = updates[key];
-        return acc;
-      }, {});
 
       // send the updated data in the request body
       const customer = await Customer.findByIdAndUpdate(
         customerId,
         {
-          $set: updateObject,
-          $currentDate: { "creditCheck.creditBureauSearch.updatedAt": true },
+          $push: {
+            "creditCheck.creditBureauSearch": updates,
+          },
         },
         { new: true }
       );
+
+      res.json(customer);
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: "Failed to update creditBureauSearch" });
+    }
+  }
+);
+// Update the creditBureauSearch field
+router.put(
+  "/creditBureauSearch/:customerId/fileupload",
+  multipleUpload,
+  async (req, res) => {
+    try {
+      const customerId = req.params.customerId;
+
+      const { bureauName, reportType, reportReason } = req.body;
+
+      if (req.files?.bureauSearchReport) {
+        req.body.bureauSearchReport = `${baseUrl}/public/filesUpload/${req.files.bureauSearchReport[0].filename}`;
+      } else {
+        return res.status(400).json({
+          error: "Please Upload A file",
+        });
+      }
+
+      // Find the document
+      const customer = await Customer.findById(customerId);
+      if (!customer) {
+        return res.status(404).send("Customer not found");
+      }
+
+      // Find the specific element in the array
+      const creditBureauSearch = customer.creditCheck.creditBureauSearch;
+
+      const element = creditBureauSearch.find(
+        (item) =>
+          item.bureauName === bureauName &&
+          item.reportType === reportType &&
+          item.reportReason === reportReason
+      );
+
+      if (!element) {
+        return res.status(400).json({
+          error:
+            "No Bureau Search History. Plese Provide Report for Search Carried Out",
+        });
+      }
+
+      // Update the specific element
+      element.bureauSearchReport = req.body.bureauSearchReport;
+
+      // Save the document
+      await customer.save();
 
       res.json(customer);
     } catch (err) {
@@ -220,6 +261,9 @@ router.put("/assignto/:customerId", async (req, res) => {
     const customerId = req.params.customerId;
     const updates = req.body;
 
+    console.log(customerId, "customerId");
+    console.log(updates, "updates");
+
     const updateObject = Object.keys(updates).reduce((acc, key) => {
       acc[`creditCheck.assignment.${key}`] = updates[key];
       return acc;
@@ -235,7 +279,7 @@ router.put("/assignto/:customerId", async (req, res) => {
     );
     res.json(customer);
   } catch (err) {
-    res.status(500).json({ error: "Failed to update decisionSummary" });
+    res.status(500).json({ error: "Failed to Assign Customer" });
   }
 });
 
@@ -276,19 +320,30 @@ router.put("/approve/hoc/:customerId", async (req, res) => {
   try {
     const customerId = req.params.customerId;
 
-    const updateObject = [];
+    const updateObject = {};
 
     //Update the Approval Status
     updateObject["creditCheck.decisionSummary.headOfCreditApprovalStatus"] =
       "approved";
 
-    const customer = await Customer.findByIdAndUpdate(
+    const customer = await Loan.findByIdAndUpdate(
       customerId,
       {
         $set: updateObject,
       },
       { new: true }
     );
+
+    // Update the Loan Status
+    await Loan.findOneAndUpdate(
+      {
+        customer: customer._id,
+      },
+      {
+        loanstatus: "with coo",
+      }
+    );
+
     res.json(customer);
   } catch (err) {
     res.status(500).json({ error: "Failed to update decisionSummary" });
@@ -300,7 +355,7 @@ router.put("/approve/coo/:customerId", async (req, res) => {
   try {
     const customerId = req.params.customerId;
 
-    const updateObject = [];
+    const updateObject = {};
 
     //Update the Approval Status
     updateObject["creditCheck.decisionSummary.cooApprovalStatus"] = "approved";
@@ -312,8 +367,20 @@ router.put("/approve/coo/:customerId", async (req, res) => {
       },
       { new: true }
     );
+
+    // Update the Loan Status
+    await Loan.findOneAndUpdate(
+      {
+        customer: customer._id,
+      },
+      {
+        loanstatus: "unbooked",
+      }
+    );
+
     res.json(customer);
   } catch (err) {
+    console.log(err);
     res.status(500).json({ error: "Failed to update decisionSummary" });
   }
 });
@@ -331,29 +398,6 @@ router.put("/kyc/:customerId", async (req, res) => {
     res.json(customer);
   } catch (error) {
     res.status(500).json({ error: "Failed to update kyc details" });
-  }
-});
-
-// Update the loanstatus property inside the kyc object
-router.put("/kyc/:customerId/loanstatus", async (req, res) => {
-  try {
-    const customerId = req.params.customerId;
-    const loanstatus = req.body.loanstatus;
-
-    // Find the customer by customerId and update the loanstatus
-    const customer = await Customer.findByIdAndUpdate(
-      customerId,
-      { "kyc.loanstatus": loanstatus },
-      { new: true }
-    );
-
-    if (!customer) {
-      return res.status(404).json({ error: "Customer not found" });
-    }
-
-    res.json(customer);
-  } catch (error) {
-    res.status(500).json({ error: "Failed to update loanstatus" });
   }
 });
 

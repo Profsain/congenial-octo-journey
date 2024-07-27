@@ -9,6 +9,14 @@ export const fetchAdmins = createAsyncThunk("admin/fetchAdmins", async () => {
   const response = await axios.get(`${apiUrl}/api/admin/users`);
   return response.data;
 });
+// Thunk to fetch admin with role Type
+export const fetchAdminsByRole = createAsyncThunk(
+  "admin/fetchAdminsByRole",
+  async (roleId) => {
+    const response = await axios.get(`${apiUrl}/api/admin/users/${roleId}`);
+    return response.data;
+  }
+);
 
 export const fetchRolesAndPermisions = createAsyncThunk(
   "admin/fetchRolesAndPermisions",
@@ -69,6 +77,7 @@ const adminSlice = createSlice({
   name: "admin",
   initialState: {
     admins: [],
+    filteredAdmins: [],
     rolesAndPermission: null,
     allPermisions: null,
     status: "idle",
@@ -85,6 +94,17 @@ const adminSlice = createSlice({
         state.admins = action.payload;
       })
       .addCase(fetchAdmins.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.error.message;
+      })
+      .addCase(fetchAdminsByRole.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(fetchAdminsByRole.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        state.filteredAdmins = action.payload;
+      })
+      .addCase(fetchAdminsByRole.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.error.message;
       })

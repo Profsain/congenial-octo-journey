@@ -12,7 +12,6 @@ import { toast } from "react-toastify";
 // toast styles
 import "react-toastify/dist/ReactToastify.css";
 
-
 // Define validation schema using Yup
 const validationSchema = Yup.object().shape({
   mandateTitle: Yup.string().required("Mandate title is required"),
@@ -170,199 +169,209 @@ const MandateRules = () => {
           validationSchema={validationSchema}
           onSubmit={handleSubmit}
         >
-          <Form>
-            <div className="FieldRow">
-              <div className="FieldGroup">
-                <label htmlFor="mandateTitle">Mandate Title</label>
-                <Field
-                  as="select"
-                  name="mandateTitle"
-                  id="mandateTitle"
-                  className="Select"
-                >
-                  <option value="" label="Select a title" />
-                  {mandateTitles.map((option) => (
-                    <option
-                      key={option.value}
-                      value={option.value}
-                      label={option.label}
-                    />
-                  ))}
-                </Field>
-                <ErrorMessage name="mandateTitle" component="div" />
-              </div>
-
-              <div className="FieldGroup">
-                <label htmlFor="mandateDuration">Duration</label>
-                <Field
-                  as="select"
-                  name="mandateDuration"
-                  id="mandateDuration"
-                  className="Select"
-                >
-                  <option value="" label="Select duration" />
-                  {durationOptions.map((option) => (
-                    <option
-                      key={option.value}
-                      value={option.value}
-                      label={option.label}
-                    />
-                  ))}
-                </Field>
-                <ErrorMessage name="mandateDuration" component="div" />
-              </div>
-            </div>
-
-            <div className="FieldRow">
-              <div className="RadioCon">
-                <label htmlFor="mandateUser">Mandate User</label>
-                <div className="Input">
-                  <label className="MandateLabel">
-                    <Field
-                      type="radio"
-                      name="mandateUser"
-                      value="employer"
-                      className="Gap"
-                    />
-                    Employer
-                  </label>
-                  <label className="MandateLabel">
-                    <Field
-                      type="radio"
-                      name="mandateUser"
-                      value="admin"
-                      className="Gap"
-                    />
-                    Admin
-                  </label>
-                </div>
-
-                <ErrorMessage name="mandateUser" component="div" />
-              </div>
-
-              <div className="RadioCon">
-                <label htmlFor="allowStacking">
-                  Allow Remita Rule Stacking
-                </label>
-                <div className="Input">
-                  <label className="MandateLabel">
-                    <Field
-                      type="radio"
-                      name="allowStacking"
-                      value="yes"
-                      className="Gap"
-                    />
-                    Yes
-                  </label>
-                  <label className="MandateLabel">
-                    <Field
-                      type="radio"
-                      name="allowStacking"
-                      value="no"
-                      className="Gap"
-                    />
-                    No
-                  </label>
-                </div>
-
-                <ErrorMessage name="allowStacking" component="div" />
-              </div>
-            </div>
-
-            <div className="FieldRow">
-              <div className="FieldGroup">
-                <label htmlFor="dateCreated">Date Created</label>
-                <Field
-                  type="date"
-                  name="dateCreated"
-                  id="dateCreated"
-                  className="Input"
-                />
-                <ErrorMessage name="dateCreated" component="div" />
-              </div>
-
-              <div className="FieldGroup">
-                <label htmlFor="secondaryDuration">
-                  Secondary Rule Duration
-                </label>
-                <Field
-                  as="select"
-                  name="secondaryDuration"
-                  id="secondaryDuration"
-                  className="Select"
-                >
-                  <option value="" label="Select duration" />
-                  {secondaryDuration.map((option) => (
-                    <option
-                      key={option.value}
-                      value={option.value}
-                      label={option.label}
-                    />
-                  ))}
-                </Field>
-                <ErrorMessage name="secondaryDuration" component="div" />
-              </div>
-            </div>
-
-            <div>
+          {({ handleChange }) => (
+            <Form>
               <div className="FieldRow">
                 <div className="FieldGroup">
-                  <label htmlFor="addEmployerStack">
-                    Add Employer for Rule Stacking
-                  </label>
+                  <label htmlFor="mandateTitle">Mandate Title</label>
                   <Field
                     as="select"
-                    name="addEmployerStack"
-                    id="addEmployerStack"
+                    name="mandateTitle"
+                    id="mandateTitle"
                     className="Select"
                   >
-                    <option value="" label="Select employers" />
-                    {employerOptions?.map((option) => (
+                    <option value="" label="Select a title" />
+                    {mandateTitles.map((option) => (
                       <option
-                        onClick={() => hanleSelectEmployer(option)}
                         key={option.value}
                         value={option.value}
                         label={option.label}
                       />
                     ))}
                   </Field>
-                  <ErrorMessage name="addEmployerStack" component="div" />
+                  <ErrorMessage name="mandateTitle" component="div" />
+                </div>
+
+                <div className="FieldGroup">
+                  <label htmlFor="mandateDuration">Duration</label>
+                  <Field
+                    as="select"
+                    name="mandateDuration"
+                    id="mandateDuration"
+                    className="Select"
+                  >
+                    <option value="" label="Select duration" />
+                    {durationOptions.map((option) => (
+                      <option
+                        key={option.value}
+                        value={option.value}
+                        label={option.label}
+                      />
+                    ))}
+                  </Field>
+                  <ErrorMessage name="mandateDuration" component="div" />
                 </div>
               </div>
-              {selectedEmployers && (
-                <div className="selected__employer">
-                  {selectedEmployers.map((employer) => (
-                    <div key={employer.value} className="d-flex gap-2">
-                      {employer.label}
-                      <button
-                        type="button"
-                        onClick={() => handleRemoveEmployer(employer)}
-                        className="btn btn-danger remove__employer"
-                      >
-                        <IoMdCloseCircle />
-                      </button>
-                    </div>
-                  ))}
+
+              <div className="FieldRow">
+                <div className="RadioCon">
+                  <label htmlFor="mandateUser">Mandate User</label>
+                  <div className="Input">
+                    <label className="MandateLabel">
+                      <Field
+                        type="radio"
+                        name="mandateUser"
+                        value="employer"
+                        className="Gap"
+                      />
+                      Employer
+                    </label>
+                    <label className="MandateLabel">
+                      <Field
+                        type="radio"
+                        name="mandateUser"
+                        value="admin"
+                        className="Gap"
+                      />
+                      Admin
+                    </label>
+                  </div>
+
+                  <ErrorMessage name="mandateUser" component="div" />
+                </div>
+
+                <div className="RadioCon">
+                  <label htmlFor="allowStacking">
+                    Allow Remita Rule Stacking
+                  </label>
+                  <div className="Input">
+                    <label className="MandateLabel">
+                      <Field
+                        type="radio"
+                        name="allowStacking"
+                        value="yes"
+                        className="Gap"
+                      />
+                      Yes
+                    </label>
+                    <label className="MandateLabel">
+                      <Field
+                        type="radio"
+                        name="allowStacking"
+                        value="no"
+                        className="Gap"
+                      />
+                      No
+                    </label>
+                  </div>
+
+                  <ErrorMessage name="allowStacking" component="div" />
+                </div>
+              </div>
+
+              <div className="FieldRow">
+                <div className="FieldGroup">
+                  <label htmlFor="dateCreated">Date Created</label>
+                  <Field
+                    type="date"
+                    name="dateCreated"
+                    id="dateCreated"
+                    className="Input"
+                  />
+                  <ErrorMessage name="dateCreated" component="div" />
+                </div>
+
+                <div className="FieldGroup">
+                  <label htmlFor="secondaryDuration">
+                    Secondary Rule Duration
+                  </label>
+                  <Field
+                    as="select"
+                    name="secondaryDuration"
+                    id="secondaryDuration"
+                    className="Select"
+                  >
+                    <option value="" label="Select duration" />
+                    {secondaryDuration.map((option) => (
+                      <option
+                        key={option.value}
+                        value={option.value}
+                        label={option.label}
+                      />
+                    ))}
+                  </Field>
+                  <ErrorMessage name="secondaryDuration" component="div" />
+                </div>
+              </div>
+
+              <div>
+                <div className="FieldRow ">
+                  <div className="FieldGroup">
+                    <label htmlFor="addEmployerStack">
+                      Add Employer for Rule Stacking
+                    </label>
+                    <select
+                      name="addEmployerStack"
+                      id="addEmployerStack"
+                      className="Select"
+                      onChange={(event) => {
+                        handleChange(event);
+                        hanleSelectEmployer(
+                          employerOptions.find(
+                            (option) => option.value === event.target.value
+                          )
+                        );
+                      }}
+                    >
+                      <option value="" label="Select employers" />
+                      {employerOptions?.map((option) => (
+                        <option
+                          onClick={() => hanleSelectEmployer(option)}
+                          key={option.value}
+                          value={option.value}
+                          label={option.label}
+                        />
+                      ))}
+                      \
+                    </select>
+                    <ErrorMessage name="addEmployerStack" component="div" />
+                  </div>
+                </div>
+                {selectedEmployers && (
+                  <div className="selected__employer">
+                    {selectedEmployers.map((employer) => (
+                      <div key={employer.value} className="d-flex gap-2">
+                        {employer.label}
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveEmployer(employer)}
+                          className="btn btn-danger remove__employer"
+                        >
+                          <IoMdCloseCircle />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+              {message && (
+                <div style={{ textAlign: "center", color: "#145098" }}>
+                  {message}
                 </div>
               )}
-            </div>
-            {message && (
-              <div style={{ textAlign: "center", color: "#145098" }}>
-                {message}
-              </div>
-            )}
 
-            <div className="BtnContainer">
-              <BocButton
-                fontSize="1.6rem"
-                type="submit"
-                bgcolor="#ecaa00"
-                bradius="18px"
-              >
-                Create Mandate
-              </BocButton>
-            </div>
-          </Form>
+              <div className="BtnContainer">
+                <BocButton
+                  fontSize="1.6rem"
+                  type="submit"
+                  bgcolor="#ecaa00"
+                  bradius="18px"
+                >
+                  Create Mandate
+                </BocButton>
+              </div>
+            </Form>
+          )}
         </Formik>
       </div>
     </div>

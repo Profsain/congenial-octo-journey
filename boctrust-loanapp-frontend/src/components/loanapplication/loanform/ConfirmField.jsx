@@ -18,7 +18,7 @@ const ConfirmField = ({
   );
 
   useEffect(() => {
-    if (fieldName === "employername") {
+    if (fieldName === "employerId") {
       const employerInfo = employers.find((employer) => employer._id === value);
       setFieldValue(employerInfo ? employerInfo.employersName : value);
     }

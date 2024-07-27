@@ -10,6 +10,7 @@ import sendSMS from "../../../../utilities/sendSms";
 import EmailTemplate from "../../shared/EmailTemplate";
 import sendEmail from "../../../../utilities/sendEmail";
 import ReactDOMServer from "react-dom/server";
+import { toast } from "react-toastify";
 
 const styles = {
   error: {
@@ -40,9 +41,19 @@ const PhoneOtp = (props) => {
     const recaptchaVerifier = new RecaptchaVerifier(
       auth,
       "recaptcha-container",
-      {}
+      {
+        size: "invisible",
+        callback: () => {
+          // reCAPTCHA solved
+          console.log("reCAPTCHA solved");
+        },
+        "expired-callback": () => {
+          // Response expired
+          console.log("reCAPTCHA expired");
+        },
+      }
     );
-    recaptchaVerifier.render();
+
     return await signInWithPhoneNumber(auth, number, recaptchaVerifier);
   };
 
@@ -62,7 +73,9 @@ const PhoneOtp = (props) => {
       setFlag(true);
     } catch (error) {
       // setErrorMsg(`Invalid phone number: ${error.message}`);
-      throw new Error("Error setting up reCAPTCHA:", error);
+      console.log(error);
+      toast.error("Error setting up reCAPTCHA:");
+      // throw new Error("Error setting up reCAPTCHA:", error);
     }
   };
 
@@ -135,7 +148,7 @@ const PhoneOtp = (props) => {
             <Form.Group className="mb-3" controlId="formPhone">
               <Form.Control
                 type="text"
-                value={props.phonenumber}
+                value={updatePhone}
                 onChange={(e) => setUpdatePhone(e.target.value)}
               />
               <Form.Text className="text-muted">
