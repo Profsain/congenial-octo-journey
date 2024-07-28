@@ -2,12 +2,17 @@ import { useEffect, useState } from "react";
 import "../../dashboardcomponents/transferdashboard/Transfer.css";
 import "./Credit.css";
 import PropTypes from "prop-types";
-import { fetchSingleCustomer } from "../../../../redux/reducers/customerReducer";
+import {
+  cooApprovalAndCreateBankoneAccount,
+  fetchSingleCustomer,
+} from "../../../../redux/reducers/customerReducer";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
-
+import { format } from "date-fns";
 import axios from "axios";
 import PageLoader from "../../shared/PageLoader";
+import { nigerianCurrencyFormat } from "../../../../../utilities/formatToNiaraCurrency";
+import { customerApprovalEnum } from "../../../../lib/userRelated";
 
 const percentageIndex = 0.45;
 
@@ -24,11 +29,17 @@ const DecisionSummary = ({ customerId }) => {
     disbursementInstruction: "",
     creditOfficerReview: "",
   });
+  const [approvalStatus, setApprovalStatus] = useState({
+    creditOfficerApprovalStatus: false,
+    headOfCreditApprovalStatus: false,
+    cooApprovalStatus: false,
+  });
   const [isLoading, setIsLoading] = useState(false);
 
-  const { selectedCustomer, customerApprovalEnum } = useSelector(
-    (state) => state.customerReducer
-  );
+  const { selectedCustomer } = useSelector((state) => state.customerReducer);
+
+  // current login superAdmin user
+  const currentUser = useSelector((state) => state.adminAuth.user);
 
   useEffect(() => {
     const getData = async () => {
@@ -49,19 +60,47 @@ const DecisionSummary = ({ customerId }) => {
         ...decisionSummaryInfo,
 
         maxAmountLendable: (
-          selectedCustomer?.creditCheck?.paySlipAnalysis?.netPay *
+          Number(selectedCustomer?.creditCheck?.paySlipAnalysis?.netPay) *
           percentageIndex
         ).toFixed(2),
         totalMonthlyDeductions:
           selectedCustomer?.creditCheck?.paySlipAnalysis?.extraLenders.reduce(
-            (acc, curr) => acc + curr.deductions,
+            (acc, curr) => acc + Number(curr.deductions),
             0
           ),
+      });
+
+      setValidateInfo({
+        isCustomerOnSoftSuit:
+          selectedCustomer?.creditCheck?.decisionSummary?.isCustomerOnSoftSuit,
+        isCustomerNextOfKinOk:
+          selectedCustomer?.creditCheck?.decisionSummary?.isCustomerNextOfKinOk,
+        isCreditCheckOk:
+          selectedCustomer?.creditCheck?.decisionSummary?.isCreditCheckOk,
+        isBvnCheckOk:
+          selectedCustomer?.creditCheck?.decisionSummary?.isBvnCheckOk,
+        disbursementInstruction:
+          selectedCustomer?.creditCheck?.decisionSummary
+            ?.disbursementInstruction,
+        creditOfficerReview:
+          selectedCustomer?.creditCheck?.decisionSummary?.creditOfficerReview,
+      });
+
+      setApprovalStatus({
+        cooApprovalStatus:
+          selectedCustomer?.creditCheck?.decisionSummary?.cooApprovalStatus,
+        creditOfficerApprovalStatus:
+          selectedCustomer?.creditCheck?.decisionSummary
+            ?.creditOfficerApprovalStatus,
+        headOfCreditApprovalStatus:
+          selectedCustomer?.creditCheck?.decisionSummary
+            ?.headOfCreditApprovalStatus,
       });
     }
   }, [selectedCustomer]);
 
   useEffect(() => {
+    if (!decisionSummaryInfo) return;
     if (
       decisionSummaryInfo?.totalMonthlyDeductions === 0 &&
       selectedCustomer?.creditCheck?.paySlipAnalysis?.monthlyLoanRepayment >
@@ -87,7 +126,7 @@ const DecisionSummary = ({ customerId }) => {
         setIsGoodCreditHistory(false);
       }
     }
-  }, []);
+  }, [decisionSummaryInfo, selectedCustomer]);
 
   const apiUrl = import.meta.env.VITE_BASE_URL;
 
@@ -108,10 +147,32 @@ const DecisionSummary = ({ customerId }) => {
     };
     try {
       setIsLoading(true);
-      await axios.put(
-        `${apiUrl}/api/updatecustomer/approve/co/${customerId}`,
-        requestObj
-      );
+      if (
+        approvalStatus.creditOfficerApprovalStatus ==
+        customerApprovalEnum.pending
+      ) {
+        await axios.put(
+          `${apiUrl}/api/updatecustomer/approve/co/${customerId}`,
+          requestObj
+        );
+      } else if (
+        approvalStatus.headOfCreditApprovalStatus ==
+        customerApprovalEnum.pending
+      ) {
+        await axios.put(
+          `${apiUrl}/api/updatecustomer/approve/hoc/${customerId}`
+        );
+      } else if (
+        approvalStatus.cooApprovalStatus == customerApprovalEnum.pending
+      ) {
+        const res = await dispatch(
+          cooApprovalAndCreateBankoneAccount(customerId)
+        );
+
+        if (res.type.includes("rejected")) {
+          return toast.error(res?.payload || "Something went wrong");
+        }
+      }
       await dispatch(fetchSingleCustomer(customerId));
       toast.success("Customer Approval Success");
     } catch (error) {
@@ -120,6 +181,48 @@ const DecisionSummary = ({ customerId }) => {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const checkIfCurrentAdminHasApproved = () => {
+    if (
+      approvalStatus.creditOfficerApprovalStatus ==
+        customerApprovalEnum.pending &&
+      currentUser.userRole.can.includes("approveCreditAssesment")
+    ) {
+      return false;
+    } else if (
+      approvalStatus.headOfCreditApprovalStatus ==
+        customerApprovalEnum.pending &&
+      currentUser.userRole.can.includes("headOfCreditApproval")
+    ) {
+      return false;
+    } else if (
+      approvalStatus.cooApprovalStatus == customerApprovalEnum.pending &&
+      currentUser.userRole.can.includes("cooApproval")
+    ) {
+      return false;
+    }
+
+    return true;
+  };
+  const checkIfCurrentAdminShouldApproved = () => {
+    if (currentUser.userRole.value === "super_admin") {
+      return true;
+    } else if (
+      approvalStatus.creditOfficerApprovalStatus ==
+        customerApprovalEnum.pending &&
+      currentUser.userRole.can.includes("headOfCreditApproval")
+    ) {
+      return false;
+    } else if (
+      approvalStatus.headOfCreditApprovalStatus ==
+        customerApprovalEnum.pending &&
+      currentUser.userRole.can.includes("cooApproval")
+    ) {
+      return false;
+    }
+
+    return true;
   };
 
   return (
@@ -132,22 +235,26 @@ const DecisionSummary = ({ customerId }) => {
         <p className="row">
           <span className="col-5"> Customer&apos;s Net pay is </span>
           <span className="figure col-7">
-            {selectedCustomer?.creditCheck?.paySlipAnalysis?.netPay}
+            {nigerianCurrencyFormat.format(
+              selectedCustomer?.creditCheck?.paySlipAnalysis?.netPay
+            )}
           </span>
         </p>
         <p className="row">
           <span className="col-5"> 45% of Customer&apos;s Net pay is </span>
           <span className="figure col-7">
-            {decisionSummaryInfo?.maxAmountLendable}
+            {nigerianCurrencyFormat.format(
+              decisionSummaryInfo?.maxAmountLendable
+            )}
           </span>
         </p>
         <p className="row">
           <span className="col-5"> Monthy Repayment</span>{" "}
           <span className="figure col-7">
-            {
+            {nigerianCurrencyFormat.format(
               selectedCustomer?.creditCheck?.paySlipAnalysis
                 ?.monthlyLoanRepayment
-            }
+            )}
           </span>
         </p>
         <p className="row">
@@ -162,15 +269,19 @@ const DecisionSummary = ({ customerId }) => {
           </span>
           <div className="col-7">
             <span className="figure">
-              {decisionSummaryInfo?.maxAmountLendable -
-                decisionSummaryInfo?.totalMonthlyDeductions}
+              {nigerianCurrencyFormat.format(
+                decisionSummaryInfo?.maxAmountLendable -
+                  decisionSummaryInfo?.totalMonthlyDeductions
+              )}
             </span>{" "}
             which is{" "}
             <span className="figure">
-              {((decisionSummaryInfo?.maxAmountLendable -
-                decisionSummaryInfo?.totalMonthlyDeductions) *
-                100) /
-                selectedCustomer?.creditCheck?.paySlipAnalysis?.netPay}
+              {(
+                ((decisionSummaryInfo?.maxAmountLendable -
+                  decisionSummaryInfo?.totalMonthlyDeductions) *
+                  100) /
+                selectedCustomer?.creditCheck?.paySlipAnalysis?.netPay
+              ).toFixed(2)}
             </span>
             % of his/her Net pay.
           </div>
@@ -287,7 +398,10 @@ const DecisionSummary = ({ customerId }) => {
               Credit DB Search{" "}
               {selectedCustomer?.creditCheck?.creditDbSearch?.updatedAt && (
                 <span className="validBtn">
-                  {selectedCustomer?.creditCheck?.creditDbSearch?.updatedAt}
+                  {format(
+                    selectedCustomer?.creditCheck?.creditDbSearch?.updatedAt,
+                    "MMM dd, HH:mm"
+                  )}
                 </span>
               )}
             </div>
@@ -307,13 +421,17 @@ const DecisionSummary = ({ customerId }) => {
               </button>
             </div>
           </div>
+          <hr />
 
           <div className="row mt-2 decision-row">
             <div>
               Deduct Search{" "}
               {selectedCustomer?.creditCheck?.deductCheck?.updatedAt && (
                 <span className="validBtn">
-                  {selectedCustomer?.creditCheck?.deductCheck?.updatedAt}
+                  {format(
+                    selectedCustomer?.creditCheck?.deductCheck?.updatedAt,
+                    "MMM dd, HH:mm"
+                  )}
                 </span>
               )}
             </div>
@@ -333,39 +451,45 @@ const DecisionSummary = ({ customerId }) => {
               </button>
             </div>
           </div>
+          <hr />
 
-          <div className="row mt-2 decision-row">
-            <div>
-              Credit Bureau Search{" "}
-              {selectedCustomer?.creditCheck?.creditBureauSearch?.updatedAt && (
-                <span className="validBtn">
-                  {selectedCustomer?.creditCheck?.creditBureauSearch?.updatedAt}
-                </span>
-              )}
-            </div>
+          <div className=" mt-2">
+            <div>Credit Bureau Search </div>
 
-            <div className="col-sm-12 col-md-3">
-              <button className="viewBtn">
-                <a
-                  target="_blank"
-                  rel="noreferrer"
-                  href={
-                    selectedCustomer?.creditCheck?.creditBureauSearch
-                      ?.bureauSearchReport[0]
-                  }
-                >
-                  View Data
-                </a>
-              </button>
-            </div>
+            {selectedCustomer?.creditCheck?.creditBureauSearch &&
+              selectedCustomer?.creditCheck?.creditBureauSearch.map((item) => (
+                <div className="row ml-4 decision-row" key={item?._id}>
+                  <div className="d-flex gap-2 mt-3 align-items-center">
+                    <h6>{item?.bureauName}</h6>
+                    <span className="validBtn">
+                      {format(item?.bureauDate, "MMM dd, HH:mm")}
+                    </span>
+                  </div>
+                  <div className="col-sm-12 col-md-3">
+                    <button className="viewBtn">
+                      <a
+                        target="_blank"
+                        rel="noreferrer"
+                        href={item?.bureauSearchReport}
+                      >
+                        View Data
+                      </a>
+                    </button>
+                  </div>
+                </div>
+              ))}
           </div>
+          <hr />
 
           <div className="row mt-2 decision-row">
             <div>
               Payslip Analysis{" "}
               {selectedCustomer?.creditCheck?.paySlipAnalysis?.updatedAt && (
                 <span className="validBtn">
-                  {selectedCustomer?.creditCheck?.paySlipAnalysis?.updatedAt}
+                  {format(
+                    selectedCustomer?.creditCheck?.paySlipAnalysis?.updatedAt,
+                    "MMM dd, HH:mm"
+                  )}
                 </span>
               )}
             </div>
@@ -412,7 +536,12 @@ const DecisionSummary = ({ customerId }) => {
                   })
                 }
                 className="form-control"
+                value={validateInfo.disbursementInstruction}
                 id="netPay"
+                disabled={
+                  approvalStatus.creditOfficerApprovalStatus !==
+                  customerApprovalEnum.pending
+                }
               ></textarea>
             </div>
           </div>
@@ -429,6 +558,11 @@ const DecisionSummary = ({ customerId }) => {
                   })
                 }
                 className="form-control"
+                value={validateInfo.creditOfficerReview}
+                disabled={
+                  approvalStatus.creditOfficerApprovalStatus !==
+                  customerApprovalEnum.pending
+                }
                 id="netPay"
               ></textarea>
             </div>
@@ -436,8 +570,8 @@ const DecisionSummary = ({ customerId }) => {
         </div>
 
         <div>
-          {selectedCustomer?.creditCheck?.decisionSummary
-            ?.creditOfficerApprovalStatus == customerApprovalEnum.pending ? (
+          {checkIfCurrentAdminShouldApproved() &&
+          !checkIfCurrentAdminHasApproved() ? (
             <div className=" row mx-5 align-items-center">
               <div className="validBtnBox">
                 <button
@@ -463,11 +597,20 @@ const DecisionSummary = ({ customerId }) => {
           ?.creditOfficerApprovalStatus === customerApprovalEnum.approved && (
           <div className="row mt-4 ">
             <p className="cooApprove ">
-              Approval by:{" "}
-              {selectedCustomer?.decisionSummary?.headOfCreditApprovalStatus
-                ? "COO"
-                : "Head of Credit"}{" "}
-              (<span className="figure">Pending</span>)
+              Approval:{" "}
+              {approvalStatus.headOfCreditApprovalStatus ===
+              customerApprovalEnum.pending ? (
+                <span>
+                  Head of Credit <span className="figure">(Pending)</span>
+                </span>
+              ) : approvalStatus.cooApprovalStatus ===
+                customerApprovalEnum.pending ? (
+                <span>
+                  by COO<span className="figure">(Pending)</span>
+                </span>
+              ) : (
+                "Completed"
+              )}
             </p>
           </div>
         )}

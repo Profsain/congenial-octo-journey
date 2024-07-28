@@ -10,6 +10,11 @@
   flex-direction: column;
   justify-content: flex-start;
   margin: 0 1rem;
+  width: 100%;
+}
+.FieldGroup .Input {
+  max-width: 460px;
+  width: 100%;
 }
 
 .Notification {
@@ -106,17 +111,17 @@
 }
 
 .selected__employer > div {
-  padding: .3rem;
+  padding: 0.3rem;
   border: 3px solid white;
- 
+
   width: fit-content;
-  height:  fit-content;
+  height: fit-content;
   max-height: 50px;
 }
 
-.remove__employer{
- border-radius: 50% in !important;
- padding: .3rem !important;
- display: grid;
- place-content: center;
+.remove__employer {
+  border-radius: 50% in !important;
+  padding: 0.3rem !important;
+  display: grid;
+  place-content: center;
 }

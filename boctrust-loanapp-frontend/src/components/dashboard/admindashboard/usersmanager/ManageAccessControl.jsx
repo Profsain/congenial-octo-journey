@@ -41,7 +41,7 @@ const ManageAccessControl = () => {
       );
 
       await dispatch(fetchRolesAndPermisions());
-      toast.success("Role Permission has been updated")
+      toast.success("Role Permission has been updated");
     } catch (error) {
       toast.error(error?.reponse?.data?.error || "Something Went Wrong");
     } finally {
@@ -84,14 +84,21 @@ const ManageAccessControl = () => {
         {rolesAndPermission && (
           <div className="FieldGroup">
             <label htmlFor="userRole">User Roles</label>
-            <select name="userRole" id="userRole" className="Input">
+            <select
+              onChange={(e) => {
+                setSelectedRole(
+                  rolesAndPermission?.find(
+                    (item) => item.value == e.target.value
+                  )
+                );
+              }}
+              name="userRole"
+              id="userRole"
+              className="Input"
+            >
               <option value="">Select Role</option>
               {rolesAndPermission.map((option) => (
-                <option
-                  onClick={() => setSelectedRole(option)}
-                  key={option._id}
-                  value={option.value}
-                >
+                <option key={option._id} value={option.value}>
                   {option.label}
                 </option>
               ))}

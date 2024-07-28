@@ -174,14 +174,14 @@ const KycViewDetails = ({ customer, setShowInfo }) => {
               name="Loan Amount"
               type="text"
               disabled
-              value={customer?.loanamount || ""}
+              value={customer?.loan?.loanamount || ""}
             />
             <div className="Space"></div>
             <KycInput
               name="Monthly Repayment"
               type="text"
               disabled
-              value={customer?.monthlyrepayment || ""}
+              value={customer?.loan?.monthlyrepayment || ""}
             />
           </div>
         </div>
@@ -199,7 +199,7 @@ const KycViewDetails = ({ customer, setShowInfo }) => {
             <KycInput
               name="Employer Name"
               type="text"
-              value={customer?.employername || ""}
+              value={customer?.employer?.employersName || ""}
             />
 
             <KycInput

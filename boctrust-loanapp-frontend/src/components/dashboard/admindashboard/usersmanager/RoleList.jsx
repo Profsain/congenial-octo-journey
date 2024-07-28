@@ -8,11 +8,9 @@ import "../../Dashboard.css";
 import PageLoader from "../../shared/PageLoader";
 import NoResult from "../../../shared/NoResult";
 import ActionNotification from "../../shared/ActionNotification";
-import EditUser from "./EditUser";
 
 // function
 import searchList from "../../../../../utilities/searchListFunc";
-import handleAdminRoles from "../../../../../utilities/getAdminRoles";
 
 const RoleList = ({ count, searchTerms, setIsEditMode }) => {
   const styles = {
@@ -35,12 +33,9 @@ const RoleList = ({ count, searchTerms, setIsEditMode }) => {
 
   // local state
   const [rolesList, setRoleList] = useState(rolesAndPermission);
-  const [show, setShow] = useState(false);
+
   const [action, setAction] = useState(false);
   const [roleId, setRoleId] = useState("");
-  const [roleObj, setRoleObj] = useState({});
-  const [adminRoles, setAdminRoles] = useState([]);
-  const [viewEdit, setViewEdit] = useState("edit");
 
   const dispatch = useDispatch();
   useEffect(() => {
@@ -64,26 +59,12 @@ const RoleList = ({ count, searchTerms, setIsEditMode }) => {
 
   // handle action select
   const handleAction = (e) => {
-    const option = e.target.value;
     const id = e.target.id;
 
-    // find selected role by id
-    const role = rolesAndPermission.find((role) => role._id === id);
-    setRoleObj(role);
+    // // find selected role by id
+    // const role = rolesAndPermission.find((role) => role._id === id);
+    // setRoleObj(role);
     setRoleId(id);
-
-    // check array of adminRoles
-    handleAdminRoles(role, setAdminRoles);
-
-    if (option === "edit") {
-      setShow(true);
-      setViewEdit("edit");
-    } else if (option === "view") {
-      setShow(true);
-      setViewEdit("view");
-    } else if (option === "delete") {
-      setAction(true);
-    }
   };
 
   // handle delete
@@ -154,17 +135,6 @@ const RoleList = ({ count, searchTerms, setIsEditMode }) => {
             </Table>
           </div>
         </div>
-      )}
-
-      {/* edit role popup model */}
-      {show && (
-        <EditUser
-          show={show}
-          onHide={() => setShow(false)}
-          roleobj={roleObj}
-          adminRoles={adminRoles}
-          viewEdit={viewEdit}
-        />
       )}
 
       {/* acton popup model */}

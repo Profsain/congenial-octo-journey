@@ -97,7 +97,7 @@ const ApplyLoan = () => {
     // send the object to the backend
     try {
       const response = await fetch(
-        `${baseUrl}/api/customer/${customerId}/new-loans`,
+        `${baseUrl}/api/loan/${customerId}`,
         {
           method: "POST",
           headers: {

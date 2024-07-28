@@ -37,7 +37,7 @@ const MyProfile = () => {
         <ProfileCard title="Last Name" value={user.lastname} />
         <ProfileCard
           title="Business Name/Employer"
-          value={user?.employername.employersName || "Self Employed"}
+          value={user?.employer.employersName || "Self Employed"}
         />
         <ProfileCard title="Branch" value={branch} />
         <ProfileCard title="Email" value="femiakin@gmail.com" />

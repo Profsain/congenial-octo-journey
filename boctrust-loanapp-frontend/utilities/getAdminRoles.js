@@ -1,10 +1,7 @@
 // Define a function to handle adminRoles
 const handleAdminRoles = (user, setAdminRoles) => {
-  if (user?.adminRoles?.length > 1) {
-    setAdminRoles(user?.adminRoles);
-  } else {
-    const roles = user?.adminRoles[0]?.split(",");
-    setAdminRoles(roles);
+  if (user?.userRole?.can?.length > 1) {
+    setAdminRoles(user?.userRole?.can);
   }
 };
 

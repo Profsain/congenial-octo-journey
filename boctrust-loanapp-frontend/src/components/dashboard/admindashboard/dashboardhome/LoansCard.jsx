@@ -6,12 +6,12 @@ const LoansCard = ({ img, title, stat, bgcolor }) => {
       display: "flex",
       alignItems: "center",
       justifyContent: "space-between",
-      width: "170px",
-      height: "100px",
-      padding: "0.9rem",
+      width: "100%",
+      height: "120px",
+      padding: "1rem",
       backgroundColor: bgcolor,
       borderRadius: "10px",
-      margin: "0.5rem 2rem 0.5rem 0",
+    
     },
     text: {
       color: "#fff",

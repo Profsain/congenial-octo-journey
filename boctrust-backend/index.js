@@ -11,14 +11,19 @@ const productRoutes = require("./routes/product");
 const inquiryRoutes = require("./routes/inquiry");
 const contactRoutes = require("./routes/contactForm");
 const branchRoutes = require("./routes/branches");
+const roleRoute = require("./routes/role");
+const loanRoute = require("./routes/loan");
+const customersLoansRoute = require("./routes/customerLoans");
 const customerRoutes = require("./routes/customer");
 const updateCustomerRoutes = require("./routes/customerUpdate");
 const accountRoutes = require("./routes/account");
 const disbursementRoutes = require("./routes/disbursementMethod");
 const adminRoutes = require("./routes/adminUser");
+const bankoneAccountOfficers = require("./routes/bankoneAccountOfficers");
 const employersManagerRoutes = require("./routes/employersManager");
 // bankone operation routes
 const bankOneOperationRoutes = require("./routes/bankingOperation");
+const bankOneProductsRoutes = require("./routes/bankoneProducts");
 // remita operation routes
 const remitaOperationRoutes = require("./routes/remitaOperation");
 const sendEmail = require("./routes/emailSender");
@@ -79,14 +84,19 @@ mongoose
         app.use('/api/contact', contactRoutes);
         app.use('/api/branch', branchRoutes);
         app.use('/api/customer', customerRoutes);
+        app.use('/api/customers-loans', customersLoansRoute);
+        app.use('/api/role', roleRoute);
+        app.use('/api/loans', loanRoute);
         app.use('/api/updatecustomer', updateCustomerRoutes);
         app.use('/api/account', accountRoutes);
         app.use('/api/disbursement', disbursementRoutes);
         app.use('/api/agency', employersManagerRoutes);
         // admin routes
         app.use('/api/admin', adminRoutes);
+        app.use('/api/account-officers', bankoneAccountOfficers);
         // bankone operation routes
         app.use('/api/bankone', bankOneOperationRoutes);
+        app.use('/api/bankone-products', bankOneProductsRoutes);
         // remita operation routes
         app.use('/api/remita', remitaOperationRoutes);
         // email sender routes
