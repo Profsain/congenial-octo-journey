@@ -1,29 +1,24 @@
+import PropTypes from "prop-types"
 import "./Overview.css";
 
-const OurVisionMission = () => {
+const OurVisionMission = ({ mission, vision, goal}) => {
   return (
     <div className="container">
       <div className="row">
         <div className="VisionLeft col-md-6 col-sm-12">
           <h3>Our Company Vision</h3>
           <p>
-            To be the Number 1 Microfinance Bank in terms of customer service,
-            profitability and returns on investment.
+            {vision || "To be the Number 1 Microfinance Bank in terms of customer service, profitability and returns on investment."}
           </p>
 
           <h3>Our Company Mission</h3>
           <p>
-            We are committed to offering the highest level of professionalism
-            and service with integrity to our partners and customers while
-            ensuring profitable returns to our shareholders.
+            {mission || "We are committed to offering the highest level of professionalism and service with integrity to our partners and customers while ensuring profitable returns to our shareholders."}
           </p>
 
           <h3>Our Company Goal</h3>
           <p>
-            Our core objective is to provide avenue for saving, access to credit
-            and financial advisory services to individuals and micro, small &
-            medium enterprises with competitive advantages. We believe in
-            Growing Together with our customer.
+            {goal || "Our core objective is to provide avenue for saving, access to credit and financial advisory services to individuals and micro, small & medium enterprises with competitive advantages. We believe in Growing Together with our customer."}
           </p>
         </div>
         <div className="VisionRight col-md-6 col-sm-12">
@@ -37,5 +32,11 @@ const OurVisionMission = () => {
     </div>
   );
 };
+
+OurVisionMission.propTypes = {
+  mission: PropTypes.string,
+  vision: PropTypes.string,
+  goal: PropTypes.string
+}
 
 export default OurVisionMission;

@@ -17,6 +17,9 @@ import loanOfficerReducer from "../reducers/loanOfficerReducer";
 import authReducer from "../reducers/adminAuthReducer";
 import settingReducer from "../reducers/settingReducer";
 import onboardingReducer from "../reducers/onboardingReducer";
+import siteContentReducer from "../reducers/siteContentReducer";
+import directors from "../reducers/boardDirectorReducer";
+import frontPageProductReducer from "../reducers/frontPageProductsReducer";
 import loanReducer from "../reducers/loanReducer";
 
 // create a store
@@ -42,6 +45,9 @@ const store = configureStore({
     adminAuth: authReducer,
     settingReducer,
     onboarding: onboardingReducer,
+    siteContent: siteContentReducer,
+    directors,
+    frontPageProduct: frontPageProductReducer,
   },
 });
 

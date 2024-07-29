@@ -1,11 +1,11 @@
 import PropTypes from "prop-types";
 import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchProduct } from "../../redux/reducers/productReducer";
+import { fetchFrontPageProduct } from "../../redux/reducers/frontPageProductsReducer";
 // animation library
 import AOS from "aos";
 import "aos/dist/aos.css";
-import data from "../../mockdatabase/products.json";
+// import data from "../../mockdatabase/products.json";
 import Headline from "../shared/Headline";
 import Header from "../shared/Header";
 import TopCard from "../shared/TopCard";
@@ -17,30 +17,21 @@ import ProductListCard from "./ProductListCard";
 const OurProduct = ({ productTitle, headerImg }) => {
   // fetch loan product
   const dispatch = useDispatch();
+  const pageProducts = useSelector(
+    (state) => state?.frontPageProduct?.pageProducts
+  );
 
   useEffect(() => {
-    dispatch(fetchProduct());
+    dispatch(fetchFrontPageProduct());
   }, [dispatch]);
 
-  const loanProducts = useSelector(
-    (state) => state.productReducer.products.products
-  );
-  const status = useSelector((state) => state.productReducer.status);
-
-  console.log("status", status)
-  console.log("loanProducts", loanProducts);
-
-  // data from json file
-  const products = data.products;
-  console.log("dummy data", products)
-
   // filter using productTitle
-  const currentProduct = data.products.filter(
+  const currentProduct = pageProducts.find(
     (product) =>
       product.productName.toLowerCase() === productTitle.toLowerCase()
   );
 
-  const { image, productName, description, benefits, features } = currentProduct[0];
+  const { image, productName, description, benefits, features } = currentProduct;
 
   // component state
   const [img, setImg] = useState(image);
@@ -50,7 +41,7 @@ const OurProduct = ({ productTitle, headerImg }) => {
   const [feature, setFeature] = useState(features);
 
   // create object of products, key is category and value is array of products
-  const productsByCategory = products.reduce((acc, product) => {
+  const productsByCategory = pageProducts.reduce((acc, product) => {
     if (!acc[product.category]) {
       acc[product.category] = [];
     }
@@ -60,7 +51,7 @@ const OurProduct = ({ productTitle, headerImg }) => {
 
   // function to handle button click and change image, description, benefits and features
   const changeProduct = (id) => {
-    const product = products.find((product) => product.id === id);
+    const product = pageProducts.find((product) => product._id === id);
     setImg(product.image);
     setName(product.productName);
     setDesc(product.description);
@@ -143,11 +134,11 @@ const OurProduct = ({ productTitle, headerImg }) => {
                     text={category.toUpperCase()}
                   />
                   <div className="BtnContainer">
-                    {productsByCategory[category].map(({ id, productName }) => (
+                    {productsByCategory[category].map(({ _id, productName }) => (
                       <ProductBtn
-                        key={id}
+                        key={_id}
                         text={productName}
-                        func={() => changeProduct(id)}
+                        func={() => changeProduct(_id)}
                       />
                     ))}
                   </div>

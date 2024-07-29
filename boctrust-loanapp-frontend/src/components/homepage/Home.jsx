@@ -1,4 +1,6 @@
 import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchContent } from "../../redux/reducers/siteContentReducer";
 // animation library
 import AOS from "aos";
 import "aos/dist/aos.css";
@@ -19,26 +21,22 @@ const Home = () => {
     });
   }, []);
 
-  // const handleSendEmail = () => {
-  //   const emailTemplateHtml = ReactDOMServer.renderToString(
-  //     <EmailTemplate firstName="Husseini Mudi" />
-  //   );
-  //   const options = {
-  //     email: "husseinimudiking@gmail.com",
-  //     subject: "Loan Application Notification",
-  //     html: emailTemplateHtml,
-  //   };
-  //   sendEmail(options);
-  // };
+  // fetch site content
+  const dispatch = useDispatch();
+  const siteContent = useSelector((state) => state.siteContent.siteContent);
+
+  useEffect(() => {
+    dispatch(fetchContent());
+  }, [dispatch]);
 
   return (
     <>
-      <HomeCarousel />
+      <HomeCarousel content={siteContent} />
       <div data-aos="fade-up">
-        <ExploreBoctrust />
+        <ExploreBoctrust content={siteContent} />
       </div>
       <div data-aos="fade-up">
-        <Overview />
+        <Overview content={siteContent} />
       </div>
       <div data-aos="fade-up">
         <Calculator />

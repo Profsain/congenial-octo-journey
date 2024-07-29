@@ -37,6 +37,17 @@ const tempDataRoutes = require("./routes/tempData");
 const bvnVerificationRoutes = require("./routes/bvnVerification");
 const career = require("./routes/career");
 const settings = require("./routes/settings");
+const siteContent = require("./routes/siteContentRoute");
+const boardMemberRoutes = require("./routes/boardMember")
+// board members seeds
+const BoardMember = require("./models/BoardOfDirectors");
+const boardMembers = require("./seedData/boardMembers");
+
+// front page products
+const productsFrontPage = require("./routes/productsFrontPage");
+const productsSeedData = require("./seedData/productsFrontPageData");
+const ProductsFrontPage = require("./models/ProductsFrontPage");
+
 
 // configure dotenv
 dotenv.config();
@@ -48,7 +59,30 @@ mongoose
     useUnifiedTopology: true,
     })
     .then(() => { 
-    console.log("Connected to database successfully");
+        console.log("Connected to database successfully");
+        
+        // seed board members data
+        BoardMember.find()
+            .then((boardMembersData) => {
+                if (boardMembersData.length === 0) {
+                    BoardMember.insertMany(boardMembers)
+                        .then(() => console.log("Board members data seeded successfully"))
+                        .catch((err) => console.log(err));
+                }
+            })
+            .catch((err) => console.log(err));
+        
+        // seed product page data
+        ProductsFrontPage.find()
+            .then((productsData) => {
+                if (productsData.length === 0) {
+                    ProductsFrontPage.insertMany(productsSeedData)
+                        .then(() => console.log("Product page data seeded successfully"))
+                        .catch((err) => console.log(err));
+                }
+            })
+            .catch((err) => console.log(err));
+        
         // create new instance of express
         const app = express();
 
@@ -119,6 +153,15 @@ mongoose
 
         // settings routes
         app.use('/api/settings', settings);
+
+        // site content routes
+        app.use('/api/site-content', siteContent);
+
+        // board member routes
+        app.use('/api/board-member', boardMemberRoutes);
+
+        // front page products
+        app.use('/api/products-front-page', productsFrontPage);
 
         app.listen(process.env.PORT || 3030, () => console.log("Server running on port 3030"));
     })

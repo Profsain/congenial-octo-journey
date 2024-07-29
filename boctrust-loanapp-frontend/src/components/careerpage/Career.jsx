@@ -1,11 +1,10 @@
 import { useState, useEffect } from "react";
-import jobs from "../../mockdatabase/jobs.json";
 // animation library
 import AOS from "aos";
 import "aos/dist/aos.css";
 // redux library operations
 import { useDispatch, useSelector } from "react-redux";
-import { fetchJobsSuccess } from "../../redux/reducers/fetchJobs";
+import { fetchCareer } from "../../redux/reducers/careerReducer";
 import { Tabs, Tab, Row } from "react-bootstrap";
 import Header from "../shared/Header";
 import Headline from "../shared/Headline";
@@ -25,29 +24,29 @@ const Career = () => {
   });
 
   // redux dispatch
-  const dispatch = useDispatch();
-  useEffect(() => {
-    dispatch(fetchJobsSuccess(jobs));
-  }, []);
+   const dispatch = useDispatch();
+   useEffect(() => {
+     dispatch(fetchCareer());
+   }, [dispatch]);
 
-  // redux state
-  const jobsData = useSelector((state) => state.fetchJobs.jobs);
+   const careers = useSelector((state) => state.careerReducer.careers.careers);
 
   const [vacancies, setVacancies] = useState([]);
   useEffect(() => {
-    setVacancies(jobsData.jobs);
-  }, [jobsData]);
+    setVacancies(careers);
+  }, [careers]);
 
+  console.log("Jobs", vacancies)
   // search function
   const handleJobSearch = (e) => {
     const keyword = e.target.value;
     if (keyword !== "") {
-      const results = jobsData.jobs.filter((job) => {
+      const results = careers.filter((job) => {
         return job.jobtitle.toLowerCase().startsWith(keyword.toLowerCase());
       });
       setVacancies(results);
     } else {
-      setVacancies(jobsData.jobs);
+      setVacancies(careers);
     }
   };
 
@@ -57,12 +56,12 @@ const Career = () => {
 
   // filter single vacancy using id
   const getVacancy = (id) => {
-    const singleJob = vacancies.filter((vacancy) => vacancy.id === id);
-    setSingleVacancy(singleJob[0]);
+    const singleJob = vacancies.find((vacancy) => vacancy._id === id);
+    setSingleVacancy(singleJob);
   };
 
   const openModal = (e) => {
-    const jobId = parseInt(e.target.id);
+    const jobId = e.target.id;
     getVacancy(jobId);
     setModalShow(true);
   };
@@ -502,6 +501,7 @@ const Career = () => {
                   </div>
                 </div>
               </Tab>
+
               <Tab eventKey="vacancy" title="Vacancies">
                 <div className="container ">
                   <Headline spacer="48px 0" text="Find a place with us!" />
@@ -517,13 +517,13 @@ const Career = () => {
                   <div className="VacancyList">
                     {vacancies?.length === 0 && (
                       <div className="NoVacancy">
-                        <Headline spacer="48px 0" text="No Vacancy Available" />
+                        <Headline spacer="48px 0" text="No Vacancy at this moment" />
                       </div>
                     )}
                     <Row xs={1} md={2} className="VacancyRow">
                       {vacancies?.map(
                         ({
-                          id,
+                          _id,
                           image,
                           jobtitle,
                           description,
@@ -532,8 +532,8 @@ const Career = () => {
                         }) => (
                           <VacancyCard
                             data-aos="fade-up"
-                            key={id}
-                            id={id}
+                            key={_id}
+                            id={_id}
                             img={image}
                             title={jobtitle}
                             // shorten description to 200 characters

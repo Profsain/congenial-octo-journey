@@ -362,7 +362,46 @@ const SideNavMain = ({ onMenuItemClick }) => {
           ) : null}
         </div>
       ) : null}
+      <div onMouseOver={openSubWebManager} onMouseLeave={closeSubWebManager}>
+        <div className="IconBox">
+          <img src="images/dwebsite.png" alt="webmanager" />
+          <p>Website Manager</p>
+        </div>
 
+        {isWebManagerOpen ? (
+          <div className="SubItem">
+            <ul>
+              {/* <li id="website" onClick={onMenuItemClick}>
+                All Pages
+              </li> */}
+              <li id="webmanager" onClick={onMenuItemClick}>
+                Blogs
+              </li>
+              <li id="contactForm" onClick={onMenuItemClick}>
+                Contact Form
+              </li>
+              <li id="addwiki" onClick={onMenuItemClick}>
+                Wikis/FAQs
+              </li>
+              <li id="customerAsk" onClick={onMenuItemClick}>
+                Customer Enquiry
+              </li>
+              <li id="career" onClick={onMenuItemClick}>
+                Career
+              </li>
+              <li id="homeEditor" onClick={onMenuItemClick}>
+                Home Page
+              </li>
+              <li id="aboutEditor" onClick={onMenuItemClick}>
+                About Page
+              </li>
+              <li id="boardEditor" onClick={onMenuItemClick}>
+                Directors 
+              </li>
+              <li id="productEditor" onClick={onMenuItemClick}>
+                Products Page
+              </li>
+            </ul>
       {(superAdmin || !shouldNotSee?.includes("kycReview")) && (
         <div onMouseOver={openSubWebManager} onMouseLeave={closeSubWebManager}>
           <div className="IconBox">
