@@ -2,13 +2,39 @@ const mongoose = require("mongoose");
 
 const siteContentSchema = new mongoose.Schema({
   homeCardText: {
-    type: [
+    // type: [
+    //   {
+    //     title: { type: String, default: "Savings" },
+    //     text: {
+    //       type: String,
+    //       default:
+    //         "Our savings products encourages individuals, micro enterprises and cooperative societies to grow their savings and easy their transactions. Saving for personal/family project i.e. (vacation, festival and ceremony e.t.c)",
+    //     },
+    //   },
+    //   {
+    //     title: { type: String, default: "Loans" },
+    //     text: {
+    //       type: String,
+    //       default:
+    //         "Our loan products help you cater to pressing needs. If you’re ready to upgrade your home decor or merely want to improve your lifestyle efficiency with a new laptop, look no further than the Boctrust",
+    //     },
+    //   },
+    //   {
+    //     title: { type: String, default: "Investment" },
+    //     text: {
+    //       type: String,
+    //       default:
+    //         "Our investment products help you secure the future by building up streams of investment towards a target while we match it up with attractive interest rates to achieve your desired goals. Emerald has the following.",
+    //     },
+    //   },
+    // ],
+     type: [
       {
         title: { type: String, default: "Savings" },
         text: {
           type: String,
           default:
-            "Our savings products encourages individuals, micro enterprises and cooperative societies to grow their savings and easy their transactions. Saving for personal/family project i.e. (vacation, festival and ceremony e.t.c)",
+            "Our savings products encourage individuals, micro enterprises, and cooperative societies to grow their savings and ease their transactions. Saving for personal/family projects (e.g., vacation, festival, ceremony, etc.)",
         },
       },
       {
@@ -16,7 +42,7 @@ const siteContentSchema = new mongoose.Schema({
         text: {
           type: String,
           default:
-            "Our loan products help you cater to pressing needs. If you’re ready to upgrade your home decor or merely want to improve your lifestyle efficiency with a new laptop, look no further than the Boctrust",
+            "Our loan products help you cater to pressing needs. If you’re ready to upgrade your home decor or merely want to improve your lifestyle efficiency with a new laptop, look no further than Boctrust.",
         },
       },
       {
@@ -24,8 +50,25 @@ const siteContentSchema = new mongoose.Schema({
         text: {
           type: String,
           default:
-            "Our investment products help you secure the future by building up streams of investment towards a target while we match it up with attractive interest rates to achieve your desired goals. Emerald has the following.",
+            "Our investment products help you secure the future by building up streams of investment towards a target while we match it with attractive interest rates to achieve your desired goals.",
         },
+      },
+    ],
+    default: [
+      {
+        title: "Savings",
+        text:
+          "Our savings products encourage individuals, micro enterprises, and cooperative societies to grow their savings and ease their transactions. Saving for personal/family projects (e.g., vacation, festival, ceremony, etc.)",
+      },
+      {
+        title: "Loans",
+        text:
+          "Our loan products help you cater to pressing needs. If you’re ready to upgrade your home decor or merely want to improve your lifestyle efficiency with a new laptop, look no further than Boctrust.",
+      },
+      {
+        title: "Investment",
+        text:
+          "Our investment products help you secure the future by building up streams of investment towards a target while we match it with attractive interest rates to achieve your desired goals.",
       },
     ],
   },
@@ -135,6 +178,7 @@ const siteContentSchema = new mongoose.Schema({
         description: "Honesty and honorable competition.",
       },
     ],
+    
   },
 });
 
