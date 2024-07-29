@@ -20,22 +20,22 @@ const DisbursementModal = ({
       >
         <Modal.Header closeButton>
           <Modal.Title>
-            <Headline text={loanObj.banking.accountDetails.Message.FullName} />
+            <Headline text={loanObj?.customer.banking?.accountDetails.Message.FullName} />
           </Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <RowCard
             title="Loan ID:"
-            text={loanObj.banking.accountDetails.Message.Id}
+            text={loanObj?.customer?.banking?.accountDetails.Message.Id}
           />
           <hr />
-          <RowCard title="Valid BVN:" text={loanObj.bvnnumber} />
+          <RowCard title="Valid BVN:" text={loanObj?.customer?.bvnnumber} />
           <hr />
           <RowCard title="KYC:" text="Completed" />
           <hr />
           <RowCard
             title="Loan Product:"
-            text={loanObj.loanProduct || "General Loan"}
+            text={loanObj.loanproduct.productName || "General Loan"}
           />
           <hr />
           <RowCard title="Loan Amount:" text={loanObj.loanamount} />
@@ -44,7 +44,7 @@ const DisbursementModal = ({
           <hr />
           <RowCard title="Repayment Month:" text={loanObj.numberofmonth} />
           <hr />
-          <RowCard title="Loan Status:" text={loanObj.kyc.loanstatus} />
+          <RowCard title="Loan Status:" text={loanObj?.loanstatus} />
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={handleClose}>

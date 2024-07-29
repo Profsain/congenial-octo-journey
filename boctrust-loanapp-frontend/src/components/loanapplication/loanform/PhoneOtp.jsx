@@ -33,28 +33,39 @@ const PhoneOtp = (props) => {
   const [updatePhone, setUpdatePhone] = useState(number);
   const [otp, setOtp] = useState("");
   const [flag, setFlag] = useState(false);
+  const [recaptchaWidgetId, setRecaptchaWidgetId] = useState();
 
   const navigate = useNavigate();
 
   // generate recaptcha
   const setUpRecaptcha = async (number) => {
-    const recaptchaVerifier = new RecaptchaVerifier(
-      auth,
-      "recaptcha-container",
-      {
-        size: "invisible",
-        callback: () => {
-          // reCAPTCHA solved
-          console.log("reCAPTCHA solved");
-        },
-        "expired-callback": () => {
-          // Response expired
-          console.log("reCAPTCHA expired");
-        },
-      }
-    );
+    console.log(auth, "auth");
+    if (!window.recaptchaVerifier) {
+      window.recaptchaVerifier = new RecaptchaVerifier(
+        auth,
+        "recaptcha-container",
+        {
+          size: "invisible",
+          callback: () => {
+            // reCAPTCHA solved
+            console.log("reCAPTCHA solved");
+          },
+          "expired-callback": () => {
+            // Response expired
+            console.log("reCAPTCHA expired");
+            if (recaptchaWidgetId) {
+              window.grecaptcha.reset(recaptchaWidgetId);
+              console.log("Reset");
+            }
+          },
+        }
+      );
+      window.recaptchaVerifier.render().then((widgetId) => {
+        setRecaptchaWidgetId(widgetId); // Store the widget ID
+      });
+    }
 
-    return await signInWithPhoneNumber(auth, number, recaptchaVerifier);
+    return await signInWithPhoneNumber(auth, number, window.recaptchaVerifier);
   };
 
   // handle otp request
@@ -73,7 +84,10 @@ const PhoneOtp = (props) => {
       setFlag(true);
     } catch (error) {
       // setErrorMsg(`Invalid phone number: ${error.message}`);
-      console.log(error);
+      console.log(error, "Some erro");
+      if (recaptchaWidgetId) {
+        window.grecaptcha.reset(recaptchaWidgetId);
+      }
       toast.error("Error setting up reCAPTCHA:");
       // throw new Error("Error setting up reCAPTCHA:", error);
     }
@@ -102,6 +116,9 @@ const PhoneOtp = (props) => {
   // handle otp verification
   const verifyOtp = async (e) => {
     e.preventDefault();
+
+    if (!window.recaptchaVerifier) return;
+
     if (otp === "" || otp.length !== 6)
       return setErrorMsg("Please enter a valid OTP");
     try {

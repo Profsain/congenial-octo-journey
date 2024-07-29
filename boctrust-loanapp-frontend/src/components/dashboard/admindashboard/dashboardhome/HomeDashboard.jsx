@@ -139,7 +139,7 @@ const HomeDashboard = () => {
             align="left"
             text="Collections"
           />
-          <div className="InlineCard">
+          <div className="InlineCard collections">
             <StatCard
               day="Today"
               date={getCurrentDateFormatted()}
@@ -172,7 +172,7 @@ const HomeDashboard = () => {
             align="left"
             text="Disbursement"
           />
-          <div className="InlineCard">
+          <div className="InlineCard collections" >
             <StatCard
               day="Today"
               date={getCurrentDateFormatted()}

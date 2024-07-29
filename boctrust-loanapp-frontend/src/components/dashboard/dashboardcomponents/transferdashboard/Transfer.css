@@ -125,3 +125,22 @@
   display: grid;
   place-content: center;
 }
+
+.FieldRow.rule__title input {
+  max-width: 100% !important;
+}
+
+.no__maxTenure {
+  margin-bottom: 0 !important;
+}
+
+.no__maxTenure > div {
+  display: flex;
+  gap: 0.5rem;
+  padding-inline: 0.5rem;
+  align-items: center;
+}
+.no__maxTenure > label {
+  margin-top: 0 !important;
+}
+

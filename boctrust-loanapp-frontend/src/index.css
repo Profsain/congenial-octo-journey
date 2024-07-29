@@ -33,14 +33,17 @@ a {
   text-decoration: none;
 }
 
-
-
 .cursor-pointer {
   cursor: pointer;
 }
 
 img {
   object-fit: contain;
+}
+
+button:disabled {
+  color: gray !important;
+  cursor: not-allowed;
 }
 
 .capitalize {

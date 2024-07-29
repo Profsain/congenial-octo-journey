@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchAllCustomer } from "../../../../redux/reducers/customerReducer";
 import { Table } from "react-bootstrap";
 import BocButton from "../../shared/BocButton";
 import DashboardHeadline from "../../shared/DashboardHeadline";
@@ -14,7 +13,7 @@ import LoanDetails from "./LoanDetails";
 import NotificationBox from "../../shared/NotificationBox";
 import NoResult from "../../../shared/NoResult";
 import sortByCreatedAt from "../../shared/sortedByDate";
-import { customerApprovalEnum } from "../../../../lib/userRelated";
+import { fetchCompletedLoan } from "../../../../redux/reducers/loanReducer";
 
 const OverdueLoans = () => {
   const styles = {
@@ -41,24 +40,14 @@ const OverdueLoans = () => {
     },
   };
 
-  // fetch all customer
+  // fetch all loan
   const dispatch = useDispatch();
-  const customers = useSelector(
-    (state) => state.customerReducer.customers.customer
-  );
+  const { completedLoans } = useSelector((state) => state.loanReducer);
+
   const status = useSelector((state) => state.customerReducer.status);
 
   // current login admin user
   const currentUser = useSelector((state) => state.adminAuth.user);
-
-  // filtere customer by isKycApproved
-  const filteredCustomers = customers?.filter(
-    (customer) =>
-      customer.kyc.isKycApproved === true &&
-      customer?.creditCheck?.decisionSummary?.cooApprovalStatus ===
-        customerApprovalEnum.approved &&
-      customer.kyc.loanstatus === "completed"
-  );
 
   const [show, setShow] = useState(false);
   const [loanObj, setLoanObj] = useState({});
@@ -71,7 +60,7 @@ const OverdueLoans = () => {
   }, [currentUser]);
 
   useEffect(() => {
-    dispatch(fetchAllCustomer());
+    dispatch(fetchCompletedLoan());
   }, [dispatch, showNotification]);
 
   // handle close notification
@@ -88,7 +77,7 @@ const OverdueLoans = () => {
 
   // handle show loan details
   const handleShow = (id) => {
-    const loan = filteredCustomers.find((customer) => customer._id === id);
+    const loan = completedLoans.find((loan) => loan._id === id);
     setLoanObj(loan);
     setShow(true);
   };
@@ -97,23 +86,19 @@ const OverdueLoans = () => {
   const [showCount, setShowCount] = useState(10);
   const [searchTerms, setSearchTerms] = useState("");
 
-  // search customer list
-  const [customerList, setCustomerList] = useState(filteredCustomers);
+  // search loan list
+  const [loanList, setLoanList] = useState(completedLoans);
 
-  // update customerList to show 10 customers on page load
+  // update loanList to show 10 customers on page load
   // or on count changes
   useEffect(() => {
-    setCustomerList(filteredCustomers?.slice(0, showCount));
-  }, [customers, showCount]);
+    setLoanList(completedLoans?.slice(0, showCount));
+  }, [completedLoans, showCount]);
 
-  // update customerList on search
+  // update loanList on search
   const handleSearch = () => {
-    const currSearch = searchList(
-      filteredCustomers,
-      searchTerms,
-      "agreefullname"
-    );
-    setCustomerList(currSearch?.slice(0, showCount));
+    const currSearch = searchList(completedLoans, searchTerms, "agreefullname");
+    setLoanList(currSearch?.slice(0, showCount));
   };
 
   useEffect(() => {
@@ -157,7 +142,7 @@ const OverdueLoans = () => {
           <div className="ListSec">
             <DashboardHeadline
               height="52px"
-              mspacer="2rem 0 -2.25rem -1rem"
+              mspacer="2rem 0 -3.2rem -1rem"
               bgcolor="#145098"
             ></DashboardHeadline>
             <div style={styles.table}>
@@ -175,49 +160,52 @@ const OverdueLoans = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {sortByCreatedAt(customerList)?.length === 0 && (
-                    <NoResult name="customer" />
+                  {loanList && sortByCreatedAt(loanList)?.length === 0 && (
+                    <NoResult name="loan" />
                   )}
-                  {customerList?.map((customer) => {
-                    return (
-                      <tr key={customer.id}>
-                        <td>
-                          {customer?.banking?.accountDetails?.Message?.Id ||
-                            "N/A"}
-                        </td>
-                        <td>{customer?.loanProduct || "General Loan"}</td>
-                        <td>
-                          {customer?.banking?.accountDetails?.Message
-                            ?.FullName ||
-                            `${customer?.firstname} ${customer?.lastname}`}
-                        </td>
-                        <td>
-                          {customer?.banking?.accountDetails?.Message
-                            .AccountNumber || "N/A"}
-                        </td>
-                        <td>{getDateOnly(customer?.createdAt)}</td>
-                        <td>N{customer?.loanamount}</td>
-                        <td style={styles.padding}>
-                          {capitalizeEachWord(customer?.kyc.loanstatus)}
-                        </td>
-                        {canUserManage && (
+                  {loanList &&
+                    loanList?.map((loan) => {
+                      return (
+                        <tr key={loan.id}>
                           <td>
-                            <div style={styles.btnBox}>
-                              <BocButton
-                                func={() => handleShow(customer._id)}
-                                bradius="12px"
-                                fontSize="14px"
-                                margin="2px"
-                                bgcolor="#ecaa00"
-                              >
-                                Details
-                              </BocButton>
-                            </div>
+                            {loan.customer?.banking?.accountDetails?.Message
+                              ?.Id || "N/A"}
                           </td>
-                        )}
-                      </tr>
-                    );
-                  })}
+                          <td>
+                            {loan?.loanproduct.productName || "General Loan"}
+                          </td>
+                          <td>
+                            {loan?.customer?.banking?.accountDetails?.Message
+                              ?.FullName ||
+                              `${loan?.customer?.firstname} ${loan?.customer?.lastname}`}
+                          </td>
+                          <td>
+                            {loan?.customer?.banking?.accountDetails?.Message
+                              .AccountNumber || "N/A"}
+                          </td>
+                          <td>{getDateOnly(loan?.createdAt)}</td>
+                          <td>N{loan?.loanamount}</td>
+                          <td style={styles.padding}>
+                            {capitalizeEachWord(loan?.loanstatus)}
+                          </td>
+                          {canUserManage && (
+                            <td>
+                              <div style={styles.btnBox}>
+                                <BocButton
+                                  func={() => handleShow(loan._id)}
+                                  bradius="12px"
+                                  fontSize="14px"
+                                  margin="2px"
+                                  bgcolor="#ecaa00"
+                                >
+                                  Details
+                                </BocButton>
+                              </div>
+                            </td>
+                          )}
+                        </tr>
+                      );
+                    })}
                 </tbody>
               </Table>
             </div>

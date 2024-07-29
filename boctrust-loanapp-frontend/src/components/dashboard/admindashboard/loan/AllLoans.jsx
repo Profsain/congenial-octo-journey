@@ -93,7 +93,7 @@ const AllLoans = ({ showCount, searchTerms }) => {
       {status === "loading" && <PageLoader />}
       <DashboardHeadline
         height="52px"
-        mspacer="2rem 0 -2.5rem -1rem"
+        mspacer="2rem 0 -3.2rem -1rem"
         bgcolor="#145098"
       ></DashboardHeadline>
       <div style={styles.table}>

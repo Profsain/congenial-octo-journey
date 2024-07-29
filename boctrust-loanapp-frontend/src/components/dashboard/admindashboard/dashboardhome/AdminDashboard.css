@@ -30,6 +30,9 @@
   align-items: center;
   gap: 1rem;
 }
+.InlineCard.collections {
+  grid-template-columns: repeat(4, 1fr);
+}
 
 @media screen and (max-width: 1200px) {
   .InlineCard {

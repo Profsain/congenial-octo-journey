@@ -3,6 +3,7 @@ import PropTypes from "prop-types";
 import { useRef, useState } from "react";
 import styles from "./tableOptionsDropdown.module.css";
 import { useOnClickOutside } from "../../../../../hooks/useOnclickOutside";
+import PageLoader from "../PageLoader";
 
 const TableOptionsDropdown = ({ items, loan }) => {
   const [showDropdown, setShowDropdown] = useState(false);
@@ -26,7 +27,10 @@ const TableOptionsDropdown = ({ items, loan }) => {
               key={index}
               onClick={() => item.func(loan)}
               className={` ${item.className}`}
+              disabled={(item?.isDisabled && item?.isDisabled(loan)) || false}
             >
+              {console.log(item?.isDisabled && item?.isDisabled(loan))}
+              {item?.isLoading && <PageLoader width="10" />}
               {item.label}
             </button>
           ))}
