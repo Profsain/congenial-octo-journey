@@ -1,7 +1,6 @@
 /* eslint-disable no-undef */
 import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchAllCustomer } from "../../../../redux/reducers/customerReducer";
 import Headline from "../../../shared/Headline";
 import { Table } from "react-bootstrap";
 import BocButton from "../../shared/BocButton";
@@ -19,6 +18,7 @@ import useSearchByDate from "../../../../../utilities/useSearchByDate";
 import useSearchByDateRange from "../../../../../utilities/useSearchByDateRange";
 import sortByCreatedAt from "../../shared/sortedByDate";
 import KycViewDetails from "./KycViewDetails";
+import { fetchAllCustomersLoans } from "../../../../redux/reducers/customersLoansReducer";
 
 const KycCheck = () => {
   const styles = {
@@ -50,7 +50,7 @@ const KycCheck = () => {
   // fetch all customer
   const dispatch = useDispatch();
   const customers = useSelector(
-    (state) => state.customerReducer.customers.customer
+    (state) => state.customersLoansReducer.customersAndLoans
   );
   const status = useSelector((state) => state.customerReducer.status);
   // component state
@@ -71,7 +71,11 @@ const KycCheck = () => {
   const [progress, setProgress] = useState(false);
 
   useEffect(() => {
-    dispatch(fetchAllCustomer());
+    const getData = async () => {
+      await dispatch(fetchAllCustomersLoans());
+    };
+
+    getData();
   }, [dispatch, showKycDetails]);
 
   // update searchCustomer state
@@ -128,8 +132,8 @@ const KycCheck = () => {
     setCustomerId(id);
 
     // filter customer by id and update current customer state
-    const customer = customers.filter((customer) => customer._id === id);
-    setCurrentCustomer(customer[0]);
+    const customer = customers.find((customer) => customer._id === id);
+    setCurrentCustomer(customer);
     setShowInfo(true);
   };
 
@@ -139,15 +143,14 @@ const KycCheck = () => {
     setShowKycDetails(true);
 
     // filter customer by id and update current customer state
-    const customer = customers.filter((customer) => customer._id === id);
-    setCurrentCustomer(customer[0]);
+    const customer = customers.find((customer) => customer._id === id);
+    setCurrentCustomer(customer);
   };
 
   // handle save kyc check and create bankone account
   const handleSaveCheck = async () => {
     setProgress(true);
     const data = {
-      loanstatus: "with credit",
       isFacialMatch,
       isIdCardValid,
       isPhotoCaptured,
@@ -163,7 +166,15 @@ const KycCheck = () => {
       body: JSON.stringify(data),
     });
 
-    await dispatch(fetchAllCustomer());
+    await fetch(`${apiUrl}/api/loans/status/${currentCustomer.loan._id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        loanstatus: "with credit",
+      }),
+    });
+
+    await dispatch(fetchAllCustomersLoans());
     setShowKycDetails(false);
     setProgress(false);
   };
@@ -195,7 +206,7 @@ const KycCheck = () => {
       fromDate: "",
       toDate: "",
     });
-    dispatch(fetchAllCustomer());
+    dispatch(fetchAllCustomersLoans());
     setSearchCustomer(customers);
   };
 
@@ -207,8 +218,12 @@ const KycCheck = () => {
   );
 
   useEffect(() => {
+    setSearchCustomer(customers);
+  }, [customers]);
+
+  useEffect(() => {
     setSearchCustomer(searchData);
-  }, [searchData]);
+  }, [searchData, customers]);
 
   return (
     <>
@@ -249,7 +264,7 @@ const KycCheck = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {searchCustomer?.length === 0 ? (
+                  {searchCustomer?.length === 0 && searchData ? (
                     <tr>
                       <td colSpan="4" style={{ textAlign: "center" }}>
                         No data available

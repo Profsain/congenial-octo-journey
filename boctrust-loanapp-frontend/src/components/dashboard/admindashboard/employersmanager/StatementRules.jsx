@@ -6,6 +6,8 @@ import * as Yup from "yup";
 import DashboardHeadline from "../../shared/DashboardHeadline";
 import "../../dashboardcomponents/transferdashboard/Transfer.css";
 import BocButton from "../../shared/BocButton";
+import { IoMdCloseCircle } from "react-icons/io";
+import { toast } from "react-toastify";
 
 // Define validation schema using Yup
 const validationSchema = Yup.object().shape({
@@ -38,42 +40,82 @@ const tenures = [
 
 const StatementRules = () => {
   const [message, setMessage] = useState(null);
-  // Fetch employers from redux store
-  const dispatch = useDispatch();
-  useEffect(() => {
-    dispatch(fetchEmployers());
-  }, [dispatch]);
+  const [selectedEmployers, setSelectedEmployers] = useState(null);
+  const [employerOptions, setEmployerOptions] = useState([]);
 
   // Get employers from redux store
   const employers = useSelector(
     (state) => state.employersManagerReducer.employers.employers
   );
 
-  const employerOptions = employers?.map((employer) => ({
-    value: employer._id,
-    label: employer.employersName,
-  }));
+  // Fetch employers from redux store
+  const dispatch = useDispatch();
+  useEffect(() => {
+    dispatch(fetchEmployers());
+  }, [dispatch]);
 
-  const handleSubmit = async (values, { resetForm }) => {
-    const id = values.addEmployer;
-    const apiUrl = import.meta.env.VITE_BASE_URL;
-    // Handle form submission logic here
-    await fetch(
-      `${apiUrl}/api/agency/employers/${id}/statementRule`,
-      {
+  useEffect(() => {
+    if (!employers) return;
+    setEmployerOptions(
+      employers?.map((employer) => ({
+        value: employer._id,
+        label: employer.employersName,
+      }))
+    );
+  }, [employers]);
+
+  const hanleSelectEmployer = (employerOptn) => {
+    let tempEmployerOptions = [...employerOptions];
+    tempEmployerOptions = tempEmployerOptions.filter(
+      (employer) => employer?.value != employerOptn?.value
+    );
+    setEmployerOptions(tempEmployerOptions);
+    if (selectedEmployers && selectedEmployers.includes(employerOptn)) return;
+    else if (selectedEmployers && selectedEmployers.length > 0) {
+      setSelectedEmployers([...selectedEmployers, employerOptn]);
+    } else {
+      setSelectedEmployers([employerOptn]);
+    }
+  };
+
+  const handleRemoveEmployer = (employerOptn) => {
+    setEmployerOptions([...employerOptions, employerOptn]);
+    let tempSelectedEmployers = [...selectedEmployers];
+    tempSelectedEmployers = tempSelectedEmployers.filter(
+      (employer) => employer?.value != employerOptn?.value
+    );
+    setSelectedEmployers(tempSelectedEmployers);
+  };
+
+  const addStatementRule = async ({ id, values }) => {
+    try {
+      const apiUrl = import.meta.env.VITE_BASE_URL;
+      // Handle form submission logic here
+      await fetch(`${apiUrl}/api/agency/employers/${id}/statementRule`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(values),
-      }
-    );
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleSubmit = async (values, { resetForm }) => {
+    if (selectedEmployers && selectedEmployers.length > 0) {
+      selectedEmployers.forEach(async (employer) => {
+        await addStatementRule({ id: employer.value, values });
+      });
+    }
 
     // Reset form after submission
     resetForm();
 
     // Display success message
     setMessage("Statement rule created successfully");
+    toast.success("Mandate rule added successfully");
     setTimeout(() => {
       setMessage(null);
     }, 3000);
@@ -88,80 +130,90 @@ const StatementRules = () => {
           validationSchema={validationSchema}
           onSubmit={handleSubmit}
         >
-          <Form>
-            <div className="FieldRow">
-              <div className="FieldGroup">
-                <label htmlFor="ruleTitle">Rule Title</label>
-                <Field
-                  type="text"
-                  name="ruleTitle"
-                  id="ruleTitle"
-                  className="Input"
-                ></Field>
-                <ErrorMessage name="ruleTitle" component="div" />
-              </div>
-
-              <div className="FieldGroup">
-                <label htmlFor="maximumTenure">Maximum Tenure</label>
-                <Field
-                  as="select"
-                  name="maximumTenure"
-                  id="maximumTenure"
-                  className="Select"
-                >
-                  <option value="" label="Select tenure" />
-                  {tenures.map((option) => (
-                    <option
-                      key={option.value}
-                      value={option.value}
-                      label={option.label}
-                    />
-                  ))}
-                </Field>
-                <ErrorMessage name="maximumTenure" component="div" />
-              </div>
-            </div>
-
-            <div className="FieldRow">
-              <div className="RadioCon">
-                <label htmlFor="rule">Rule</label>
-                <div className="Input">
-                  <label className="MandateLabel">
-                    <Field
-                      type="radio"
-                      name="rule"
-                      value="tenure"
-                      className="Gap"
-                    />
-                    Tenure
-                  </label>
-                  <label className="MandateLabel">
-                    <Field
-                      type="radio"
-                      name="rule"
-                      value="amount"
-                      className="Gap"
-                    />
-                    Amount
-                  </label>
+          {({ handleChange }) => (
+            <Form>
+              <div className="FieldRow rule__title">
+                <div className="FieldGroup ">
+                  <label htmlFor="ruleTitle">Rule Title</label>
+                  <Field
+                    type="text"
+                    name="ruleTitle"
+                    id="ruleTitle"
+                    className="Input"
+                  ></Field>
+                  <ErrorMessage name="ruleTitle" component="div" />
                 </div>
-
-                <ErrorMessage name="rule" component="div" />
               </div>
 
-              <div className="FieldGroup">
-                <label htmlFor="maximumAmount">Maximum Amount</label>
-                <Field
-                  type="text"
-                  name="maximumAmount"
-                  id="maximumAmount"
-                  className="Input"
-                ></Field>
-                <ErrorMessage name="maximumAmount" component="div" />
+              <div className="FieldRow">
+                <div className="FieldGroup">
+                  <label htmlFor="maximumTenure">Maximum Tenure</label>
+                  <Field
+                    as="select"
+                    name="maximumTenure"
+                    id="maximumTenure"
+                    className="Select"
+                  >
+                    <option value="" label="Select tenure" />
+                    {tenures.map((option) => (
+                      <option
+                        key={option.value}
+                        value={option.value}
+                        label={option.label}
+                      />
+                    ))}
+                  </Field>
+                  <ErrorMessage name="maximumTenure" component="div" />
+                </div>
+                <div className="FieldGroup no__maxTenure ">
+                  <div className="Input ">
+                    <label>
+                      <Field type="checkbox" name="nomaxtenure" />
+                    </label>
+                    No Maximum Tenure
+                  </div>
+                </div>
               </div>
-            </div>
 
-            {/* <div className="FieldRow">
+              <div className="FieldRow">
+                <div className="FieldGroup">
+                  <label htmlFor="maximumAmount">Maximum Amount</label>
+                  <Field
+                    type="text"
+                    name="maximumAmount"
+                    id="maximumAmount"
+                    className="Input"
+                  ></Field>
+                  <ErrorMessage name="maximumAmount" component="div" />
+                </div>
+                <div className="RadioCon">
+                  <label htmlFor="rule">Rule</label>
+                  <div className="Input">
+                    <label className="MandateLabel">
+                      <Field
+                        type="radio"
+                        name="rule"
+                        value="tenure"
+                        className="Gap"
+                      />
+                      Tenure
+                    </label>
+                    <label className="MandateLabel">
+                      <Field
+                        type="radio"
+                        name="rule"
+                        value="amount"
+                        className="Gap"
+                      />
+                      Amount
+                    </label>
+                  </div>
+
+                  <ErrorMessage name="rule" component="div" />
+                </div>
+              </div>
+
+              {/* <div className="FieldRow">
               <div className="FieldGroup">
                 <label htmlFor="addEmployers">Add Employers</label>
                 <Field
@@ -173,7 +225,7 @@ const StatementRules = () => {
                 <ErrorMessage name="addEmployers" component="div" />
               </div>
             </div> */}
-            <div className="FieldRow">
+              {/* <div className="FieldRow">
               <div className="FieldGroup">
                 <label htmlFor="addEmployer">Add Employer</label>
                 <Field
@@ -193,25 +245,77 @@ const StatementRules = () => {
                 </Field>
                 <ErrorMessage name="addEmployer" component="div" />
               </div>
-            </div>
+            </div> */}
 
-            {message && (
-              <div style={{ textAlign: "center", color: "#145098" }}>
-                {message}
+              <div>
+                <div className="FieldRow ">
+                  <div className="FieldGroup">
+                    <label htmlFor="addEmployerStack">
+                      Add Employer for Rule Stacking
+                    </label>
+                    <select
+                      name="addEmployer"
+                      id="addEmployer"
+                      className="Select"
+                      onChange={(event) => {
+                        handleChange(event);
+                        hanleSelectEmployer(
+                          employerOptions.find(
+                            (option) => option.value === event.target.value
+                          )
+                        );
+                      }}
+                    >
+                      <option value="" label="Select employers" />
+                      {employerOptions?.map((option) => (
+                        <option
+                          onClick={() => hanleSelectEmployer(option)}
+                          key={option.value}
+                          value={option.value}
+                          label={option.label}
+                        />
+                      ))}
+                      \
+                    </select>
+                    <ErrorMessage name="addEmployer" component="div" />
+                  </div>
+                </div>
+                {selectedEmployers && (
+                  <div className="selected__employer">
+                    {selectedEmployers.map((employer) => (
+                      <div key={employer.value} className="d-flex gap-2">
+                        {employer.label}
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveEmployer(employer)}
+                          className="btn btn-danger remove__employer"
+                        >
+                          <IoMdCloseCircle />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
-            )}
 
-            <div className="BtnContainer">
-              <BocButton
-                fontSize="1.6rem"
-                type="submit"
-                bgcolor="#ecaa00"
-                bradius="18px"
-              >
-                Create Rule
-              </BocButton>
-            </div>
-          </Form>
+              {message && (
+                <div style={{ textAlign: "center", color: "#145098" }}>
+                  {message}
+                </div>
+              )}
+
+              <div className="BtnContainer">
+                <BocButton
+                  fontSize="1.6rem"
+                  type="submit"
+                  bgcolor="#ecaa00"
+                  bradius="18px"
+                >
+                  Create Rule
+                </BocButton>
+              </div>
+            </Form>
+          )}
         </Formik>
       </div>
     </div>

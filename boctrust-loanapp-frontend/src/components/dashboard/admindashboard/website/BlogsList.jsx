@@ -18,12 +18,21 @@ const BlogsList = ({ count, searchTerms }) => {
   const [action, setAction] = useState(false);
   const [actionId, setActionId] = useState("");
   const [selectedBlog, setSelectedBlog] = useState({});
+  const [canUserManage, setCanUserManage] = useState(false);
+
+  // current login superAdmin user
+  const currentUser = useSelector((state) => state.adminAuth.user);
+
   const dispatch = useDispatch();
 
   useEffect(() => {
     // Dispatch the fetchBlogPosts action here
     dispatch(fetchBlogPosts());
   }, [dispatch]);
+
+  useEffect(() => {
+    setCanUserManage(currentUser?.userRole?.can.includes("websiteManagement"));
+  }, [currentUser]);
 
   // Get the blogs from the store
   const blogs = useSelector((state) => state.blogReducer.posts.posts);
@@ -113,7 +122,7 @@ const BlogsList = ({ count, searchTerms }) => {
                   <th>Category</th>
                   <th>Date Posted</th>
                   <th>Status</th>
-                  <th>Action</th>
+                  {canUserManage && <th>Action</th>}
                 </tr>
               </thead>
               <tbody>
@@ -125,29 +134,31 @@ const BlogsList = ({ count, searchTerms }) => {
                     <td>{blog.category}</td>
                     <td>{getDateOnly(blog.createdAt)}</td>
                     <td style={styles.completed}>Active</td>
-                    <td>
-                      <div>
-                        <BocButton
-                          margin="4px"
-                          bradius="8px"
-                          bgcolor="#145098"
-                          func={handleAction}
-                          id={blog._id}
-                          width="58px"
-                        >
-                          Edit
-                        </BocButton>
-                        <BocButton
-                          margin="4px"
-                          bradius="8px"
-                          func={handleAction}
-                          id={blog._id}
-                          width="58px"
-                        >
-                          Delete
-                        </BocButton>
-                      </div>
-                    </td>
+                    {canUserManage && (
+                      <td>
+                        <div>
+                          <BocButton
+                            margin="4px"
+                            bradius="8px"
+                            bgcolor="#145098"
+                            func={handleAction}
+                            id={blog._id}
+                            width="58px"
+                          >
+                            Edit
+                          </BocButton>
+                          <BocButton
+                            margin="4px"
+                            bradius="8px"
+                            func={handleAction}
+                            id={blog._id}
+                            width="58px"
+                          >
+                            Delete
+                          </BocButton>
+                        </div>
+                      </td>
+                    )}
                   </tr>
                 ))}
               </tbody>

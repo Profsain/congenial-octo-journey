@@ -9,6 +9,7 @@ const multer = require("multer");
 const path = require("path");
 const CustomerModel = require("../models/Customer"); // Import customer model
 const Customer = require("../models/Customer");
+const Loan = require("../models/Loan");
 
 // configure dotenv
 dotenv.config();
@@ -77,8 +78,22 @@ router.post("/customer", multipleUpload, async (req, res) => {
   try {
     const customer = await CustomerModel.create(req.body);
 
+    const loan = await Loan.create({
+      customer: customer._id,
+      loanproduct: req.body.loanproduct,
+      loanamount: req.body.loanamount,
+      monthlyrepayment: req.body.monthlyrepayment,
+      buyoverloan: req.body.buyoverloan,
+      numberofmonth: req.body.numberofmonth,
+      loantotalrepayment: req.body.loantotalrepayment,
+      loanpurpose: req.body.loanpurpose,
+      otherpurpose: req.body.otherpurpose,
+      deductions: req.body.deductions,
+    });
+
     res.status(201).json(customer);
   } catch (error) {
+    console.log(error);
     res.status(400).json({ error: "Unable to create customer" });
   }
 });
@@ -131,7 +146,9 @@ const baseUrl = process.env.BASE_URL;
 
 router.get("/customers", async (req, res) => {
   try {
-    const customer = await CustomerModel.find().sort({ createdAt: -1 });
+    const customer = await CustomerModel.find()
+      .populate("employer")
+      .sort({ createdAt: -1 });
 
     // exclude password and confirm password from customer
     customer.forEach((customer) => {
@@ -155,6 +172,7 @@ router.get("/customers", async (req, res) => {
     // Return success response with users and image URLs
     return res.status(200).json({ customer: customerWithImages });
   } catch (error) {
+    console.log(error);
     res.status(500).json({ error: "Unable to fetch customer" });
   }
 });
@@ -175,12 +193,13 @@ router.get("/customer/:customerId", async (req, res) => {
       employmentletter: `${baseUrl}/public/filesUpload/${customer.employmentletter}`,
       photocaptureImg: `${baseUrl}/public/filesUpload/${customer.photocapture}`,
     };
-    console.log(customer, "customer");
+
     res.status(200).json(customer);
   } catch (error) {
     res.status(500).json({ error: "Unable to fetch customer" });
   }
 });
+
 
 // Update a customer by ID
 router.put("/customer/:customerId", async (req, res) => {
@@ -287,11 +306,10 @@ router.post("/forgot-password", async (req, res) => {
 router.post("/reset-password", async (req, res) => {
   try {
     const { token, newPassword } = req.body;
-    console.log("customer", token, newPassword);
 
     // Find the user with the provided token
     const customer = await Customer.findOne({ token });
-    console.log("Find customer", customer);
+
     if (!customer) {
       return res.status(400).json({ message: "Invalid or expired token" });
     }
@@ -308,91 +326,6 @@ router.post("/reset-password", async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Internal server error" });
-  }
-});
-
-// add new loan operations
-// Endpoint to add a new loan to the allLoans array of a customer
-router.post("/:customerId/new-loans", async (req, res) => {
-  const { customerId } = req.params;
-  const newLoan = req.body; // Assuming the loan object is sent in the request body
-
-  try {
-    // Find the customer by ID
-    const customer = await Customer.findById(customerId);
-
-    if (!customer) {
-      return res.status(404).json({ error: "Customer not found" });
-    }
-
-    // Add the new loan to the allLoans array
-    customer.allLoans.push(newLoan);
-
-    // Save the updated customer document
-    await customer.save();
-
-    res.status(201).json({ message: "Loan added successfully", loan: newLoan });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-// Endpoint to fetch all loans for a customer
-router.get("/:customerId/all-loans", async (req, res) => {
-  const { customerId } = req.params;
-
-  try {
-    // Find the customer by ID
-    const customer = await Customer.findById(customerId);
-
-    if (!customer) {
-      return res.status(404).json({ error: "Customer not found" });
-    }
-
-    // Return the allLoans array
-    res.status(200).json(customer.allLoans);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-// Endpoint to update a loan object in the allLoans array
-router.put("/:customerId/loans/:loanId", async (req, res) => {
-  const { customerId, loanId } = req.params;
-  const loanUpdates = req.body;
-
-  try {
-    // Find the customer by ID
-    const customer = await Customer.findById(customerId);
-
-    if (!customer) {
-      return res.status(404).json({ error: "Customer not found" });
-    }
-
-    // Find the loan by ID within the allLoans array
-    const loanIndex = customer.allLoans.findIndex(
-      (loan) => loan._id.toString() === loanId
-    );
-
-    if (loanIndex === -1) {
-      return res.status(404).json({ error: "Loan not found" });
-    }
-
-    // Update the loan properties
-    customer.allLoans[loanIndex] = {
-      ...customer.allLoans[loanIndex].toObject(), // Convert Mongoose document to plain object
-      ...loanUpdates, // Merge updates
-    };
-
-    // Save the updated customer document
-    await customer.save();
-
-    res.status(200).json({
-      message: "Loan updated successfully",
-      loan: customer.allLoans[loanIndex],
-    });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
   }
 });
 

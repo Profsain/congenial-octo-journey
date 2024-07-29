@@ -28,6 +28,7 @@ const BocButton = ({
     width: width,
     height: height || "40px",
     margin: margin,
+    textTransform: "capitalize",
   };
 
   return (
