@@ -9,15 +9,18 @@ import contactFormReducer from "../reducers/contactFormReducer";
 import branchReducer from "../reducers/branchReducer";
 import accountReducer from "../reducers/accountReducer";
 import customerReducer from "../reducers/customerReducer";
+import customersLoansReducer from "../reducers/customersLoansReducer";
 import disbursementMethodReducer from "../reducers/disbursementMethodReducer";
 import employersManagerReducer from "../reducers/employersManagerReducer";
 import adminUserReducer from "../reducers/adminUserReducer";
+import loanOfficerReducer from "../reducers/loanOfficerReducer";
 import authReducer from "../reducers/adminAuthReducer";
 import settingReducer from "../reducers/settingReducer";
 import onboardingReducer from "../reducers/onboardingReducer";
 import siteContentReducer from "../reducers/siteContentReducer";
 import directors from "../reducers/boardDirectorReducer";
 import frontPageProductReducer from "../reducers/frontPageProductsReducer";
+import loanReducer from "../reducers/loanReducer";
 
 // create a store
 const store = configureStore({
@@ -29,11 +32,14 @@ const store = configureStore({
     wikiReducer,
     careerReducer,
     contactFormReducer,
+    customersLoansReducer,
     branchReducer,
     accountReducer,
     customerReducer,
+    loanReducer,
     disbursementMethodReducer,
     adminUserReducer,
+    loanOfficerReducer,
     employersManagerReducer,
     user: userSlice,
     adminAuth: authReducer,

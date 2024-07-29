@@ -30,7 +30,7 @@ const formData = (formValues) => {
   formData.append("nkinphonenumber", formValues.nkinphonenumber);
   formData.append("nkinrelationship", formValues.nkinrelationship);
   formData.append("nkinresidentialaddress", formValues.nkinresidentialaddress);
-  formData.append("employername", formValues.employername);
+  formData.append("employer", formValues.employerId);
   formData.append("otheremployername", formValues.otheremployername);
   formData.append("employeraddress", formValues.employeraddress);
   formData.append("employmentstartdate", formValues.employmentstartdate);

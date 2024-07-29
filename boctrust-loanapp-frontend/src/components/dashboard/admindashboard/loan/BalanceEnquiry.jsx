@@ -1,7 +1,6 @@
 import PropTypes from "prop-types";
 import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchAllCustomer } from "../../../../redux/reducers/customerReducer";
 import Table from "react-bootstrap/Table";
 import "../../Dashboard.css";
 import DashboardHeadline from "../../shared/DashboardHeadline";
@@ -13,6 +12,7 @@ import searchList from "../../../../../utilities/searchListFunc";
 import LoanDetails from "./LoanDetails";
 import NoResult from "../../../shared/NoResult";
 import sortByCreatedAt from "../../shared/sortedByDate";
+import { fetchCompletedLoan } from "../../../../redux/reducers/loanReducer";
 
 const BalanceEnquiry = () => {
   const styles = {
@@ -35,24 +35,15 @@ const BalanceEnquiry = () => {
     },
   };
 
-  // fetch all customer
+  // fetch all loan
   const dispatch = useDispatch();
-  const customers = useSelector(
-    (state) => state.customerReducer.customers.customer
-  );
+  const { completedLoans } = useSelector((state) => state.loanReducer);
+
   const status = useSelector((state) => state.customerReducer.status);
 
   useEffect(() => {
-    dispatch(fetchAllCustomer());
+    dispatch(fetchCompletedLoan());
   }, [dispatch]);
-
-  // filtere customer by isKycApproved
-  const filteredCustomers = customers?.filter(
-    (customer) =>
-      customer.kyc.isKycApproved === true &&
-      customer.deductions !== "remita" &&
-      customer.disbursementstatus === "approved"
-  );
 
   const [showCount, setShowCount] = useState(10);
   const [searchTerms, setSearchTerms] = useState("");
@@ -66,48 +57,28 @@ const BalanceEnquiry = () => {
   };
 
   // handle show loan details
-  const apiUrl = import.meta.env.VITE_BASE_URL;
+  // const apiUrl = import.meta.env.VITE_BASE_URL;
   const [isProcessing, setIsProcessing] = useState(false);
 
-  const handleCheckBalance = async (id) => {
-    // set is processing to true
+  const handleCheckBalance = async () => {
     setIsProcessing(true);
-    // get loan details
-    const loan = filteredCustomers.find((customer) => customer._id === id);
-    setLoanObj(loan);
-    const loanAccountNumber = loan.banking.accountDetails.Message.AccountNumber;
-    // call api to get balance details
-    const loanBalance = await fetch(
-      `${apiUrl}/api/bankone/balanceEnquiry/${loanAccountNumber}`
-    );
-    const loanBalanceData = await loanBalance.json();
-
-    // set is processing to false
-    setTimeout(() => {
-      setIsProcessing(false);
-      setShow(true);
-    }, 5000);
   };
 
-  // search customer list
-  const [customerList, setCustomerList] = useState(filteredCustomers);
+  // search loan list
+  const [loansList, setLoansList] = useState(completedLoans);
 
-  // update customerList to show 10 customers on page load
+  // update loansList to show 10 customers on page load
   // or on count changes
   useEffect(() => {
-    setCustomerList(filteredCustomers?.slice(0, showCount));
-  }, [customers, showCount]);
+    setLoansList(completedLoans?.slice(0, showCount));
+  }, [completedLoans, showCount]);
 
-  // update customerList on search
+  // update loansList on search
   const handleSearch = () => {
     // check filteredCustomers is not empty
-    if (!filteredCustomers) return;
-    const currSearch = searchList(
-      filteredCustomers,
-      searchTerms,
-      "agreefullname"
-    );
-    setCustomerList(currSearch?.slice(0, showCount));
+    if (!completedLoans) return;
+    const currSearch = searchList(completedLoans, searchTerms, "agreefullname");
+    setLoansList(currSearch?.slice(0, showCount));
   };
 
   useEffect(() => {
@@ -144,78 +115,93 @@ const BalanceEnquiry = () => {
       </div>
 
       <div className="bSection">
-      {/* data loader */}
-      {status === "loading" && <PageLoader />}
-      <DashboardHeadline
-        height="52px"
-        mspacer="2rem 0 -2.5rem -1rem"
-        bgcolor="#145098"
-      ></DashboardHeadline>
-      <div style={styles.table}>
-        <Table borderless hover responsive="sm">
-          <thead style={styles.head}>
-            <tr>
-              <th>Loan ID</th>
-              <th>Loan Product</th>
-              <th>Borrower</th>
-              <th>A/C Number</th>
-              <th>Date</th>
-              <th>Applied Amount</th>
-              <th>Status</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {customerList?.length === 0 && <NoResult name="customer" />}
-            {sortByCreatedAt(customerList)?.map((customer) => {
-              return (
-                <tr key={customer._id}>
-                  <td>{customer.banking?.accountDetails?.Message.Id}</td>
-                  <td>{customer.loanProduct || "General Loan"}</td>
-                  <td>{customer.banking?.accountDetails?.Message.FullName}</td>
-                  <td>
-                    {customer?.banking?.accountDetails?.Message?.AccountNumber}
-                  </td>
-                  <td>{getDateOnly(customer.createdAt)}</td>
-                  <td>N{customer.loanamount}</td>
-                  <td>
-                    {customer.disbursementstatus === "pending" ? (
-                      <p style={styles.pending}>Pending</p>
-                    ) : customer.disbursementstatus === "approved" ? (
-                      <p style={styles.approved}>Disbursed</p>
-                    ) : customer.disbursementstatus === "stopped" ? (
-                      <p style={styles.pending}>Stopped</p>
-                    ) : (
-                      <p style={styles.completed}>Rejected</p>
-                    )}
-                  </td>
-                  <td>
-                    <div>
-                      {isProcessing && (<PageLoader width="12px" />)}
-                      <BocButton
-                        func={() => handleCheckBalance(customer._id)}
-                        bradius="12px"
-                        fontSize="12px"
-                        width="80px"
-                        margin="4px"
-                        bgcolor="#ecaa00"
-                      >
-                        Check
-                      </BocButton>
-                    </div>
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </Table>
-      </div>
-      <NextPreBtn />
+        {/* data loader */}
+        {status === "loading" && <PageLoader />}
+        <DashboardHeadline
+          height="52px"
+          mspacer="2rem 0 -3.2rem -1rem"
+          bgcolor="#145098"
+        ></DashboardHeadline>
+        <div style={styles.table}>
+          <Table borderless hover responsive="sm">
+            <thead style={styles.head}>
+              <tr>
+                <th>Loan ID</th>
+                <th>Loan Product</th>
+                <th>Borrower</th>
+                <th>A/C Number</th>
+                <th>Date</th>
+                <th>Applied Amount</th>
+                <th>Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {loansList && loansList?.length === 0 && <NoResult name="loan" />}
+              {loansList &&
+                sortByCreatedAt(loansList)?.map((loan) => {
+                  return (
+                    <tr key={loan._id}>
+                      <td>
+                        {loan?.customer?.banking?.accountDetails?.Message.Id}
+                      </td>
+                      <td>{loan.loanproduct.productName || "General Loan"}</td>
+                      <td>
+                        {
+                          loan?.customer.banking?.accountDetails?.Message
+                            .FullName
+                        }
+                      </td>
+                      <td>
+                        {
+                          loan?.customer?.banking?.accountDetails?.Message
+                            ?.AccountNumber
+                        }
+                      </td>
+                      <td>{getDateOnly(loan.createdAt)}</td>
+                      <td>N{loan.loanamount}</td>
+                      <td>
+                        {loan.disbursementstatus === "pending" ? (
+                          <p style={styles.pending}>Pending</p>
+                        ) : loan.disbursementstatus === "approved" ? (
+                          <p style={styles.approved}>Disbursed</p>
+                        ) : loan.disbursementstatus === "stopped" ? (
+                          <p style={styles.pending}>Stopped</p>
+                        ) : (
+                          <p style={styles.completed}>Rejected</p>
+                        )}
+                      </td>
+                      <td>
+                        <div>
+                          {isProcessing && <PageLoader width="12px" />}
+                          <BocButton
+                            func={() => handleCheckBalance(loan._id)}
+                            bradius="12px"
+                            fontSize="12px"
+                            width="80px"
+                            margin="4px"
+                            bgcolor="#ecaa00"
+                          >
+                            Check
+                          </BocButton>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+            </tbody>
+          </Table>
+        </div>
+        <NextPreBtn />
 
-      {/* show loan details model */}
-      {show && (
-        <LoanDetails show={show} handleClose={handleClose} loanObj={loanObj} />
-      )}
+        {/* show loan details model */}
+        {show && (
+          <LoanDetails
+            show={show}
+            handleClose={handleClose}
+            loanObj={loanObj}
+          />
+        )}
       </div>
     </>
   );
@@ -227,8 +213,6 @@ BalanceEnquiry.propTypes = {
 };
 
 export default BalanceEnquiry;
-
-
 
 // const BalanceEnquiry = () => {
 //   return (

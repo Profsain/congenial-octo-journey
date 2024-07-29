@@ -15,12 +15,13 @@ import "./Form.css";
 import calculatorfunc from "../../shared/calculatorfunc";
 
 // bvn verification function
-import { bvnVerification } from "./bvnVerification";
+// import { bvnVerification } from "./bvnVerification";
 import { ToastContainer, toast } from "react-toastify";
 
 // toast styles
 import "react-toastify/dist/ReactToastify.css";
 import { useNavigate } from "react-router-dom";
+import { updateCustomerStateValues } from "../../../redux/reducers/customerReducer";
 
 // loan form component
 const LoanFirstStep = ({ data }) => {
@@ -123,7 +124,7 @@ const LoanFirstStep = ({ data }) => {
   };
 
   // send data to redux store
-  const productId = ref.current?.values.loanproduct;
+  const productId = ref.current?.values.loanproduct || initialLoanProduct?._id;
 
   const product = loanProducts?.find((product) => product._id === productId);
 
@@ -147,6 +148,22 @@ const LoanFirstStep = ({ data }) => {
       loanProduct: product,
     });
 
+    // Store the Information In Redux Store Instead of DB
+    dispatch(
+      updateCustomerStateValues({
+        name: "loanFirstInfo",
+        value: {
+          bvn,
+          loanAmount: loanamount,
+          careerType: careertype,
+          numberOfMonths: noofmonth,
+          loanTotalRepayment: loanRepaymentTotal,
+          monthlyRepayment,
+          loanProduct: product,
+        },
+      })
+    );
+
     // send data to database and redirect to bvn verification page
     await fetch(`${apiUrl}/api/tempdata/tempdata`, {
       method: "POST",
@@ -158,8 +175,8 @@ const LoanFirstStep = ({ data }) => {
       .then((response) => response.json())
       .then(() => {
         // search for bvn details and verify
-       
-         bvnVerification();
+
+        //  bvnVerification();
 
         navigate("/app/nibbs-login");
 
@@ -189,7 +206,7 @@ const LoanFirstStep = ({ data }) => {
             <Formik
               initialValues={initialValues({ loanamount, careertype })}
               validationSchema={validationSchema}
-                // onSubmit={handleSubmit}
+              // onSubmit={handleSubmit}
               innerRef={ref}
               encType="multipart/form-data"
             >

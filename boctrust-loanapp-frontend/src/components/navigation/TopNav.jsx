@@ -48,8 +48,8 @@ const TopNav = ({ settings }) => {
         </div>
         <div className="Hero">
           <h1 className="Welcome">
-            {settings.siteTitle
-              ? settings.siteTitle
+            {settings?.siteTitle
+              ? settings?.siteTitle
               : "Welcome to BOCTRUST Microfinance Bank Limited"}
           </h1>
           <p className="Licence">Licenced by Central Bank of Nigeria</p>

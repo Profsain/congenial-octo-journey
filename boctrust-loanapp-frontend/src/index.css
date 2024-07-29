@@ -29,12 +29,21 @@ p {
   font-family: "Open Sans", sans-serif;
 }
 
+a {
+  text-decoration: none;
+}
+
 .cursor-pointer {
   cursor: pointer;
 }
 
 img {
   object-fit: contain;
+}
+
+button:disabled {
+  color: gray !important;
+  cursor: not-allowed;
 }
 
 .capitalize {
@@ -55,7 +64,6 @@ img {
   background-color: #145088 !important;
   padding-left: 1rem;
 }
-
 
 @media screen and (max-width: 600px) {
   .Welcome {
@@ -96,12 +104,6 @@ img {
   /* Search Page */
   .SearchContainer {
     width: 90% !important;
-  }
-
-  /* carousel mobile  */
-  .CarouselContainer {
-    margin-top: 12px !important;
-    top: 80px !important;
   }
 
   .CardContainer {
@@ -317,11 +319,8 @@ img {
     margin: 8px !important;
     /* padding: 18px; */
   }
-  .InlineCard {
-    flex-direction: column !important;
-  }
+
   .StatCard {
-    width: 120px !important;
     margin: 8px !important;
   }
   .StatCard p {

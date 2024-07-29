@@ -5,6 +5,21 @@ const ExtraLenderSchema = new mongoose.Schema({
   deductions: { type: Number },
 });
 
+const CreditBureauSearchSchema = new mongoose.Schema({
+  bureauName: { type: String, default: "" },
+  bvnNo: { type: String, default: "" },
+  reportType: { type: String, default: "" },
+  reportReason: { type: String, default: "" },
+  bureauDate: { type: String, default: "" },
+  bureauSearchReport: { type: String, default: "" },
+  isCreditBureauCheck: {
+    type: Boolean,
+    default: false,
+  },
+  creditBureauResult: {},
+  updatedAt: Date, // Field to store the timestamp
+});
+
 const customerSchema = new mongoose.Schema(
   {
     bvnnumber: {
@@ -37,22 +52,13 @@ const customerSchema = new mongoose.Schema(
     nkinphonenumber: String,
     nkinrelationship: String,
     nkinresidentialaddress: String,
-    loanamount: String,
-    numberofmonth: String,
-    loantotalrepayment: String,
-    loanproduct: {
-      type: Object,
-      default: {},
-    },
-    monthlyrepayment: String,
+
     careertype: String,
-    numberofmonth: {
-      type: String,
-      default: "0",
+
+    employer: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Employer",
     },
-    loanpurpose: [String],
-    otherpurpose: String,
-    employername: mongoose.Schema.Types.Mixed,
     employeraddress: String,
     employmentletter: String,
     employmentstartdate: String,
@@ -71,21 +77,14 @@ const customerSchema = new mongoose.Schema(
     hasloan: String,
     currentmonthlyplanrepaymentamount: String,
     estimatedmonthlylivingexpense: String,
-    buyoverloan: String,
-    buyoverloanactivated: {
-      type: Boolean,
-      default: false,
-    },
+
     beneficiaryname: String,
     beneficiarybank: String,
     beneficiaryaccountnumber: String,
     liquidationbalance: String,
-    deductions: String,
+
     guarantee: String,
-    disbursementstatus: {
-      type: String,
-      default: "pending",
-    },
+
     acceptterms: String,
     acceptpolicy: String,
     sharemyremita: Boolean,
@@ -93,11 +92,8 @@ const customerSchema = new mongoose.Schema(
     agreedate: String,
     signature: String,
     photocapture: String,
-    haveagent: String,
-    agentname: {
-      type: String,
-      default: "Boctrust Admin",
-    },
+    
+
     username: { type: String, unique: true, required: true },
     password: String,
     confirmpassword: String,
@@ -135,26 +131,20 @@ const customerSchema = new mongoose.Schema(
         updatedAt: Date, // Field to store the timestamp
       },
       creditBureauSearch: {
-        bureauName: { type: String, default: "" },
-        bvnNo: { type: String, default: "" },
-        reportType: { type: String, default: "" },
-        reportReason: { type: String, default: "" },
-        bureauDate: { type: String, default: "" },
-        bureauSearchReport: { type: [String], default: "" },
-        isCreditBureauCheck: {
-          type: Boolean,
-          default: false,
-        },
-        creditBureauResult: {},
-        updatedAt: Date, // Field to store the timestamp
+        type: [CreditBureauSearchSchema],
+        default: [],
       },
       paySlipAnalysis: {
-        netPay: { type: String, default: "" },
+        netPay: { type: Number, default: 0 },
         extraLenders: {
           type: [ExtraLenderSchema],
           default: [],
         },
-        monthlyLoanRepayment: { type: String, default: "" },
+        numOfExtraLenders: {
+          type: Number,
+          default: 0,
+        },
+        monthlyLoanRepayment: { type: Number, default: 0 },
         dateOfBirth: { type: String, default: "" },
         dateOfAppointment: { type: String, default: "" },
         isApplicantCivilianPolice: {
@@ -234,10 +224,6 @@ const customerSchema = new mongoose.Schema(
       default: "head office",
     },
     kyc: {
-      loanstatus: {
-        type: String,
-        default: "with_operations",
-      },
       isFacialMatch: {
         type: Boolean,
         default: false,
@@ -267,6 +253,7 @@ const customerSchema = new mongoose.Schema(
         default: Date.now,
       },
     },
+
     transactions: {
       type: Array,
       default: [],
@@ -279,12 +266,7 @@ const customerSchema = new mongoose.Schema(
       type: String,
       default: "0.00",
     },
-    allLoans: [
-      {
-        type: Object,
-        default: {},
-      },
-    ],
+
     banking: {
       isAccountCreated: {
         type: Boolean,
