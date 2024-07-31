@@ -48,6 +48,7 @@ const SideNavMain = ({ onMenuItemClick }) => {
 
   // current login admin user
   const currentUser = useSelector((state) => state.adminAuth.user);
+
   const userRole = currentUser.jobRole;
 
   // role based menu
@@ -55,7 +56,7 @@ const SideNavMain = ({ onMenuItemClick }) => {
   const [adminRoles, setAdminRoles] = useState([]);
   useEffect(() => {
     if (currentUser) {
-      if (currentUser.userType === "admin" || currentUser.userType === "md") {
+      if (currentUser.adminType === "admin" || currentUser.userType === "md") {
         setAdmin("admin");
       }
 

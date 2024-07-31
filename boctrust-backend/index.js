@@ -43,7 +43,6 @@ const productsFrontPage = require("./routes/productsFrontPage");
 const productsSeedData = require("./seedData/productsFrontPageData");
 const ProductsFrontPage = require("./models/ProductsFrontPage");
 
-
 // configure dotenv
 dotenv.config();
 
