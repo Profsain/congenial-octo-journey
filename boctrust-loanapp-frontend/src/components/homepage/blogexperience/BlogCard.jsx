@@ -37,7 +37,7 @@ const BlogCard = ({
   };
   return (
     <div style={styles.card}>
-      <Link to="/blog" style={styles.blogTitle}>{shortTitle}</Link>
+      <Link to="/blogs" style={styles.blogTitle}>{shortTitle}</Link>
     </div>
   );
 };

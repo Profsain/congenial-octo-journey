@@ -12,7 +12,7 @@ const boardMembers = [
     name: "FEMI ALONGE",
     title: "Director",
     biography: [
-      "Mr Alonge, a chartered banker, is the current MD/CEO and oversees the day-to-day management of the bank. with over 20 years local and international banking experience spanning Retail, Commercial and Corporate Banking. Worked with Guaranty Trust Bank, Lead Bank and Standard Chartered Bank where he spent over 16 years and held various positions such as Senior Credit Analyst, Area Manager. Head, Asset Backed Financing West Africa, Executive Director Corporate and Institutional Banking Tanzania as an International staff. In 2017, he was appointed CEO Africa Northstar Finance Services Mauritius.",
+      "Mr Alonge, a chartered banker, is the current Director and oversees the day-to-day management of the bank. with over 20 years local and international banking experience spanning Retail, Commercial and Corporate Banking. Worked with Guaranty Trust Bank, Lead Bank and Standard Chartered Bank where he spent over 16 years and held various positions such as Senior Credit Analyst, Area Manager. Head, Asset Backed Financing West Africa, Executive Director Corporate and Institutional Banking Tanzania as an International staff. In 2017, he was appointed CEO Africa Northstar Finance Services Mauritius.",
       "He is an Engineering graduate from Obafemi Awolowo University and an MBA graduate from the University of Bangor U.K. He is a member of Chartered institute of Bankers Nigeria and an affiliate member of international compliance association London UK."
     ],
   },

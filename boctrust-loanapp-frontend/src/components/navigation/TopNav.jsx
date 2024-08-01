@@ -35,8 +35,8 @@ const TopNav = ({ settings }) => {
   }, []);
 
   return (
-    <div className="TopNavContainer">
-      <div className="Topnav">
+    <div className="TopNavContainer ">
+      <div className="Topnav my-2">
         <div className="BrandCon">
           <Link to="/">
             <img
@@ -52,7 +52,6 @@ const TopNav = ({ settings }) => {
               ? settings.siteTitle
               : "Welcome to BOCTRUST Microfinance Bank Limited"}
           </h1>
-          <p className="Licence">Licenced by Central Bank of Nigeria</p>
         </div>
         <div>
           <button className="CallUs">Licenced by CBN</button>
@@ -72,7 +71,11 @@ const TopNav = ({ settings }) => {
                 </Nav.Link>
 
                 {/* about dropdown */}
-                <NavDropdown title="About" id="basic-nav-dropdown" className="mx-4">
+                <NavDropdown
+                  title="About"
+                  id="basic-nav-dropdown"
+                  className="mx-4"
+                >
                   <div className="DropSpace"></div>
                   <NavDropdown.Item className="DropItem" href="/about">
                     Company Overview

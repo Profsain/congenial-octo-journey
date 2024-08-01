@@ -205,7 +205,7 @@ const OurProduct = ({ productTitle, headerImg }) => {
   useEffect(() => {
     AOS.init({ duration: 2000 });
   }, []);
-  console.log("Products", pageProducts);
+
   const currentProduct = useMemo(() => {
     if (selectedProductId) {
       return pageProducts.find((product) => product._id === selectedProductId);
