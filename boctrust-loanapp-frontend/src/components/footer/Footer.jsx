@@ -46,8 +46,21 @@ const Footer = ({ settings }) => {
             <div className="col-md-6">
               <ul>
                 <li>
+                  <Link className="Link" to="/">
+                    Home
+                  </Link>
+                </li>
+                <li>
                   <Link className="Link" to="/about">
                     About App
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    className="Link"
+                    to="/regular-savings"
+                  >
+                    Our Product
                   </Link>
                 </li>
                 <li>
@@ -58,11 +71,6 @@ const Footer = ({ settings }) => {
                 <li>
                   <Link className="Link" to="/loan">
                     Loans
-                  </Link>
-                </li>
-                <li>
-                  <Link className="Link" to="/support">
-                    FAQ
                   </Link>
                 </li>
                 <li>
@@ -84,10 +92,20 @@ const Footer = ({ settings }) => {
                     Careers
                   </Link>
                 </li>
+                <li>
+                  <Link className="Link" to="/blogs">
+                    Blogs
+                  </Link>
+                </li>
 
                 <li>
                   <Link className="Link" to="/support">
-                    Help
+                    Support
+                  </Link>
+                </li>
+                <li>
+                  <Link className="Link" to="/login">
+                    Login
                   </Link>
                 </li>
               </ul>
@@ -99,12 +117,15 @@ const Footer = ({ settings }) => {
           <p>
             Address:
             <br />
-            {settings.address ? settings.address : "1st floor, 26 Moloney street, Onikan."}
+            {settings.address
+              ? settings.address
+              : "1st floor, 26 Moloney street, Onikan."}
           </p>
           <p>
             Phone:
             <br />
-            {settings.phoneNumber1 ? settings.phoneNumber1 : "08177773196"} <br />
+            {settings.phoneNumber1 ? settings.phoneNumber1 : "08177773196"}{" "}
+            <br />
             {settings.phoneNumber2 ? settings.phoneNumber2 : "08076710000"}
           </p>
           <p>
