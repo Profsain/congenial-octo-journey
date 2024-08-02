@@ -37,6 +37,7 @@ const boardMemberRoutes = require("./routes/boardMember")
 // board members seeds
 const BoardMember = require("./models/BoardOfDirectors");
 const boardMembers = require("./seedData/boardMembers");
+const jobApplicationRoutes = require("./routes/jobApplication");
 
 // front page products
 const productsFrontPage = require("./routes/productsFrontPage");
@@ -139,6 +140,7 @@ mongoose
 
         // career routes
         app.use('/api/career', career);
+        app.use('./api/job-application', jobApplicationRoutes);
 
         // settings routes
         app.use('/api/settings', settings);
