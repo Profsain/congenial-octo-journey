@@ -53,6 +53,11 @@
   border-bottom: 1px solid gray;
 }
 
+.manage__accessControl select,
+.manage__accessControl option {
+  z-index: 100;
+}
+
 
 select:disabled{
   opacity: 0.5;

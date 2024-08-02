@@ -180,7 +180,7 @@ const MandateHistory = () => {
                   <td>
                     {customer.firstname} {customer.lastname}
                   </td>
-                  <td>{customer.employername || "N/A"}</td>
+                  <td>{customer.employer?.employersName || "N/A"}</td>
                   <td>N{customer.loantotalrepayment}</td>
                   <td>
                     {!customer.remita.remitaDetails.firstPaymentDate

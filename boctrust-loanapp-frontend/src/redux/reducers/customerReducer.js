@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 
 //fetch accounts
 const apiUrl = import.meta.env.VITE_BASE_URL;
@@ -14,7 +14,7 @@ export const fetchAllCustomer = createAsyncThunk(
     return response.data;
   }
 );
-// Thunk to fetch account from the API
+// Thunk to fetch Single Customer
 export const fetchSingleCustomer = createAsyncThunk(
   "account/fetchSingleCustomer",
   async (customerId) => {
@@ -24,28 +24,39 @@ export const fetchSingleCustomer = createAsyncThunk(
   }
 );
 
+// Thunk to COO Approval and Create Bank One account
+export const cooApprovalAndCreateBankoneAccount = createAsyncThunk(
+  "account/cooApprovalAndCreateBankoneAccount",
+  async (customerId, thunkAPI) => {
+    try {
+      await axios.put(`${apiUrl}/api/updatecustomer/approve/coo/${customerId}`);
+      await axios.post(
+        `${apiUrl}/api/bankone/newCustomerAccount/${customerId}`
+      );
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        return thunkAPI.rejectWithValue(error.response?.data?.message);
+      }
+      return thunkAPI.rejectWithValue("Could not Approve and Create Account");
+    }
+  }
+);
+
 // customer slice
 const customerSlice = createSlice({
   name: "customers",
   initialState: {
     customers: [],
     selectedCustomer: null,
-    customerApprovalEnum: {
-      approved: "approved",
-      declined: "declined",
-      pending: "pending",
-    },
-    loanStatusEnum: {
-      booked: "booked",
-      with_co: "with co",
-      with_credit: "with credit",
-      with_operations: "with operations",
-      completed: "completed",
-    },
+    loanFirstInfo: null,
     status: "idle",
     error: null,
   },
-  reducers: {},
+  reducers: {
+    updateCustomerStateValues: (state, action) => {
+      state[action.payload.name] = action.payload.value;
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(fetchAllCustomer.pending, (state) => {
@@ -69,8 +80,21 @@ const customerSlice = createSlice({
       .addCase(fetchSingleCustomer.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.error.message;
+      })
+
+      .addCase(cooApprovalAndCreateBankoneAccount.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(cooApprovalAndCreateBankoneAccount.fulfilled, (state) => {
+        state.status = "succeeded";
+      })
+      .addCase(cooApprovalAndCreateBankoneAccount.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.error.message;
       });
   },
 });
+
+export const { updateCustomerStateValues } = customerSlice.actions;
 
 export default customerSlice.reducer;

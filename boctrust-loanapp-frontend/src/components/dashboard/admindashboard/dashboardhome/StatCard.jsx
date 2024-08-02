@@ -2,7 +2,7 @@ import PropTypes from "prop-types";
 const StatCard = ({ day, date, stat, datecolor }) => {
   const styles = {
     container: {
-      width: "240px",
+      width: "100%",
       height: "115px",
       padding: "1rem",
       backgroundColor: "#fff",

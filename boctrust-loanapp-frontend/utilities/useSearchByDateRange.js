@@ -13,7 +13,7 @@ const useSearchByDateRange = (initialList, dateRange, dateKey) => {
 
   useEffect(() => {
     searchByDateRange();
-  }, [dateRange, dateKey]);
+  }, [dateRange, dateKey, initialList]);
 
   return {
     searchData,

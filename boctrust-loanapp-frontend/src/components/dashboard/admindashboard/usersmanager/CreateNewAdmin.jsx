@@ -31,7 +31,7 @@ const CreateNewAdmin = ({ func }) => {
 
   const handleSubmit = async (values, { resetForm }) => {
     const apiUrl = import.meta.env.VITE_BASE_URL;
-    console.log(values, "Values");
+
     try {
       setIsLoading(true);
 
@@ -47,8 +47,18 @@ const CreateNewAdmin = ({ func }) => {
       formData.append("phone", values.phone);
       formData.append("username", values.username.toLowerCase());
       formData.append("password", values.password);
-      formData.append("userRole", values.userRole);
+
       formData.append("userType", values.userType);
+
+      if (values.userType && values.userType === "super_admin") {
+        const adminRole = rolesAndPermission?.find(
+          (item) => item.value === "super_admin"
+        );
+
+        formData.append("userRole", adminRole?._id);
+      } else {
+        formData.append("userRole", values.userRole);
+      }
 
       const res = await fetch(`${apiUrl}/api/admin/register`, {
         method: "POST",

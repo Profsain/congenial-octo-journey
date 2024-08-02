@@ -85,3 +85,12 @@ input:active {
 .new__roleForm button {
   width: 200px !important;
 }
+
+
+
+/* For Book Loan Page */
+.bookloan__container td > *{
+
+  margin: auto 0;
+
+}

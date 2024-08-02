@@ -248,7 +248,7 @@ const ConfirmData = ({ career }) => {
             <hr />
             <ConfirmField
               labelName="Employer Name"
-              fieldName="employername"
+              fieldName="employerId"
               type="text"
               values={values}
               func={handleInputChange}

@@ -13,6 +13,8 @@ const EditUser = (props) => {
   const dispatch = useDispatch();
   const user = props.userobj;
 
+  console.log(user, "user")
+
   const viewEdit = props.viewEdit;
 
   // form state
@@ -54,6 +56,15 @@ const EditUser = (props) => {
     setEditAdminRoles("");
     dispatch(fetchAdmins());
   };
+
+  useEffect(() => {
+    if (editUserType && editUserType === "super_admin") {
+      const adminRole = rolesAndPermission?.find(
+        (item) => item.value === "super_admin"
+      );
+      setEditAdminRoles(adminRole?._id);
+    }
+  }, [editUserType, rolesAndPermission]);
 
   // close model box
   const handleClose = () => {
@@ -196,7 +207,11 @@ const EditUser = (props) => {
               <select
                 name="userRole"
                 value={editAdminRoles?._id}
-                disabled={viewEdit !== "edit" || !editUserType || editUserType === "super_admin"}  
+                disabled={
+                  viewEdit !== "edit" ||
+                  !editUserType ||
+                  editUserType === "super_admin"
+                }
                 id="userRole"
                 className="Input  w-100"
               >

@@ -5,7 +5,6 @@ import { fetchAllCustomer } from "../../../../redux/reducers/customerReducer";
 import Table from "react-bootstrap/Table";
 import "../../Dashboard.css";
 import DashboardHeadline from "../../shared/DashboardHeadline";
-import BocButton from "../../shared/BocButton";
 import NextPreBtn from "../../shared/NextPreBtn";
 import PageLoader from "../../shared/PageLoader";
 import getDateOnly from "../../../../../utilities/getDate";
@@ -13,11 +12,12 @@ import searchList from "../../../../../utilities/searchListFunc";
 import LoanDetails from "./LoanDetails";
 import NoResult from "../../../shared/NoResult";
 import DisbursementModal from "./DisbursementModal";
-import sendSMS from "../../../../../utilities/sendSms";
-import sendEmail from "../../../../../utilities/sendEmail";
-import EmailTemplate from "../../../shared/EmailTemplate";
-import ReactDOMServer from "react-dom/server";
 import sortByCreatedAt from "../../shared/sortedByDate";
+import { fetchBookedOrDisbursedLoans } from "../../../../redux/reducers/loanReducer";
+import TableOptionsDropdown from "../../shared/tableOptionsDropdown/TableOptionsDropdown";
+import { GrView } from "react-icons/gr";
+import { IoMdCheckmarkCircleOutline } from "react-icons/io";
+import { FcCancel } from "react-icons/fc";
 
 const LoanDisbursement = () => {
   const styles = {
@@ -40,30 +40,60 @@ const LoanDisbursement = () => {
     },
   };
 
-  // fetch all customer
-  const dispatch = useDispatch();
-  const customers = useSelector(
-    (state) => state.customerReducer.customers.customer
-  );
-  const status = useSelector((state) => state.customerReducer.status);
+  // Base URL for API
+  const apiUrl = import.meta.env.VITE_BASE_URL;
 
-  useEffect(() => {
-    dispatch(fetchAllCustomer());
-  }, [dispatch]);
+  // holds state to check for loged in users permisson to approve
+  const [canUserManage, setCanUserManage] = useState(false);
+  const [canUserDisburse, setCanUserDisburse] = useState(false);
+  const [canUserApprove, setCanUserApprove] = useState(false);
 
-  // filter customer by isKycApproved
-  const filteredCustomers = customers?.filter(
-    (customer) =>
-      customer.kyc.isKycApproved === true &&
-      customer.deductions !== "remita" &&
-      customer.kyc.loanstatus === "completed"
-  );
+  const { bookedDisbursedLoans } = useSelector((state) => state.loanReducer);
 
   const [showCount, setShowCount] = useState(10);
   const [searchTerms, setSearchTerms] = useState("");
 
   const [show, setShow] = useState(false);
   const [loanObj, setLoanObj] = useState({});
+
+  // handle loan approval
+  const [showDisburse, setShowDisburse] = useState(false);
+  const [approveDisburseLoading, setApproveDisburseLoading] = useState(false);
+  const [rejectLoading, setRejectLoading] = useState(false);
+
+  // current login admin user
+  const currentUser = useSelector((state) => state.adminAuth.user);
+
+  // search customer list
+  const [loansList, setLoansList] = useState(bookedDisbursedLoans);
+
+  const status = useSelector((state) => state.customerReducer.status);
+
+  // fetch all customer
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    setCanUserManage(currentUser?.userRole?.can.includes("loanManagement"));
+    setCanUserApprove(
+      currentUser?.userRole?.can.includes("approveTransactions")
+    );
+    setCanUserDisburse(currentUser?.userRole?.can.includes("loanDisbursment"));
+  }, [currentUser]);
+
+  useEffect(() => {
+    const getData = async () => {
+      await dispatch(fetchBookedOrDisbursedLoans());
+    };
+
+    getData();
+  }, [dispatch]);
+
+  // update loansList to show 10 customers on page load
+  // or on count changes
+  useEffect(() => {
+    setLoansList(bookedDisbursedLoans?.slice(0, showCount));
+  }, [bookedDisbursedLoans, showCount]);
+
   // handle close loan details
   const handleClose = () => {
     setLoanObj({});
@@ -72,98 +102,55 @@ const LoanDisbursement = () => {
 
   // handle show loan details
   const handleView = (id) => {
-    const loan = filteredCustomers.find((customer) => customer._id === id);
+    if (!bookedDisbursedLoans) return;
+    const loan = bookedDisbursedLoans.find((customer) => customer._id === id);
     setLoanObj(loan);
     setShow(true);
   };
 
-  const apiUrl = import.meta.env.VITE_BASE_URL;
-  // handle loan approval
-  const [showDisburse, setShowDisburse] = useState(false);
-  const [processing, setProcessing] = useState(false);
-
-  const updateLoanStatus = async (customerId, status) => {
-    const data = { disbursementstatus: status };
-
-    // send update to backend
-    await fetch(
-      `${apiUrl}/api/customer/customer/disbursestatus/${customerId}`,
-      {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      }
-    );
+  const handleInitiateDisbursement = async () => {
+    try {
+      setApproveDisburseLoading(true);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setApproveDisburseLoading(false);
+    }
   };
 
   const handleApproval = async (id) => {
-    setProcessing(true);
+    setApproveDisburseLoading(true);
 
     try {
       // Process loan approval
-      const loan = filteredCustomers.find((customer) => customer._id === id);
+      const loan = bookedDisbursedLoans.find((customer) => customer._id === id);
       setLoanObj(loan);
 
       // Create loan and disburse in bankone
-      const newDisbursement = await fetch(`${apiUrl}/api/bankone/createLoan`, {
+      await fetch(`${apiUrl}/api/bankone/createLoan`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(loan),
       });
 
-      if (!newDisbursement.ok) {
-        throw new Error(
-          `Failed to create loan. Status: ${newDisbursement.status}`
-        );
-      }
-
-      const disbursedData = await newDisbursement.json();
-
-      // Check if disbursement is successful and update loan status to disbursed
-      if (disbursedData.status === "success") {
-        // Send SMS to customer
-        const message = `Your loan application has been approved. Your loan of N${loan.loanamount} has been disbursed to your account. Thank you for choosing Bank of Credit.`;
-        sendSMS(loan.phonenumber, message);
-
-        // Send email to customer
-        const emailTemplate = ReactDOMServer.renderToStaticMarkup(
-          <EmailTemplate
-            firstName={loan.firstname}
-            content={`Your loan application has been approved. Your loan of N${loan.loanamount} has been disbursed to your account. Thank you for choosing Bank of Credit.`}
-          />
-        );
-        const option = {
-          email: loan.email,
-          subject: "Loan Application Approved",
-          html: emailTemplate,
-        };
-
-        sendEmail(option);
-
-        // Update loan status to approved
-        updateLoanStatus(id, "approved");
-      }
-
       dispatch(fetchAllCustomer());
     } catch (error) {
       console.error("Error:", error.message);
     } finally {
-      setProcessing(false);
+      setApproveDisburseLoading(false);
     }
   };
 
   const handleRejection = async (id) => {
     // process loan rejection
-    const loan = filteredCustomers.find((customer) => customer._id === id);
+    const loan = bookedDisbursedLoans.find((customer) => customer._id === id);
     setLoanObj(loan);
 
     // setProcessing to true after 5 second
     setTimeout(() => {
-      setProcessing(false);
+      setRejectLoading(false);
     }, 5000);
-    // update loan status to rejected
-    // update isProcessed to true
-    updateLoanStatus(id, "rejected");
+
     dispatch(fetchAllCustomer());
   };
 
@@ -172,30 +159,54 @@ const LoanDisbursement = () => {
     setShowDisburse(false);
   };
 
-  // search customer list
-  const [customerList, setCustomerList] = useState(filteredCustomers);
-
-  // update customerList to show 10 customers on page load
-  // or on count changes
-  useEffect(() => {
-    setCustomerList(filteredCustomers?.slice(0, showCount));
-  }, [customers, showCount]);
-
-  // update customerList on search
+  // update loansList on search
   const handleSearch = () => {
-    // check filteredCustomers is not empty
-    if (!filteredCustomers) return;
+    // check bookedDisbursedLoans is not empty
+    if (!bookedDisbursedLoans) return;
     const currSearch = searchList(
-      filteredCustomers,
+      bookedDisbursedLoans,
       searchTerms,
       "agreefullname"
     );
-    setCustomerList(currSearch?.slice(0, showCount));
+    setLoansList(currSearch?.slice(0, showCount));
   };
 
   useEffect(() => {
     handleSearch();
   }, [searchTerms]);
+
+  const tableOptions = [
+    {
+      className: "",
+      icon: <GrView />,
+      label: "View Details",
+      func: (customer) => handleView(customer._id),
+    },
+    {
+      className: "text-primary",
+      icon: <IoMdCheckmarkCircleOutline />,
+      label: canUserDisburse
+        ? "Disburse Loan"
+        : canUserApprove
+        ? "Approve Disbursement"
+        : "",
+      isDisabled: (loan) =>
+        (canUserDisburse && loan.disbursementstatus === "disbursed") ||
+        (canUserApprove && loan.disbursementstatus !== "disbursed"),
+      isLoading: approveDisburseLoading,
+      func: (loan) => handleInitiateDisbursement(loan),
+    },
+    {
+      className: "text-danger",
+      icon: <FcCancel />,
+      label: "Reject Loan",
+      isDisabled: (loan) =>
+        (canUserDisburse && loan.disbursementstatus === "disbursed") ||
+        (canUserApprove && loan.disbursementstatus === "approved"),
+      isLoading: rejectLoading,
+      func: (loan) => handleRejection(loan._id),
+    },
+  ];
 
   return (
     <>
@@ -230,7 +241,7 @@ const LoanDisbursement = () => {
         {status === "loading" && <PageLoader />}
         <DashboardHeadline
           height="52px"
-          mspacer="2rem 0 -2.5rem -1rem"
+          mspacer="2rem 0 -3.2rem -1rem"
           bgcolor="#145098"
         ></DashboardHeadline>
         <div style={styles.table}>
@@ -248,76 +259,56 @@ const LoanDisbursement = () => {
               </tr>
             </thead>
             <tbody>
-              {customerList?.length === 0 && <NoResult name="customer" />}
-              {sortByCreatedAt(customerList)?.map((customer) => {
-                return (
-                  <tr key={customer._id}>
-                    <td>{customer.banking?.accountDetails?.Message.Id}</td>
-                    <td>{customer.loanProduct || "General Loan"}</td>
-                    <td>{customer.banking?.accountDetails?.Message.FullName}</td>
-                    <td>
-                      {
-                        customer?.banking?.accountDetails?.Message
-                          ?.AccountNumber
-                      }
-                    </td>
-                    <td>{getDateOnly(customer.createdAt)}</td>
-                    <td>N{customer.loanamount}</td>
+              {loansList && loansList?.length === 0 && (
+                <NoResult name="customer" />
+              )}
+              {loansList &&
+                sortByCreatedAt(loansList)?.map((loan) => {
+                  return (
+                    <tr key={loan._id}>
+                      <td>
+                        {loan?.customer?.banking?.accountDetails?.Message.Id}
+                      </td>
+                      <td>{loan.loanproduct.productName || "General Loan"}</td>
+                      <td>
+                        {
+                          loan?.customer?.banking?.accountDetails?.Message
+                            .FullName
+                        }
+                      </td>
+                      <td>
+                        {
+                          loan?.customer?.banking?.accountDetails?.Message
+                            ?.AccountNumber
+                        }
+                      </td>
+                      <td>{getDateOnly(loan.createdAt)}</td>
+                      <td>N{loan.loanamount}</td>
 
-                    <td>
-                      {customer.disbursementstatus === "pending" ? (
-                        <p style={styles.pending}>Pending</p>
-                      ) : customer.disbursementstatus === "approved" ? (
-                        <p style={styles.approved}>Disbursed</p>
-                      ) : customer.disbursementstatus === "stopped" ? (
-                        <p style={styles.pending}>Stopped</p>
-                      ) : (
-                        <p style={styles.completed}>Rejected</p>
-                      )}
-                    </td>
-                    <td>
-                      <div>
-                        {customer.disbursementstatus === "pending" ? (
-                          <div>
-                            {processing && <PageLoader width="12px" />}
-                            <BocButton
-                              func={() => handleRejection(customer._id)}
-                              bradius="12px"
-                              fontSize="12px"
-                              width="80px"
-                              margin="4px"
-                              bgcolor="#ecaa00"
-                            >
-                              Reject
-                            </BocButton>
-                            <BocButton
-                              func={() => handleApproval(customer._id)}
-                              bradius="12px"
-                              fontSize="12px"
-                              width="80px"
-                              margin="4px"
-                              bgcolor="#ecaa00"
-                            >
-                              Approve
-                            </BocButton>
-                          </div>
+                      <td>
+                        {loan.disbursementstatus === "pending" ? (
+                          <p style={styles.pending}>Pending</p>
+                        ) : loan.disbursementstatus === "approved" ? (
+                          <p style={styles.approved}>Disbursed</p>
+                        ) : loan.disbursementstatus === "stopped" ? (
+                          <p style={styles.pending}>Stopped</p>
                         ) : (
-                          <BocButton
-                            func={() => handleView(customer._id)}
-                            bradius="12px"
-                            fontSize="12px"
-                            width="80px"
-                            margin="4px"
-                            bgcolor="#ecaa00"
-                          >
-                            View
-                          </BocButton>
+                          <p style={styles.completed}>Rejected</p>
                         )}
-                      </div>
-                    </td>
-                  </tr>
-                );
-              })}
+                      </td>
+                      <td>
+                        {canUserManage && (
+                          <td>
+                            <TableOptionsDropdown
+                              loan={loan}
+                              items={tableOptions}
+                            />
+                          </td>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })}
             </tbody>
           </Table>
         </div>

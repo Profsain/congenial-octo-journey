@@ -1,7 +1,6 @@
 import PropTypes from "prop-types";
 import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchAllCustomer } from "../../../../redux/reducers/customerReducer";
 import Table from "react-bootstrap/Table";
 import "../../Dashboard.css";
 import DashboardHeadline from "../../shared/DashboardHeadline";
@@ -13,6 +12,8 @@ import searchList from "../../../../../utilities/searchListFunc";
 import LoanDetails from "./LoanDetails";
 import NoResult from "../../../shared/NoResult";
 import sortByCreatedAt from "../../shared/sortedByDate";
+import { loanStatusEnum } from "../../../../lib/userRelated";
+import { fetchAllLoans } from "../../../../redux/reducers/loanReducer";
 
 const AllLoans = ({ showCount, searchTerms }) => {
   const styles = {
@@ -37,23 +38,28 @@ const AllLoans = ({ showCount, searchTerms }) => {
 
   const [show, setShow] = useState(false);
   const [loanObj, setLoanObj] = useState({});
+  // search Loans list
+  const [loansList, setLoansList] = useState(null);
 
   // fetch all customer
   const dispatch = useDispatch();
-  const customers = useSelector(
-    (state) => state.customerReducer.customers.customer
-  );
-  const { loanStatusEnum } = useSelector((state) => state.customerReducer);
+  const { allLoans } = useSelector((state) => state.loanReducer);
   const status = useSelector((state) => state.customerReducer.status);
 
   useEffect(() => {
-    dispatch(fetchAllCustomer());
+    const getData = async () => {
+      await dispatch(fetchAllLoans());
+    };
+    getData();
   }, [dispatch, show]);
 
-  // filtere customer by isKycApproved
-  const filteredCustomers = customers?.filter(
-    (customer) => customer.kyc.isKycApproved === true
-  );
+  // update loansList to show 10 allLoans on page load
+  // or on count changes
+  useEffect(() => {
+    if (allLoans) {
+      setLoansList(allLoans?.slice(0, showCount));
+    }
+  }, [allLoans, showCount]);
 
   // handle close loan details
   const handleClose = () => {
@@ -63,28 +69,18 @@ const AllLoans = ({ showCount, searchTerms }) => {
 
   // handle show loan details
   const handleShow = (id) => {
-    const loan = filteredCustomers.find((customer) => customer._id === id);
+    const loan = loansList && loansList.find((loan) => loan._id === id);
     setLoanObj(loan);
     setShow(true);
   };
 
-  // search customer list
-  const [customerList, setCustomerList] = useState(filteredCustomers);
-
-  // update customerList to show 10 customers on page load
-  // or on count changes
-  useEffect(() => {
-    setCustomerList(filteredCustomers?.slice(0, showCount));
-  }, [customers, showCount]);
-
-  // update customerList on search
+  // update loansList on search
   const handleSearch = () => {
-    const currSearch = searchList(
-      filteredCustomers,
-      searchTerms,
-      "agreefullname"
-    );
-    setCustomerList(currSearch?.slice(0, showCount));
+    if (!allLoans) {
+      return;
+    }
+    const currSearch = searchList(allLoans, searchTerms, "agreefullname");
+    setLoansList(currSearch?.slice(0, showCount));
   };
 
   useEffect(() => {
@@ -97,7 +93,7 @@ const AllLoans = ({ showCount, searchTerms }) => {
       {status === "loading" && <PageLoader />}
       <DashboardHeadline
         height="52px"
-        mspacer="2rem 0 -2.5rem -1rem"
+        mspacer="2rem 0 -3.2rem -1rem"
         bgcolor="#145098"
       ></DashboardHeadline>
       <div style={styles.table}>
@@ -115,45 +111,49 @@ const AllLoans = ({ showCount, searchTerms }) => {
             </tr>
           </thead>
           <tbody>
-            {customerList?.length === 0 && <NoResult name="customer" />}
-            {sortByCreatedAt(customerList)?.map((customer) => {
-              return (
-                <tr key={customer._id}>
-                  <td>{customer.banking?.accountDetails?.Message.Id}</td>
-                  <td>{customer.loanProduct || "General Loan"}</td>
-                  <td>
-                    {customer.banking?.accountDetails?.Message.FullName ??
-                      `${customer?.firstname} ${customer?.lastname}`}
-                  </td>
-                  <td>
-                    {customer?.banking?.accountDetails?.Message?.AccountNumber}
-                  </td>
-                  <td>{getDateOnly(customer.createdAt)}</td>
-                  <td>N{customer.loanamount}</td>
-                  <td
-                    style={styles.padding}
-                    className={
-                      customer?.kyc?.loanstatus === loanStatusEnum.completed
-                        ? "text-success"
-                        : "text-warning"
-                    }
-                  >
-                    {" "}
-                    {capitalizeEachWord(customer.kyc.loanstatus)}
-                  </td>
-                  <td>
-                    <div>
-                      <button
-                        onClick={() => handleShow(customer._id)}
-                       className="btn btn-info text-white"
-                      >
-                        Details
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              );
-            })}
+            {loansList?.length === 0 && <NoResult name="customer" />}
+            {loansList &&
+              sortByCreatedAt(loansList)?.map((loan) => {
+                return (
+                  <tr key={loan._id}>
+                    <td>{loan.banking?.accountDetails?.Message.Id}</td>
+                    <td>{loan.loanproduct.productName || "General Loan"}</td>
+                    <td>
+                      {loan.banking?.accountDetails?.Message.FullName ??
+                        `${loan?.customer.firstname} ${loan?.customer.lastname}`}
+                    </td>
+                    <td>
+                      {
+                        loan.customer?.banking?.accountDetails?.Message
+                          ?.AccountNumber
+                      }
+                    </td>
+                    <td>{getDateOnly(loan.createdAt)}</td>
+                    <td>N{loan.loanamount}</td>
+                    <td
+                      style={styles.padding}
+                      className={
+                        loan?.customer?.kyc?.loanstatus === loanStatusEnum.completed
+                          ? "text-success"
+                          : "text-warning"
+                      }
+                    >
+                      {" "}
+                      {capitalizeEachWord(loan.loanstatus)}
+                    </td>
+                    <td>
+                      <div>
+                        <button
+                          onClick={() => handleShow(loan._id)}
+                          className="btn btn-info text-white"
+                        >
+                          Details
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
           </tbody>
         </Table>
       </div>

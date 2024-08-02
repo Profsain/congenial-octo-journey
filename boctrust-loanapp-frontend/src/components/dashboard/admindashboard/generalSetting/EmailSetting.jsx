@@ -1,6 +1,6 @@
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchSetting } from "../../../../redux/reducers/settingReducer";
 import "../../dashboardcomponents/transferdashboard/Transfer.css";
@@ -20,64 +20,67 @@ const validationSchema = Yup.object().shape({
   smptEncryption: Yup.string().required("SMPT encryption is required"),
 });
 
-
 const EmailSetting = () => {
   const dispatch = useDispatch();
   const settings = useSelector(
     (state) => state.settingReducer?.settings?.settings[0]
   );
   const status = useSelector((state) => state.settingReducer.status);
-
+  const [initialValues, setInitialValues] = useState(null);
   useEffect(() => {
     dispatch(fetchSetting());
   }, [dispatch]);
 
-  const {
-    mailType,
-    fromEmail,
-    fromName,
-    smtpName,
-    smtpPort,
-    smtpUsername,
-    smtpPassword,
-    smtpEncryption,
-  } = settings;
+  useEffect(() => {
+    if (settings) {
+      const {
+        mailType,
+        fromEmail,
+        fromName,
+        smtpName,
+        smtpPort,
+        smtpUsername,
+        smtpPassword,
+        smtpEncryption,
+      } = settings;
 
-  const initialValues = {
-    mailType: mailType || "",
-    fromEmail: fromEmail || "",
-    fromName: fromName || "",
-    smptName: smtpName || "",
-    smptPort: smtpPort || "",
-    smptUsername: smtpUsername || "",
-    smptPassword: smtpPassword || "",
-    smptEncryption: smtpEncryption || "",
+      setInitialValues({
+        mailType: mailType || "",
+        fromEmail: fromEmail || "",
+        fromName: fromName || "",
+        smptName: smtpName || "",
+        smptPort: smtpPort || "",
+        smptUsername: smtpUsername || "",
+        smptPassword: smtpPassword || "",
+        smptEncryption: smtpEncryption || "",
+      });
+    }
+  }, []);
+
+  const handleSubmit = async (values) => {
+    try {
+      // Handle form submission logic here
+      const data = {
+        mailType: values.mailType,
+        fromEmail: values.fromEmail,
+        fromName: values.fromName,
+        smtpName: values.smptName,
+        smtpPort: values.smptPort,
+        smtpUsername: values.smptUsername,
+        smtpPassword: values.smptPassword,
+        smtpEncryption: values.smptEncryption,
+      };
+
+      console.log(data);
+
+      const response = await updateSettings(data);
+      console.log("Settings updated:", response);
+
+      //  resetForm();
+    } catch (error) {
+      console.error("Error updating settings:", error);
+    }
   };
-
-   const handleSubmit = async (values) => {
-     try {
-       // Handle form submission logic here
-       const data = {
-          mailType: values.mailType,
-          fromEmail: values.fromEmail,
-          fromName: values.fromName,
-          smtpName: values.smptName,
-          smtpPort: values.smptPort,
-          smtpUsername: values.smptUsername,
-          smtpPassword: values.smptPassword,
-          smtpEncryption: values.smptEncryption,
-       };
-
-       console.log(data);
-
-       const response = await updateSettings(data);
-       console.log("Settings updated:", response);
-
-       //  resetForm();
-     } catch (error) {
-       console.error("Error updating settings:", error);
-     }
-   };
 
   return (
     <div className="TransContainer">

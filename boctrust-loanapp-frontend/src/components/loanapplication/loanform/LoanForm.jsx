@@ -30,6 +30,7 @@ import { toast } from "react-toastify";
 // toast styles
 import "react-toastify/dist/ReactToastify.css";
 import { calcDaysDiffFromNow } from "../../../../utilities/calcDaysDiff";
+import { fetchAllLoanOfficers } from "../../../redux/reducers/loanOfficerReducer";
 
 // loan form component
 const LoanForm = () => {
@@ -59,6 +60,8 @@ const LoanForm = () => {
   const employers = useSelector(
     (state) => state.employersManagerReducer.employers.employers
   );
+  const { allLoanOfficers } = useSelector((state) => state.loanOfficerReducer);
+  const { loanFirstInfo } = useSelector((state) => state.customerReducer);
 
   // get start data from local storage
   const [careerType, setCareerType] = useState("");
@@ -66,20 +69,30 @@ const LoanForm = () => {
   const [monthlyRepayment, setMonthlyRepayment] = useState("");
   const [product, setProduct] = useState({});
   const [showReconfirmBvn, setShowReconfirmBvn] = useState(false);
-  const [firstStepData, setFirstStepData] = useState({
-    loanAmount: "50000",
-    bvn: "14131321321313",
-    careerType: "government employee",
-    numberOfMonths: "2",
-    loanTotalRepayment: "54000",
-    monthlyRepayment: "27000",
-    loanProduct: "termLoan",
-  });
+  const [firstStepData, setFirstStepData] = useState();
+
+  // Temporarily Update the firstep Data from the redux store
+  useEffect(() => {
+    setFirstStepData(loanFirstInfo);
+  }, [loanFirstInfo]);
+
+  // Temporarily Update the firstep Data from the redux store
+  useEffect(() => {
+    const getData = async () => {
+      try {
+        await dispatch(fetchAllLoanOfficers());
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    getData();
+  }, [dispatch]);
 
   useEffect(() => {
     // set showReconfirmBvn modal after 30 seconds
     const timer = setTimeout(() => {
-      setShowReconfirmBvn(true);
+      setShowReconfirmBvn(false);
     }, 30000);
 
     // Cleanup function to clear the timer
@@ -227,18 +240,21 @@ const LoanForm = () => {
         // set customerEmail
 
         const employer = employers.find(
-          (employer) => employer._id === formValues.employername
+          (employer) => employer._id === formValues.employerId
         );
         // generate customer id
         const customerId = generateCustomerId();
         const formData = new FormData();
         formData.append("customerId", customerId);
-        formData.append("loanamount", formValues.loanamount);
+        formData.append(
+          "loanamount",
+          parseInt(formValues.loanamount.replace(/,/g, ""))
+        );
         formData.append("numberofmonth", formValues.numberofmonth);
         formData.append("loantotalrepayment", loanRepaymentTotal);
         formData.append("monthlyrepayment", monthlyRepayment);
         formData.append("careertype", formValues.careertype);
-        formData.append("loanproduct", product);
+        formData.append("loanproduct", product._id);
         formData.append("loanpurpose", formValues.loanpurpose);
         formData.append("otherpurpose", formValues.otherpurpose);
         formData.append("bvnnumber", formValues.bvnnumber);
@@ -271,7 +287,7 @@ const LoanForm = () => {
           "nkinresidentialaddress",
           formValues.nkinresidentialaddress
         );
-        formData.append("employername", employer);
+        formData.append("employer", employer._id);
         formData.append("otheremployername", formValues.otheremployername);
         formData.append("employeraddress", formValues.employeraddress);
         formData.append("employmentstartdate", formValues.employmentstartdate);
@@ -346,7 +362,9 @@ const LoanForm = () => {
         console.log(res, "res");
       }
     } catch (error) {
+      const errorResponse = await res.json();
       console.log(error);
+      toast.error(errorResponse?.error || "Something Went Wrong");
     }
 
     // setSubmitting(false);
@@ -406,7 +424,7 @@ const LoanForm = () => {
         setStepImg("https://i.imgur.com/DPMDjLy.png");
       } else if (
         step === 2 &&
-        (isFieldValid("employername", ref) ||
+        (isFieldValid("employerId", ref) ||
           isFieldValid("otheremployername", ref)) &&
         isFieldValid("employeraddress", ref) &&
         // Only for Applicants who are non business Owners
@@ -417,8 +435,11 @@ const LoanForm = () => {
         isFieldValid("netmonthlyincome", ref) &&
         isFieldValid("totalannualincome", ref) &&
         isFieldValid("officialemail", ref) &&
-        (employer?.statementRule
+        (employer?.statementRule?.ruleActive
           ? ref.current?.values.uploadbankstatement
+          : true) &&
+        (employer?.employerLetterRule?.ruleActive
+          ? ref.current?.values.employmentletter
           : true)
       ) {
         // checkin the applicaat service duration is >= the madate rule set by the employer and exepting applicats whith no employer madate and bisiness owners
@@ -871,12 +892,12 @@ const LoanForm = () => {
                                     {careerType === "government employee" && (
                                       <SelectField
                                         label="Employer Name"
-                                        name="employername"
+                                        name="employerId"
                                       >
                                         <option value=""></option>
                                         {employers?.map((employer) => {
                                           setEmployerId(
-                                            ref.current?.values.employername
+                                            ref.current?.values.employerId
                                           );
                                           return (
                                             <option
@@ -893,7 +914,7 @@ const LoanForm = () => {
 
                                     {/* type employer name if not in list */}
                                     {(careerType !== "government employee" ||
-                                      values?.employername === "other") && (
+                                      values?.employerId === "other") && (
                                       <TextInput
                                         label={
                                           careerType === "business owner"
@@ -971,7 +992,7 @@ const LoanForm = () => {
                                   ) : null}
                                   {/* Bank Statement and Employement Letter fro government Employeee*/}
                                   <div className="d-flex gap-3">
-                                    {employer?.statementRule ? (
+                                    {employer?.statementRule?.ruleActive ? (
                                       <div className="FileUploadBox ">
                                         <Headline
                                           color="#000"
@@ -988,7 +1009,8 @@ const LoanForm = () => {
                                           }
                                         />
                                       </div>
-                                    ) : employer?.employmentLetterRule ? (
+                                    ) : employer?.employmentLetterRule
+                                        ?.ruleActive ? (
                                       <div className="FileUploadBox ">
                                         <Headline
                                           color="#000"
@@ -1453,11 +1475,21 @@ const LoanForm = () => {
                                         </div>
                                       </div>
                                       {values.haveagent === "yes" && (
-                                        <TextInput
-                                          label="Loan Officer's Name"
-                                          name="agentname"
-                                          type="text"
-                                        />
+                                        <SelectField
+                                          label="Select Loan Officer"
+                                          name="agent"
+                                        >
+                                          <option value=""></option>
+                                          {allLoanOfficers &&
+                                            allLoanOfficers.map((admins) => (
+                                              <option
+                                                key={admins._id}
+                                                value={admins._id}
+                                              >
+                                                {admins.fullName}
+                                              </option>
+                                            ))}
+                                        </SelectField>
                                       )}
                                     </div>
                                     <hr />

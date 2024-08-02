@@ -46,23 +46,30 @@ const SideNavMain = ({ onMenuItemClick }) => {
   const openSubSetting = () => setIsSettingOpen(true);
   const closeSubSetting = () => setIsSettingOpen(false);
 
-  // current login admin user
+  // current login superAdmin user
   const currentUser = useSelector((state) => state.adminAuth.user);
 
   const userRole = currentUser.jobRole;
 
   // role based menu
-  const [admin, setAdmin] = useState("");
+  const [superAdmin, setSuperAdmin] = useState("");
   const [adminRoles, setAdminRoles] = useState([]);
+  const [shouldNotSee, setShouldNotSee] = useState([]);
+
   useEffect(() => {
     if (currentUser) {
       if (currentUser.adminType === "admin" || currentUser.userType === "md") {
         setAdmin("admin");
+        
+      if (currentUser?.userType === "super_admin") {
+        setSuperAdmin("super_admin");
       }
 
       handleAdminRoles(currentUser, setAdminRoles);
+
+      setShouldNotSee(currentUser?.userRole?.shouldNotSee);
     }
-  }, []);
+  }, [currentUser]);
 
   return (
     <div className="NavIcons SideMain FixSideNav">
@@ -70,7 +77,7 @@ const SideNavMain = ({ onMenuItemClick }) => {
         <div className=" LgLogo">
           <img src="images/dlogo.png" alt="boctrust-logo" />
         </div>
-        <p>{userRole}</p>
+        <p className="text-capitalize">{currentUser?.userRole?.label}</p>
       </div>
 
       <div id="dashboard" className="IconBox" onClick={onMenuItemClick}>
@@ -109,7 +116,7 @@ const SideNavMain = ({ onMenuItemClick }) => {
               <li id="customer" onClick={onMenuItemClick}>
                 All Customers
               </li>
-              {admin || adminRoles?.includes("customer_request") ? (
+              {superAdmin || adminRoles?.includes("customer_request") ? (
                 <li id="customerrequest" onClick={onMenuItemClick}>
                   Customer Request
                 </li>
@@ -120,57 +127,52 @@ const SideNavMain = ({ onMenuItemClick }) => {
       </div>
 
       {/* loans menu */}
-      {admin || adminRoles?.includes("my_loan") ? (
-        <div onMouseOver={openSubLoan} onMouseLeave={closeSubLoan}>
-          <div className="IconBox">
-            <img src="images/dmyloan.png" alt="loan" />
-            <p>Loans</p>
-          </div>
-          {isLoanOpen ? (
-            <div className="SubItem">
-              <ul>
-                <li id="myloan" onClick={onMenuItemClick}>
-                  All Loans
-                </li>
-                <li id="pendingloans" onClick={onMenuItemClick}>
-                  Pending Loan
-                </li>
-                <li id="activeloans" onClick={onMenuItemClick}>
-                  Active Loan
-                </li>
-                <li id="loancalculator" onClick={onMenuItemClick}>
-                  Loan Calculator
-                </li>
-                <li id="loanproducts" onClick={onMenuItemClick}>
-                  Loan Products
-                </li>
-                {/* updated */}
-                <li id="loandisbursement" onClick={onMenuItemClick}>
-                  Loan Disbursement
-                </li>
-                <li id="balanceenquiry" onClick={onMenuItemClick}>
-                  Balance Enquiry
-                </li>
-                <li id="checkcustomer" onClick={onMenuItemClick}>
-                  Check Customer
-                </li>
-                <li id="getloan" onClick={onMenuItemClick}>
-                  Get Loan
-                </li>
-                <li id="checkrepayment" onClick={onMenuItemClick}>
-                  Check Repayment
-                </li>
-                <li id="loanstatement" onClick={onMenuItemClick}>
-                  Statement
-                </li>
-                <li id="loanbalance" onClick={onMenuItemClick}>
-                  Loan Balance
-                </li>
-              </ul>
-            </div>
-          ) : null}
+
+      <div onMouseOver={openSubLoan} onMouseLeave={closeSubLoan}>
+        <div className="IconBox">
+          <img src="images/dmyloan.png" alt="loan" />
+          <p>Loans</p>
         </div>
-      ) : null}
+        {isLoanOpen ? (
+          <div className="SubItem">
+            <ul>
+              <li id="myloan" onClick={onMenuItemClick}>
+                All Loans
+              </li>
+              <li id="pendingloans" onClick={onMenuItemClick}>
+                Pending Loan
+              </li>
+              <li id="bookloans" onClick={onMenuItemClick}>
+                Book Loans
+              </li>
+
+              {/* updated */}
+              <li id="loandisbursement" onClick={onMenuItemClick}>
+                Disburse Loans
+              </li>
+              <li id="completedloans" onClick={onMenuItemClick}>
+                Completed Loans
+              </li>
+              <li id="overdueloans" onClick={onMenuItemClick}>
+                Overdue Loans
+              </li>
+              <li id="loanproducts" onClick={onMenuItemClick}>
+                Loan Products
+              </li>
+              <li id="loancalculator" onClick={onMenuItemClick}>
+                Loan Calculator
+              </li>
+              <li id="balanceenquiry" onClick={onMenuItemClick}>
+                Balance Enquiry
+              </li>
+
+              <li id="loanstatement" onClick={onMenuItemClick}>
+                Loan A/C Statement
+              </li>
+            </ul>
+          </div>
+        ) : null}
+      </div>
 
       {/* repayment menu */}
       <div id="repayment" className="IconBox" onClick={onMenuItemClick}>
@@ -242,7 +244,7 @@ const SideNavMain = ({ onMenuItemClick }) => {
               <li id="debitTransactions" onClick={onMenuItemClick}>
                 Debit Transactions
               </li>
-              {admin || adminRoles?.includes("manage_nibss") ? (
+              {superAdmin || adminRoles?.includes("manage_nibss") ? (
                 <li id="collectionsSummary" onClick={onMenuItemClick}>
                   Collections Summary
                 </li>
@@ -250,7 +252,7 @@ const SideNavMain = ({ onMenuItemClick }) => {
               <li id="debitMandates" onClick={onMenuItemClick}>
                 Debit Mandates
               </li>
-              {admin || adminRoles?.includes("manage_nibss") ? (
+              {superAdmin || adminRoles?.includes("manage_nibss") ? (
                 <li id="stopRestartCollections" onClick={onMenuItemClick}>
                   Stop/Restart Collections
                 </li>
@@ -268,7 +270,7 @@ const SideNavMain = ({ onMenuItemClick }) => {
         {isRemitaOpen ? (
           <div className="SubItem">
             <ul>
-              {admin || adminRoles?.includes("get_salary_history") ? (
+              {superAdmin || adminRoles?.includes("get_salary_history") ? (
                 <li id="checksalaryhistory" onClick={onMenuItemClick}>
                   Check Salary History
                 </li>
@@ -284,7 +286,7 @@ const SideNavMain = ({ onMenuItemClick }) => {
               <li id="mandatehistory" onClick={onMenuItemClick}>
                 Mandate History
               </li>
-              {admin || adminRoles?.includes("stop_remita_loan") ? (
+              {superAdmin || adminRoles?.includes("stop_remita_loan") ? (
                 <li id="stopcollections" onClick={onMenuItemClick}>
                   Stop Collections
                 </li>
@@ -294,19 +296,21 @@ const SideNavMain = ({ onMenuItemClick }) => {
         ) : null}
       </div>
 
-      <div id="creditbureau" className="IconBox" onClick={onMenuItemClick}>
-        <img
-          id="creditbureau"
-          onClick={onMenuItemClick}
-          src="images/dreport.png"
-          alt="creditbureau"
-        />
-        <p id="creditbureau" onClick={onMenuItemClick}>
-          Credit Assessment
-        </p>
-      </div>
+      {(superAdmin || !shouldNotSee?.includes("creditAssessment")) && (
+        <div id="creditbureau" className="IconBox" onClick={onMenuItemClick}>
+          <img
+            id="creditbureau"
+            onClick={onMenuItemClick}
+            src="images/dreport.png"
+            alt="creditbureau"
+          />
+          <p id="creditbureau" onClick={onMenuItemClick}>
+            Credit Assessment
+          </p>
+        </div>
+      )}
 
-      {admin || adminRoles?.includes("employer_manager") ? (
+      {superAdmin || !shouldNotSee?.includes("employerManager") ? (
         <div onMouseOver={openSubEmployer} onMouseLeave={closeSubEmployer}>
           <div className="IconBox">
             <img src="images/dmda.png" alt="mdas" />
@@ -336,7 +340,7 @@ const SideNavMain = ({ onMenuItemClick }) => {
         </div>
       ) : null}
 
-      {admin || adminRoles?.includes("kyc_review") ? (
+      {superAdmin || !shouldNotSee?.includes("kycReview") ? (
         <div onMouseOver={openSubKyc} onMouseLeave={closeSubKyc}>
           <div className="IconBox">
             <img src="images/dkyc.png" alt="kyc" />
@@ -363,7 +367,6 @@ const SideNavMain = ({ onMenuItemClick }) => {
           ) : null}
         </div>
       ) : null}
-
       <div onMouseOver={openSubWebManager} onMouseLeave={closeSubWebManager}>
         <div className="IconBox">
           <img src="images/dwebsite.png" alt="webmanager" />
@@ -407,9 +410,39 @@ const SideNavMain = ({ onMenuItemClick }) => {
                 Products Page
               </li>
             </ul>
+      {(superAdmin || !shouldNotSee?.includes("kycReview")) && (
+        <div onMouseOver={openSubWebManager} onMouseLeave={closeSubWebManager}>
+          <div className="IconBox">
+            <img src="images/dwebsite.png" alt="webmanager" />
+            <p>Website Manager</p>
           </div>
-        ) : null}
-      </div>
+
+          {isWebManagerOpen ? (
+            <div className="SubItem">
+              <ul>
+                {/* <li id="website" onClick={onMenuItemClick}>
+        All Pages
+      </li> */}
+                <li id="webmanager" onClick={onMenuItemClick}>
+                  Blogs
+                </li>
+                <li id="contactForm" onClick={onMenuItemClick}>
+                  Contact Form
+                </li>
+                <li id="addwiki" onClick={onMenuItemClick}>
+                  Wikis/FAQs
+                </li>
+                <li id="customerAsk" onClick={onMenuItemClick}>
+                  Customer Enquiry
+                </li>
+                <li id="career" onClick={onMenuItemClick}>
+                  Career
+                </li>
+              </ul>
+            </div>
+          ) : null}
+        </div>
+      )}
 
       {/* <div id="withdrawmethod" className="IconBox" onClick={onMenuItemClick}>
         <img
@@ -423,27 +456,33 @@ const SideNavMain = ({ onMenuItemClick }) => {
         </p>
       </div> */}
 
-      <div onMouseOver={openSubUserManager} onMouseLeave={closeSubUserManager}>
-        <div className="IconBox">
-          <img src="images/dusermanage.png" alt="usermanager" />
-          <p>User Manager</p>
-        </div>
-        {isUserManagerOpen ? (
-          <div className="SubItem">
-            <ul>
-              <li id="allusers" onClick={onMenuItemClick}>
-                All Users
-              </li>
-              <li id="userrole" onClick={onMenuItemClick}>
-                User Roles
-              </li>
-              <li id="accesscontrol" onClick={onMenuItemClick}>
-                Access Control
-              </li>
-            </ul>
+      {(superAdmin || !shouldNotSee?.includes("userManager")) && (
+        <div
+          onMouseOver={openSubUserManager}
+          onMouseLeave={closeSubUserManager}
+        >
+          <div className="IconBox">
+            <img src="images/dusermanage.png" alt="usermanager" />
+            <p>User Manager</p>
           </div>
-        ) : null}
-      </div>
+          {isUserManagerOpen ? (
+            <div className="SubItem">
+              <ul>
+                <li id="allusers" onClick={onMenuItemClick}>
+                  All Users
+                </li>
+                <li id="userrole" onClick={onMenuItemClick}>
+                  User Roles
+                </li>
+                <li id="accesscontrol" onClick={onMenuItemClick}>
+                  Access Control
+                </li>
+              </ul>
+            </div>
+          ) : null}
+        </div>
+      )}
+
       <div onMouseOver={openSubReports} onMouseLeave={closeSubReports}>
         <div className="IconBox">
           <img src="images/dreport.png" alt="report" />
@@ -467,28 +506,30 @@ const SideNavMain = ({ onMenuItemClick }) => {
         ) : null}
       </div>
 
-      <div onMouseOver={openSubSetting} onMouseLeave={closeSubSetting}>
-        <div className="IconBox">
-          <img src="images/dreport.png" alt="report" />
-          <p>Settings</p>
-        </div>
-
-        {isSettingOpen ? (
-          <div className="SubItem">
-            <ul>
-              <li id="general" onClick={onMenuItemClick}>
-                General
-              </li>
-              <li id="email" onClick={onMenuItemClick}>
-                Email
-              </li>
-              <li id="googleanalytics" onClick={onMenuItemClick}>
-                Google Analytics
-              </li>
-            </ul>
+      {(superAdmin || !shouldNotSee?.includes("userManager")) && (
+        <div onMouseOver={openSubSetting} onMouseLeave={closeSubSetting}>
+          <div className="IconBox">
+            <img src="images/dreport.png" alt="report" />
+            <p>Settings</p>
           </div>
-        ) : null}
-      </div>
+
+          {isSettingOpen ? (
+            <div className="SubItem">
+              <ul>
+                <li id="general" onClick={onMenuItemClick}>
+                  General
+                </li>
+                <li id="email" onClick={onMenuItemClick}>
+                  Email
+                </li>
+                <li id="googleanalytics" onClick={onMenuItemClick}>
+                  Google Analytics
+                </li>
+              </ul>
+            </div>
+          ) : null}
+        </div>
+      )}
     </div>
   );
 };

@@ -47,7 +47,7 @@ const validationSchema = Yup.object({
   nkinresidentialaddress: Yup.string().required("Required"),
 
   // employment
-  employername: Yup.string().required("Required"),
+  employerId: Yup.string().required("Required"),
   employeraddress: Yup.string().required("Required"),
   employmentstartdate: Yup.date().required("Required"),
   netmonthlyincome: Yup.number().required("Required"),

@@ -11,6 +11,7 @@ import "react-toastify/dist/ReactToastify.css";
 import PageLoader from "../../shared/PageLoader";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchSingleCustomer } from "../../../../redux/reducers/customerReducer";
+import CheckPaylsipFileUpload from "./molecules/CheckPaySlipInput";
 const apiUrl = import.meta.env.VITE_BASE_URL;
 
 const employerGroup = {
@@ -190,6 +191,7 @@ const PaySlipAnalysis = ({
             </div>
           </div>
         </div>
+        <CheckPaylsipFileUpload selectedCustomer={selectedCustomer} />
 
         {/* step 1 */}
         <div>
@@ -314,28 +316,36 @@ const PaySlipAnalysis = ({
                 <div id="extraDetails"></div>
                 <div className="moreBox pb-4">
                   <div className="d-flex gap-1">
-                    <button
-                      onClick={() => {
-                        const currentFormState = { ...formState };
-                        currentFormState.extraLenders.pop();
+                    {formState?.extraLenders?.length > 0 && (
+                      <button
+                        onClick={() => {
+                          const currentFormState = { ...formState };
+                          currentFormState.extraLenders.pop();
 
-                        setFormState(currentFormState);
-                      }}
-                      className="btn btn-secondary"
-                      type="button"
-                    >
-                      Remove Last
-                    </button>
+                          setFormState(currentFormState);
+                        }}
+                        className="btn btn-secondary"
+                        type="button"
+                      >
+                        Remove Last
+                      </button>
+                    )}
                     <button
                       onClick={() => {
                         // addMoreLenders();
-                        const currentFormState = { ...formState };
-                        currentFormState.extraLenders?.push({
+
+                        const currentFormState = [...formState.extraLenders];
+
+                  
+                        currentFormState?.push({
                           id: Date.now(),
                           ...lenderInit,
                         });
 
-                        setFormState(currentFormState);
+                        setFormState({
+                          ...formState,
+                          extraLenders: currentFormState,
+                        });
                       }}
                       className="btn btn-success"
                       type="button"

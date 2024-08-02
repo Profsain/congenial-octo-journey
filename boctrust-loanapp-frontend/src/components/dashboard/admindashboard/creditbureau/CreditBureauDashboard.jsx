@@ -1,7 +1,6 @@
 /* eslint-disable no-undef */
 import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchAllCustomer } from "../../../../redux/reducers/customerReducer";
 import { Modal, Button } from "react-bootstrap";
 import CreditCheckForm from "./CreditCheckForm";
 import { Table } from "react-bootstrap";
@@ -16,6 +15,9 @@ import useSearch from "../../../../../utilities/useSearchName";
 import useSearchByDate from "../../../../../utilities/useSearchByDate";
 import useSearchByDateRange from "../../../../../utilities/useSearchByDateRange";
 import KycViewDetails from "../kyc/KycViewDetails";
+import { toast } from "react-toastify";
+import { customerApprovalEnum } from "../../../../lib/userRelated";
+import { fetchAllCustomersLoans } from "../../../../redux/reducers/customersLoansReducer";
 
 const styles = {
   btnBox: {
@@ -46,22 +48,22 @@ const styles = {
 };
 
 const CreditBureauDashboard = () => {
-  const [customerId, setCustomerId] = useState("");
+  const [selectedCustomer, setSelectedCustomer] = useState("");
   const [searchCustomer, setSearchCustomer] = useState([]);
   const [showCreditCheckForm, setShowCreditCheckForm] = useState(false);
   const [show, setShow] = useState(false);
   const [showError, setShowError] = useState(false);
 
   const [customerInfo, setCustomerInfo] = useState(null);
+  // current login superAdmin user
+  const currentUser = useSelector((state) => state.adminAuth.user);
 
   // fetch all customer
   const dispatch = useDispatch();
   const customers = useSelector(
-    (state) => state.customerReducer.customers.customer
+    (state) => state.customersLoansReducer.customersAndLoans
   );
-  const { customerApprovalEnum } = useSelector(
-    (state) => state.customerReducer
-  );
+
   const status = useSelector((state) => state.customerReducer.status);
 
   // get current login admin
@@ -73,7 +75,10 @@ const CreditBureauDashboard = () => {
   }, [admin, showCreditCheckForm]);
 
   useEffect(() => {
-    dispatch(fetchAllCustomer());
+    const getData = async () => {
+      await dispatch(fetchAllCustomersLoans());
+    };
+    getData();
   }, [dispatch]);
 
   // handle search by
@@ -91,6 +96,10 @@ const CreditBureauDashboard = () => {
     setSearchCustomer(filteredData);
   }, [searchTerm, filteredData]);
 
+  useEffect(() => {
+    setSearchCustomer(customers);
+  }, [customers]);
+
   // handle search by date
   const { filteredDateData } = useSearchByDate(customers, "createdAt");
   const searchByDate = () => {
@@ -103,7 +112,7 @@ const CreditBureauDashboard = () => {
       fromDate: "",
       toDate: "",
     });
-    dispatch(fetchAllCustomer());
+    dispatch(fetchAllCustomersLoans());
     setSearchCustomer(customers);
   };
 
@@ -125,6 +134,7 @@ const CreditBureauDashboard = () => {
 
   const filterCustomers = () => {
     if (admin.role === "credit analyst") {
+      console.log(searchCustomer, "searchCustomer")
       const filteredCustomers = searchCustomer?.filter((customer) => {
         return (
           customer.creditCheck.assignment.isCreditAnalystAssigned === false ||
@@ -148,7 +158,8 @@ const CreditBureauDashboard = () => {
 
   // handle credit check start btn
   const handleStartCheck = (customer) => {
-    setCustomerId(customer._id);
+    setSelectedCustomer(customer);
+
     if (!customer.creditCheck.assignment.isCreditAnalystAssigned) {
       setShow(true);
     } else {
@@ -159,8 +170,8 @@ const CreditBureauDashboard = () => {
   // handle cancel check
   const handleCancelCheck = () => {
     setShowCreditCheckForm(false);
-    setCustomerId("");
-    dispatch(fetchAllCustomer());
+    setSelectedCustomer("");
+    dispatch(fetchAllCustomersLoans());
   };
 
   useEffect(() => {
@@ -171,24 +182,41 @@ const CreditBureauDashboard = () => {
   const assignCustomer = async () => {
     const apiUrl = import.meta.env.VITE_BASE_URL;
 
-    await fetch(`${apiUrl}/api/updatecustomer/assignto/${customerId}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        creditAnalyst: adminName,
-        isCreditAnalystAssigned: true,
-      }),
-    });
+    await fetch(
+      `${apiUrl}/api/updatecustomer/assignto/${selectedCustomer._id}`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          creditAnalyst: adminName,
+          isCreditAnalystAssigned: true,
+        }),
+      }
+    );
 
-    dispatch(fetchAllCustomer());
+    await dispatch(fetchAllCustomersLoans());
   };
 
-  const handleProceed = () => {
-    assignCustomer(); // assign customer to credit analyst
-    setShow(false);
-    setShowCreditCheckForm(true);
+  const handleProceed = async () => {
+    try {
+      const res = await assignCustomer(); // assign customer to credit analyst
+      console.log(res, "res");
+
+      setShow(false);
+      setShowCreditCheckForm(true);
+    } catch (error) {
+      console.log(error);
+      toast.error();
+    }
+  };
+
+  const checkViewPermissions = (userTypes) => {
+    if (userTypes.includes(currentUser.userRole.value)) {
+      return true;
+    }
+    return false;
   };
 
   const handleClose = () => {
@@ -229,9 +257,16 @@ const CreditBureauDashboard = () => {
                     <th>Loan Requested</th>
                     <th>Review</th>
                     <th>Assigned</th>
-                    <th>Credit Check</th>
+                    <th>Analyst Check</th>
+                    {currentUser.userRole.can.includes(
+                      "headOfCreditApproval"
+                    ) && <th>HOC Approval</th>}
+                    {currentUser.userRole.can.includes("cooApproval") && (
+                      <th>COO Approval</th>
+                    )}
                   </tr>
                 </thead>
+
                 <tbody>
                   {/* show no record if no customer is available */}
                   {filteredCustomersData.length === 0 && (
@@ -243,19 +278,19 @@ const CreditBureauDashboard = () => {
                   )}
                   {filteredCustomersData?.map((customer) => (
                     <tr key={customer._id}>
-                      <td>{customer.customerId}</td>
+                      <td>{customer?.customerId}</td>
                       <td>
                         {customer.firstname} {customer.lastname}
                       </td>
-                      {customer.employername ? (
-                        <td>{customer.employername}</td>
+                      {customer.employer?.employersName ? (
+                        <td>{customer.employer?.employersName}</td>
                       ) : (
                         <td>N/A</td>
                       )}
 
-                      <td>N{customer.loanamount}</td>
+                      <td>N{customer.loan?.loanamount}</td>
                       <td
-                        className="cursor-pointer"
+                        className="cursor-pointer text-underline"
                         onClick={() => {
                           setCustomerInfo(customer);
                         }}
@@ -287,14 +322,17 @@ const CreditBureauDashboard = () => {
                                   customer?.creditCheck.assignment
                                     .creditAnalyst === admin.fullName
                                 ) {
-                                  setCustomerId(customer._id);
+                                  setSelectedCustomer(customer);
                                   setShowCreditCheckForm(true);
                                 } else {
                                   handleStartCheck(customer);
                                 }
                               }}
                             >
-                              Start
+                              {customer?.creditCheck.assignment.creditAnalyst ==
+                              admin.fullName
+                                ? "Continue..."
+                                : "Start"}
                             </BocButton>
                           </div>
                         </td>
@@ -307,11 +345,79 @@ const CreditBureauDashboard = () => {
                               width="80px"
                               margin="0 4px"
                               bgcolor="#028a0f"
-                              func={() => handleStartCheck(customer._id)}
+                              func={() => {
+                                if (
+                                  checkViewPermissions([
+                                    "credit_analyst",
+                                    "super_admin",
+                                  ])
+                                ) {
+                                  setSelectedCustomer(customer);
+                                  setShowCreditCheckForm(true);
+                                }
+                              }}
                             >
-                              Done
+                              {
+                                customer?.creditCheck?.decisionSummary
+                                  ?.creditOfficerApprovalStatus
+                              }
                             </BocButton>
                           </div>
+                        </td>
+                      )}
+
+                      {currentUser.userRole.can.includes(
+                        "headOfCreditApproval"
+                      ) && (
+                        <td>
+                          <BocButton
+                            bradius="12px"
+                            fontSize="14px"
+                            width="80px"
+                            margin="0 4px"
+                            bgcolor={
+                              customer?.creditCheck?.decisionSummary
+                                ?.headOfCreditApprovalStatus ===
+                              customerApprovalEnum.approved
+                                ? "#028a0f"
+                                : "rgb(251 191 36)"
+                            }
+                            func={() => {
+                              setSelectedCustomer(customer);
+                              setShowCreditCheckForm(true);
+                            }}
+                          >
+                            {
+                              customer?.creditCheck?.decisionSummary
+                                ?.headOfCreditApprovalStatus
+                            }
+                          </BocButton>
+                        </td>
+                      )}
+                      {currentUser.userRole.can.includes("cooApproval") && (
+                        <td>
+                          <BocButton
+                            bradius="12px"
+                            fontSize="14px"
+                            width="80px"
+                            margin="0 4px"
+                            bgcolor={
+                              customer?.creditCheck?.decisionSummary
+                                ?.cooApprovalStatus ===
+                              customerApprovalEnum.approved
+                                ? "#028a0f"
+                                : "rgb(251 191 36)"
+                            }
+                            func={() => {
+                              setSelectedCustomer(customer);
+                              setShowCreditCheckForm(true);
+                            }}
+                          >
+                            {
+                              customer?.creditCheck?.decisionSummary
+                                ?.cooApprovalStatus
+                            }
+                          </BocButton>
                         </td>
                       )}
                     </tr>
@@ -327,7 +433,13 @@ const CreditBureauDashboard = () => {
           {/* credit check form  */}
           <CreditCheckForm
             setShowCreditCheckForm={setShowCreditCheckForm}
-            customerId={customerId}
+            customerId={selectedCustomer?._id}
+            initFormStep={
+              selectedCustomer?.creditCheck?.decisionSummary
+                ?.creditOfficerApprovalStatus === customerApprovalEnum.approved
+                ? 3
+                : 0
+            }
           />
           <div className="  d-flex justify-content-center">
             <button
