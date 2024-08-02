@@ -1,5 +1,6 @@
 import PropTypes from "prop-types";
 import { Card, Button, Stack } from "react-bootstrap";
+import { useEffect, useState } from "react";
 import "./Career.css";
 
 const VacancyCard = ({
@@ -11,6 +12,18 @@ const VacancyCard = ({
   deadline,
   func,
 }) => {
+  const [isDeadlineReached, setIsDeadlineReached] = useState(false);
+
+  useEffect(() => {
+    const checkDeadline = () => {
+      const currentDate = new Date();
+      const deadlineDate = new Date(deadline);
+      setIsDeadlineReached(currentDate >= deadlineDate);
+    };
+
+    checkDeadline();
+  }, [deadline]);
+
   return (
     <Card style={{ width: "22rem", padding: "6px", margin: "6px" }}>
       <Card.Img
@@ -31,14 +44,28 @@ const VacancyCard = ({
           </div>
         </Stack>
 
-        <Button
-          id={id}
-          variant="primary my-3"
-          style={{ backgroudColor: "#145088" }}
-          onClick={func}
-        >
-          View Details
-        </Button>
+        {isDeadlineReached ? (
+          <Button
+            variant="secondary my-3"
+            style={{
+              backgroundColor: "#145088",
+              opacity: 0.5,
+              cursor: "not-allowed",
+            }}
+            disabled
+          >
+            Application Closed
+          </Button>
+        ) : (
+          <Button
+            id={id}
+            variant="primary my-3"
+            style={{ backgroundColor: "#145088" }}
+            onClick={func}
+          >
+            View Details
+          </Button>
+        )}
       </Card.Body>
     </Card>
   );

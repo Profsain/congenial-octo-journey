@@ -47,7 +47,7 @@
 }
 
 .InquiryForm {
-    display: none;
+    display: block;
     width: 100% !important;
     margin: 0 auto;
     padding: 60px;

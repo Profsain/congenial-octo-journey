@@ -49,6 +49,8 @@ const SideNavMain = ({ onMenuItemClick }) => {
   // current login superAdmin user
   const currentUser = useSelector((state) => state.adminAuth.user);
 
+  const userRole = currentUser.jobRole;
+
   // role based menu
   const [superAdmin, setSuperAdmin] = useState("");
   const [adminRoles, setAdminRoles] = useState([]);
@@ -56,6 +58,9 @@ const SideNavMain = ({ onMenuItemClick }) => {
 
   useEffect(() => {
     if (currentUser) {
+      if (currentUser.adminType === "admin" || currentUser.userType === "md") {
+        setAdmin("admin");
+        
       if (currentUser?.userType === "super_admin") {
         setSuperAdmin("super_admin");
       }
@@ -388,6 +393,9 @@ const SideNavMain = ({ onMenuItemClick }) => {
               </li>
               <li id="career" onClick={onMenuItemClick}>
                 Career
+              </li>
+              <li id="job-applicants" onClick={onMenuItemClick}>
+                Job Applications
               </li>
               <li id="homeEditor" onClick={onMenuItemClick}>
                 Home Page

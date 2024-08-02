@@ -200,6 +200,73 @@ const productsSeedData = [
       "Securities: (Motor vehicle/ C of O of any landed property/ Stock hypothecation)",
       "Tenure: maximum of 12 months"
     ]
+  },
+  {
+    category: "advisory",
+    productName: "Small Business Advisory",
+    description: "At Boctrust, We understand small business is the backbone of the economy, hence, our commitment to their growth and expansion, and investment in sustaining their development.  Our aim is to help our clients achieve their business goals from their present state to their desired state through.",
+    image: "images/products/bis2.jpeg",
+    benefits: [
+      "Strategic direction and improved decision-making",
+        "Enhanced financial performance and profitability",
+        "Accelerated business growth and market expansion",
+        "Reduced risks and avoidance of common pitfalls",
+        "Professional development and mentoring support",
+        "Customized solutions for individual business needs",
+        "Increased competitiveness and market positioning",
+        "Peace of mind with trusted guidance and support"
+    ],
+    features: [
+      "Expert guidance across various business areas",
+        "Assistance with business planning, financial analysis, and market research",
+        "Support in risk management and operational efficiency",
+        "Access to networks and resources for growth opportunities"
+    ]
+  },
+  {
+    category: "advisory",
+    productName: "Micro Insurance Advisory",
+    description: "Every business needs protection and thus the need to be secured through appropriate insurance products. At BOCTRUST Microfinance, we are committed to provide timely advisory services on Micro-insurance policies. With Micro-Insurance, low-income earners are protected against specific perils in exchange for regular premium payments proportionate to the likelihood and cost of the risk involved. Thus, with us, customers are always rest assured of the best insurance options required to protect their businesses.",
+    image: "images/products/bis3.jpeg",
+    benefits: [
+      "Access to affordable insurance options tailored for low-income individuals",
+        "Protection against unforeseen risks and financial losses",
+        "Guidance in selecting appropriate micro insurance products",
+        "Improved understanding of insurance terms and coverage",
+        "Assistance in filing claims and navigating the insurance process"
+    ],
+    features: [
+      "Expert advice on micro insurance products and providers",
+        "Evaluation of individual needs and risk profiles",
+        "Education on insurance principles and policies",
+        "Assistance in determining appropriate coverage levels",
+        "Support in comparing and selecting micro insurance plans",
+        "Help in understanding policy terms, conditions, and exclusions",
+        "Claims assistance and support during the claims settlement process"
+    ]
+  },
+  {
+    category: "advisory",
+    productName: "Financial Advisory",
+    description: "Our expertise is anchored on our extensive business knowledge and technical know-how. We help our customers with focus on strategic, operational, financial and capital needs of their businesses. We provide advisory services on the full spectrum of financial and transactional challenges faced by SMEs which may hinder their business performance.",
+    image: "images/products/bis1.png",
+    benefits: [
+      "Expert guidance for personalized financial planning and wealth management",
+        "Assistance in setting and achieving financial goals",
+        "Improved understanding of investment options and risk management",
+        "Objective analysis and recommendations based on individual financial circumstances",
+        "Help in optimizing tax strategies and maximizing returns",
+        "Peace of mind and confidence in making informed financial decisions"
+    ],
+    features: [
+      "Comprehensive financial assessment and analysis",
+        "Customized financial planning and investment strategies",
+        "Regular monitoring and adjustment of financial plans",
+        "Access to a wide range of investment products and opportunities",
+        "Retirement planning and pension advice",
+        "Estate planning and wealth transfer guidance",
+        "Ongoing support and advice from qualified financial professionals"
+    ]
   }
 ];
 

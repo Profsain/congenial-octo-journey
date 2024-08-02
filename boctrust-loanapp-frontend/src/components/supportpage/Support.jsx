@@ -107,6 +107,7 @@ const Support = () => {
   // component state
   const [firstFaqs, setFirstFaqs] = useState(currentFaqs);
   const [searchTerm, setSearchTerm] = useState("");
+  const [showForm, setShowForm] = useState(false);
 
   //    create object of faqs, key is category and value is array of object question and answer
   const faqsByCategory = faqs.reduce((acc, faq) => {
@@ -121,6 +122,7 @@ const Support = () => {
 
   // handle faq data change on category btn click
   const handleFaqChange = (category) => {
+    setShowForm(false);
     const currentFaqs = faqsByCategory[category];
     setFirstFaqs(currentFaqs);
     // add active class to the clicked btn
@@ -132,6 +134,12 @@ const Support = () => {
     currentBtn.classList.add("ActiveCategory");
   };
 
+  // open inquiry form
+  const handleOpenFormBtn = () => {
+    // toggle showForm
+    setShowForm(!showForm);
+  }
+
   // handle search term change
   const handleSearch = (e) => {
     setSearchTerm(e.target.value);
@@ -141,11 +149,6 @@ const Support = () => {
     setFirstFaqs(currentFaqs);
   };
 
-  // hide and show inquiry form
-  const handleInquiry = () => {
-    const inquiryForm = document.querySelector(".InquiryForm");
-    inquiryForm.classList.toggle("ShowInquiryForm");
-  };
 
   return (
     <>
@@ -175,16 +178,20 @@ const Support = () => {
                 </button>
               </div>
             ))}
+
+            <div className="col-md-2 col-sm-4 my-1">
+              <Button variant="outline-warning" onClick={handleOpenFormBtn}>
+                Send as Inquiry
+              </Button>
+            </div>
           </div>
 
           <Divider />
           {/* faqs */}
-          {firstFaqs.length === 0 ? (
+          {firstFaqs.length === 0 || showForm ? (
             <div className="NoResult">
               <h3 className="text-center">No results found</h3>
-              <Button variant="outline-warning" onClick={handleInquiry}>
-                Send as Inquiry
-              </Button>
+              <p>Fill the form below and our customer support team will get back to you within 48 hours</p>
 
               {/* inquiry form */}
               <div className="InquiryForm">
@@ -231,12 +238,12 @@ const Support = () => {
                     Submit
                   </Button>
                 </Form>
-                <p style={{textAlign: "center"}}>{ message}</p>
+                <p style={{ textAlign: "center" }}>{message}</p>
               </div>
             </div>
           ) : (
-              <div>
-                {status === "loading" && <PageLoader />}
+            <div>
+              {status === "loading" && <PageLoader />}
               {firstFaqs.map(({ id, question, answer }) => (
                 <Accordion key={id} defaultActiveKey="0" flush>
                   <Accordion.Item

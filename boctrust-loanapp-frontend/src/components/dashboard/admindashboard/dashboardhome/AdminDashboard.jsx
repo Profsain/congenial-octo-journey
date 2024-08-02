@@ -53,6 +53,7 @@ import LoanDisbursement from "../loan/LoanDisbursement";
 import BalanceEnquiry from "../loan/BalanceEnquiry";
 import LoanStatement from "../loan/LoanStatement";
 import PostJobs from "../website/PostJobs";
+import JobApplicationsList from "../website/JobApplicationsList";
 import GeneralSettings from "../generalSetting/GeneralSettings";
 import EmailSetting from "../generalSetting/EmailSetting";
 import GoogleAnalytics from "../generalSetting/GoogleAnalytics";
@@ -241,6 +242,9 @@ const AdminDashboard = () => {
       case "career":
         setCurrentTitle("Careers/Jobs");
         break;
+      case "job-applicants":
+        setCurrentTitle("Job Applications List");
+        break;
       case "contactForm":
         setCurrentTitle("Contact Us Record");
         break;
@@ -403,6 +407,8 @@ const AdminDashboard = () => {
         return <CustomerAsk />;
       case "career":
         return <PostJobs />;
+      case "job-applicants":
+        return <JobApplicationsList />;
       case "homeEditor":
         return <HomeEditor />;
       case "aboutEditor":

@@ -10,7 +10,7 @@ const Calculator = () => {
 
   // calculate interest rate
   useEffect(() => {
-    const rate = interestRate(amount, days, 8);
+    const rate = interestRate(amount, days, 4);
     setResult(rate);
   }, [amount, days]);
   

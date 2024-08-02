@@ -35,6 +35,7 @@ import LoanForm from "./components/loanapplication/loanform/LoanForm";
 import Login from "./components/dashboard/login/Login";
 import PasswordReset from "./components/dashboard/login/PasswordReset";
 import BaseLayout from "./layouts/BaseLayout";
+import JobApplicationForm from "./components/careerpage/JobApplicationForm";
 import { ToastContainer } from "react-toastify";
 
 // toast styles
@@ -82,6 +83,7 @@ function App() {
           <Route path="/contact" element={<Contact />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/careers" element={<Career />} />
+          <Route path="/jobs-application" element={<JobApplicationForm />} />
 
           {/* terms and conditions */}
           <Route path="/terms" element={<TermsCondition />} />

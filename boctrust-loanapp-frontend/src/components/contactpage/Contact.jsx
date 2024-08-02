@@ -1,4 +1,7 @@
 import { useState, useEffect } from "react";
+import sendEmail from "../../../utilities/sendEmail";
+import EmailTemplate from "../shared/EmailTemplate";
+import ReactDOMServer from "react-dom/server";
 // animation library
 import AOS from "aos";
 import "aos/dist/aos.css";
@@ -49,7 +52,7 @@ const Contact = () => {
   const handleChange = (e) => {
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value
+      [e.target.name]: e.target.value,
     });
   };
 
@@ -66,15 +69,13 @@ const Contact = () => {
     }
   };
 
-
   // Function to count words in a string
   const wordCount = (text) => {
     const words = text.trim().split(/\s+/);
-    setWords(words.length)
+    setWords(words.length);
     return words.length;
   };
 
-  
   const clearField = () => {
     setFormData({
       fullName: "",
@@ -100,13 +101,37 @@ const Contact = () => {
       message,
     };
 
-    await fetch(`${apiUrl}/api/contact/contacts`, {
+    const response = await fetch(`${apiUrl}/api/contact/contacts`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify(contact),
     });
+
+    if (response.ok) {
+      // send form to email
+      const emailTemplate = ReactDOMServer.renderToStaticMarkup(
+        <EmailTemplate
+          firstName="Boctrust Team"
+          content={`
+            Inquiry from: ${fullName}
+            Phone Number: ${phoneNumber}
+            Email: ${email}
+            Topic: ${subject}
+            
+            Message: ${message}.`}
+        />
+      );
+
+      const option = {
+        email: "enquiries@boctrustmfb.com",
+        subject: "Customer Inquiry from Boctrust MFB",
+        html: emailTemplate,
+      };
+
+      sendEmail(option);
+    }
 
     clearField();
     // set notification messgae
@@ -223,7 +248,9 @@ const Contact = () => {
                     placeholder="Type here"
                     required
                   />
-                  <p style={{fontSize: "12px", padding: "6px"}}>Words { words} of 150</p>
+                  <p style={{ fontSize: "12px", padding: "6px" }}>
+                    Words {words} of 150
+                  </p>
                 </Form.Group>
 
                 <Button

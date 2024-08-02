@@ -4,7 +4,8 @@ import { Button, Modal } from "react-bootstrap";
 import "./Career.css";
 
 const BoxModel = (props) => {
-  const { jobtitle, description, deadline, dateposted } = props.vacancy;
+  const { jobtitle, description, deadline, dateposted } =
+    props.vacancy;
 
   return (
     <Modal
@@ -23,10 +24,7 @@ const BoxModel = (props) => {
         <p>{description}</p>
       </Modal.Body>
       <Modal.Footer>
-        <Button
-          className="BtnApply"
-          onClick={() => alert("Application form under construction")}
-        >
+        <Button className="BtnApply" onClick={props.handleApply}>
           Start your Application
         </Button>
         <Button className="BtnClose" onClick={props.onHide}>
@@ -40,6 +38,7 @@ const BoxModel = (props) => {
 BoxModel.propTypes = {
   onHide: PropTypes.func,
   vacancy: PropTypes.object,
+  handleApply: PropTypes.func,
 };
 
 export default BoxModel;
