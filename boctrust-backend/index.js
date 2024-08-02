@@ -140,7 +140,7 @@ mongoose
 
         // career routes
         app.use('/api/career', career);
-        app.use('./api/job-application', jobApplicationRoutes);
+        app.use('/api/job-application', jobApplicationRoutes);
 
         // settings routes
         app.use('/api/settings', settings);
