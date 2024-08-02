@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import {useNavigate} from "react-router-dom";
 // animation library
 import AOS from "aos";
 import "aos/dist/aos.css";
@@ -16,6 +17,7 @@ import BoxModel from "./BoxModel";
 
 const Career = () => {
   const [key, setKey] = useState("joinus");
+  const navigate = useNavigate();
 
   useEffect(() => {
     AOS.init({
@@ -33,10 +35,14 @@ const Career = () => {
 
   const [vacancies, setVacancies] = useState([]);
   useEffect(() => {
-    setVacancies(careers);
+    if (careers && careers.length > 0) {
+      const sortedVacancies = careers
+        .slice()
+        .sort((a, b) => new Date(b.dateposted) - new Date(a.dateposted));
+      setVacancies(sortedVacancies);
+    }
   }, [careers]);
 
-  console.log("Jobs", vacancies)
   // search function
   const handleJobSearch = (e) => {
     const keyword = e.target.value;
@@ -65,6 +71,14 @@ const Career = () => {
     getVacancy(jobId);
     setModalShow(true);
   };
+
+  const handleJobApplication = () => {
+    // set modal show to false
+    setModalShow(false);
+
+    // navigate to job-application page and pass the singleVacancy as props
+    navigate("/jobs-application", { state: { vacancy: singleVacancy } });
+  }
 
   return (
     <>
@@ -556,6 +570,7 @@ const Career = () => {
         vacancy={singleVacancy}
         show={modalShow}
         onHide={() => setModalShow(false)}
+        handleApply={handleJobApplication}
       />
     </>
   );
