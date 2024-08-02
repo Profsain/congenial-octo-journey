@@ -391,6 +391,9 @@ const SideNavMain = ({ onMenuItemClick }) => {
               <li id="career" onClick={onMenuItemClick}>
                 Career
               </li>
+              <li id="job-applicants" onClick={onMenuItemClick}>
+                Job Applications
+              </li>
               <li id="homeEditor" onClick={onMenuItemClick}>
                 Home Page
               </li>

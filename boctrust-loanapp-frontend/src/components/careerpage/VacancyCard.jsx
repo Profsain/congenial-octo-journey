@@ -18,7 +18,7 @@ const VacancyCard = ({
     const checkDeadline = () => {
       const currentDate = new Date();
       const deadlineDate = new Date(deadline);
-      setIsDeadlineReached(currentDate <= deadlineDate);
+      setIsDeadlineReached(currentDate >= deadlineDate);
     };
 
     checkDeadline();
