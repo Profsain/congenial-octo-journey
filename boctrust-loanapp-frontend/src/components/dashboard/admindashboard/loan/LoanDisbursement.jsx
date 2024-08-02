@@ -96,35 +96,6 @@ const LoanDisbursement = () => {
     );
   };
 
-  // const handleApproval = async (id) => {
-  //   setProcessing(true);
-  //   // process loan approval
-  //   const loan = filteredCustomers.find((customer) => customer._id === id);
-  //   setLoanObj(loan);
-  //   // create loan and disburse in bankone
-  //   const newDisbursement = await fetch(`${apiUrl}/api/bankone/createLoan`, {
-  //     method: "POST",
-  //     headers: { "Content-Type": "application/json" },
-  //     body: JSON.stringify(loanObj),
-  //   });
-  //   const disbursedData = await newDisbursement.json;
-
-  //   // check if disbursement is successful and
-  //   // update loan status to disbursed
-  //   // update isProcessed to true
-  //   console.log("response", newDisbursement);
-  //   if (newDisbursement.ok) {
-  //     updateLoanStatus(id, "approved");
-  //   }
-  //   setTimeout(() => {
-  //     setProcessing(false);
-  //   }, 5000);
-  //   console.log("Disbursement", disbursedData);
-  //   dispatch(fetchAllCustomer());
-  // };
-
-  // handle loan rejection
-
   const handleApproval = async (id) => {
     setProcessing(true);
 

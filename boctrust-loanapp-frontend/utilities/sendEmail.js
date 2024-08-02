@@ -3,7 +3,6 @@ const sendEmail = async (options) => {
 
   const { email, subject, html } = options;
 
-  console.log(email, subject, html, " email, subject, html");
 
   const response = await fetch(`${apiUrl}/api/email/send-email`, {
     method: "POST",
