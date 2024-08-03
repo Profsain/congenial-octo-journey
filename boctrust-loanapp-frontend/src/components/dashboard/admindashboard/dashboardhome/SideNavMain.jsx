@@ -60,7 +60,8 @@ const SideNavMain = ({ onMenuItemClick }) => {
     if (currentUser) {
       if (currentUser.adminType === "admin" || currentUser.userType === "md") {
         setAdmin("admin");
-        
+      }
+      
       if (currentUser?.userType === "super_admin") {
         setSuperAdmin("super_admin");
       }
