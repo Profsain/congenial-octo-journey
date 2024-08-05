@@ -31,6 +31,7 @@ const LoanHome = () => {
     setStartObject({});
   };
 
+
   return (
     <>
       {isOpened ? (
@@ -76,13 +77,7 @@ const LoanHome = () => {
                       text="How much do you need?"
                     />
                     <img src="images/naira.png" alt="" className="NairaIcon" />
-                    {/* <input
-                      className="Field"
-                      id="loanamount"
-                      type="text"
-                      value={Number(formik.values.loanamount).toLocaleString()}
-                      {...formik.getFieldProps("loanamount")}
-                    /> */}
+
                     <input
                       className="Field"
                       id="loanamount"

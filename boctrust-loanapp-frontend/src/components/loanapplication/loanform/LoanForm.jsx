@@ -30,9 +30,18 @@ import { toast } from "react-toastify";
 // toast styles
 import "react-toastify/dist/ReactToastify.css";
 import { calcDaysDiffFromNow } from "../../../../utilities/calcDaysDiff";
+import PhotocaptureStatic from "./photocapture/PhotocaptureStatic";
 
 // loan form component
 const LoanForm = () => {
+
+   // open photo capture fix code start
+  const [openCapture, setOpenCapture] = useState(false);
+  const handleOpenCapture = () => {
+    setOpenCapture(true);
+  };
+  // capture fix code end
+  
   // Function to initialize the bvn details extraction after redirect to clallback url
   const initializeApp = () => {
     const urlSearchParams = new URLSearchParams(window.location.search);
@@ -1492,7 +1501,9 @@ const LoanForm = () => {
                                       text="Confirm your Identity"
                                     />
                                     <div id="CapturePhoto">
-                                      <PhotoCapture func={setCaptureImg} />
+                                      {/* update fix */}
+                                      {openCapture ? (<PhotoCapture func={setCaptureImg} />) : (<PhotocaptureStatic func={handleOpenCapture} />)}
+                                      
                                     </div>
                                     <Headline
                                       fontSize="16px"
