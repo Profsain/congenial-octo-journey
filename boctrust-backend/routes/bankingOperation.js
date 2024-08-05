@@ -5,6 +5,7 @@ const router = express.Router();
 // add token to environment variable
 const token = process.env.BANKONE_TOKEN;
 const baseUrl = "https://api.mybankone.com";
+// const baseUrl = "https://staging.mybankone.com";
 const mfbcode = "100579";
 
 // Create customer account endpoint (Done)
@@ -270,27 +271,6 @@ router.get("/getCustomerById/:customerId", (req, res) => {
     });
 });
 
-// get all commercial bank
-router.get("/getAllCommercialBank", async (req, res) => {
-  const options = { method: "GET", headers: { accept: "application/json" } };
-
-  try {
-    const response = await fetch(
-      `${baseUrl}/ThirdPartyAPIService/APIService/BillsPayment/GetCommercialBanks/${token}`,
-      options
-    );
-
-    const result = await response.json();
-    res.status(200).json({
-      message: "All banks fetched successfully",
-      data: result,
-    });
-  } catch (error) {
-    console.log(error);
-    throw new Error(`HTTP error! BankOne get all banks failed. Status: ${500}`);
-  }
-});
-
 // interbank transfer endpoint
 router.post("/interbankTransfer", (req, res) => {
   // Define the interbank transfer request payload here
@@ -486,5 +466,39 @@ router.get(
     }
   }
 );
+
+router.get("/commercialbanks", async (req, res) => {
+  try {
+    // Construct the URL with the provided parameters
+    const apiUrl = `${baseUrl}/ThirdPartyAPIService/APIService/BillsPayment/GetCommercialBanks/${token}`;
+
+    const options = {
+      method: "GET",
+      headers: {
+        accept: "application/json",
+      },
+    };
+
+    const response = await fetch(apiUrl, options);
+
+    if (!response) {
+      console.log("server error");
+      throw new Error(response);
+    }
+
+    // Check content-type header to ensure the response is JSON
+    const contentType = response.headers.get("content-type");
+    if (!contentType || !contentType.includes("application/json")) {
+      throw new Error("Unexpected response format. Expected JSON.");
+    }
+
+    const data = await response.json();
+
+    res.json(data); // Send the response to the client
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: err }); // Handle errors and send a response to the client
+  }
+});
 
 module.exports = router;

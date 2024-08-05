@@ -141,6 +141,26 @@ router.post("/login", async (req, res) => {
   }
 });
 
+router.post("/checkValidEmail", async (req, res) => {
+  try {
+    const customerExist = await CustomerModel.findOne({
+      email: req.body.email,
+    });
+    if (customerExist) {
+      res.status(400).json({
+        error: "Email Already Exist",
+      });
+    } else {
+      res.status(200).json({
+        message: "Email is Valid",
+      });
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: "Unable to fetch customer" });
+  }
+});
+
 // Read all customer
 const baseUrl = process.env.BASE_URL;
 
@@ -199,7 +219,6 @@ router.get("/customer/:customerId", async (req, res) => {
     res.status(500).json({ error: "Unable to fetch customer" });
   }
 });
-
 
 // Update a customer by ID
 router.put("/customer/:customerId", async (req, res) => {

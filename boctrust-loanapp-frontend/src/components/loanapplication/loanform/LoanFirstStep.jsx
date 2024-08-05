@@ -15,13 +15,13 @@ import "./Form.css";
 import calculatorfunc from "../../shared/calculatorfunc";
 
 // bvn verification function
-// import { bvnVerification } from "./bvnVerification";
+import { bvnVerification } from "./bvnVerification";
 import { ToastContainer, toast } from "react-toastify";
 
 // toast styles
 import "react-toastify/dist/ReactToastify.css";
-import { useNavigate } from "react-router-dom";
-import { updateCustomerStateValues } from "../../../redux/reducers/customerReducer";
+// import { useNavigate } from "react-router-dom";
+// import { updateCustomerStateValues } from "../../../redux/reducers/customerReducer";
 
 // loan form component
 const LoanFirstStep = ({ data }) => {
@@ -48,7 +48,7 @@ const LoanFirstStep = ({ data }) => {
     (state) => state.productReducer.products.products
   );
 
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
 
   useEffect(() => {
     dispatch(fetchProduct());
@@ -149,20 +149,20 @@ const LoanFirstStep = ({ data }) => {
     });
 
     // Store the Information In Redux Store Instead of DB
-    dispatch(
-      updateCustomerStateValues({
-        name: "loanFirstInfo",
-        value: {
-          bvn,
-          loanAmount: loanamount,
-          careerType: careertype,
-          numberOfMonths: noofmonth,
-          loanTotalRepayment: loanRepaymentTotal,
-          monthlyRepayment,
-          loanProduct: product,
-        },
-      })
-    );
+    // dispatch(
+    //   updateCustomerStateValues({
+    //     name: "loanFirstInfo",
+    //     value: {
+    //       bvn,
+    //       loanAmount: loanamount,
+    //       careerType: careertype,
+    //       numberOfMonths: noofmonth,
+    //       loanTotalRepayment: loanRepaymentTotal,
+    //       monthlyRepayment,
+    //       loanProduct: product,
+    //     },
+    //   })
+    // );
 
     // send data to database and redirect to bvn verification page
     await fetch(`${apiUrl}/api/tempdata/tempdata`, {
@@ -176,9 +176,7 @@ const LoanFirstStep = ({ data }) => {
       .then(() => {
         // search for bvn details and verify
 
-        //  bvnVerification();
-
-        navigate("/app/nibbs-login");
+        bvnVerification();
 
         // set show loan form to true
         // setShowLoanForm(true);

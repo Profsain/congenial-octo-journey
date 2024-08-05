@@ -1,5 +1,5 @@
 /* eslint-disable no-undef */
-import { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import PropTypes from "prop-types";
 // fetch data from api
 import { useDispatch, useSelector } from "react-redux";
@@ -31,9 +31,16 @@ import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { calcDaysDiffFromNow } from "../../../../utilities/calcDaysDiff";
 import { fetchAllLoanOfficers } from "../../../redux/reducers/loanOfficerReducer";
+import {
+  deleteFromLocalStorage,
+  getFromLocalStorage,
+  storeInLocalStorage,
+} from "../../../../utilities/localStorage";
+
+const apiUrl = import.meta.env.VITE_BASE_URL;
 
 // loan form component
-const LoanForm = () => {
+const LoanForm = React.memo(function LoanFormComponent() {
   // Function to initialize the bvn details extraction after redirect to clallback url
   const initializeApp = () => {
     const urlSearchParams = new URLSearchParams(window.location.search);
@@ -52,10 +59,6 @@ const LoanForm = () => {
 
   // fetch loan product
   const dispatch = useDispatch();
-  useEffect(() => {
-    dispatch(fetchProduct());
-    dispatch(fetchEmployers());
-  }, [dispatch]);
 
   const employers = useSelector(
     (state) => state.employersManagerReducer.employers.employers
@@ -70,6 +73,8 @@ const LoanForm = () => {
   const [product, setProduct] = useState({});
   const [showReconfirmBvn, setShowReconfirmBvn] = useState(false);
   const [firstStepData, setFirstStepData] = useState();
+  // fetch all commercial banks
+  const [banks, setBanks] = useState([]);
 
   // Temporarily Update the firstep Data from the redux store
   useEffect(() => {
@@ -81,6 +86,11 @@ const LoanForm = () => {
     const getData = async () => {
       try {
         await dispatch(fetchAllLoanOfficers());
+        await dispatch(fetchProduct());
+        await dispatch(fetchEmployers());
+
+        // fetching Banks
+        await fetchAllBanks(setBanks);
       } catch (error) {
         console.log(error);
       }
@@ -92,7 +102,7 @@ const LoanForm = () => {
   useEffect(() => {
     // set showReconfirmBvn modal after 30 seconds
     const timer = setTimeout(() => {
-      setShowReconfirmBvn(false);
+      setShowReconfirmBvn(true);
     }, 30000);
 
     // Cleanup function to clear the timer
@@ -121,12 +131,6 @@ const LoanForm = () => {
     }
   }, [firstStepData]);
 
-  // fetch all commercial banks
-  const [banks, setBanks] = useState([]);
-  useEffect(() => {
-    fetchAllBanks(setBanks);
-  }, []);
-
   const [step, setStep] = useState(1);
   const [showForm, setShowForm] = useState(true);
   const [stepImg, setStepImg] = useState("https://i.imgur.com/DPMDjLy.png");
@@ -144,15 +148,22 @@ const LoanForm = () => {
   const [signature, setSignature] = useState("");
   const [marketerClientPic, setMarketerClientPic] = useState("");
 
+  const updateFormValues = () => {
+    const formValues = getFromLocalStorage("onbaordData");
+    formValues && ref.current?.setValues(formValues);
+  };
+
   // scroll to the top of the page
   useEffect(() => {
     window.scrollTo(0, 0);
+    updateFormValues();
   }, [step, showForm]);
 
   // update photocapture value when captureImg change
   useEffect(() => {
     if (captureImg) {
       ref.current?.setFieldValue("photocapture", captureImg);
+      updateFormValues();
     }
     if (idCard) {
       ref.current?.setFieldValue("valididcard", idCard);
@@ -172,15 +183,7 @@ const LoanForm = () => {
     if (marketerClientPic) {
       ref.current?.setFieldValue("marketerClientPic", marketerClientPic);
     }
-  }, [
-    captureImg,
-    idCard,
-    paySlip,
-    employmentLetter,
-    marketerClientPic,
-    signature,
-    bankStatements,
-  ]);
+  }, [captureImg, idCard, paySlip, employmentLetter, marketerClientPic, signature, bankStatements]);
 
   // get current formik value
   const ref = useRef();
@@ -237,7 +240,6 @@ const LoanForm = () => {
     try {
       if (ref.current.values) {
         const formValues = ref.current?.values;
-        // set customerEmail
 
         const employer = employers.find(
           (employer) => employer._id === formValues.employerId
@@ -345,21 +347,21 @@ const LoanForm = () => {
             "image.jpg"
           ); // Convert data URI to Blob
         formData.append("haveagent", formValues.haveagent);
-        formData.append("agentname", formValues.agentname);
+        formData.append("agentcode", formValues.agentcode);
         formData.append("username", formValues.username);
         formData.append("password", formValues.password);
         formData.append("confirmpassword", formValues.confirmpassword);
 
         // send formData to database
-        const apiUrl = import.meta.env.VITE_BASE_URL;
-        const res = await fetch(`${apiUrl}/api/customer/customer`, {
+
+        await fetch(`${apiUrl}/api/customer/customer`, {
           method: "POST",
           mode: "cors",
           enctype: "multipart/form-data",
           body: formData,
         });
 
-        console.log(res, "res");
+        deleteFromLocalStorage("onbaordData");
       }
     } catch (error) {
       const errorResponse = await res.json();
@@ -383,7 +385,6 @@ const LoanForm = () => {
   // func to check if individual field is valid
   const isFieldValid = (fieldName, ref) => {
     const { isValid, errors } = ref.current;
-    console.log(fieldName, errors[fieldName]);
     return isValid || !errors[fieldName];
   };
 
@@ -422,6 +423,7 @@ const LoanForm = () => {
       if (step === 1) {
         setStep(2);
         setStepImg("https://i.imgur.com/DPMDjLy.png");
+        storeInLocalStorage({ key: "onbaordData", value: ref.current?.values });
       } else if (
         step === 2 &&
         (isFieldValid("employerId", ref) ||
@@ -455,9 +457,13 @@ const LoanForm = () => {
           setStep(3);
 
           setStepImg("https://i.imgur.com/DPMDjLy.png");
+          storeInLocalStorage({
+            key: "onbaordData",
+            value: ref.current?.values,
+          });
         } else {
           return notify(
-            "Please You are not Eligible to Apply for loan on this plateform"
+            "Please You are not Eligible to Apply for loan on this platform"
           );
         }
       } else if (
@@ -467,18 +473,20 @@ const LoanForm = () => {
       ) {
         setStep(4);
         setStepImg("https://i.imgur.com/DPMDjLy.png");
+        storeInLocalStorage({ key: "onbaordData", value: ref.current?.values });
       } else if (
         step === 4 &&
         ref.current?.values.signature
         // && ref.current?.values.photocapture
       ) {
-        console.log(
-          ref.current?.values.photocapture,
-          "ref.current?.values.photocapture"
-        );
         setStep(5);
         setStepImg("https://i.imgur.com/DPMDjLy.png");
+        storeInLocalStorage({
+          key: "onbaordData",
+          value: ref.current?.values,
+        });
       } else {
+        console.log(ref.current?.values, " ref.current?.values");
         notify("Please Enter Valid Details for all Fields");
       }
     } else {
@@ -513,7 +521,7 @@ const LoanForm = () => {
             })}
             validationSchema={validationSchema}
             onSubmit={handleSubmit}
-            enableReinitialize
+            enableReinitialize={true}
             innerRef={ref}
             encType="multipart/form-data"
           >
@@ -1077,19 +1085,25 @@ const LoanForm = () => {
                                     {/* Input row sectioin */}
                                     <div className="InputRow">
                                       <TextInput
-                                        label="Bank Name"
+                                        onBlur={() => {
+                                          ref.current?.setFieldValue(
+                                            "disbursementbankname",
+                                            values.salarybankname
+                                          );
+                                        }}
+                                        label="Salary Account Name"
                                         name="salarybankname"
                                         type="text"
                                       />
                                       <div className="Space"></div>
                                       {/* dropdown list */}
                                       <SelectField
-                                        label="Bank code"
+                                        label="Bank Name"
                                         name="bankcode"
                                       >
                                         <option value="">Select</option>
-                                        <option value="000">No Bank</option>
-                                        {banks.data?.map((bank) => {
+                                        {/* <option value="000">No Bank</option> */}
+                                        {banks?.map((bank) => {
                                           return (
                                             <option
                                               key={bank.ID}
@@ -1103,11 +1117,39 @@ const LoanForm = () => {
                                     </div>
                                   </div>
 
-                                  <div className="InputRow">
+                                  <div className="w-50">
                                     <TextInput
-                                      label="Account Number"
+                                      onBlur={() => {
+                                        console.log(
+                                          values.salaryaccountnumber,
+                                          "salaryaccountnumber"
+                                        );
+
+                                        ref.current?.setFieldValue(
+                                          "disbursementaccountnumber",
+                                          values.salaryaccountnumber
+                                        );
+                                      }}
+                                      label="Salary Account No."
                                       name="salaryaccountnumber"
                                       type="text"
+                                    />
+                                  </div>
+
+                                  <div className="InputRow">
+                                    <TextInput
+                                      label="Disbursement Acc. Name"
+                                      name="disbursementbankname"
+                                      type="text"
+                                      disabled
+                                    />
+                                    <div className="Space"></div>
+
+                                    <TextInput
+                                      label="Disbursement Acc. No."
+                                      name="disbursementaccountnumber"
+                                      type="text"
+                                      disabled
                                     />
                                   </div>
 
@@ -1161,7 +1203,7 @@ const LoanForm = () => {
                                             src="images/naira.png"
                                             alt=""
                                             className="NairaI
-                                        FinNaira FinNaira2"
+                                          FinNaira FinNaira2"
                                           />
                                           <TextInput
                                             label="Estimated monthly living expense"
@@ -1477,16 +1519,16 @@ const LoanForm = () => {
                                       {values.haveagent === "yes" && (
                                         <SelectField
                                           label="Select Loan Officer"
-                                          name="agent"
+                                          name="agentcode"
                                         >
                                           <option value=""></option>
                                           {allLoanOfficers &&
-                                            allLoanOfficers.map((admins) => (
+                                            allLoanOfficers.map((officers) => (
                                               <option
-                                                key={admins._id}
-                                                value={admins._id}
+                                                key={officers.Code}
+                                                value={officers.Code}
                                               >
-                                                {admins.fullName}
+                                                {officers.Name}
                                               </option>
                                             ))}
                                         </SelectField>
@@ -1524,7 +1566,15 @@ const LoanForm = () => {
                                       text="Confirm your Identity"
                                     />
                                     <div id="CapturePhoto">
-                                      <PhotoCapture func={setCaptureImg} />
+                                      <PhotoCapture
+                                        func={(imageSrc) => {
+                                          storeInLocalStorage({
+                                            key: "onbaordData",
+                                            value: ref.current?.values,
+                                          });
+                                          setCaptureImg(imageSrc);
+                                        }}
+                                      />
                                     </div>
                                     <Headline
                                       fontSize="16px"
@@ -1533,10 +1583,6 @@ const LoanForm = () => {
                                   </div>
                                   {/*  marketerClientPic Upload */}
                                   <div className="SelfiCon">
-                                    <Headline
-                                      color="#000"
-                                      text="Take Picture"
-                                    />
                                     <Headline
                                       fontSize="16px"
                                       text="Are you a DSA / Marketer? Upload client picture below. "
@@ -1665,7 +1711,7 @@ const LoanForm = () => {
       )}
     </div>
   );
-};
+});
 
 LoanForm.propTypes = {
   data: PropTypes.any,

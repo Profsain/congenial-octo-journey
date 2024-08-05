@@ -68,7 +68,7 @@ const initialValues = ({ loanamount, careertype, captureImg, deductions }) => ({
   photocapture: captureImg,
   marketerClientPic: "",
   haveagent: "",
-  agentname: "",
+  agentcode: "",
   username: "",
   password: "",
   confirmpassword: "",
