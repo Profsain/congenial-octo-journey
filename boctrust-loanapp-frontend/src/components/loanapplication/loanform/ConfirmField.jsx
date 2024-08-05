@@ -21,6 +21,8 @@ const ConfirmField = ({
     if (fieldName === "employerId") {
       const employerInfo = employers.find((employer) => employer._id === value);
       setFieldValue(employerInfo ? employerInfo.employersName : value);
+    } else {
+      setFieldValue(value);
     }
   }, [employers, fieldName, value]);
 

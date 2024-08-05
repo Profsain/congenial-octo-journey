@@ -138,6 +138,67 @@ router.post("/register", type, async (req, res, next) => {
   }
 }); // registration logic ends here
 
+router.post("/registerTest", async (req, res, next) => {
+  try {
+    // Get user input
+    const { fullName, email, phone, username, password, userType, userRole } =
+      req.body;
+
+    // Validate user input
+    if (!(email && password && fullName && phone && username && userType)) {
+      return res.status(400).json({ error: "All input is required" });
+    }
+
+    // check if user already exist
+    // Validate if user exist in our database
+    const oldUser = await User.findOne({ email });
+
+    if (oldUser) {
+      return res
+        .status(409)
+        .json({ error: "User Already Exist. Please Login" });
+    }
+
+    // Encrypt user password
+    const encryptedPassword = await bcrypt.hash(password, 10);
+
+    // Create user in our database
+    const user = await User.create({
+      fullName,
+      email: email.toLowerCase(), // sanitize: convert email to lowercase
+      phone,
+      username,
+      password: encryptedPassword,
+      userRole,
+      userType,
+    });
+
+    // Create token
+    const token = jwt.sign(
+      { user_id: user._id, username },
+      process.env.TOKEN_KEY,
+      {
+        expiresIn: "2h",
+      }
+    );
+    // save user token
+    user.token = token;
+    user.save();
+
+    // return token
+    res.cookie("token", token, {
+      withCredentials: true,
+      httpOnly: false,
+    });
+
+    // return new user
+    return res.status(201).json({ success: "User created successfully" });
+    next();
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+}); // registration logic ends here
+
 // verify admin middleware route
 router.post("/verify", (req, res) => {
   const token = req.cookies.token;
@@ -326,8 +387,5 @@ router.put("/update/:id", async (req, res) => {
     return res.status(500).json({ error: error.message });
   }
 }); // update user logic ends here
-
-
-
 
 module.exports = router; // export router

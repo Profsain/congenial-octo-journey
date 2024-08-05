@@ -78,7 +78,7 @@ const formData = (formValues) => {
   formData.append("signature", formValues.signature);
   formData.append("photocapture", formValues.photocapture);
   formData.append("haveagent", formValues.haveagent);
-  formData.append("agentname", formValues.agentname);
+  formData.append("agentcode", formValues.agentcode);
   formData.append("username", formValues.username);
   formData.append("password", formValues.password);
   formData.append("confirmpassword", formValues.confirmpassword);

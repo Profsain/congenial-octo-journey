@@ -6,6 +6,8 @@ import ConfirmField from "./ConfirmField";
 import Headline from "../../shared/Headline";
 import PhoneOtp from "./PhoneOtp";
 import "./Form.css";
+import axios from "axios";
+import { toast } from "react-toastify";
 
 const passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/;
 
@@ -46,9 +48,20 @@ const CreateAccount = ({
     }
   }, [password, confirmpassword]);
 
-  const handleCreateAccount = () => {
-    setModalShow(true);
-    // handleSubmit();
+  const handleCreateAccount = async () => {
+    try {
+      //  Check if Email is Valid
+      await axios.post(
+        `${import.meta.env.VITE_BASE_URL}/api/customer/checkValidEmail`,
+        {
+          email: values.email,
+        }
+      );
+
+      setModalShow(true);
+    } catch (error) {
+      toast.error("Email Already Exist");
+    }
   };
 
   return (
@@ -58,6 +71,13 @@ const CreateAccount = ({
           <Headline color="#000" text="Create Login / User Details" />
           <div className="row">
             <div className="col-sm-12 col-md-8">
+              <ConfirmField
+                placeholderText="Email"
+                fieldName="email"
+                type="text"
+                values={values}
+                func={handleInputChange}
+              />
               <ConfirmField
                 placeholderText="Username"
                 fieldName="username"

@@ -6,6 +6,7 @@ const TextInput = ({ label, ...props }) => {
   // which we can spread on <input>. We can use field meta to show an error
   // message if the field is invalid and it has been touched (i.e. visited)
   const [field, meta] = useField(props);
+
   return (
     <div className="d-flex flex-column ">
       <label htmlFor={props.id || props.name}>{label}</label>
@@ -15,7 +16,12 @@ const TextInput = ({ label, ...props }) => {
         {...props}
         value={field.value || ""}
         onChange={field.onChange}
-        onBlur={field.onBlur}
+        onBlur={(event) => {
+          field.onBlur(event);
+          if (props.onBlur) {
+            props.onBlur(event);
+          }
+        }}
         placeholder={props.placeholder}
       />
       {meta.touched && meta.error ? (
@@ -30,6 +36,7 @@ TextInput.propTypes = {
   id: PropTypes.any,
   name: PropTypes.string,
   placeholder: PropTypes.string,
+  onBlur: PropTypes.func,
 };
 
 export default TextInput;

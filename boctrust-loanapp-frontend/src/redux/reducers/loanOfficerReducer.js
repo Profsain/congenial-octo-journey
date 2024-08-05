@@ -24,12 +24,21 @@ export const fetchSingleLoanOfficers = createAsyncThunk(
   }
 );
 
-
 // customer slice
 const loanOfficerSlice = createSlice({
   name: "loanOfficers",
   initialState: {
-    allLoanOfficers: [],
+    allLoanOfficers: [
+      {
+        Name: "9PSB, LIMITED",
+        Code: "1001",
+        Branch: null,
+        Gender: null,
+        PhoneNumber: null,
+        Email: null,
+        Id: null,
+      },
+    ],
     selectedLoanOfficer: null,
     status: "idle",
     error: null,
