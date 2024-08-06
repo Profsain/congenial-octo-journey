@@ -3,10 +3,9 @@
     height: 100%;
     position: relative;
     padding-bottom: 98px;
-
-}
-
-.TopSection {
+  }
+  
+  .TopSection {
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
@@ -16,18 +15,18 @@
     top: 60px;
     bottom: 0;
     left: 7rem;
-}
-
-.TopText {
+  }
+  
+  .TopText {
     width: 90%;
-}
-
-.TopText p {
+  }
+  
+  .TopText p {
     color: #fff;
     font-size: 1.2rem;
-}
-
-.HeroCard {
+  }
+  
+  .HeroCard {
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -37,82 +36,82 @@
     background-image: linear-gradient(to bottom, #fcf2d9, #fff);
     width: 770px;
     box-shadow: 0px 2px 3px 0px #6f6f6f;
-}
-
-.Field {
+  }
+  
+  .Field {
     width: 80%;
     padding: 4px 48px;
     border: none;
     border-radius: 6px;
     box-shadow: 0px 0px 3px 0px #6f6f6f;
     font-size: 1.5rem;
-}
-
-.Field:focus {
+  }
+  
+  .Field:focus {
     outline: none;
     border: 1px solid #145088;
-}
-
-.NairaIcon {
+  }
+  
+  .NairaIcon {
     position: relative;
     top: 46px !important;
     right: 248px;
     width: 20px;
     height: 20px;
     margin-right: 28px !important;
-}
-
-.ErrorMsg {
+  }
+  
+  .ErrorMsg {
     color: red;
     font-size: 1rem;
     margin-top: 8px;
     text-align: left !important;
     width: 90%;
-}
-
-.ActionBtn {
+  }
+  
+  .ActionBtn {
     background-color: #145088;
     border: none;
     margin-top: 38px;
     margin-bottom: 108px;
     width: 50%;
     font-size: 1.5rem;
-}
-
-/* LoanStep */
-.LoanStep {
-  display: flex;
-  margin-top: 50px;
-}
-
-.CtaText {
+  }
+  
+  /* LoanStep */
+  .LoanStep {
+    display: flex;
+    margin-top: 50px;
+  }
+  
+  .CtaText {
     padding: 90px;
     color: #145088;
     font-size: 2.5rem;
-}
-
-.CtaText p {
+  }
+  
+  .CtaText p {
     margin-bottom: -16px;
     letter-spacing: 3px;
-}
-
-.CtaText span {
+  }
+  
+  .CtaText span {
     color: #ecaa00;
     font-size: 3.2rem;
-}
-
-/* Boctrust info section */
-.BocTrustMsg {
+  }
+  
+  /* Boctrust info section */
+  .BocTrustMsg {
     margin-top: 48px;
     padding: 60px 118px;
     background-color: #145088;
-}
-.DescriptionText {
+  }
+  .DescriptionText {
     color: #000 !important;
-}
-
-/* Testimonials */
-.NextPrevBtn {
+  }
+  
+  /* Testimonials */
+  .NextPrevBtn {
     width: 60px;
     height: 60px;
     border-radius: 50%;
@@ -122,8 +121,9 @@
     font-size: 2rem;
     margin-right: 28px;
     box-shadow: 0px 0px 3px 0px #6f6f6f;
-}
-
-.NextPrevBtn:hover {
+  }
+  
+  .NextPrevBtn:hover {
     background-color: #fff4ca;
-}
+  }
+  
