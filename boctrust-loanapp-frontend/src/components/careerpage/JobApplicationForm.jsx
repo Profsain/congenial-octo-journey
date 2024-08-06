@@ -90,7 +90,7 @@ const JobApplicationForm = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form className="job__form" onSubmit={handleSubmit}>
       <label>
         Full-Name:
         <input
