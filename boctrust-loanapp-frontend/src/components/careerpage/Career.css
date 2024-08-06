@@ -69,7 +69,7 @@ li {
 }
 
 /* src/components/JobApplicationForm.css */
-/* form {
+.job__form {
   max-width: 600px;
   margin: 28px auto;
   padding: 20px;
@@ -78,17 +78,17 @@ li {
   background-color: #f9f9f9;
 }
 
-form label {
+.job__form label {
   display: block;
   margin-bottom: 10px;
   font-weight: bold;
 }
 
-form input[type="text"],
-form input[type="email"],
-form input[type="tel"],
-form textarea,
-form input[type="file"] {
+.job__form input[type="text"],
+.job__form input[type="email"],
+.job__form input[type="tel"],
+.job__form textarea,
+.job__form input[type="file"] {
   width: calc(100% - 20px);
   padding: 8px;
   margin-bottom: 15px;
@@ -97,7 +97,7 @@ form input[type="file"] {
   box-sizing: border-box;
 }
 
-form button {
+.job__form button {
   display: inline-block;
   padding: 10px 20px;
   color: #fff;
@@ -107,7 +107,7 @@ form button {
   cursor: pointer;
 }
 
-form button:hover {
+.job__form button:hover {
   background-color: #0056b3;
 }
 
@@ -116,4 +116,4 @@ form button:hover {
   font-weight: bold;
   text-align: center;
   font-size: 1.3rem;
-} */
+}
