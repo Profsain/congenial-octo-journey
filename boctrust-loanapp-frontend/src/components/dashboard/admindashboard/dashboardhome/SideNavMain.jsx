@@ -49,8 +49,6 @@ const SideNavMain = ({ onMenuItemClick }) => {
   // current login superAdmin user
   const currentUser = useSelector((state) => state.adminAuth.user);
 
-  const userRole = currentUser.jobRole;
-
   // role based menu
   const [superAdmin, setSuperAdmin] = useState("");
   const [adminRoles, setAdminRoles] = useState([]);
@@ -58,10 +56,6 @@ const SideNavMain = ({ onMenuItemClick }) => {
 
   useEffect(() => {
     if (currentUser) {
-      if (currentUser.adminType === "admin" || currentUser.userType === "md") {
-        setAdmin("admin");
-      }
-      
       if (currentUser?.userType === "super_admin") {
         setSuperAdmin("super_admin");
       }
@@ -374,7 +368,7 @@ const SideNavMain = ({ onMenuItemClick }) => {
           <p>Website Manager</p>
         </div>
 
-        {isWebManagerOpen ? (
+        {isWebManagerOpen && (
           <div className="SubItem">
             <ul>
               {/* <li id="website" onClick={onMenuItemClick}>
@@ -405,12 +399,15 @@ const SideNavMain = ({ onMenuItemClick }) => {
                 About Page
               </li>
               <li id="boardEditor" onClick={onMenuItemClick}>
-                Directors 
+                Directors
               </li>
               <li id="productEditor" onClick={onMenuItemClick}>
                 Products Page
               </li>
             </ul>
+          </div>
+        )}
+      </div>
       {(superAdmin || !shouldNotSee?.includes("kycReview")) && (
         <div onMouseOver={openSubWebManager} onMouseLeave={closeSubWebManager}>
           <div className="IconBox">

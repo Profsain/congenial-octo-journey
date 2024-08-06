@@ -69,7 +69,7 @@ li {
 }
 
 /* src/components/JobApplicationForm.css */
-form {
+/* form {
   max-width: 600px;
   margin: 28px auto;
   padding: 20px;
@@ -116,4 +116,4 @@ form button:hover {
   font-weight: bold;
   text-align: center;
   font-size: 1.3rem;
-}
+} */
