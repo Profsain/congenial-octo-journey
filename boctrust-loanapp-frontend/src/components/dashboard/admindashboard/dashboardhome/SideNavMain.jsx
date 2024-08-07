@@ -5,6 +5,7 @@ import "../../Dashboard.css";
 import handleAdminRoles from "../../../../../utilities/getAdminRoles";
 
 const SideNavMain = ({ onMenuItemClick }) => {
+  const [isCustomerOpen, setIsCustomerOpen] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [isLoanOpen, setIsLoanOpen] = useState(false);
   const [isAccountOpen, setIsAccountOpen] = useState(false);
@@ -15,6 +16,9 @@ const SideNavMain = ({ onMenuItemClick }) => {
   const [isReportsOpen, setIsReportsOpen] = useState(false);
   const [isUserManagerOpen, setIsUserManagerOpen] = useState(false);
   const [isSettingOpen, setIsSettingOpen] = useState(false);
+
+  const openSubCustomer = () => setIsCustomerOpen(true);
+  const closeSubCustomer = () => setIsCustomerOpen(false);
 
   const openSubItem = () => setIsOpen(true);
   const closeSubItem = () => setIsOpen(false);
@@ -100,12 +104,12 @@ const SideNavMain = ({ onMenuItemClick }) => {
       </div>
 
       {/* Menu with sub item */}
-      <div onMouseOver={openSubItem} onMouseLeave={closeSubItem}>
+      <div onMouseOver={openSubCustomer} onMouseLeave={closeSubCustomer}>
         <div className="IconBox">
           <img src="images/dprofile.png" alt="customer" />
           <p>Customers</p>
         </div>
-        {isOpen ? (
+        {isCustomerOpen ? (
           <div className="SubItem">
             <ul>
               <li id="customer" onClick={onMenuItemClick}>
@@ -408,39 +412,6 @@ const SideNavMain = ({ onMenuItemClick }) => {
           </div>
         )}
       </div>
-      {(superAdmin || !shouldNotSee?.includes("kycReview")) && (
-        <div onMouseOver={openSubWebManager} onMouseLeave={closeSubWebManager}>
-          <div className="IconBox">
-            <img src="images/dwebsite.png" alt="webmanager" />
-            <p>Website Manager</p>
-          </div>
-
-          {isWebManagerOpen ? (
-            <div className="SubItem">
-              <ul>
-                {/* <li id="website" onClick={onMenuItemClick}>
-        All Pages
-      </li> */}
-                <li id="webmanager" onClick={onMenuItemClick}>
-                  Blogs
-                </li>
-                <li id="contactForm" onClick={onMenuItemClick}>
-                  Contact Form
-                </li>
-                <li id="addwiki" onClick={onMenuItemClick}>
-                  Wikis/FAQs
-                </li>
-                <li id="customerAsk" onClick={onMenuItemClick}>
-                  Customer Enquiry
-                </li>
-                <li id="career" onClick={onMenuItemClick}>
-                  Career
-                </li>
-              </ul>
-            </div>
-          ) : null}
-        </div>
-      )}
 
       {/* <div id="withdrawmethod" className="IconBox" onClick={onMenuItemClick}>
         <img
