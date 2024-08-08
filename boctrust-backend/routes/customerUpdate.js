@@ -125,6 +125,7 @@ router.put(
     }
   }
 );
+
 // Update the creditBureauSearch field
 router.put(
   "/creditBureauSearch/:customerId/fileupload",
@@ -326,10 +327,13 @@ router.put("/approve/hoc/:customerId", async (req, res) => {
     updateObject["creditCheck.decisionSummary.headOfCreditApprovalStatus"] =
       "approved";
 
-    const customer = await Loan.findByIdAndUpdate(
+    const customer = await Customer.findByIdAndUpdate(
       customerId,
       {
         $set: updateObject,
+        $currentDate: {
+          "creditCheck.decisionSummary.creditOfficerApprovedAt": true,
+        },
       },
       { new: true }
     );

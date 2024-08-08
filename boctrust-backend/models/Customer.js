@@ -29,7 +29,13 @@ const customerSchema = new mongoose.Schema(
       type: String,
       default: "",
     },
-    customerId: String,
+    customerId: {
+      type: mongoose.Schema.Types.ObjectId,
+    },
+    loanId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Loan'
+    },
     firstname: String,
     lastname: String,
     email: { type: String, unique: true, required: true },
@@ -52,6 +58,7 @@ const customerSchema = new mongoose.Schema(
     nkinphonenumber: String,
     nkinrelationship: String,
     nkinresidentialaddress: String,
+    gender: String,
 
     careertype: String,
 
