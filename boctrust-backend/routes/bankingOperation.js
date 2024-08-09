@@ -14,6 +14,77 @@ require('dotenv').config();
 // Parse JSON string from .env
 const bankoneConfig = JSON.parse(process.env.BANKONE_API_CONFIG);
 
+const createCustomerAccountAndLoan = async (customerId, loanDetails) => {
+  try {
+    // Call the customer and account creation endpoint
+    const accountCreationResponse = await fetch(
+      `http://localhost:3030/api/bankone/createCustomerAndAccount/${customerId}`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    if (!accountCreationResponse.ok) {
+      const errorText = await accountCreationResponse.text();
+      throw new Error(`Account creation failed: ${errorText}`);
+    }
+
+    const accountData = await accountCreationResponse.json();
+
+    // Prepare loan details with data from account creation
+    const loanPayload = {
+      ...loanDetails,
+      CustomerID: accountData.CustomerID, 
+      LinkedAccountNumber: accountData.AccountNumber,
+    };
+
+    // Call the loan creation endpoint
+    const loanCreationResponse = await fetch(
+      `http://localhost:3030/api/bankone/createLoan`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(loanPayload),
+      }
+    );
+
+    if (!loanCreationResponse.ok) {
+      const errorText = await loanCreationResponse.text();
+      throw new Error(`Loan creation failed: ${errorText}`);
+    }
+
+    const loanData = await loanCreationResponse.json();
+
+    return {
+      accountData,
+      loanData,
+    };
+  } catch (err) {
+    console.error("Error in createCustomerAccountAndLoan:", err.message);
+    throw err;
+  }
+};
+
+router.post("/createCustomerAccountAndLoan/:customerId", async (req, res) => {
+  const { customerId } = req.params;
+  const loanDetails = req.body;
+
+  try {
+    const result = await createCustomerAccountAndLoan(customerId, loanDetails);
+    res.status(200).json({
+      message: "Customer, Account, and Loan created successfully",
+      result,
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // Create customer account endpoint (Done)
 router.post("/createCustomerAccount", async (req, res) => {
   // destructure the request body
