@@ -15,12 +15,12 @@ import "./Form.css";
 import calculatorfunc from "../../shared/calculatorfunc";
 
 // bvn verification function
-// import { bvnVerification } from "./bvnVerification";
+import { bvnVerification } from "./bvnVerification";
 import { ToastContainer, toast } from "react-toastify";
 
 // toast styles
 import "react-toastify/dist/ReactToastify.css";
-import { useNavigate } from "react-router-dom";
+// import { useNavigate } from "react-router-dom";
 import { updateCustomerStateValues } from "../../../redux/reducers/customerReducer";
 
 // loan form component
@@ -45,10 +45,12 @@ const LoanFirstStep = ({ data }) => {
   const dispatch = useDispatch();
 
   const loanProducts = useSelector(
-    (state) => state.productReducer.products.products
+    (state) => state.productReducer.products
   );
 
-  const navigate = useNavigate();
+  
+
+  // const navigate = useNavigate();
 
   useEffect(() => {
     dispatch(fetchProduct());
@@ -56,7 +58,7 @@ const LoanFirstStep = ({ data }) => {
 
   useEffect(() => {
     setInitialLoanProduct(
-      loanProducts?.find((item) => item.productName === "Term Loan")
+      loanProducts?.find((item) => item.ProductName === "TERM DEPOSIT")
     );
   }, [loanProducts]);
 
@@ -77,7 +79,7 @@ const LoanFirstStep = ({ data }) => {
   const calculateRepayment = (userClicked) => {
     // get product id from formik values
     const productId =
-      ref.current?.values.loanproduct || initialLoanProduct?._id;
+      ref.current?.values.loanproduct || initialLoanProduct?.ProductCode;
 
     const noOfMonths = ref.current?.values.numberofmonth;
 
@@ -87,10 +89,10 @@ const LoanFirstStep = ({ data }) => {
     setNoofmonth(noOfMonths);
 
     // find product
-    const product = loanProducts?.find((product) => product._id === productId);
+    const product = loanProducts?.find((product) => product.ProductCode === productId);
 
     // get interest rate
-    const loanRate = product?.interestRate;
+    const loanRate = product?.InterestRate || 1;
 
     // calculator loan amount
     const loanCal = calculatorfunc(
@@ -124,9 +126,9 @@ const LoanFirstStep = ({ data }) => {
   };
 
   // send data to redux store
-  const productId = ref.current?.values.loanproduct || initialLoanProduct?._id;
+  const productId = ref.current?.values.loanproduct || initialLoanProduct?.ProductCode;
 
-  const product = loanProducts?.find((product) => product._id === productId);
+  const product = loanProducts?.find((product) => product.ProductCode === productId);
 
   // handle bvn verification
   // const [showLoanForm, setShowLoanForm] = useState(false);
@@ -176,9 +178,9 @@ const LoanFirstStep = ({ data }) => {
       .then(() => {
         // search for bvn details and verify
 
-        // bvnVerification();
+        bvnVerification();
 
-        navigate("/app/nibbs-login")
+        // navigate("/app/nibbs-login")
 
         // set show loan form to true
         // setShowLoanForm(true);
@@ -287,10 +289,10 @@ const LoanFirstStep = ({ data }) => {
                                   >
                                     {loanProducts?.map((product) => (
                                       <option
-                                        key={product._id}
-                                        value={product._id}
+                                        key={product.ProductCode}
+                                        value={product.ProductCode}
                                       >
-                                        {product.productName}
+                                        {product.ProductName}
                                       </option>
                                     ))}
                                   </Field>

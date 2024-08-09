@@ -26,8 +26,8 @@ const loanSchema = new mongoose.Schema(
       type: String,
     },
     loanproduct: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Product",
+      type: String,
+      required: true
     },
     disbursementstatus: {
       type: String,

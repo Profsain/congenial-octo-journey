@@ -42,8 +42,6 @@ const multipleUpload = upload.fields([
 
 // Create a new customer
 router.post("/customer", multipleUpload, async (req, res) => {
-  console.log(req.files, "req.files")
-  
   if (req.files.valididcard) {
     req.body.valididcard = req.files.valididcard[0].filename;
   }
@@ -66,8 +64,10 @@ router.post("/customer", multipleUpload, async (req, res) => {
   // hash password
   // check if user already exist
   // Validate if user exist in our database
-  const { email } = req.body;
-  const oldUser = await CustomerModel.findOne({ email });
+  const { email, username } = req.body;
+  const oldUser = await CustomerModel.findOne({
+    $or: [{ email: email }, { username: username }],
+  });
 
   if (oldUser) {
     return res.status(409).json({ error: "User Already Exist. Please Login" });
@@ -146,7 +146,7 @@ router.post("/login", async (req, res) => {
 router.post("/checkValidEmail", async (req, res) => {
   try {
     const customerExist = await CustomerModel.findOne({
-      email: req.body.email,
+      $or: [{ email: req.body.email }, { username: req.body.username }],
     });
     if (customerExist) {
       res.status(400).json({

@@ -55,12 +55,13 @@ const CreateAccount = ({
         `${import.meta.env.VITE_BASE_URL}/api/customer/checkValidEmail`,
         {
           email: values.email,
+          username: values.username,
         }
       );
 
       setModalShow(true);
     } catch (error) {
-      toast.error("Email Already Exist");
+      toast.error("Email Or Username Already Exist");
     }
   };
 
