@@ -18,6 +18,7 @@ import { IoMdCheckmarkCircleOutline } from "react-icons/io";
 import { FcCancel } from "react-icons/fc";
 import { toast } from "react-toastify";
 import { fetchUnbookedOrBookedLoans } from "../../../../redux/reducers/loanReducer";
+import BookingModal from "./BookingModal";
 
 const BookLoans = () => {
   const styles = {
@@ -54,18 +55,17 @@ const BookLoans = () => {
   const currentUser = useSelector((state) => state.adminAuth.user);
 
   const [show, setShow] = useState(false);
+  const [showBookModal, setShowBookModal] = useState(false);
   const [loanObj, setLoanObj] = useState({});
   const [message, setMessage] = useState("");
   const [showNotification, setShowNotification] = useState(false);
   const [canUserManage, setCanUserManage] = useState(false);
+  const [canUserBook, setCanUserBook] = useState(false);
+  const [canUserApprove, setCanUserApprove] = useState(false);
 
   // handle search
   const [showCount, setShowCount] = useState(10);
   const [searchTerms, setSearchTerms] = useState("");
-
-  useEffect(() => {
-    setCanUserManage(currentUser?.userRole?.can.includes("loanManagement"));
-  }, [currentUser]);
 
   useEffect(() => {
     const getData = async () => {
@@ -74,6 +74,12 @@ const BookLoans = () => {
 
     getData();
   }, [dispatch, showNotification]);
+
+  useEffect(() => {
+    setCanUserManage(currentUser?.userRole?.can.includes("loanManagement"));
+    setCanUserApprove(currentUser?.userRole?.can.includes("approveBookLoan"));
+    setCanUserBook(currentUser?.userRole?.can.includes("bookLoans"));
+  }, [currentUser]);
 
   // handle close notification
   const closeNotification = () => {
@@ -97,7 +103,7 @@ const BookLoans = () => {
 
   // search customer list
   const [loansList, setLoansList] = useState(unbookedBookedLoans);
-
+  const [selectedLoan, setSelectedLoan] = useState(null);
   // update loansList to show 10 customers on page load
   // or on count changes
   useEffect(() => {
@@ -131,18 +137,32 @@ const BookLoans = () => {
       className: "",
       icon: <GrView />,
       label: "View Details",
-      func: (customer) => handleShow(customer._id),
+      func: (loan) => handleShow(loan._id),
     },
     {
       className: "text-primary",
       icon: <IoMdCheckmarkCircleOutline />,
-      label: "Book Loan",
-      func: (customer) => handleBookLoan(customer),
+      label: canUserBook
+        ? "Book Loan"
+        : canUserApprove
+        ? "Approve Booking"
+        : "",
+      isDisabled: (loan) =>
+        (canUserBook && loan.bookingApproval) ||
+        (canUserApprove && loan.bookingApproval),
+      func: (loan) => {
+        console.log(loan, "Something");
+        setSelectedLoan(loan);
+        setShowBookModal(true);
+      },
     },
     {
       className: "text-danger",
       icon: <FcCancel />,
       label: "Reject Loan",
+      isDisabled: (loan) =>
+        (canUserBook && loan.bookingApproval) ||
+        (canUserApprove && loan.bookingApproval),
       func: (customer) => handleShow(customer._id),
     },
   ];
@@ -251,6 +271,22 @@ const BookLoans = () => {
           </div>
         </div>
       </div>
+
+      {/* show loan details model */}
+      {show && (
+        <LoanDetails show={show} handleClose={handleClose} loanObj={loanObj} />
+      )}
+
+      {/* show Modal for Booking Details */}
+      {showBookModal && (
+        <BookingModal
+          selectedLoan={selectedLoan}
+          show={showBookModal}
+          handleApproval={handleBookLoan}
+          handleClose={() => setShowBookModal(false)}
+          loanObj={loanObj}
+        />
+      )}
 
       {/* show loan details model */}
       {show && (

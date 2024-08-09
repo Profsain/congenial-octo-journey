@@ -16,7 +16,7 @@ const StatCard = ({ day, date, stat, datecolor }) => {
     },
     day: {
       fontWeight: "900",
-      fontSize: "1.2rem",
+      fontSize: "1rem",
     },
     date: {
       fontSize: "0.8rem",
@@ -26,7 +26,7 @@ const StatCard = ({ day, date, stat, datecolor }) => {
       borderRadius: "5px",
     },
     stat: {
-      fontSize: "2rem",
+      fontSize: "1.5rem",
     },
   };
   return (

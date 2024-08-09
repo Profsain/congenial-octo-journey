@@ -11,6 +11,7 @@ import EmailTemplate from "../../shared/EmailTemplate";
 import sendEmail from "../../../../utilities/sendEmail";
 import ReactDOMServer from "react-dom/server";
 import { toast } from "react-toastify";
+import PageLoader from "../../dashboard/shared/PageLoader";
 
 const styles = {
   error: {
@@ -34,42 +35,51 @@ const PhoneOtp = (props) => {
   const [otp, setOtp] = useState("");
   const [flag, setFlag] = useState(false);
   const [recaptchaWidgetId, setRecaptchaWidgetId] = useState();
+  const [isLoading, setLoading] = useState(false);
 
   const navigate = useNavigate();
 
   // generate recaptcha
   const setUpRecaptcha = async (number) => {
-    console.log(auth, "auth");
-    if (!window.recaptchaVerifier) {
-      window.recaptchaVerifier = new RecaptchaVerifier(
-        auth,
-        "recaptcha-container",
-        {
-          size: "invisible",
-          callback: () => {
-            // reCAPTCHA solved
-            console.log("reCAPTCHA solved");
-          },
-          "expired-callback": () => {
-            // Response expired
-            console.log("reCAPTCHA expired");
-            if (recaptchaWidgetId) {
-              window.grecaptcha.reset(recaptchaWidgetId);
-              console.log("Reset");
-            }
-          },
-        }
-      );
-      window.recaptchaVerifier.render().then((widgetId) => {
-        setRecaptchaWidgetId(widgetId); // Store the widget ID
-      });
-    }
+    try {
+      if (!window.recaptchaVerifier) {
+        window.recaptchaVerifier = new RecaptchaVerifier(
+          auth,
+          "recaptcha-container",
+          {
+            size: "invisible",
+            callback: () => {
+              // reCAPTCHA solved
+              console.log("reCAPTCHA solved");
+            },
+            "expired-callback": () => {
+              // Response expired
+              console.log("reCAPTCHA expired");
+              if (recaptchaWidgetId) {
+                window.grecaptcha.reset(recaptchaWidgetId);
+                console.log("Reset");
+              }
+            },
+          }
+        );
+        window.recaptchaVerifier.render().then((widgetId) => {
+          setRecaptchaWidgetId(widgetId); // Store the widget ID
+        });
+      }
 
-    return await signInWithPhoneNumber(auth, number, window.recaptchaVerifier);
+      return await signInWithPhoneNumber(
+        auth,
+        number,
+        window.recaptchaVerifier
+      );
+    } catch (error) {
+      toast.error(`Error: ${error}`);
+    }
   };
 
   // handle otp request
   const requestOtp = async (e) => {
+    setLoading(true);
     e.preventDefault();
     const phone = "+234" + updatePhone.slice(1);
 
@@ -79,9 +89,12 @@ const PhoneOtp = (props) => {
       return setErrorMsg("Please enter a valid phone number");
     try {
       const response = await setUpRecaptcha(phone);
-
+    if(response){
       setConfirmOtp(response);
       setFlag(true);
+    }
+
+      
     } catch (error) {
       // setErrorMsg(`Invalid phone number: ${error.message}`);
       console.log(error, "Some erro");
@@ -90,6 +103,8 @@ const PhoneOtp = (props) => {
       }
       toast.error("Error setting up reCAPTCHA:");
       // throw new Error("Error setting up reCAPTCHA:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -179,7 +194,7 @@ const PhoneOtp = (props) => {
               </Button>{" "}
               &nbsp; &nbsp; &nbsp; &nbsp;
               <Button variant="primary" type="submit">
-                Send OTP
+                {isLoading ? <PageLoader width="10px" /> : "Send OTP"}
               </Button>
             </div>
           </Form>

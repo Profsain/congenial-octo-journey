@@ -65,6 +65,11 @@ button:disabled {
   padding-left: 1rem;
 }
 
+.css-14s5rfu-MuiFormLabel-root-MuiInputLabel-root {
+  margin-top: 0 !important;
+  max-width: 100% !important;
+}
+
 @media screen and (max-width: 600px) {
   .Welcome {
     display: none;

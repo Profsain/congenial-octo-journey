@@ -15,7 +15,7 @@ const LoansCard = ({ img, title, stat, bgcolor }) => {
     },
     text: {
       color: "#fff",
-      fontsize: "2.9rem",
+      fontsize: "2rem",
       fontWeight: "900px",
       textAlign: "right",
     },
