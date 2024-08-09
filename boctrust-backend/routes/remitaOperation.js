@@ -111,7 +111,7 @@ router.post('/loan-disbursement-notification', async (req, res) => {
     // number of repayment months
     const numberOfRepayments = req.body.numberofmonth;
     const customerId = req.body.remita.remitaDetails.data.data.customerId;
-    console.log("id", customerId)
+    
     const raw = JSON.stringify({
       "customerId": customerId,
       "authorisationCode": authorisationCode,

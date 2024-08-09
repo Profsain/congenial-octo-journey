@@ -1,487 +1,651 @@
-import PropTypes from "prop-types"
-import { useState } from "react";
+import PropTypes from "prop-types";
+import { useEffect, useState } from "react";
 import "../../dashboardcomponents/transferdashboard/Transfer.css";
 import "./Credit.css";
 // function
-import addMoreLenders from "./addMoreLender";
+import axios from "axios";
+import { toast, ToastContainer } from "react-toastify";
 
-const PaySlipAnalysis = ({ customerId }) => {
-  const [isApplicantCivilianPolice, setIsApplicantCivilianPolice] =
-    useState(false);
-  const [
-    isPaySlipContainsMoreThenFiveLenders,
-    setIsPaySlipContainsMoreThenFiveLenders,
-  ] = useState(false);
-  const [
-    monthlyDeductionNotMoreThan50Percent,
-    setMonthlyDeductonNotMoreThan50Percent,
-  ] = useState(false);
-  const [takeHomePayNotLessThan20Percent, setTakeHomePayNotLessThan20Percent] =
-    useState(false);
-  const [takeHomePayNotLessThan30K, setTakeHomePayNotLessThan30K] =
-    useState(false);
-  const [netPayNotLessThan30K, setNetPayNotLessThan30K] = useState(false);
+// toast styles
+import "react-toastify/dist/ReactToastify.css";
+import PageLoader from "../../shared/PageLoader";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchSingleCustomer } from "../../../../redux/reducers/customerReducer";
+import CheckPaylsipFileUpload from "./molecules/CheckPaySlipInput";
+const apiUrl = import.meta.env.VITE_BASE_URL;
+
+const employerGroup = {
+  police: "police",
+  others: "others",
+};
+
+const lenderInit = {
+  name: "",
+  deductions: 0,
+};
+const PaySlipAnalysis = ({
+  customerId,
+  formState,
+  reportConfirmation,
+  setReportConfirmation,
+  setFormState,
+}) => {
   // const [customerId, setCustomerId] = useState("64fecbd663898c27692bea4c");
+  const [isLoading, setIsLoading] = useState(false);
+
+  const [employerGroupings, setEmployerGroupings] = useState(null);
+
+  const [selectedEmployerGroup, setSelectedEmployerGroup] = useState(
+    employerGroupings?.other
+  );
+
+  const selectedCustomer = useSelector(
+    (state) => state.customerReducer.selectedCustomer
+  );
+
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    const getData = async () => {
+      try {
+        await dispatch(fetchSingleCustomer(customerId));
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    getData();
+  }, []);
+
+  useEffect(() => {
+    const getData = async () => {
+      try {
+        const res = await axios.get(`${apiUrl}/api/agency/payslip-grouping`);
+
+        setEmployerGroupings(res.data);
+        setSelectedEmployerGroup(
+          res.data?.find((item) => item?.name === employerGroup.others)
+        );
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    getData();
+  }, []);
+
+  useEffect(() => {
+    if (selectedEmployerGroup) {
+      setFormState({
+        ...formState,
+        benchmark: selectedEmployerGroup?.benchmark,
+      });
+    }
+  }, [selectedEmployerGroup]);
 
   const handleCivilianPolice = () => {
-    setIsApplicantCivilianPolice(!isApplicantCivilianPolice);
+    setReportConfirmation({
+      ...reportConfirmation,
+      isApplicantCivilianPolice: !reportConfirmation.isApplicantCivilianPolice,
+    });
   };
   const handleChange = () => {
-    setMonthlyDeductonNotMoreThan50Percent(
-      !monthlyDeductionNotMoreThan50Percent
-    );
+    setReportConfirmation({
+      ...reportConfirmation,
+      monthlyDeductionBelowPercentageBenchmark:
+        !reportConfirmation.monthlyDeductionBelowPercentageBenchmark,
+    });
   };
   const handleDeduction = () => {
-    setTakeHomePayNotLessThan20Percent(!takeHomePayNotLessThan20Percent);
+    setReportConfirmation({
+      ...reportConfirmation,
+      takeHomePayNotLessThan20PercentGross:
+        !reportConfirmation.takeHomePayNotLessThan20PercentGross,
+    });
   };
   const handleTakehome = () => {
-    setTakeHomePayNotLessThan30K(!takeHomePayNotLessThan30K);
+    setReportConfirmation({
+      ...reportConfirmation,
+      takeHomePayNotLessThanBenchmark:
+        !reportConfirmation.takeHomePayNotLessThanBenchmark,
+    });
   };
   const handlePayslip = () => {
-    setIsPaySlipContainsMoreThenFiveLenders(
-      !isPaySlipContainsMoreThenFiveLenders
-    );
+    setReportConfirmation({
+      ...reportConfirmation,
+      isPaySlipContainsMoreThenFiveLenders:
+        !reportConfirmation.isPaySlipContainsMoreThenFiveLenders,
+    });
   };
   const handleNetPay = () => {
-    setNetPayNotLessThan30K(!netPayNotLessThan30K);
+    setReportConfirmation({
+      ...reportConfirmation,
+      netPayNotLessThanBenchmark:
+        !reportConfirmation.netPayNotLessThanBenchmark,
+    });
   };
-
-  // form state
-  const [formState, setFormState] = useState({
-    netPay: "",
-    grossPay: "",
-    lenders: "",
-    extraLenders: "",
-    extraLenderName: "",
-    extraLenderDeduction: "",
-    monthlyLoanRepayment: "",
-    dateOfBirth: "",
-    dateOfAppointment: "",
-    uploadPaySlip: "",
-  });
 
   const handleFormChange = (e) => {
     const { name, value } = e.target;
     setFormState({ ...formState, [name]: value });
   };
 
-  // submit form data to backend
   const handleFormSubmit = async (e) => {
     e.preventDefault();
+  };
 
-    const apiUrl = import.meta.env.VITE_BASE_URL;
+  const handleActivateBuyOver = async () => {
+    setIsLoading(true);
+    try {
+      await axios.put(
+        `${apiUrl}/api/updatecustomer/activate-buyover/${customerId}`
+      );
 
-    const formData = new FormData(); // create a new FormData object
-    formData.append("netPay", formState.netPay); // add the fields to formData
-    formData.append("grossPay", formState.grossPay);
-    formData.append("lenders", formState.lenders);
-    formData.append("extraLenders", formState.extraLenders);
-    formData.append("monthlyLoanRepayment", formState.monthlyLoanRepayment);
-    formData.append("dateOfBirth", formState.dateOfBirth);
-    formData.append("dateOfAppointment", formState.dateOfAppointment);
-    formData.append("isApplicantCivilianPolice", isApplicantCivilianPolice);
-    formData.append("uploadPaySlip", formState.uploadPaySlip);
-    formData.append(
-      "isPaySlipContainsMoreThenFiveLenders",
-      isPaySlipContainsMoreThenFiveLenders
-    );
-    formData.append("extraLenderName", formState.extraLenderName);
-    formData.append("extraLenderDeduction", formState.extraLenderDeduction);
-    formData.append(
-      "monthlyDeductionNotMoreThan50Percent",
-      monthlyDeductionNotMoreThan50Percent
-    );
-    formData.append(
-      "takeHomePayNotLessThan20Percent",
-      takeHomePayNotLessThan20Percent
-    );
-    formData.append("takeHomePayNotLessThan30K", takeHomePayNotLessThan30K);
-    formData.append("netPayNotLessThan30K", netPayNotLessThan30K);
-
-
-    // send formData object to backend
-    await fetch(
-      `${apiUrl}/api/updatecustomer/paySlipAnalysis/${customerId}`,
-      {
-        method: "PUT",
-        enctype: "multipart/form-data",
-        body: formData,
-      }
-    );
-
-    // clear form fields
-    setFormState({
-      netPay: "",
-      grossPay: "",
-      lenders: "",
-      extraLenders: "",
-      extraLenderName: "",
-      extraLenderDeduction: "",
-      monthlyLoanRepayment: "",
-      dateOfBirth: "",
-      dateOfAppointment: "",
-      uploadPaySlip: "",
-    });
+      toast.success("Buyover Loan Activation Success", {
+        position: "bottom-right",
+      });
+    } catch (error) {
+      toast.error(error?.response?.data?.error, {
+        position: "bottom-right",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
-    <div className="TransContainer RBox">
-      <div className=" d-flex justify-content-center p-5">
-        <h4>Pay Slip Analysis</h4>
-      </div>
+    employerGroupings && (
+      <div className="TransContainer RBox">
+        <div className=" d-flex  justify-content-center p-5">
+          <div className="d-flex w-100 justify-content-between align-items-center">
+            <h4>Pay Slip Analysis</h4>
 
-      {/* step 1 */}
-      <div>
-        {/* Pay slip check */}
-        <form
-          className="row"
-          encType="multipart/form-data"
-          onSubmit={handleFormSubmit}
-        >
-          <div className="col-sm-12 col-md-6">
-            <h6 className="creditTitle">Pay Slip Data</h6>
+            <div className="d-flex gap-4 align-items-center">
+              <label htmlFor="searchType" className="fs-6 fw-bold mt-0">
+                Employer:
+              </label>
+              <div style={{ width: "150px" }}>
+                <select
+                  id="searchType"
+                  className="form-select capitalize "
+                  value={selectedEmployerGroup?.name}
+                  onChange={(e) =>
+                    setSelectedEmployerGroup(
+                      employerGroupings?.find(
+                        (item) => item.name === e.target.value
+                      )
+                    )
+                  }
+                >
+                  {employerGroupings?.map((group) => (
+                    <option
+                      className="capitalize"
+                      key={group.name}
+                      value={group.name}
+                    >
+                      {group.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+        <CheckPaylsipFileUpload selectedCustomer={selectedCustomer} />
 
-            <div className="row mb-3">
-              <label htmlFor="netPay" className="col-form-label col-4 mt-2">
-                Enter Net Pay
-              </label>
-              <div className="col-8">
-                <input
-                  type="text"
-                  className="form-control"
-                  name="netPay"
-                  value={formState.netPay}
-                  onChange={handleFormChange}
-                />
-              </div>
-            </div>
-            <div className="row mb-3">
-              <label
-                htmlFor="dSearchDate"
-                className="col-form-label col-4 mt-2"
-              >
-                Enter Gross Pay
-              </label>
-              <div className="col-8">
-                <input
-                  type="text"
-                  className="form-control"
-                  name="grossPay"
-                  value={formState.grossPay}
-                  onChange={handleFormChange}
-                />
-              </div>
-            </div>
-            <div className="row mb-3">
-              <label
-                htmlFor="dSearchDate"
-                className="col-form-label col-4 mt-2"
-              >
-                Number of Lenders on Slip
-              </label>
-              <div className="col-8">
-                <input
-                  type="text"
-                  className="form-control"
-                  name="lenders"
-                  value={formState.lenders}
-                  onChange={handleFormChange}
-                />
-              </div>
-            </div>
-            <div className="row mb-3">
-              <label
-                htmlFor="dSearchDate"
-                className="col-form-label col-4 mt-2"
-              >
-                Extra Lenders discovered
-              </label>
-              <div className="col-8">
-                <input
-                  type="text"
-                  className="form-control"
-                  name="extraLenders"
-                  value={formState.extraLenders}
-                  onChange={handleFormChange}
-                />
-              </div>
-            </div>
+        {/* step 1 */}
+        <div>
+          {/* Pay slip check */}
+          <form
+            className="row"
+            encType="multipart/form-data"
+            onSubmit={handleFormSubmit}
+          >
+            <div className="col-sm-12 col-md-6">
+              <h6 className="creditTitle">Pay Slip Data</h6>
 
-            {/* extra lender details */}
-            <div id="extraLender">
-              <hr />
-              <h5>Add Extra Lender Details</h5>
+              <div className="row mb-3">
+                <label htmlFor="netPay" className="col-form-label col-4 mt-2">
+                  Enter Net Pay
+                </label>
+                <div className="col-8">
+                  <input
+                    type="text"
+                    className="form-control"
+                    name="netPay"
+                    value={formState.netPay}
+                    onChange={handleFormChange}
+                  />
+                </div>
+              </div>
+              {selectedEmployerGroup?.name === employerGroup.police && (
+                <div className="row mb-3">
+                  <label
+                    htmlFor="dSearchDate"
+                    className="col-form-label col-4 mt-2"
+                  >
+                    Number of Lenders on Slip
+                  </label>
+                  <div className="col-8">
+                    <input
+                      type="text"
+                      className="form-control"
+                      name="lenders"
+                      value={formState.lenders}
+                      onChange={handleFormChange}
+                    />
+                  </div>
+                </div>
+              )}
               <div className="row mb-3">
                 <label
                   htmlFor="dSearchDate"
                   className="col-form-label col-4 mt-2"
                 >
-                  Name of Lender
+                  Extra Lenders discovered
                 </label>
                 <div className="col-8">
-                  <input type="text" className="form-control lenderName" />
+                  <input
+                    type="number"
+                    className="form-control"
+                    name="numOfExtraLenders"
+                    value={formState.numOfExtraLenders}
+                    onChange={handleFormChange}
+                  />
                 </div>
               </div>
+
+              {/* extra lender details */}
+              <div id="extraLender ">
+                <hr />
+                <h5>Add Extra Lender Details</h5>
+                {formState.extraLenders?.map((item) => (
+                  <div key={item?.id} className="border-bottom mb-3">
+                    <div className="row mb-3">
+                      <label
+                        htmlFor="dSearchDate"
+                        className="col-form-label col-4 mt-2"
+                      >
+                        Name of Lender
+                      </label>
+                      <div className="col-8">
+                        <input
+                          type="text"
+                          value={item.name}
+                          onChange={(e) => {
+                            const currentFormState = { ...formState };
+                            currentFormState.extraLenders?.forEach((lender) =>
+                              lender.id === item.id
+                                ? (item.name = e.target.value)
+                                : lender
+                            );
+
+                            setFormState(currentFormState);
+                          }}
+                          className="form-control lenderName"
+                        />
+                      </div>
+                    </div>
+                    <div className="row mb-3">
+                      <label
+                        htmlFor="dSearchDate"
+                        className="col-form-label col-4 mt-2"
+                      >
+                        Monthly Deductions
+                      </label>
+                      <div className="col-8">
+                        <input
+                          type="number"
+                          value={item.deductions}
+                          onChange={(e) => {
+                            const currentFormState = { ...formState };
+                            currentFormState.extraLenders?.forEach((lender) =>
+                              lender.id === item.id
+                                ? (item.deductions = Number(e.target.value))
+                                : lender
+                            );
+
+                            setFormState(currentFormState);
+                          }}
+                          className="form-control lenderDeduction"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                ))}
+                <div id="extraDetails"></div>
+                <div className="moreBox pb-4">
+                  <div className="d-flex gap-1">
+                    {formState?.extraLenders?.length > 0 && (
+                      <button
+                        onClick={() => {
+                          const currentFormState = { ...formState };
+                          currentFormState.extraLenders.pop();
+
+                          setFormState(currentFormState);
+                        }}
+                        className="btn btn-secondary"
+                        type="button"
+                      >
+                        Remove Last
+                      </button>
+                    )}
+                    <button
+                      onClick={() => {
+                        // addMoreLenders();
+
+                        const currentFormState = [...formState.extraLenders];
+
+                  
+                        currentFormState?.push({
+                          id: Date.now(),
+                          ...lenderInit,
+                        });
+
+                        setFormState({
+                          ...formState,
+                          extraLenders: currentFormState,
+                        });
+                      }}
+                      className="btn btn-success"
+                      type="button"
+                    >
+                      And Another
+                    </button>
+                  </div>
+                </div>
+              </div>
+              {/* extra lender details end */}
+
               <div className="row mb-3">
                 <label
                   htmlFor="dSearchDate"
                   className="col-form-label col-4 mt-2"
                 >
-                  Monthly Deductions
+                  Monthly Loan Repayment
                 </label>
                 <div className="col-8">
-                  <input type="text" className="form-control lenderDeduction" />
+                  <input
+                    type="text"
+                    className="form-control"
+                    name="monthlyLoanRepayment"
+                    value={formState.monthlyLoanRepayment}
+                    onChange={handleFormChange}
+                  />
                 </div>
               </div>
-              <div id="extraDetails"></div>
-              <div className="moreBox">
-                <button
-                  onClick={addMoreLenders}
-                  type="button"
-                  className="btnAdd"
-                >
-                  +
-                </button>
-                <p>Add More Lenders</p>
-              </div>
-            </div>
-            {/* extra lender details end */}
 
-            <div className="row mb-3">
-              <label
-                htmlFor="dSearchDate"
-                className="col-form-label col-4 mt-2"
-              >
-                Monthly Loan Repayment
-              </label>
-              <div className="col-8">
-                <input
-                  type="text"
-                  className="form-control"
-                  name="monthlyLoanRepayment"
-                  value={formState.monthlyLoanRepayment}
-                  onChange={handleFormChange}
-                />
-              </div>
-            </div>
-
-            <div className="row mb-3">
-              <label
-                htmlFor="dSearchDate"
-                className="col-form-label col-4 mt-2"
-              >
-                Date of Birth
-              </label>
-              <div className="col-8">
-                <input
-                  type="date"
-                  className="form-control"
-                  name="dateOfBirth"
-                  value={formState.dateOfBirth}
-                  onChange={handleFormChange}
-                />
-              </div>
-            </div>
-
-            <div className="row mb-3">
-              <label
-                htmlFor="dSearchDate"
-                className="col-form-label col-4 mt-2"
-              >
-                Date of Appointment
-              </label>
-              <div className="col-8">
-                <input
-                  type="date"
-                  className="form-control"
-                  name="dateOfAppointment"
-                  value={formState.dateOfAppointment}
-                  onChange={handleFormChange}
-                />
-              </div>
-            </div>
-
-            <div className="row reportRow mb-5">
-              <div className="col-sm-8 col-md-8">
+              <div className="row mb-3">
                 <label
-                  className="form-check-label"
-                  htmlFor="flexSwitchCheckChecked"
+                  htmlFor="dSearchDate"
+                  className="col-form-label col-4 mt-2"
                 >
-                  Is applicant a civilian police?
+                  Date of Birth
                 </label>
+                <div className="col-8">
+                  <input
+                    type="date"
+                    className="form-control"
+                    name="dateOfBirth"
+                    value={formState.dateOfBirth}
+                    onChange={handleFormChange}
+                  />
+                </div>
               </div>
 
-              <div className="form-check form-switch col-sm-4 col-md-4 mt-4">
-                <input
-                  className="form-check-input"
-                  type="checkbox"
-                  role="switch"
-                  checked={isApplicantCivilianPolice}
-                  onChange={handleCivilianPolice}
-                />
-                <label className="form-check-label mx-3 checked">
-                  {isApplicantCivilianPolice ? "Yes" : "No"}
-                </label>
-              </div>
-            </div>
-
-            <div className="row mb-3">
-              <label
-                htmlFor="dSearchDate"
-                className="col-form-label col-4 mt-2"
-              >
-                Upload Pay Slip
-              </label>
-              <div className="col-8">
-                <input
-                  type="file"
-                  className="form-control"
-                  onChange={(e) => {
-                    e.target.files[0];
-                  }}
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* report confirmation */}
-          <div className="col-sm-12 col-md-6 midBorder">
-            <h6 className="creditTitle">Report Confirmation</h6>
-
-            <div className="row reportRow mb-5">
-              <div className="col-sm-8 col-md-8">
+              <div className="row mb-3">
                 <label
-                  className="form-check-label"
-                  htmlFor="flexSwitchCheckChecked"
+                  htmlFor="dSearchDate"
+                  className="col-form-label col-4 mt-2"
                 >
-                  Applicant Payslip does not contain more than 5 lenders
+                  Date of Appointment
                 </label>
+                <div className="col-8">
+                  <input
+                    type="date"
+                    className="form-control"
+                    name="dateOfAppointment"
+                    value={formState.dateOfAppointment}
+                    onChange={handleFormChange}
+                  />
+                </div>
               </div>
 
-              <div className="form-check form-switch col-sm-4 col-md-4 mt-4">
-                <input
-                  className="form-check-input"
-                  type="checkbox"
-                  role="switch"
-                  checked={isPaySlipContainsMoreThenFiveLenders}
-                  onChange={handlePayslip}
-                />
-                <label className="form-check-label mx-3 checked">
-                  {isPaySlipContainsMoreThenFiveLenders ? "Yes" : "No"}
-                </label>
-              </div>
-            </div>
+              {selectedEmployerGroup.name === employerGroup.police && (
+                <div className="row reportRow mb-5">
+                  <div className="col-sm-8 col-md-8">
+                    <label
+                      className="form-check-label"
+                      htmlFor="flexSwitchCheckChecked"
+                    >
+                      Is applicant a civilian police?
+                    </label>
+                  </div>
 
-            <div className="row reportRow mb-5">
-              <div className="col-sm-8 col-md-8">
+                  <div className="form-check form-switch col-sm-4 col-md-4 mt-4">
+                    <input
+                      className="form-check-input"
+                      type="checkbox"
+                      role="switch"
+                      checked={reportConfirmation.isApplicantCivilianPolice}
+                      onChange={handleCivilianPolice}
+                    />
+                    <label className="form-check-label mx-3 checked">
+                      {reportConfirmation.isApplicantCivilianPolice
+                        ? "Yes"
+                        : "No"}
+                    </label>
+                  </div>
+                </div>
+              )}
+
+              <div className="row mb-3">
                 <label
-                  className="form-check-label"
-                  htmlFor="flexSwitchCheckChecked"
+                  htmlFor="dSearchDate"
+                  className="col-form-label col-4 mt-2"
                 >
-                  Customer Deduction for monthly loan not more than 50% of Net
-                  pay
+                  Upload Pay Slip
                 </label>
-              </div>
-
-              <div className="form-check form-switch col-sm-4 col-md-4 mt-4">
-                <input
-                  className="form-check-input"
-                  type="checkbox"
-                  role="switch"
-                  checked={monthlyDeductionNotMoreThan50Percent}
-                  onChange={handleChange}
-                />
-                <label className="form-check-label mx-3 checked">
-                  {monthlyDeductionNotMoreThan50Percent ? "Yes" : "No"}
-                </label>
+                <div className="col-8">
+                  <input
+                    type="file"
+                    className="form-control"
+                    onChange={(e) => {
+                      setFormState({
+                        ...formState,
+                        uploadPaySlip: e.target.files[0],
+                      });
+                    }}
+                  />
+                </div>
               </div>
             </div>
 
-            <div className="row reportRow mb-5">
-              <div className="col-sm-8 col-md-8">
-                <label
-                  className="form-check-label"
-                  htmlFor="flexSwitchCheckChecked"
-                >
-                  Customer Take home not less than 20% of Gross Pay
-                </label>
+            {/* report confirmation */}
+            <div className="col-sm-12 col-md-6 midBorder">
+              <h6 className="creditTitle">Report Confirmation</h6>
+
+              {selectedEmployerGroup?.name === employerGroup.police && (
+                <div className="row reportRow mb-5">
+                  <div className="col-sm-8 col-md-8">
+                    <label
+                      className="form-check-label"
+                      htmlFor="flexSwitchCheckChecked"
+                    >
+                      Applicant Payslip does not contain more than 5 lenders
+                    </label>
+                  </div>
+
+                  <div className="form-check form-switch col-sm-4 col-md-4 mt-4">
+                    <input
+                      className="form-check-input"
+                      type="checkbox"
+                      role="switch"
+                      checked={
+                        reportConfirmation.isPaySlipContainsMoreThenFiveLenders
+                      }
+                      onChange={handlePayslip}
+                    />
+                    <label className="form-check-label mx-3 checked">
+                      {reportConfirmation.isPaySlipContainsMoreThenFiveLenders
+                        ? "Yes"
+                        : "No"}
+                    </label>
+                  </div>
+                </div>
+              )}
+
+              <div className="row reportRow mb-5">
+                <div className="col-sm-8 col-md-8">
+                  <label
+                    className="form-check-label"
+                    htmlFor="flexSwitchCheckChecked"
+                  >
+                    Customer Deduction for monthly loan not more than 45% of Net
+                    pay
+                  </label>
+                </div>
+
+                <div className="form-check form-switch col-sm-4 col-md-4 mt-4">
+                  <input
+                    className="form-check-input"
+                    type="checkbox"
+                    role="switch"
+                    checked={
+                      reportConfirmation.monthlyDeductionBelowPercentageBenchmark
+                    }
+                    onChange={handleChange}
+                  />
+                  <label className="form-check-label mx-3 checked">
+                    {reportConfirmation.monthlyDeductionBelowPercentageBenchmark
+                      ? "Yes"
+                      : "No"}
+                  </label>
+                </div>
               </div>
 
-              <div className="form-check form-switch col-sm-4 col-md-4 mt-4">
-                <input
-                  className="form-check-input"
-                  type="checkbox"
-                  role="switch"
-                  checked={takeHomePayNotLessThan20Percent}
-                  onChange={handleDeduction}
-                />
-                <label className="form-check-label mx-3 checked">
-                  {takeHomePayNotLessThan20Percent ? "Yes" : "No"}
-                </label>
+              {selectedEmployerGroup?.name === employerGroup.police && (
+                <div className="row reportRow mb-5">
+                  <div className="col-sm-8 col-md-8">
+                    <label
+                      className="form-check-label"
+                      htmlFor="flexSwitchCheckChecked"
+                    >
+                      Customer Take home not less than 20% of Gross Pay
+                    </label>
+                  </div>
+
+                  <div className="form-check form-switch col-sm-4 col-md-4 mt-4">
+                    <input
+                      className="form-check-input"
+                      type="checkbox"
+                      role="switch"
+                      checked={
+                        reportConfirmation.takeHomePayNotLessThan20PercentGross
+                      }
+                      onChange={handleDeduction}
+                    />
+                    <label className="form-check-label mx-3 checked">
+                      {reportConfirmation.takeHomePayNotLessThan20PercentGross
+                        ? "Yes"
+                        : "No"}
+                    </label>
+                  </div>
+                </div>
+              )}
+              <div className="row reportRow mb-5">
+                <div className="col-sm-8 col-md-8">
+                  <label
+                    className="form-check-label"
+                    htmlFor="flexSwitchCheckChecked"
+                  >
+                    Customer Take home not less than N
+                    {reportConfirmation.isApplicantCivilianPolice &&
+                    selectedEmployerGroup.name === employerGroup.police
+                      ? selectedEmployerGroup.civilianPolice
+                      : selectedEmployerGroup?.benchmark}
+                  </label>
+                </div>
+
+                <div className="form-check form-switch col-sm-4 col-md-4 mt-4">
+                  <input
+                    className="form-check-input"
+                    type="checkbox"
+                    role="switch"
+                    checked={reportConfirmation.takeHomePayNotLessThanBenchmark}
+                    onChange={handleTakehome}
+                  />
+                  <label className="form-check-label mx-3 checked">
+                    {reportConfirmation.takeHomePayNotLessThanBenchmark
+                      ? "Yes"
+                      : "No"}
+                  </label>
+                </div>
               </div>
+
+              <div className="row reportRow mb-5">
+                <div className="col-sm-8 col-md-8">
+                  <label
+                    className="form-check-label"
+                    htmlFor="flexSwitchCheckChecked"
+                  >
+                    Customer Net Pay is N{" "}
+                    {reportConfirmation.isApplicantCivilianPolice &&
+                    selectedEmployerGroup.name === employerGroup.police
+                      ? selectedEmployerGroup.civilianPolice
+                      : selectedEmployerGroup?.benchmark}{" "}
+                    or more
+                  </label>
+                </div>
+
+                <div className="form-check form-switch col-sm-4 col-md-4 mt-4">
+                  <input
+                    className="form-check-input"
+                    type="checkbox"
+                    role="switch"
+                    checked={reportConfirmation.netPayNotLessThanBenchmark}
+                    onChange={handleNetPay}
+                  />
+                  <label className="form-check-label mx-3 checked">
+                    {reportConfirmation.netPayNotLessThanBenchmark
+                      ? "Yes"
+                      : "No"}
+                  </label>
+                </div>
+              </div>
+
+              {selectedCustomer?.buyoverloan?.toLowerCase() == "yes" && (
+                <div className="row mx-5 align-items-center">
+                  <button
+                    onClick={handleActivateBuyOver}
+                    type="button"
+                    className="btn btn-success mt-3"
+                  >
+                    {isLoading ? (
+                      <PageLoader width="16px" />
+                    ) : (
+                      "  Activate Buyover / Top up"
+                    )}
+                  </button>
+                </div>
+              )}
             </div>
-            <div className="row reportRow mb-5">
-              <div className="col-sm-8 col-md-8">
-                <label
-                  className="form-check-label"
-                  htmlFor="flexSwitchCheckChecked"
-                >
-                  Customer Take home not less than N30,000
-                </label>
-              </div>
+          </form>
+        </div>
 
-              <div className="form-check form-switch col-sm-4 col-md-4 mt-4">
-                <input
-                  className="form-check-input"
-                  type="checkbox"
-                  role="switch"
-                  checked={takeHomePayNotLessThan30K}
-                  onChange={handleTakehome}
-                />
-                <label className="form-check-label mx-3 checked">
-                  {takeHomePayNotLessThan30K ? "Yes" : "No"}
-                </label>
-              </div>
-            </div>
-
-            <div className="row reportRow mb-5">
-              <div className="col-sm-8 col-md-8">
-                <label
-                  className="form-check-label"
-                  htmlFor="flexSwitchCheckChecked"
-                >
-                  Customer Net Pay is N30,000 or more
-                </label>
-              </div>
-
-              <div className="form-check form-switch col-sm-4 col-md-4 mt-4">
-                <input
-                  className="form-check-input"
-                  type="checkbox"
-                  role="switch"
-                  checked={netPayNotLessThan30K}
-                  onChange={handleNetPay}
-                />
-                <label className="form-check-label mx-3 checked">
-                  {netPayNotLessThan30K ? "Yes" : "No"}
-                </label>
-              </div>
-            </div>
-
-            <div className="row mx-5 align-items-center">
-              <button type="submit" className="btn btn-warning mt-3">
-                Update Report
-              </button>
-            </div>
-          </div>
-        </form>
+        <ToastContainer />
       </div>
-    </div>
+    )
   );
 };
 
 PaySlipAnalysis.propTypes = {
-  customerId: PropTypes.string
-}
+  uploadPaySlipAnalysis: PropTypes.func,
+  formState: PropTypes.object,
+  setFormState: PropTypes.func,
+  setReportConfirmation: PropTypes.func,
+  reportConfirmation: PropTypes.object,
+  customerId: PropTypes.string,
+};
 
 export default PaySlipAnalysis;

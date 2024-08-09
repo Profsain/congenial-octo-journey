@@ -7,7 +7,10 @@ import DashboardHeadline from "../../shared/DashboardHeadline";
 import "../customers/Customer.css";
 import "./CreateNewAdmin.css";
 import validationSchema from "./validationSchema";
-import adminRoles from "./adminRoles";
+import { userTypes } from "../../../../lib/userRelated";
+import { useSelector } from "react-redux";
+import PageLoader from "../../shared/PageLoader";
+import { toast } from "react-toastify";
 
 const initialValues = {
   fullName: "",
@@ -16,59 +19,72 @@ const initialValues = {
   phone: "",
   username: "",
   password: "",
+  userRole: "",
   userType: "",
-  jobRole: "",
-  adminRoles: [],
 };
-
-const userTypes = [
-  { value: "admin", label: "Admin" },
-  { value: "md", label: "MD" },
-  { value: "coo", label: "COO" },
-  { value: "credit_head", label: "Credit Head" },
-  { value: "credit_analyst", label: "Credit Analyst" },
-  { value: "operation_staff", label: "Operation Staff" },
-  { value: "loan_officer", label: "Loan Officer" },
-];
 
 const CreateNewAdmin = ({ func }) => {
   const [notification, setNotification] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+
+  const { rolesAndPermission } = useSelector((state) => state.adminUserReducer);
 
   const handleSubmit = async (values, { resetForm }) => {
     const apiUrl = import.meta.env.VITE_BASE_URL;
 
-    // Handle form submission logic here
-    const formData = new FormData();
-    formData.append("fullName", values.fullName);
-    formData.append("photo", values.photo);
-    formData.append("email", values.email.toLowerCase());
-    formData.append("phone", values.phone);
-    formData.append("username", values.username.toLowerCase());
-    formData.append("password", values.password);
-    formData.append("userType", values.userType);
-    formData.append("jobRole", values.jobRole);
-    formData.append("adminRoles", values.adminRoles);
+    try {
+      setIsLoading(true);
 
-    await fetch(`${apiUrl}/api/admin/register`, {
-      method: "POST",
-      enctype: "multipart/form-data",
-      body: formData,
-    });
+      if (values.userType !== "super_admin" && !values.userRole) {
+        return toast.error("Please provide a User Role");
+      }
 
-    // clear fields
-    resetForm();
+      // Handle form submission logic here
+      const formData = new FormData();
+      formData.append("fullName", values.fullName);
+      formData.append("photo", values.photo);
+      formData.append("email", values.email.toLowerCase());
+      formData.append("phone", values.phone);
+      formData.append("username", values.username.toLowerCase());
+      formData.append("password", values.password);
 
-    // clear checkbox
-    const checkboxes = document.querySelectorAll('input[type="checkbox"]');
-    checkboxes.forEach((checkbox) => {
-      checkbox.checked = false;
-    });
+      formData.append("userType", values.userType);
 
-    setNotification("New admin user added successfully");
+      if (values.userType && values.userType === "super_admin") {
+        const adminRole = rolesAndPermission?.find(
+          (item) => item.value === "super_admin"
+        );
 
-    setTimeout(() => {
-      setNotification("");
-    }, 3000);
+        formData.append("userRole", adminRole?._id);
+      } else {
+        formData.append("userRole", values.userRole);
+      }
+
+      const res = await fetch(`${apiUrl}/api/admin/register`, {
+        method: "POST",
+        enctype: "multipart/form-data",
+        body: formData,
+      });
+
+      if (res.ok) {
+        // clear fields
+        resetForm();
+
+        setNotification("New admin user added successfully");
+
+        setTimeout(() => {
+          setNotification("");
+        }, 3000);
+        toast.success("New admin user added successfully");
+      } else {
+        const errorResponse = await res.json();
+        toast.error(errorResponse?.error || "Something Went Wrong");
+      }
+    } catch (error) {
+      toast.error(error?.reponse?.data?.error || "Something Went Wrong");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleClose = () => {
@@ -83,7 +99,7 @@ const CreateNewAdmin = ({ func }) => {
 
   return (
     <div className="TransContainer">
-      <DashboardHeadline>Add New Method</DashboardHeadline>
+      <DashboardHeadline>Add New User</DashboardHeadline>
       <div className="FormCon">
         <form onSubmit={formik.handleSubmit}>
           <div className="FieldRow">
@@ -185,32 +201,18 @@ const CreateNewAdmin = ({ func }) => {
             </div>
           </div>
 
+          {console.log(formik.errors)}
+
           <div className="FieldRow">
             <div className="FieldGroup">
-              <label htmlFor="jobRole">Job Role</label>
-              <input
-                type="text"
-                name="jobRole"
-                placeholder="Enter job role"
-                id="jobRole"
-                className="Input"
-                onChange={formik.handleChange}
-                value={formik.values.jobRole}
-              />
-              {formik.errors.jobRole && formik.touched.jobRole ? (
-                <div className="Error">{formik.errors.jobRole}</div>
-              ) : null}
-            </div>
-
-            <div className="FieldGroup">
-              <label htmlFor="userType">Admin Type</label>
+              <label htmlFor="userType">User Type</label>
               <select
                 name="userType"
                 id="userType"
                 className="Input"
                 onChange={formik.handleChange}
               >
-                <option value="">Select Role</option>
+                <option value="">Select Type</option>
                 {userTypes.map((option) => (
                   <option key={option.value} value={option.value}>
                     {option.label}
@@ -221,15 +223,41 @@ const CreateNewAdmin = ({ func }) => {
                 <div className="Error">{formik.errors.userType}</div>
               ) : null}
             </div>
+
+            {rolesAndPermission && (
+              <div className="FieldGroup">
+                <label htmlFor="userRole">User Roles</label>
+                <select
+                  name="userRole"
+                  disabled={
+                    !formik.values.userType ||
+                    formik.values.userType === "super_admin"
+                  }
+                  onChange={formik.handleChange}
+                  id="userRole"
+                  className="Input"
+                >
+                  <option value="">Select Role</option>
+                  {rolesAndPermission.map((option) => (
+                    <option key={option._id} value={option._id}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+                {formik.errors.userRole && formik.touched.userRole ? (
+                  <div className="Error">{formik.errors.userRole}</div>
+                ) : null}
+              </div>
+            )}
           </div>
 
           {/* adminRoles checkbox options section */}
-          <div className="AdminRoles">
+          {/* <div className="AdminRoles">
             <label htmlFor="adminRoles">Admin Roles</label>
 
             <div className="CheckboxContainer">
-              {adminRoles.map((option) => (
-                <div key={option.value} className="CheckboxGroup">
+              {adminRoles?.map((option) => (
+                <div key={option.value} className="CheckboxGrou">
                   <input
                     type="checkbox"
                     name="adminRoles"
@@ -237,14 +265,16 @@ const CreateNewAdmin = ({ func }) => {
                     value={option.value}
                     onChange={formik.handleChange}
                   />
-                  <label htmlFor={option.value}>{option.label}</label>
+                  <label htmlFor={option.value} className="checkboxLabel">
+                    {option.label}
+                  </label>
                 </div>
               ))}
             </div>
             {formik.errors.adminRoles && formik.touched.adminRoles ? (
               <div className="Error">{formik.errors.adminRoles}</div>
             ) : null}
-          </div>
+          </div> */}
 
           {/* notification message */}
           <div className="Notification">
@@ -254,23 +284,25 @@ const CreateNewAdmin = ({ func }) => {
           <div className="BtnRow">
             <div className="BtnContainer">
               <BocButton
-                fontSize="1.6rem"
+                fontSize="1.3rem"
                 type="button"
                 bgcolor="gray"
                 bradius="18px"
                 func={handleClose}
+                width={"200px"}
               >
                 Cancel
               </BocButton>
             </div>
             <div className="BtnContainer">
               <BocButton
-                fontSize="1.6rem"
+                fontSize="1.3rem"
                 type="submit"
                 bgcolor="#ecaa00"
                 bradius="18px"
+                width={"200px"}
               >
-                Submit
+                {isLoading ? <PageLoader width="16px" /> : "Submit"}
               </BocButton>
             </div>
           </div>

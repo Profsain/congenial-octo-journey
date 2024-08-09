@@ -5,9 +5,8 @@ import "./AdminDashboard.css";
 import LoansCard from "./LoansCard";
 import StatCard from "./StatCard";
 import BocChart from "./BocChart";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchAllCustomer } from "../../../../redux/reducers/customerReducer";
 import {
   getCurrentDateFormatted,
   getYesterdayDate,
@@ -15,64 +14,80 @@ import {
   getLastMonthAndYear,
   getCurrentYear,
 } from "./dashboradfunc";
+import PageLoader from "../../shared/PageLoader";
+import { fetchAllLoans } from "../../../../redux/reducers/loanReducer";
 
 const HomeDashboard = () => {
+  const [customerAnalytics, setCustomerAnalytics] = useState({
+    kycCompleted: null,
+    withCoo: null,
+    withOperations: null,
+    withCredit: null,
+    booked: null,
+    completed: null,
+  });
   // fetch all customer data
   const dispatch = useDispatch();
-  const customers = useSelector(
-    (state) => state.customerReducer.customers.customer
-  );
+
+  const { allLoans } = useSelector((state) => state.loanReducer);
 
   useEffect(() => {
-    dispatch(fetchAllCustomer()).catch((error) =>
-      console.error("Error fetching customers:", error)
+    dispatch(fetchAllLoans()).catch((error) =>
+      console.error("Error fetching Loans:", error)
     );
   }, [dispatch]);
 
-  // filter customer with kyc status completed
-  const kycCompleted = customers
-    ? customers?.filter((customer) => customer?.kyc?.isKycApproved === true)
-    : [];
+  useEffect(() => {
+    if (allLoans) {
+      setCustomerAnalytics({
+        ...customerAnalytics,
+        booked: allLoans?.filter((loan) => loan?.loanstatus === "booked") || [],
+        kycCompleted:
+          allLoans?.filter(
+            (loan) => loan?.customer?.kyc?.isKycApproved === true
+          ) || [],
+        withCoo:
+          allLoans?.filter(
+            (loan) =>
+              loan?.loanstatus === "with coo" || loan?.loanstatus === "unbooked"
+          ) || [],
+        withCredit:
+          allLoans?.filter((loan) => loan?.loanstatus === "with credit") || [],
 
-  // filter customer with loan status
-  const withCoo = customers
-    ? customers?.filter((customer) => customer?.kyc?.loanstatus === "with coo")
-    : [];
+        withOperations:
+          allLoans?.filter((loan) => loan?.loanstatus === "with operations") ||
+          [],
 
-  const withOperations = customers
-    ? customers?.filter(
-        (customer) => customer?.kyc?.loanstatus === "with operation"
-      )
-    : [];
-
-  const withCredit = customers
-    ? customers?.filter(
-        (customer) => customer?.kyc?.loanstatus === "with credit"
-      )
-    : [];
-
-  const booked = customers
-    ? customers?.filter((customer) => customer?.kyc?.loanstatus === "booked")
-    : [];
-
-  const completed = customers
-    ? customers?.filter((customer) => customer?.kyc?.loanstatus === "completed")
-    : [];
-
-  const totalCustomer = kycCompleted.length;
+        completed:
+          allLoans?.filter((loan) => loan?.loanstatus === "completed") || [],
+      });
+    }
+  }, [allLoans]);
 
   // check
   return (
     <>
       <div className="TopCard">
         <FigCard>
-          <h4 className="Title">{totalCustomer || "0"}</h4>
+          {customerAnalytics.completed ? (
+            <h4 className="Title">
+              {customerAnalytics.kycCompleted.length || "0"}
+            </h4>
+          ) : (
+            <PageLoader width="28px" />
+          )}
           <img className="CardIcon" src="images/eyes.png" alt="icon" />
           <p>Total Customers</p>
         </FigCard>
         <div className="Spacer"></div>
         <FigCard>
-          <h4 className="Title">{totalCustomer || "0"}</h4>
+          {customerAnalytics.completed ? (
+            <h4 className="Title">
+              {customerAnalytics.completed.length || "0"}
+            </h4>
+          ) : (
+            <PageLoader width="28px" />
+          )}
           <img className="CardIcon" src="images/eyes.png" alt="icon" />
           <p>Total No Disbursed</p>
         </FigCard>
@@ -82,38 +97,36 @@ const HomeDashboard = () => {
         <div className="LoansStat">
           <Headline spacer="0 0 0.6rem 0" align="left" text="Loans" />
           <div className="InlineCard">
-            <div className="MStat">
-              <LoansCard
-                img="images/padding.png"
-                title="With Operations"
-                stat={withOperations.length}
-                bgcolor="#ea5767"
-              />
-              <LoansCard
-                img="images/star.png"
-                title="With Credit"
-                stat={withCredit.length}
-                bgcolor="#f6ab60"
-              />
-            </div>
-            <div className="MStat">
-              <LoansCard
-                img="images/thumbup.png"
-                title="With COO"
-                stat={withCoo.length}
-                bgcolor="#32c6c7"
-              />
-              <LoansCard
-                img="images/star.png"
-                title="Booked"
-                stat={booked.length}
-                bgcolor="#ecaa00"
-              />
-            </div>
+            <LoansCard
+              img="images/padding.png"
+              title="With Operations"
+              stat={customerAnalytics.withOperations?.length}
+              bgcolor="#ea5767"
+            />
+            <LoansCard
+              img="images/star.png"
+              title="With Credit"
+              stat={customerAnalytics.withCredit?.length}
+              bgcolor="#f6ab60"
+            />
+
+            <LoansCard
+              img="images/thumbup.png"
+              title="With COO/Unbooked"
+              stat={customerAnalytics.withCoo?.length}
+              bgcolor="#32c6c7"
+            />
+            <LoansCard
+              img="images/star.png"
+              title="Booked"
+              stat={customerAnalytics.booked?.length}
+              bgcolor="#ecaa00"
+            />
+
             <LoansCard
               img="images/active.png"
               title="Completed"
-              stat={completed.length}
+              stat={customerAnalytics.completed?.length}
               bgcolor="#2bb294"
             />
             {/* add here */}

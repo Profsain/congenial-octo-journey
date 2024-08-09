@@ -10,6 +10,7 @@ import DashboardHeadline from "../../shared/DashboardHeadline";
 import "../customers/Customer.css";
 import NextPreBtn from "../../shared/NextPreBtn";
 import PageLoader from "../../shared/PageLoader";
+import sortByCreatedAt from "../../shared/sortedByDate";
 
 const ActiveLoans = () => {
   const styles = {
@@ -81,14 +82,14 @@ const ActiveLoans = () => {
             </tr>
           </thead>
           <tbody>
-            {filteredCustomers?.map((customer) => {
+            {sortByCreatedAt(filteredCustomers)?.map((customer) => {
               return (
                 <tr key={customer._id}>
-                  <td>{customer.banking.accountDetails.Message.Id}</td>
+                  <td>{customer.banking?.accountDetails?.Message.Id}</td>
                   <td>{customer.loanProduct || "General Loan"}</td>
-                  <td>{customer.banking.accountDetails.Message.FullName}</td>
+                  <td>{customer.banking?.accountDetails?.Message.FullName}</td>
                   <td>
-                    {customer.banking.accountDetails.Message.AccountNumber}
+                    {customer.banking?.accountDetails?.Message.AccountNumber}
                   </td>
                   <td>{getDateOnly(customer.createdAt)}</td>
                   <td>N{customer.loanamount}</td>

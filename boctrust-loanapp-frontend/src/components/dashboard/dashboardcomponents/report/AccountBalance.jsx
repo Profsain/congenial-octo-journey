@@ -45,13 +45,14 @@ const AccountBalance = () => {
       fontSize: "1.2rem",
     },
   };
+
   const handleSubmit = (values) => {
     // Handle form submission logic here
     console.log(values);
   };
 
   return (
-    <div style={ styles.accountCon}  className="SecCon">
+    <div style={styles.accountCon} className="SecCon">
       <div>
         <DashboardHeadline>Account Balance Report</DashboardHeadline>
         <Formik
@@ -116,43 +117,29 @@ const AccountBalance = () => {
         </Formik>
       </div>
       <div style={styles.container}>
-        <BocButton
-          bgcolor="#636363"
-          bradius="22px"
-          width="90px"
-          margin="0 8px"
-        >
+        <BocButton bgcolor="#636363" bradius="22px" width="90px" margin="0 8px">
           Copy
         </BocButton>
-        <BocButton
-          bgcolor="#636363"
-          bradius="22px"
-          width="90px"
-          margin="0 8px"
-        >
+        <BocButton bgcolor="#636363" bradius="22px" width="90px" margin="0 8px">
           Excel
         </BocButton>
-        <BocButton
-          bgcolor="#636363"
-          bradius="22px"
-          width="90px"
-          margin="0 8px"
-        >
+        <BocButton bgcolor="#636363" bradius="22px" width="90px" margin="0 8px">
           PDF
         </BocButton>
-        <BocButton
-          bgcolor="#636363"
-          bradius="22px"
-          width="90px"
-          margin="0 8px"
-        >
+        <BocButton bgcolor="#636363" bradius="22px" width="90px" margin="0 8px">
           Print
         </BocButton>
       </div>
 
       {/* balance table  */}
-      <div >
-        <Table borderless hover responsive="sm" style={styles.table} className="DTable">
+      <div>
+        <Table
+          borderless
+          hover
+          responsive="sm"
+          style={styles.table}
+          className="DTable"
+        >
           <thead>
             <tr style={styles.th}>
               <th>Date</th>
@@ -164,6 +151,11 @@ const AccountBalance = () => {
           </thead>
           <tbody>
             <tr>
+              <td colSpan="7" style={{ textAlign: "center" }}>
+                No transactions record
+              </td>
+            </tr>
+            {/* <tr>
               <td>2023-25-03</td>
               <td>1234567891</td>
               <td>Awolabi James</td>
@@ -176,7 +168,7 @@ const AccountBalance = () => {
               <td>Awolabi James</td>
               <td>N300000</td>
               <td>N300000</td>
-            </tr>
+            </tr> */}
           </tbody>
         </Table>
       </div>

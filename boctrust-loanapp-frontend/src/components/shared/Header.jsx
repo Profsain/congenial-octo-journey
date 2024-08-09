@@ -9,18 +9,14 @@ const Header = ({ imgurl }) => {
       backgroundSize: "cover",
       backgroundRepeat: "no-repeat",
       backgroundPosition: "center",
-      marginTop: "60px",
     },
   };
 
-  return (
-    <div className="container-fluid" style={styles.header}>
-    </div>
-  );
+  return <div className="container-fluid" style={styles.header}></div>;
 };
 
 Header.propTypes = {
-  imgurl: PropTypes.string
-}
+  imgurl: PropTypes.string,
+};
 
 export default Header;

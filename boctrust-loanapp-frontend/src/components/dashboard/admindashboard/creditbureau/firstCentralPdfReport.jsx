@@ -133,43 +133,56 @@ const styles = StyleSheet.create({
     color: "#145980",
     fontWeight: "bold",
     padding: "5px",
-    marginTop: "6px"
+    marginTop: "6px",
   },
 });
 
 const FirstCentralPdfReport = ({ report }) => {
-
   const {
-    BankVerificationNo,
-    BirthDate,
-    CellularNo,
-    Dependants,
-    DriversLIcenseNo,
-    EmailAddress,
-    EmployerDetail,
-    FirstName,
-    Surname,
-    Gender,
-    HomeTelephoneNo,
-    MaritalStatus,
-    NationalIDNo,
-    Nationality,
-    OtherName,
-    PassportNo,
-    PencomIDNo,
-    ResidentialAddress1,
-    WorkTelephoneNo,
-    ReferenceNo,
-    otheridNo,
-  } = report[1].PersonalDetailsSummary[0];
+    BankVerificationNo = "",
+    BirthDate = "",
+    CellularNo = "",
+    Dependants = "",
+    DriversLIcenseNo = "",
+    EmailAddress = "",
+    EmployerDetail = "",
+    FirstName = "",
+    Surname = "",
+    Gender = "",
+    HomeTelephoneNo = "",
+    MaritalStatus = "",
+    NationalIDNo = "",
+    Nationality = "",
+    OtherName = "",
+    PassportNo = "",
+    PencomIDNo = "",
+    ResidentialAddress1 = "",
+    WorkTelephoneNo = "",
+    ReferenceNo = "",
+    otheridNo = "",
+  } = report[1]?.PersonalDetailsSummary[0] || {};
   const fullName = `${Surname} ${FirstName} ${OtherName || ""}` || "N/A";
 
-  const {Amountarrear, LastBouncedChequesDate, LastJudgementDate, Rating, TotalAccountarrear, TotalAccounts, TotalDishonouredAmount, TotalJudgementAmount, TotalMonthlyInstalment, TotalNumberofDishonoured, TotalNumberofJudgement, TotalOutstandingdebt, TotalaccountinGoodcondition,  } = report[3].CreditAccountSummary[0];
+  const {
+    Amountarrear = "",
+    LastBouncedChequesDate = "",
+    LastJudgementDate = "",
+    Rating = "",
+    TotalAccountarrear = "",
+    TotalAccounts = "",
+    TotalDishonouredAmount = "",
+    TotalJudgementAmount = "",
+    TotalMonthlyInstalment = "",
+    TotalNumberofDishonoured = "",
+    TotalNumberofJudgement = "",
+    TotalOutstandingdebt = "",
+    TotalaccountinGoodcondition = "",
+  } = report[3]?.CreditAccountSummary[0] || {};
 
-  const creditAgreementSummary = report[5].CreditAgreementSummary;
-  const accountMonthlyPaymentHistory = report[7].AccountMonthlyPaymentHistory;
-  const employmentHistory = report[13].EmploymentHistory;
-  const enquiryHistory = report[10].EnquiryHistoryTop[0]
+  const creditAgreementSummary = report[5]?.CreditAgreementSummary || [];
+  const accountMonthlyPaymentHistory = report[7]?.AccountMonthlyPaymentHistory|| [];
+  const employmentHistory = report[13]?.EmploymentHistory || [];
+  const enquiryHistory = report[10]?.EnquiryHistoryTop[0] || {};
 
   return (
     <PDFViewer style={styles.viewer}>
@@ -201,7 +214,9 @@ const FirstCentralPdfReport = ({ report }) => {
               </div>
               <div style={styles.tbox}>
                 <Text style={styles.p}>Enquiry Date:</Text>
-                <Text style={styles.p}>{enquiryHistory.DateRequested || ""}</Text>
+                <Text style={styles.p}>
+                  {enquiryHistory?.DateRequested || ""}
+                </Text>
               </div>
               <div style={styles.tbox}>
                 <Text style={styles.p}>Enquiry Type:</Text>
@@ -853,21 +868,24 @@ const FirstCentralPdfReport = ({ report }) => {
                       </View>
                     </View>
 
-                    {employmentHistory.map(({EmployerDetails, Occupation, UpDateDate, }) => (
-                      <View style={styles.tableRow} key={EmployerDetails || ""}>
-                      <View style={styles.tdb}>
-                        <Text>{EmployerDetails || ""}</Text>
-                      </View>
-                      <View style={styles.tdb}>
-                        <Text>
-                          {UpDateDate || ""}
-                        </Text>
-                      </View>
-                      <View style={styles.tdb}>
-                        <Text>{Occupation || ""}</Text>
-                      </View>
-                    </View>
-                    ))}
+                    {employmentHistory.map(
+                      ({ EmployerDetails, Occupation, UpDateDate }) => (
+                        <View
+                          style={styles.tableRow}
+                          key={EmployerDetails || ""}
+                        >
+                          <View style={styles.tdb}>
+                            <Text>{EmployerDetails || ""}</Text>
+                          </View>
+                          <View style={styles.tdb}>
+                            <Text>{UpDateDate || ""}</Text>
+                          </View>
+                          <View style={styles.tdb}>
+                            <Text>{Occupation || ""}</Text>
+                          </View>
+                        </View>
+                      )
+                    )}
                   </View>
                 </View>
               </div>

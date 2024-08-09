@@ -9,10 +9,18 @@ const validationSchema = Yup.object({
   loanpurpose: Yup.array()
     .min(1, "Please select at least one purpose")
     .required("Required"),
-  bvnnumber: Yup.string().required("Required").matches(/^[0-9]+$/, "Must be only digits").min(11, 'Must be exactly 11 digits').max(11, 'Must be exactly 11 digits'),
+  bvnnumber: Yup.string()
+    .required("Required")
+    .matches(/^[0-9]+$/, "Must be only digits")
+    .min(11, "Must be exactly 11 digits")
+    .max(11, "Must be exactly 11 digits"),
   firstname: Yup.string().required("Required"),
   lastname: Yup.string().required("Required"),
-  phonenumber: Yup.string().required("Required").matches(/^[0-9]+$/, "Must be only digits").min(11, 'Must be exactly 11 digits').max(11, 'Must be exactly 11 digits'),
+  phonenumber: Yup.string()
+    .required("Required")
+    .matches(/^[0-9]+$/, "Must be only digits")
+    .min(11, "Must be exactly 11 digits")
+    .max(11, "Must be exactly 11 digits"),
   dob: Yup.date().required("Required"),
   email: Yup.string().email("Invalid email format").required("Required"),
   maritalstatus: Yup.string().required("Required"),
@@ -25,39 +33,67 @@ const validationSchema = Yup.object({
   stateoforigin: Yup.string().required("Required"),
   ippis: Yup.string().required("Required"),
   servicenumber: Yup.string().required("Required"),
-  valididcard: Yup.mixed().required("Required"),
+  valididcard: Yup.mixed().required("File is Required"),
 
   // next of kin
   nkinfirstname: Yup.string().required("Required"),
   nkinlastname: Yup.string().required("Required"),
-  nkinphonenumber: Yup.string().required("Required").matches(/^[0-9]+$/, "Must be only digits").min(11, 'Must be exactly 11 digits').max(11, 'Must be exactly 11 digits'),
+  nkinphonenumber: Yup.string()
+    .required("Required")
+    .matches(/^[0-9]+$/, "Must be only digits")
+    .min(11, "Must be exactly 11 digits")
+    .max(11, "Must be exactly 11 digits"),
   nkinrelationship: Yup.string().required("Required"),
   nkinresidentialaddress: Yup.string().required("Required"),
 
   // employment
-  employername: Yup.string().required("Required"),
+  employerId: Yup.string().required("Required"),
   employeraddress: Yup.string().required("Required"),
   employmentstartdate: Yup.date().required("Required"),
   netmonthlyincome: Yup.number().required("Required"),
   totalannualincome: Yup.number().required("Required"),
-  officialemail: Yup.string().email("Invalid email format").required("Required"),
+  officialemail: Yup.string()
+    .email("Invalid email format")
+    .required("Required"),
   uploadpayslip: Yup.mixed().required("Required"),
 
   // bank details and disbursement
   salarybankname: Yup.string().required("Required"),
   bankcode: Yup.string().required("Required"),
-  salaryaccountnumber: Yup.string().required("Required").matches(/^[0-9]+$/, "Must be only digits").min(10, 'Must be exactly 10 digits').max(10, 'Must be exactly 10 digits'),
-  sameasaboveaccount: Yup.boolean().required("Required"),
+  salaryaccountnumber: Yup.string()
+    .required("Required")
+    .matches(/^[0-9]+$/, "Must be only digits")
+    .min(10, "Must be exactly 10 digits")
+    .max(10, "Must be exactly 10 digits"),
+
   disbursmentbankname: Yup.string().required("Required"),
-  disbursmentaccountnumber: Yup.string().required("Required").matches(/^[0-9]+$/, "Must be only digits").min(10, 'Must be exactly 10 digits').max(10, 'Must be exactly 10 digits'),
+  disbursmentaccountnumber: Yup.string()
+    .required("Required")
+    .matches(/^[0-9]+$/, "Must be only digits")
+    .min(10, "Must be exactly 10 digits")
+    .max(10, "Must be exactly 10 digits"),
   hasloan: Yup.string().required("Required"),
-  loanbalance: Yup.string().required("Required"),
+  currentmonthlyplanrepaymentamount: Yup.string()
+    .required("Required")
+    .matches(/^[0-9]+$/, "Must be only digits"),
+  estimatedmonthlylivingexpense: Yup.string()
+    .required("Required")
+    .matches(/^[0-9]+$/, "Must be only digits"),
+  loanbalance: Yup.string()
+    .required("Required")
+    .matches(/^[0-9]+$/, "Must be only digits"),
   loanprovider: Yup.string().required("Required"),
   buyoverloan: Yup.string().required("Required"),
   beneficiaryname: Yup.string().required("Required"),
   beneficiarybank: Yup.string().required("Required"),
-  beneficiaryaccountnumber: Yup.number().required("Required").min(10, 'Must be exactly 10 digits').max(10, 'Must be exactly 10 digits'),
-  liquidationbalance: Yup.string().required("Required"),
+  beneficiaryaccountnumber: Yup.string()
+    .required("Required")
+    .matches(/^[0-9]+$/, "Must be only digits")
+    .min(10, "Must be exactly 10 digits")
+    .max(10, "Must be exactly 10 digits"),
+  liquidationbalance: Yup.string()
+    .required("Required")
+    .matches(/^[0-9]+$/, "Must be only digits"),
   deductions: Yup.string().required("Required"),
   guarantee: Yup.string().required("Required"),
 

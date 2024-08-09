@@ -18,6 +18,8 @@ import NoResult from "../../../shared/NoResult.jsx";
 import useSearch from "../../../../../utilities/useSearchName.js";
 import useSearchByDate from "../../../../../utilities/useSearchByDate.js";
 import useSearchByDateRange from "../../../../../utilities/useSearchByDateRange.js";
+import sortByCreatedAt from "../../shared/sortedByDate.js";
+import getDateOnly from "../../../../../utilities/getDate";
 
 const CheckSalaryHistory = () => {
   const styles = {
@@ -205,18 +207,20 @@ const CheckSalaryHistory = () => {
                 <th>Last Name</th>
                 <th>Account Number</th>
                 <th>BVN</th>
+                <th>Date</th>
                 <th>Do Check</th>
                 <th>Status</th>
               </tr>
             </thead>
             <tbody>
               {customerList?.length === 0 && <NoResult name="customer" />}
-              {customerList?.map((customer) => (
+              {sortByCreatedAt(customerList)?.map((customer) => (
                 <tr key={customer._id}>
                   <td>{customer.firstname}</td>
                   <td>{customer.lastname}</td>
                   <td>{customer.salaryaccountnumber}</td>
                   <td>{customer.bvnnumber}</td>
+                  <td>{getDateOnly(customer.createdAt)}</td>
                   {customer.remita?.isRemitaCheck ? (
                     <td
                       style={styles.pending}

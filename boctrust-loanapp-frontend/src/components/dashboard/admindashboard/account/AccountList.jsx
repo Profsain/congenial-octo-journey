@@ -8,6 +8,7 @@ import DashboardHeadline from "../../shared/DashboardHeadline";
 import PageLoader from "../../shared/PageLoader";
 import NoResult from "../../../shared/NoResult";
 import searchList from "../../../../../utilities/searchListFunc";
+import sortByCreatedAt from "../../shared/sortedByDate";
 
 const AccountList = ({showCount, searchTerms}) => {
   const styles = {
@@ -72,6 +73,7 @@ const AccountList = ({showCount, searchTerms}) => {
     handleSearch();
   }, [searchTerms]);
 
+  console.log("customerList", customerList);
   return (
     <div>
       {status === "loading" && <PageLoader />}
@@ -87,6 +89,7 @@ const AccountList = ({showCount, searchTerms}) => {
               <th>Account Number</th>
               <th>Customer</th>
               <th>Account ID</th>
+              <th>Account Officer</th>
               <th>Status</th>
               {/* <th>Action</th> */}
             </tr>
@@ -94,11 +97,12 @@ const AccountList = ({showCount, searchTerms}) => {
           <tbody>
             {customerList?.length === 0 && <NoResult name="customer" />}
 
-            {customerList?.map((customer) => (
+            {sortByCreatedAt(customerList)?.map((customer) => (
               <tr key={customer._id}>
-                <td>{customer.banking.accountDetails.Message.AccountNumber}</td>
-                <td>{customer.banking.accountDetails.Message.FullName}</td>
-                <td>{customer.banking.accountDetails.Message.Id}</td>
+                <td>{customer.banking?.accountDetails?.Message.AccountNumber}</td>
+                <td>{customer.banking?.accountDetails?.Message.FullName}</td>
+                <td>{customer.banking?.accountDetails?.Message.Id}</td>
+                <td>{customer.agentname || "Boctrust"}</td>
                 <td style={styles.completed}>Active</td>
                 {/* <td>
                   <select name="action" id="action">

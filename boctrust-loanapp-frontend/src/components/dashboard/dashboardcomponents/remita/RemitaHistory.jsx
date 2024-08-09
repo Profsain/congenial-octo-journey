@@ -1,5 +1,5 @@
+import { useState } from "react";
 import BocButton from "../../shared/BocButton";
-// import DashboardHeadline from "../../shared/DashboardHeadline";
 import Table from "react-bootstrap/Table";
 
 const RemitaHistory = () => {
@@ -19,8 +19,10 @@ const RemitaHistory = () => {
     },
     decline: {
       color: "#ff0000",
-    }
+    },
   };
+
+  const [remitaHistory, setRemitaHistory] = useState([]);
 
   return (
     <div>
@@ -40,42 +42,64 @@ const RemitaHistory = () => {
             </tr>
           </thead>
           <tbody>
-            <tr>
-              <td>2023-25-03</td>
-              <td>1234567891</td>
-              <td>N2134</td>
-              <td>Repayment</td>
-              <td style={styles.completed}>Successful</td>
-              <td>
-                <BocButton cursor="pointer" bgcolor="#145098" bradius="18px">
-                  View
-                </BocButton>
-              </td>
-            </tr>
-            <tr>
-              <td>2023-25-03</td>
-              <td>1234567891</td>
-              <td>N2134</td>
-              <td>Repayment</td>
-              <td style={styles.decline}>Decline</td>
-              <td>
-                <BocButton cursor="pointer" bgcolor="#145098" bradius="18px">
-                  View
-                </BocButton>
-              </td>
-            </tr>
-            <tr>
-              <td>2023-25-05</td>
-              <td>1234567891</td>
-              <td>N1134</td>
-              <td>Repayment</td>
-              <td style={styles.completed}>Successful</td>
-              <td>
-                <BocButton cursor="pointer" bgcolor="#145098" bradius="18px">
-                  View
-                </BocButton>
-              </td>
-            </tr>
+            {remitaHistory.length === 0 ? (
+              <tr>
+                <td colSpan="8" style={{ textAlign: "center" }}>
+                  No loan record
+                </td>
+              </tr>
+            ) : (
+              <div>
+                <tr>
+                  <td>2023-25-03</td>
+                  <td>1234567891</td>
+                  <td>N2134</td>
+                  <td>Repayment</td>
+                  <td style={styles.completed}>Successful</td>
+                  <td>
+                    <BocButton
+                      cursor="pointer"
+                      bgcolor="#145098"
+                      bradius="18px"
+                    >
+                      View
+                    </BocButton>
+                  </td>
+                </tr>
+                <tr>
+                  <td>2023-25-03</td>
+                  <td>1234567891</td>
+                  <td>N2134</td>
+                  <td>Repayment</td>
+                  <td style={styles.decline}>Decline</td>
+                  <td>
+                    <BocButton
+                      cursor="pointer"
+                      bgcolor="#145098"
+                      bradius="18px"
+                    >
+                      View
+                    </BocButton>
+                  </td>
+                </tr>
+                <tr>
+                  <td>2023-25-05</td>
+                  <td>1234567891</td>
+                  <td>N1134</td>
+                  <td>Repayment</td>
+                  <td style={styles.completed}>Successful</td>
+                  <td>
+                    <BocButton
+                      cursor="pointer"
+                      bgcolor="#145098"
+                      bradius="18px"
+                    >
+                      View
+                    </BocButton>
+                  </td>
+                </tr>
+              </div>
+            )}
           </tbody>
         </Table>
       </div>

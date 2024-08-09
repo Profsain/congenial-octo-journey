@@ -41,6 +41,8 @@ const LoanCard = ({
       color: "#fff",
     },
   };
+
+  console.log(title)
   return (
     <div className="card" style={styles.cardStyle}>
       <div className="card-body">

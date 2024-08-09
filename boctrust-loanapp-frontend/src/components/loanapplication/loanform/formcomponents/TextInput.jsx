@@ -7,7 +7,7 @@ const TextInput = ({ label, ...props }) => {
   // message if the field is invalid and it has been touched (i.e. visited)
   const [field, meta] = useField(props);
   return (
-    <div>
+    <div className="d-flex flex-column ">
       <label htmlFor={props.id || props.name}>{label}</label>
       <input
         className="TextInput"

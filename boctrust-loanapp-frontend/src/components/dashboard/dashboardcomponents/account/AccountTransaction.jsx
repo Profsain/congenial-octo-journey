@@ -1,3 +1,4 @@
+import { useSelector } from "react-redux";
 import Table from "react-bootstrap/Table";
 import BocButton from "../../shared/BocButton";
 import "../../Dashboard.css";
@@ -25,6 +26,12 @@ const AccountTransaction = () => {
       color: "#ecaa00",
     },
   };
+
+  // current user
+  const user = useSelector((state) => state.adminAuth.user);
+
+  const transactions = user?.transactions || [];
+
   return (
     <div className=" SecCon">
       <DashboardHeadline
@@ -46,97 +53,48 @@ const AccountTransaction = () => {
             </tr>
           </thead>
           <tbody>
-            <tr>
-              <td>2023-25-03</td>
-              <td>7640232221</td>
-              <td>N21760</td>
-              <td>Cr</td>
-              <td>Transfer</td>
-              <td style={styles.booked}>Booked</td>
-              <td>
-                <BocButton bradius="18px" cursor="pointer" bgcolor="#145098">
-                  View
-                </BocButton>
-              </td>
-            </tr>
-            <tr>
-              <td>2023-25-03</td>
-              <td>7640232221</td>
-              <td>N21760</td>
-              <td>Dr</td>
-              <td>Deposit</td>
-              <td style={styles.withcredit}>With Credit Officer</td>
-              <td>
-                <BocButton bradius="18px" cursor="pointer" bgcolor="#145098">
-                  View
-                </BocButton>
-              </td>
-            </tr>
-            <tr>
-              <td>2023-25-03</td>
-              <td>7640232221</td>
-              <td>N21760</td>
-              <td>Dr</td>
-              <td>Fee</td>
-              <td style={styles.completed}>Completed</td>
-              <td>
-                <BocButton bradius="18px" cursor="pointer" bgcolor="#145098">
-                  View
-                </BocButton>
-              </td>
-            </tr>
-            <tr>
-              <td>2023-25-03</td>
-              <td>7640232221</td>
-              <td>N21760</td>
-              <td>Cr</td>
-              <td>Deposit</td>
-              <td style={styles.booked}>Booked</td>
-              <td>
-                <BocButton bradius="18px" cursor="pointer" bgcolor="#145098">
-                  View
-                </BocButton>
-              </td>
-            </tr>
-            <tr>
-              <td>2023-25-04</td>
-              <td>7640232221</td>
-              <td>N31760</td>
-              <td>Dr</td>
-              <td>Transfer</td>
-              <td style={styles.withcredit}>With Operation</td>
-              <td>
-                <BocButton bradius="18px" cursor="pointer" bgcolor="#145098">
-                  View
-                </BocButton>
-              </td>
-            </tr>
-            <tr>
-              <td>2023-25-03</td>
-              <td>7640232221</td>
-              <td>N21760</td>
-              <td>Dr</td>
-              <td>Fee</td>
-              <td style={styles.withdisbursement}>With Disbursement</td>
-              <td>
-                <BocButton bradius="18px" cursor="pointer" bgcolor="#145098">
-                  View
-                </BocButton>
-              </td>
-            </tr>
-            <tr>
-              <td>2023-25-07</td>
-              <td>7640232221</td>
-              <td>N41760</td>
-              <td>Cr</td>
-              <td>Deposit</td>
-              <td style={styles.completed}>Completed</td>
-              <td>
-                <BocButton bradius="18px" cursor="pointer" bgcolor="#145098">
-                  View
-                </BocButton>
-              </td>
-            </tr>
+            {transactions.length === 0 ? (
+              <tr>
+                <td colSpan="7" style={{ textAlign: "center" }}>
+                  No transactions record
+                </td>
+              </tr>
+            ) : (
+              transactions.map((transaction, index) => (
+                <tr key={index}>
+                  <td>{transaction.date}</td>
+                  <td>{transaction.accountNumber}</td>
+                  <td>{transaction.amount}</td>
+                  <td>{transaction.drCr}</td>
+                  <td>{transaction.type}</td>
+                  <td
+                    style={
+                      transaction.status === "Booked"
+                        ? styles.booked
+                        : transaction.status === "Completed"
+                        ? styles.completed
+                        : transaction.status === "With Credit"
+                        ? styles.withcredit
+                        : transaction.status === "With Disbursement"
+                        ? styles.withdisbursement
+                        : ""
+                    }
+                  >
+                    {transaction.status}
+                  </td>
+                  <td>
+                    <BocButton
+                      cursor="pointer"
+                      bgcolor="#145098"
+                      fontSize="1.6rem"
+                      padding="0.5rem 1rem"
+                    >
+                      View
+                    </BocButton>
+                  </td>
+                </tr>
+              ))
+            )}
           </tbody>
         </Table>
       </div>

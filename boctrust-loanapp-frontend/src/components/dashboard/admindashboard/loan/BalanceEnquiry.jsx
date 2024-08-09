@@ -12,6 +12,7 @@ import getDateOnly from "../../../../../utilities/getDate";
 import searchList from "../../../../../utilities/searchListFunc";
 import LoanDetails from "./LoanDetails";
 import NoResult from "../../../shared/NoResult";
+import sortByCreatedAt from "../../shared/sortedByDate";
 
 const BalanceEnquiry = () => {
   const styles = {
@@ -80,7 +81,6 @@ const BalanceEnquiry = () => {
       `${apiUrl}/api/bankone/balanceEnquiry/${loanAccountNumber}`
     );
     const loanBalanceData = await loanBalance.json();
-    console.log("Loan Balance Result", loanBalanceData);
 
     // set is processing to false
     setTimeout(() => {
@@ -142,6 +142,8 @@ const BalanceEnquiry = () => {
           </div>
         </DashboardHeadline>
       </div>
+
+      <div className="bSection">
       {/* data loader */}
       {status === "loading" && <PageLoader />}
       <DashboardHeadline
@@ -165,12 +167,12 @@ const BalanceEnquiry = () => {
           </thead>
           <tbody>
             {customerList?.length === 0 && <NoResult name="customer" />}
-            {customerList?.map((customer) => {
+            {sortByCreatedAt(customerList)?.map((customer) => {
               return (
                 <tr key={customer._id}>
-                  <td>{customer.banking.accountDetails.Message.Id}</td>
+                  <td>{customer.banking?.accountDetails?.Message.Id}</td>
                   <td>{customer.loanProduct || "General Loan"}</td>
-                  <td>{customer.banking.accountDetails.Message.FullName}</td>
+                  <td>{customer.banking?.accountDetails?.Message.FullName}</td>
                   <td>
                     {customer?.banking?.accountDetails?.Message?.AccountNumber}
                   </td>
@@ -214,6 +216,7 @@ const BalanceEnquiry = () => {
       {show && (
         <LoanDetails show={show} handleClose={handleClose} loanObj={loanObj} />
       )}
+      </div>
     </>
   );
 };

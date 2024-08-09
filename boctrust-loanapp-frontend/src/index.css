@@ -15,13 +15,51 @@ body {
   min-height: 100vh;
 }
 
-h1, h2, h3, h4, h5, h6 {
-  font-family: 'Manrope', sans-serif;
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: "Manrope", sans-serif;
   font-weight: 700;
 }
 
 p {
-  font-family: 'Open Sans', sans-serif;
+  font-family: "Open Sans", sans-serif;
+}
+
+a {
+  text-decoration: none;
+}
+
+
+
+.cursor-pointer {
+  cursor: pointer;
+}
+
+img {
+  object-fit: contain;
+}
+
+.capitalize {
+  text-transform: capitalize;
+}
+
+.table > :not(caption) > * > * {
+  padding: 1rem 0.5rem !important;
+}
+
+.carousel {
+  top: 6px !important;
+  margin-top: 0 !important;
+}
+
+.navbar-collapse.collapse {
+  z-index: 50;
+  background-color: #145088 !important;
+  padding-left: 1rem;
 }
 
 @media screen and (max-width: 600px) {
@@ -65,12 +103,6 @@ p {
     width: 90% !important;
   }
 
-  /* carousel mobile  */
-  .CarouselContainer {
-    margin-top: 12px !important;
-    top: 80px !important;
-  }
-
   .CardContainer {
     margin-top: 5px !important;
   }
@@ -93,7 +125,11 @@ p {
 
   .NairaIcon {
     top: 34px;
-    right: 110px;
+    right: 90px;
+  }
+
+  #careertype {
+    width: 80% !important;
   }
 
   .FinNaira2 {
@@ -125,7 +161,6 @@ p {
     display: flex;
     flex-direction: column;
     justify-content: center !important;
-
   }
 
   .TestimonialCard {
@@ -157,14 +192,14 @@ p {
   }
 
   .Step {
-    padding: 28px 18px ;
+    padding: 28px 18px;
   }
 
   .FormInputBox {
     padding: 12px;
   }
 
-  .InputRow  {
+  .InputRow {
     flex-direction: column;
   }
 
@@ -172,7 +207,8 @@ p {
     width: 100% !important;
   }
 
-  .Signature, .FileUploadBox {
+  .Signature,
+  .FileUploadBox {
     flex-direction: column;
   }
 
@@ -192,7 +228,6 @@ p {
 
   .DashboardContainer {
     padding: 0 !important;
-    margin-top: 7rem !important;
   }
   .Inline {
     display: none;
@@ -220,7 +255,7 @@ p {
     font-size: 13px !important;
   }
   .YellowCard {
-   height: 200px !important;
+    height: 200px !important;
   }
 
   .MLoan {
@@ -231,7 +266,6 @@ p {
     height: 66px !important;
     margin: 2rem 0 -4rem -1.5rem !important;
     font-size: 1.2rem !important;
-
   }
 
   .DTable {
@@ -254,7 +288,8 @@ p {
     margin-bottom: -10rem !important;
   }
 
-  .FieldGroup input, select {
+  .FieldGroup input,
+  select {
     width: 300px !important;
   }
   .BtnContainer {
@@ -281,13 +316,9 @@ p {
     margin: 8px !important;
     /* padding: 18px; */
   }
-  .InlineCard {
-    flex-direction: column !important;
-  }
-  .StatCard {
-    width: 120px !important;
-    margin: 8px !important;
 
+  .StatCard {
+    margin: 8px !important;
   }
   .StatCard p {
     font-size: 0.7rem !important;
@@ -300,152 +331,174 @@ p {
   .TransContainer {
     width: 100% !important;
     background-color: #fff !important;
-   }
-   .ReportCon {
+  }
+  .ReportCon {
     margin-right: 0 !important;
-   }
-   .LDBox {
+  }
+  .LDBox {
     margin-top: 5rem !important;
-
-   }
-   .MainBox {
+  }
+  .MainBox {
     margin: 0;
-   }
-   .SearchBar {
+  }
+  .SearchBar {
     flex-direction: column !important;
     padding-bottom: 0.7rem !important;
-   }
-   .ListSec {
+  }
+  .ListSec {
     margin-top: 11rem;
-   }
-   .SBox {
+  }
+  .SBox {
     padding-left: 3.4rem;
-   }
-   .SBox input {
+  }
+  .SBox input {
     width: 85% !important;
     margin-left: 1rem !important;
-   }
-   .Content {
+  }
+  .Content {
     width: 300px !important;
-   }
-   .action {
+  }
+  .action {
     width: 90px !important;
-   }
-   .FieldRow {
+  }
+  .FieldRow {
     margin-top: 0;
-   }
-   .IAddress {
+  }
+  .IAddress {
     margin: 4rem 0 -5rem -1rem !important;
     width: 60% !important;
-   }
-   .IUpload {
+  }
+  .IUpload {
     padding: 0 0 0 6rem !important;
     width: 100%;
-   }
-   .CRequest, .DCard {
+  }
+  .CRequest,
+  .DCard {
     margin: 0 !important;
-   }
+  }
 
-   .VBox {
+  .VBox {
     flex-direction: column !important;
     margin-bottom: -4rem !important;
-   }
-   .RBox {
+  }
+  /* .RBox {
     margin-top: 6rem !important;
-   }
-   .PCont {
-    padding: 1rem !important
-   }
-   .RTitle {
+   } */
+  .PCont {
+    padding: 1rem !important;
+  }
+  .RTitle {
     font-size: 1rem !important;
     font-weight: 700 !important;
-   }
-   .RowSection {
+  }
+  .RowSection {
     flex-direction: column !important;
     width: 100% !important;
-   }
-   .DetailsCon {
+  }
+  .DetailsCon {
     margin-top: 2rem !important;
     padding: 6px !important;
-   }
-   .RadioCon {
+  }
+  .RadioCon {
     width: 200px !important;
     margin-left: -6rem !important;
-   }
+  }
 
-   .KSection {
+  .KSection {
     margin: 0 !important;
-   }
-   .OfficialIdCard, .FaceCapture {
+  }
+  .OfficialIdCard,
+  .FaceCapture {
     width: 100% !important;
     padding-left: 0 !important;
     padding-right: 1rem !important;
     margin-top: 5rem !important;
     margin-left: 0 !important;
-   }
-   .MatchCon {
+  }
+  .MatchCon {
     margin-left: 0 !important;
-   }
-   .TimeStamp {
+  }
+  .TimeStamp {
     left: 0 !important;
     margin-left: 0 !important;
     width: 95% !important;
-   } 
-   .FormatBtn {
+  }
+  .FormatBtn {
     flex-direction: column !important;
     margin-bottom: 1rem;
-   }
-   .Signature {
+  }
+  .Signature {
     margin-left: 3.3rem !important;
-   }
-   .Capture, .ICard {
+  }
+  .Capture,
+  .ICard {
     margin-top: -5rem !important;
-   }
+  }
 
-   .asBox {
-      flex-direction: column;
-    }
+  .asBox {
+    flex-direction: column;
+  }
 
-    /* overview card */
-    .overCard {
-      width: 90% !important;
-      margin: 8px !important;
-    }
+  /* overview card */
+  .overCard {
+    width: 90% !important;
+    margin: 8px !important;
+  }
 
-    /* search by box */
-    .searchByBox {
-      width: 90% !important;
-      margin-top: 4rem !important;
-      margin-bottom: -5rem !important;
-    }
+  /* search by box */
+  .searchByBox {
+    width: 90% !important;
+    margin-top: 4rem !important;
+    margin-bottom: -5rem !important;
+  }
 
-    .searchByBox input {
-      width: 100% !important;
-    }
+  .searchByBox input {
+    width: 100% !important;
+  }
 
-    .range {
-      flex-direction: column !important;
-      width: 90% !important;
-    }
+  .range {
+    flex-direction: column !important;
+    width: 90% !important;
+  }
 
-    .range input {
-      width: 100% !important;
-    }
+  .range input {
+    width: 100% !important;
+  }
 
-    .asBox {
-      flex-direction: row;
-    }
+  .asBox {
+    flex-direction: row;
+  }
 
-    .Topnav {
-      padding: 0 !important;
-      padding-bottom: 16px !important;
-      padding-right: 14px !important; 
-    }
-    .Hero {
-      display: none !important;
-    }
+  .Topnav {
+    padding: 0 !important;
+    padding-bottom: 16px !important;
+    padding-right: 14px !important;
+  }
+  .Hero {
+    display: none !important;
+  }
 
-    .DescriptionJob {
-      margin-top: 48px !important;
-    }
+  .DescriptionJob {
+    margin-top: 48px !important;
+  }
+
+  /* my loan  */
+  .ResultContainer {
+    margin-top: 6rem !important;
+    margin-left: -1rem !important;
+    margin-bottom: -4rem !important;
+  }
+
+  .bSection {
+    margin-top: 12rem !important;
+  }
+
+  .appForm {
+    margin-top: 3rem !important;
+  }
+
+  .mGroup {
+    margin-left: -2rem !important;
+    margin-bottom: -3.5rem !important;
+  }
 }

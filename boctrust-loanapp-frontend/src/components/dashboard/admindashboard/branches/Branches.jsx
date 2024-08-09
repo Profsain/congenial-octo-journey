@@ -34,7 +34,7 @@ const Branches = () => {
     <>
       {!openAddBranch ? (
         <div className="MainBox">
-          {admin || adminRoles.includes("manage_branch") ? (
+          {admin || adminRoles?.includes("manage_branch") ? (
             <div className="AddBtn">
               <BocButton
                 bgcolor="#ecaa00"

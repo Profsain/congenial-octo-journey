@@ -1,7 +1,6 @@
 /* eslint-disable no-undef */
 import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchAllCustomer } from "../../../../redux/reducers/customerReducer";
 import Headline from "../../../shared/Headline";
 import { Table } from "react-bootstrap";
 import BocButton from "../../shared/BocButton";
@@ -13,6 +12,13 @@ import "./Kyc.css";
 import getDateOnly from "../../../../../utilities/getDate";
 import getTime from "../../../../../utilities/getTime";
 import OtherDocuments from "./OtherDocuments";
+import ViewBySection from "../remita/ViewBySection";
+import useSearch from "../../../../../utilities/useSearchName";
+import useSearchByDate from "../../../../../utilities/useSearchByDate";
+import useSearchByDateRange from "../../../../../utilities/useSearchByDateRange";
+import sortByCreatedAt from "../../shared/sortedByDate";
+import KycViewDetails from "./KycViewDetails";
+import { fetchAllCustomersLoans } from "../../../../redux/reducers/customersLoansReducer";
 
 const KycCheck = () => {
   const styles = {
@@ -40,14 +46,15 @@ const KycCheck = () => {
   };
 
   const apiUrl = import.meta.env.VITE_BASE_URL;
-  
+
   // fetch all customer
   const dispatch = useDispatch();
   const customers = useSelector(
-    (state) => state.customerReducer.customers.customer
+    (state) => state.customersLoansReducer.customersAndLoans
   );
   const status = useSelector((state) => state.customerReducer.status);
   // component state
+  const [searchCustomer, setSearchCustomer] = useState([]);
   const [customerId, setCustomerId] = useState("");
   const [currentCustomer, setCurrentCustomer] = useState({});
   const [showKycDetails, setShowKycDetails] = useState(false);
@@ -59,12 +66,26 @@ const KycCheck = () => {
   const [isOtherDocsValidated, setIsOtherDocsValidated] = useState(null);
   const [isKycApproved, setIsKycApproved] = useState(null);
   const [showOtherDocs, setShowOtherDocs] = useState(false);
+  const [showInfo, setShowInfo] = useState(false);
   // processing bar state
   const [progress, setProgress] = useState(false);
 
   useEffect(() => {
-    dispatch(fetchAllCustomer());
+    const getData = async () => {
+      await dispatch(fetchAllCustomersLoans());
+    };
+
+    getData();
   }, [dispatch, showKycDetails]);
+
+  // update searchCustomer state
+  useEffect(() => {
+    if (customers?.length > 0) {
+      setSearchCustomer(customers);
+    } else {
+      setSearchCustomer([]);
+    }
+  }, [customers]);
 
   // scroll to top
   useEffect(() => {
@@ -107,21 +128,29 @@ const KycCheck = () => {
     setShowOtherDocs(true);
   };
 
+  const handleViewInfo = (id) => {
+    setCustomerId(id);
+
+    // filter customer by id and update current customer state
+    const customer = customers.find((customer) => customer._id === id);
+    setCurrentCustomer(customer);
+    setShowInfo(true);
+  };
+
   // handle credit check start btn
   const handleStartCheck = (id) => {
     setCustomerId(id);
     setShowKycDetails(true);
 
     // filter customer by id and update current customer state
-    const customer = customers.filter((customer) => customer._id === id);
-    setCurrentCustomer(customer[0]);
+    const customer = customers.find((customer) => customer._id === id);
+    setCurrentCustomer(customer);
   };
 
   // handle save kyc check and create bankone account
   const handleSaveCheck = async () => {
     setProgress(true);
     const data = {
-      loanstatus: "with coo",
       isFacialMatch,
       isIdCardValid,
       isPhotoCaptured,
@@ -137,55 +166,78 @@ const KycCheck = () => {
       body: JSON.stringify(data),
     });
 
-    // create bankone account for customer
-    if (isKycApproved) {
-      const newAccount = await fetch(
-        `${apiUrl}/api/bankone/createCustomerAccount`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(currentCustomer),
-        }
-      );
-      const account = await newAccount.json();
+    await fetch(`${apiUrl}/api/loans/status/${currentCustomer.loan._id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        loanstatus: "with credit",
+      }),
+    });
 
-      // update customer data with account details
-      const accountData = {
-        isAccountCreated: true,
-        accountDetails: account.data,
-      };
-      
-      await fetch(
-        `${apiUrl}/api/updatecustomer/banking/${customerId}`,
-        {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(accountData),
-        }
-      );
-
-     }
+    await dispatch(fetchAllCustomersLoans());
     setShowKycDetails(false);
     setProgress(false);
   };
 
+  // handle search by
+  const { searchTerm, setSearchTerm, filteredData } = useSearch(
+    customers,
+    "firstname"
+  );
+
+  const [dateRange, setDateRange] = useState({
+    fromDate: "",
+    toDate: "",
+  });
+
+  useEffect(() => {
+    setSearchCustomer(filteredData);
+  }, [searchTerm, filteredData]);
+
+  // handle search by date
+  const { filteredDateData } = useSearchByDate(customers, "createdAt");
+  const searchByDate = () => {
+    setSearchCustomer(filteredDateData);
+  };
+
+  // handle list reload
+  const handleReload = () => {
+    setDateRange({
+      fromDate: "",
+      toDate: "",
+    });
+    dispatch(fetchAllCustomersLoans());
+    setSearchCustomer(customers);
+  };
+
+  // handle search by date range
+  const { searchData } = useSearchByDateRange(
+    customers,
+    dateRange,
+    "createdAt"
+  );
+
+  useEffect(() => {
+    setSearchCustomer(customers);
+  }, [customers]);
+
+  useEffect(() => {
+    setSearchCustomer(searchData);
+  }, [searchData, customers]);
+
   return (
     <>
-      {!showOtherDocs && (
+      {!showOtherDocs && !showInfo && (
         <div>
           <div>
-            <Headline text="View by:" />
-            <div style={styles.btnBox} className="VBox">
-              <BocButton margin="8px 18px" bgcolor="#ecaa00" bradius="25px">
-                Recent Application
-              </BocButton>
-              <BocButton margin="8px 18px" bgcolor="#ecaa00" bradius="25px">
-                Date Range
-              </BocButton>
-              <BocButton margin="8px 18px" bgcolor="#ecaa00" bradius="25px">
-                Specific User
-              </BocButton>
-            </div>
+            {/* view by section */}
+            <ViewBySection
+              setSearch={setSearchTerm}
+              setDateRange={setDateRange}
+              dateRange={dateRange}
+              searchDateFunc={searchByDate}
+              handleReload={handleReload}
+            />
           </div>
 
           {/* data loader */}
@@ -197,57 +249,77 @@ const KycCheck = () => {
               height="52px"
               mspacer="2rem 0 -2.55rem -1rem"
               bgcolor="#145098"
-            ></DashboardHeadline>
+            />
             <div style={styles.table}>
               <Table borderless hover responsive="sm">
                 <thead style={styles.head}>
                   <tr>
                     <th>Customer ID</th>
                     <th>Full Name</th>
-                    <th>View Document</th>
+                    <th>Phone</th>
+                    <th>Date</th>
+                    <th>View Details</th>
+                    <th>View Documents</th>
                     <th>Do Review</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {customers?.map((customer) => (
-                    <tr key={customer._id}>
-                      <td>{customer.phonenumber.slice(1)}</td>
-                      <td>{customer.firstname + " " + customer.lastname}</td>
-                      <td
-                        onClick={() => handleViewDocs(customer._id)}
-                        style={styles.padding}
-                        className="viewDocs"
-                      >
-                        View
+                  {searchCustomer?.length === 0 && searchData ? (
+                    <tr>
+                      <td colSpan="4" style={{ textAlign: "center" }}>
+                        No data available
                       </td>
-                      <td>
-                        <div>
-                          {customer.kyc.isKycApproved ? (
-                            <BocButton
-                              bradius="12px"
-                              fontSize="14px"
-                              margin="0 4px"
-                              bgcolor="#5cc51c"
-                            >
-                              Done
-                            </BocButton>
-                          ) : (
-                            <a href="#kycSection">
+                    </tr>
+                  ) : (
+                    sortByCreatedAt(searchData)?.map((customer) => (
+                      <tr key={customer._id}>
+                        <td>{customer.customerId}</td>
+                        <td>{customer.firstname + " " + customer.lastname}</td>
+                        <td>{customer.phonenumber}</td>
+                        <td>{getDateOnly(customer.createdAt)}</td>
+                        <td
+                          onClick={() => handleViewInfo(customer._id)}
+                          style={styles.padding}
+                          className="viewDocs"
+                        >
+                          View
+                        </td>
+                        <td
+                          onClick={() => handleViewDocs(customer._id)}
+                          style={styles.padding}
+                          className="viewDocs"
+                        >
+                          View
+                        </td>
+                        <td>
+                          <div>
+                            {customer.kyc.isKycApproved ? (
                               <BocButton
                                 bradius="12px"
                                 fontSize="14px"
                                 margin="0 4px"
-                                bgcolor="#f64f4f"
-                                func={() => handleStartCheck(customer._id)}
+                                bgcolor="#5cc51c"
                               >
-                                Check
+                                Done
                               </BocButton>
-                            </a>
-                          )}
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
+                            ) : (
+                              <a href="#kycSection">
+                                <BocButton
+                                  bradius="12px"
+                                  fontSize="14px"
+                                  margin="0 4px"
+                                  bgcolor="#f64f4f"
+                                  func={() => handleStartCheck(customer._id)}
+                                >
+                                  Check
+                                </BocButton>
+                              </a>
+                            )}
+                          </div>
+                        </td>
+                      </tr>
+                    ))
+                  )}
                 </tbody>
               </Table>
             </div>
@@ -537,7 +609,7 @@ const KycCheck = () => {
                     bgcolor="#145098"
                     func={handleSaveCheck}
                   >
-                    Valid/Create Account
+                    Valid
                   </BocButton>
                 ) : (
                   <PageLoader />
@@ -554,6 +626,9 @@ const KycCheck = () => {
           customerObj={currentCustomer}
           setShowDocs={setShowOtherDocs}
         />
+      )}
+      {showInfo && (
+        <KycViewDetails customer={currentCustomer} setShowInfo={setShowInfo} />
       )}
     </>
   );

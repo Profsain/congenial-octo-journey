@@ -24,15 +24,7 @@ router.post('/send-email', async (req, res) => {
             html: html
 
         };
-            
-        //         if (error) {
-        //             console.log(error);
-        //             res.status(500).json({ success: false, error: 'Internal Server Error, mail not sent' });
-        //         } else {
-        //             console.log('Email sent: ' + info.response);
-        //             res.status(200).json({ success: true, message: 'Email sent successfully' });
-        //         }
-        //     });
+
         let info = await transporter.sendMail({
             from: '"Boctrust"  eBusiness@boctrustmfb.com', // sender address
             to: email, // list of receivers
@@ -40,7 +32,6 @@ router.post('/send-email', async (req, res) => {
             text: html, // plain text body
         });
 
-        console.log("Message sent: %s", info.messageId);
         res.status(200).json({ success: true, message: 'Email sent successfully' });
     } catch (error) {
         console.log(error);

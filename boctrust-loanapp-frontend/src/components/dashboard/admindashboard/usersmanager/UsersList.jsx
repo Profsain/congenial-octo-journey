@@ -78,7 +78,7 @@ const UsersList = ({ count, searchTerms }) => {
     if (option === "edit") {
       setShow(true);
       setViewEdit("edit");
-    } else if (option === "view") { 
+    } else if (option === "view") {
       setShow(true);
       setViewEdit("view");
     } else if (option === "delete") {
@@ -124,7 +124,7 @@ const UsersList = ({ count, searchTerms }) => {
             <tbody>
               {usersList?.length === 0 && <NoResult name="user" />}
               {usersList?.map((user) => (
-                <tr key={user._id}>
+                <tr key={user._id} className="">
                   <td>
                     <img
                       src={user.imageUrl}
@@ -137,8 +137,12 @@ const UsersList = ({ count, searchTerms }) => {
                   <td>{user.phone}</td>
                   <td>{user.username}</td>
                   <td>{user.userType}</td>
-                  <td>{user.jobRole}</td>
-                  <td style={styles.completed}>{user.status.toUpperCase()}</td>
+                  <td>{user?.userRole?.label || "All"}</td>
+                  <td >
+                    <span className="badge bg-success">
+                      {user.status.toUpperCase()}
+                    </span>
+                  </td>
                   <td>
                     <select
                       name="action"
@@ -161,10 +165,14 @@ const UsersList = ({ count, searchTerms }) => {
 
       {/* edit user popup model */}
       {show && (
-        <EditUser show={show} onHide={() => setShow(false)} userobj={userObj} adminRoles={adminRoles} viewEdit={viewEdit} />
-      )
-      }
-    
+        <EditUser
+          show={show}
+          onHide={() => setShow(false)}
+          userobj={userObj}
+          adminRoles={adminRoles}
+          viewEdit={viewEdit}
+        />
+      )}
 
       {/* acton popup model */}
       <ActionNotification

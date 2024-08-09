@@ -1,74 +1,99 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
-const EmployerSchema = mongoose.Schema({
+const EmployerSchema = mongoose.Schema(
+  {
     employersId: {
-        type: String,
-        required: true,
-        trim: true,
+      type: String,
+      required: true,
+      trim: true,
     },
     employersName: {
-        type: String,
-        required: true,
+      type: String,
+      required: true,
     },
     employersAddress: {
-        type: String,
-        required: true,
+      type: String,
+      required: true,
     },
     dateAdded: {
-        type: Date,
-        default: Date.now,
+      type: Date,
+      default: Date.now,
     },
     mandateIssued: {
-        type: String,
-        default: "false",
+      type: String,
+      default: "false",
     },
     mandateRule: {
-        mandateTitle: {
-            type: String,
-            trim: true,
-            default: "No Mandate Rule",
-        },
-        mandateUser: {
-            type: String,
-            trim: true,
-            default: "Default User",
-        },
-        mandateDuration: {
-            type: String,
-            trim: true,
-            default: "0 Months",
-        },
-        dateCreated: {
-            type: Date,
-            default: Date.now,
-        },
-        allowStacking: {
-            type: String,
-            default: false,
-        },
-        secondaryDuration: {
-            type: String,
-            default: false,
-        },
+      mandateTitle: {
+        type: String,
+        trim: true,
+        default: "No Mandate Rule",
+      },
+      mandateUser: {
+        type: String,
+        trim: true,
+        default: "Default User",
+      },
+      mandateDuration: {
+        type: String,
+        trim: true,
+        default: "0 Months",
+      },
+      dateCreated: {
+        type: Date,
+        default: Date.now,
+      },
+      allowStacking: {
+        type: String,
+        default: false,
+      },
+      secondaryDuration: {
+        type: String,
+        default: false,
+      },
     },
     statementRule: {
-        ruleTitle: {
-            type: String,
-            trim: true,
-            default: "Statement Title",
-        },
-        maximumTenure: {
-            type: String,
-            trim: true,
-            default: "0 Months",
-        },
-        maximumAmount: {
-            type: String,
-            trim: true,
-            default: "0.00",
-        },
-    }
-}, { timestamps: true });
+      ruleActive: {
+        type: Boolean,
+        defualt: false,
+      },
+      ruleTitle: {
+        type: String,
+        trim: true,
+        default: "Statement Title",
+      },
+      maximumTenure: {
+        type: String,
+        trim: true,
+        default: "0 Months",
+      },
+      maximumAmount: {
+        type: String,
+        trim: true,
+        default: "0.00",
+      },
+    },
+    employerLetterRule: {
+      ruleActive: {
+        type: Boolean,
+        defualt: false,
+      },
+      ruleTitle: {
+        type: String,
+        trim: true,
+      },
+      maximumTenure: {
+        type: String,
+        trim: true,
+      },
+      maximumAmount: {
+        type: String,
+        trim: true,
+      },
+    },
+  },
+  { timestamps: true }
+);
 
-const Employer = mongoose.model('Employer', EmployerSchema);
+const Employer = mongoose.model("Employer", EmployerSchema);
 module.exports = Employer; // export employer model

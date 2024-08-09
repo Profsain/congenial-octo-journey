@@ -34,7 +34,9 @@ BocButton.propTypes = {
   bgcolor: PropTypes.string,
   btnclassName: PropTypes.any,
   children: PropTypes.any,
-  color: PropTypes.string
+  color: PropTypes.string,
+  type: PropTypes.string,
+  disable: PropTypes.bool
 }
 
 export default BocButton;

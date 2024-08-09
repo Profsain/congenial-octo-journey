@@ -5,6 +5,7 @@ import {
   YAxis,
   CartesianGrid,
   Tooltip,
+  ResponsiveContainer,
 } from "recharts";
 
 const data = [
@@ -55,35 +56,35 @@ const data = [
 const BocChart = () => {
   return (
     <div className="ChartBar">
-      <AreaChart
-        width={1000}
-        height={400}
-        data={data}
-        syncId="anyId"
-        margin={{
-          top: 10,
-          right: 30,
-          left: 20,
-          bottom: 0,
-        }}
-      >
-        <CartesianGrid strokeDasharray="3 3" />
-        <XAxis dataKey="name" />
-        <YAxis />
-        <Tooltip />
-        <Area
-          type="monotone"
-          dataKey="Deposit"
-          stroke="#ecaa00"
-          fill="#ecaa11"
-        />
-        <Area
-          type="monotone"
-          dataKey="Withdraw"
-          stroke="#ecaa00"
-          fill="#ecaa00"
-        />
-      </AreaChart>
+      <ResponsiveContainer width="100%" height={400}>
+        <AreaChart
+          data={data}
+          syncId="anyId"
+          margin={{
+            top: 10,
+            right: 20,
+            left: 20,
+            bottom: 0,
+          }}
+        >
+          <CartesianGrid strokeDasharray="3 3" />
+          <XAxis dataKey="name" />
+          <YAxis />
+          <Tooltip />
+          <Area
+            type="monotone"
+            dataKey="Deposit"
+            stroke="#ecaa00"
+            fill="#ecaa11"
+          />
+          <Area
+            type="monotone"
+            dataKey="Withdraw"
+            stroke="#ecaa00"
+            fill="#ecaa00"
+          />
+        </AreaChart>
+      </ResponsiveContainer>
     </div>
   );
 };

@@ -18,12 +18,19 @@ const UserManagerDashboard = () => {
         <div className="BlogSection">
           <div className="AddBtn">
             <BocButton func={handleAddNew} bgcolor="#ecaa00" bradius="22px">
-              <span>+</span> Add New Role
+              <div className="d-flex gap-1 align-items-center">
+                <span>+</span> Add New User
+              </div>
             </BocButton>
           </div>
           {/* top search bar */}
           <div className="Search">
-            <DashboardHeadline mspacer="40px 0" padding="0" height="70px" bgcolor="#d9d9d9">
+            <DashboardHeadline
+              mspacer="40px 0"
+              padding="0"
+              height="70px"
+              bgcolor="#d9d9d9"
+            >
               <div className="SearchBar">
                 <div className="FormGroup">
                   <label htmlFor="show">Show</label>
@@ -57,7 +64,6 @@ const UserManagerDashboard = () => {
           </div>
         </div>
       ) : (
- 
         <CreateNewAdmin func={setShowAddNew} />
       )}
     </div>

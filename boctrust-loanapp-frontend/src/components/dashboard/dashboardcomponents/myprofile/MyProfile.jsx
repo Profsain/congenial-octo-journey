@@ -21,6 +21,8 @@ const MyProfile = () => {
     }
   };
 
+  // console.log("user profile", user)
+
   return (
     <div style={styles.container} className="PCon">
       <div>
@@ -35,12 +37,12 @@ const MyProfile = () => {
         <ProfileCard title="Last Name" value={user.lastname} />
         <ProfileCard
           title="Business Name/Employer"
-          value={user.employername || "Self Employed"}
+          value={user?.employer.employersName || "Self Employed"}
         />
         <ProfileCard title="Branch" value={branch} />
         <ProfileCard title="Email" value="femiakin@gmail.com" />
         <ProfileCard title="Mobile Number" value={user.phonenumber} />
-        <ProfileCard title="Address" value={user.houseaddress} />
+        <ProfileCard title="Address" value={user.houseaddress || ""} />
       </div>
     </div>
   );

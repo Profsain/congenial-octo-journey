@@ -138,7 +138,8 @@ const styles = StyleSheet.create({
 });
 
 const FirstCentralCommercialPdf = ({ report }) => {
-  console.log("Report", report);
+  const businesInfo = report[1].BusinessData[0] || [];
+  if (businesInfo.length === 0) return <div className="d-fle justify-content-center lign-items-center fw-bold ">No Coperate Information for User</div>;
   const {
     BusinessName,
     BusinessRegistrationNumber,
@@ -151,24 +152,24 @@ const FirstCentralCommercialPdf = ({ report }) => {
     Telephone1,
   } = report[1].BusinessData[0];
 
-    const {
-      Amountarrear,
-      LastBouncedChequesDate,
-      LastJudgementDate,
-      Rating,
-      TotalAccountarrear,
-      TotalAccounts,
-      TotalDishonouredAmount,
-      TotalJudgementAmount,
-      TotalMonthlyInstalment,
-      TotalNumberofDishonoured,
-      TotalNumberofJudgement,
-      TotalOutstandingdebt,
-      TotalaccountinGoodcondition,
-    } = report[3].FacilityPerformanceSummary[0];
+  const {
+    Amountarrear,
+    LastBouncedChequesDate,
+    LastJudgementDate,
+    Rating,
+    TotalAccountarrear,
+    TotalAccounts,
+    TotalDishonouredAmount,
+    TotalJudgementAmount,
+    TotalMonthlyInstalment,
+    TotalNumberofDishonoured,
+    TotalNumberofJudgement,
+    TotalOutstandingdebt,
+    TotalaccountinGoodcondition,
+  } = report[3].FacilityPerformanceSummary[0];
 
-    const creditAgreementSummary = report[5].CreditAgreementSummary;
-    const accountMonthlyPaymentHistory = report[7].AccountMonthlyPaymentHistory;
+  const creditAgreementSummary = report[5].CreditAgreementSummary;
+  const accountMonthlyPaymentHistory = report[7].AccountMonthlyPaymentHistory;
   //   const employmentHistory = report[13].EmploymentHistory;
 
   return (
@@ -225,9 +226,7 @@ const FirstCentralCommercialPdf = ({ report }) => {
               </div>
               <div style={styles.tbox}>
                 <Text style={styles.p}>Matching Rate:</Text>
-                <Text style={styles.p}>
-                  {Rating || "0"}%{" "}
-                </Text>
+                <Text style={styles.p}>{Rating || "0"}% </Text>
               </div>
             </View>
           </div>

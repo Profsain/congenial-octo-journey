@@ -1,8 +1,12 @@
+import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchProduct } from "../../../../redux/reducers/productReducer";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import DashboardHeadline from "../../shared/DashboardHeadline";
 import "../transferdashboard/Transfer.css";
 import BocButton from "../../shared/BocButton";
+import interestRate from "../../../shared/calculatorfunc";
 
 // Define validation schema using Yup
 const validationSchema = Yup.object().shape({
@@ -14,12 +18,6 @@ const validationSchema = Yup.object().shape({
   purpose: Yup.string().required("Loan purpose is required"),
 });
 
-const loanProductOptions = [
-  { value: "car loan", label: "Car Loan" },
-  { value: "salary advance", label: "Salary Advance" },
-  // Add more options as needed
-];
-
 const initialValues = {
   loanProduct: "",
   duration: "",
@@ -28,9 +26,33 @@ const initialValues = {
 };
 
 const LoanCalculator = () => {
+  const [loanRepayment, setLoanRepayment] = useState("");
+
+  // fetch loan product
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(fetchProduct());
+  }, [dispatch]);
+
+  const loanProducts = useSelector(
+    (state) => state.productReducer.products.products
+  );
   const handleSubmit = (values) => {
-    // Handle form submission logic here
-    console.log(values);
+    // find loan product
+    const loanProduct = loanProducts.find(
+      (product) => product._id === values.loanProduct
+    );
+
+    // calculate loan repayment
+    const rate = loanProduct.interestRate;
+    const amount = parseInt(values.amount);
+    const duration = parseInt(values.duration) * 30;
+    const repayInterest = interestRate(amount, duration, rate);
+
+    const totalRepayment = amount + repayInterest;
+
+    setLoanRepayment(`Total repayment: ${totalRepayment}`);
   };
 
   return (
@@ -43,7 +65,7 @@ const LoanCalculator = () => {
       >
         <Form>
           <div className="FieldRow">
-            <div className="FieldGroup">
+            <div className="FieldGroup" style={{ marginBottom: "18px" }}>
               <label htmlFor="loanProduct">Loan Product</label>
               <Field
                 as="select"
@@ -52,11 +74,11 @@ const LoanCalculator = () => {
                 className="Select"
               >
                 <option value="" label="Select a product" />
-                {loanProductOptions.map((option) => (
+                {loanProducts.map((option) => (
                   <option
-                    key={option.value}
-                    value={option.value}
-                    label={option.label}
+                    key={option._id}
+                    value={option._id}
+                    label={option.productName}
                   />
                 ))}
               </Field>
@@ -93,6 +115,16 @@ const LoanCalculator = () => {
               <ErrorMessage name="purpose" component="div" />
             </div>
           </div>
+
+          {/* calculation result */}
+          {loanRepayment && (
+            <div
+              style={{ color: "orange", textAlign: "center", fontSize: "28px" }}
+            >
+              {loanRepayment}
+            </div>
+          )}
+
           <div className="BtnContainer">
             <BocButton
               fontSize="1.6rem"

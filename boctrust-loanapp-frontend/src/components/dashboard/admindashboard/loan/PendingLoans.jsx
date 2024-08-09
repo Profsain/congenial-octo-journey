@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchAllCustomer } from "../../../../redux/reducers/customerReducer";
 import { Table } from "react-bootstrap";
 import BocButton from "../../shared/BocButton";
 import DashboardHeadline from "../../shared/DashboardHeadline";
@@ -13,16 +12,13 @@ import searchList from "../../../../../utilities/searchListFunc";
 import LoanDetails from "./LoanDetails";
 import NotificationBox from "../../shared/NotificationBox";
 import NoResult from "../../../shared/NoResult";
+import sortByCreatedAt from "../../shared/sortedByDate";
+import { fetchPendingLoans } from "../../../../redux/reducers/loanReducer";
 
 const PaddingLoans = () => {
   const styles = {
-    table: {
-      // margin: "0 2rem -2rem 3rem",
-      fontSize: "10px",
-    },
     head: {
       color: "#fff",
-      fontSize: "1rem",
     },
     approved: {
       color: "#5cc51c",
@@ -41,42 +37,45 @@ const PaddingLoans = () => {
     btnBox: {
       display: "flex",
       justifyContent: "space-between",
-    }
+    },
   };
 
-  const [currentAdmin, setCurrentAdmin] = useState("");
   // fetch all customer
   const dispatch = useDispatch();
-  const customers = useSelector(
-    (state) => state.customerReducer.customers.customer
-  );
+  const { pendingLoans } = useSelector((state) => state.loanReducer);
+
   const status = useSelector((state) => state.customerReducer.status);
 
   // current login admin user
   const currentUser = useSelector((state) => state.adminAuth.user);
-  const userType = currentUser.userType;
-  useEffect(() => {
-    if (currentUser) {
-      setCurrentAdmin(userType);
-    }
-  }, [currentUser, userType]);
-
-  // filtere customer by isKycApproved
-  const filteredCustomers = customers?.filter(
-    (customer) =>
-      customer.kyc.isKycApproved === true &&
-      customer.kyc.loanstatus !== "completed"
-  );
 
   const [show, setShow] = useState(false);
   const [loanObj, setLoanObj] = useState({});
-  const [customerId, setCustomerId] = useState("");
   const [message, setMessage] = useState("");
   const [showNotification, setShowNotification] = useState(false);
+  const [canUserManage, setCanUserManage] = useState(false);
+
+  // handle search
+  const [showCount, setShowCount] = useState(10);
+  const [searchTerms, setSearchTerms] = useState("");
 
   useEffect(() => {
-    dispatch(fetchAllCustomer());
+    setCanUserManage(currentUser?.userRole?.can.includes("loanManagement"));
+  }, [currentUser]);
+
+  useEffect(() => {
+    const getData = async () => {
+      await dispatch(fetchPendingLoans());
+    };
+
+    getData();
   }, [dispatch, showNotification]);
+
+  // update loansList to show 10 pendingLoans on page load
+  // or on count changes
+  useEffect(() => {
+    setLoansList(pendingLoans?.slice(0, showCount));
+  }, [pendingLoans, showCount]);
 
   // handle close notification
   const closeNotification = () => {
@@ -88,98 +87,22 @@ const PaddingLoans = () => {
   const handleClose = () => {
     setLoanObj({});
     setShow(false);
-    setCustomerId("");
   };
 
   // handle show loan details
   const handleShow = (id) => {
-    const loan = filteredCustomers.find((customer) => customer._id === id);
+    const loan = pendingLoans.find((customer) => customer._id === id);
     setLoanObj(loan);
     setShow(true);
-    setCustomerId(id);
   };
-
-  // handle loan approval
-  const updateLoanStatus = async (customerId, status) => {
-    const apiUrl = import.meta.env.VITE_BASE_URL;
-    const data = { loanstatus: status };
-
-    // send update to backend
-    await fetch(`${apiUrl}/api/updatecustomer/kyc/${customerId}/loanstatus`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data),
-    });
-  };
-
-  const handleApproval = async (id) => {
-    // process loan approval
-    if (currentAdmin === "admin" || currentAdmin === "md") {
-      updateLoanStatus(id, "completed");
-      // create loan and disburse in bankone
-      // const newDisbursement = await fetch(
-      //   `${apiUrl}/api/bankone/createLoan`,
-      //   {
-      //     method: "POST",
-      //     headers: { "Content-Type": "application/json" },
-      //     body: JSON.stringify(loanObj),
-      //   }
-      // );
-      // const disbursedData = await newDisbursement.json
-      // console.log("Disbursement", disbursedData)
-
-    } else if (currentAdmin === "coo") {
-      updateLoanStatus(id, "with operation");
-    } else if (currentAdmin === "operation") {
-      updateLoanStatus(id, "booked");
-    }
-
-    setShow(false);
-    setMessage("Loan Processed Successfully by " + currentAdmin);
-    setShowNotification(true);
-    // dispatch fetch all customer
-    dispatch(fetchAllCustomer());
-  };
-
-  // handle rejected loan
-  const handleRejected = (id) => {
-    // process loan approval
-    if (currentAdmin === "admin" || currentAdmin === "md") {
-      updateLoanStatus(id, "rejected admin");
-    } else if (currentAdmin === "coo") {
-      updateLoanStatus(id, "rejected coo");
-    } else if (currentAdmin === "operation") {
-      updateLoanStatus(id, "rejected operation");
-    }
-
-    setShow(false);
-    setMessage("Loan Processed Successfully by " + currentAdmin);
-    setShowNotification(true);
-    // dispatch fetch all customer
-    dispatch(fetchAllCustomer());
-  };
-
-  // handle search
-  const [showCount, setShowCount] = useState(10);
-  const [searchTerms, setSearchTerms] = useState("");
 
   // search customer list
-  const [customerList, setCustomerList] = useState(filteredCustomers);
+  const [loansList, setLoansList] = useState(null);
 
-  // update customerList to show 10 customers on page load
-  // or on count changes
-  useEffect(() => {
-    setCustomerList(filteredCustomers?.slice(0, showCount));
-  }, [customers, showCount]);
-
-  // update customerList on search
+  // update loansList on search
   const handleSearch = () => {
-    const currSearch = searchList(
-      filteredCustomers,
-      searchTerms,
-      "agreefullname"
-    );
-    setCustomerList(currSearch?.slice(0, showCount));
+    const currSearch = searchList(pendingLoans, searchTerms, "agreefullname");
+    setLoansList(currSearch?.slice(0, showCount));
   };
 
   useEffect(() => {
@@ -241,63 +164,52 @@ const PaddingLoans = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {customerList?.length === 0 && <NoResult name="customer" />}
-                  {customerList?.map((customer) => {
-                    return (
-                      <tr key={customer.id}>
-                        <td>{customer.banking.accountDetails.Message.Id}</td>
-                        <td>{customer.loanProduct || "General Loan"}</td>
-                        <td>
-                          {customer.banking.accountDetails.Message.FullName}
-                        </td>
-                        <td>
-                          {
-                            customer.banking.accountDetails.Message
-                              .AccountNumber
-                          }
-                        </td>
-                        <td>{getDateOnly(customer.createdAt)}</td>
-                        <td>N{customer.loanamount}</td>
-                        <td style={styles.padding}>
-                          {capitalizeEachWord(customer.kyc.loanstatus)}
-                        </td>
-                        <td>
-                          <div style={styles.btnBox}>
-                            <BocButton
-                              func={() => handleShow(customer._id)}
-                              bradius="12px"
-                              fontSize="10px"
-                              width="50px"
-                              margin="2px"
-                              bgcolor="#ecaa00"
-                            >
-                              Details
-                            </BocButton>
-                            <BocButton
-                              func={() => handleApproval(customer._id)}
-                              bradius="12px"
-                              fontSize="10px"
-                              width="50px"
-                              margin="2px"
-                              bgcolor="#7dd50e"
-                            >
-                              Approve
-                            </BocButton>
-                            <BocButton
-                              func={() => handleRejected(customer._id)}
-                              bradius="12px"
-                              fontSize="10px"
-                              width="50px"
-                              margin="2px"
-                              bgcolor="#f64f4f"
-                            >
-                              Reject
-                            </BocButton>
-                          </div>
-                        </td>
-                      </tr>
-                    );
-                  })}
+                  {loansList && sortByCreatedAt(loansList)?.length === 0 && (
+                    <NoResult name="Loans" />
+                  )}
+                  {loansList &&
+                    loansList?.map((loan) => {
+                      return (
+                        <tr key={loan.id}>
+                          <td>
+                            {loan?.customer.banking?.accountDetails?.Message
+                              ?.Id || "N/A"}
+                          </td>
+                          <td>
+                            {loan?.loanproduct.productName || "General Loan"}
+                          </td>
+                          <td>
+                            {loan?.customer.banking?.accountDetails?.Message
+                              ?.FullName ||
+                              `${loan?.customer.firstname} ${loan?.customer.lastname}`}
+                          </td>
+                          <td>
+                            {loan?.banking?.accountDetails?.Message
+                              .AccountNumber || "N/A"}
+                          </td>
+                          <td>{getDateOnly(loan?.createdAt)}</td>
+                          <td>N{loan?.loanamount}</td>
+                          <td style={styles.padding}>
+                            {capitalizeEachWord(loan?.loanstatus)}
+                          </td>
+                          {canUserManage && (
+                            <td>
+                              <div style={styles.btnBox}>
+                                <BocButton
+                                  func={() => handleShow(loan._id)}
+                                  bradius="12px"
+                                  fontSize="14px"
+                                  margin="2px"
+                                  bgcolor="#ecaa00"
+                                >
+                                  Details
+                                </BocButton>
+                              </div>
+                            </td>
+                          )}
+                        </tr>
+                      );
+                    })}
                 </tbody>
               </Table>
             </div>
@@ -308,13 +220,7 @@ const PaddingLoans = () => {
 
       {/* show loan details model */}
       {show && (
-        <LoanDetails
-          show={show}
-          handleClose={handleClose}
-          loanObj={loanObj}
-          currentPage="pending"
-          handleApproval={() => handleApproval(customerId)}
-        />
+        <LoanDetails show={show} handleClose={handleClose} loanObj={loanObj} />
       )}
 
       {/* show notification model */}

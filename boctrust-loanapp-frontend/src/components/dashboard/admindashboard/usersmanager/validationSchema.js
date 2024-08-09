@@ -17,8 +17,8 @@ const validationSchema = Yup.object().shape({
       "Password must contain at least 8 characters, one letter, one number, and one special character"
     ),
   userType: Yup.string().required("User type is required"),
-  jobRole: Yup.string().required("Job role is required"),
-  adminRoles: Yup.array().required("Admin role is required"),
+  userRole: Yup.string().required("Admin role is required"),
 });
+
 
 export default validationSchema;
