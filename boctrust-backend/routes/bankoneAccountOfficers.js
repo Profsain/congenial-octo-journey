@@ -4,11 +4,12 @@ const router = express.Router();
 
 // add token to environment variable
 const token = process.env.BANKONE_TOKEN;
+const baseUrl = process.env.BANKONE_BASE_URL;
 const mfbcode = "100579";
 
 // Add a request interceptor
 const axiosInstance = axios.create({
-  baseURL: "https://api.mybankone.com",
+  baseURL: baseUrl,
 });
 
 // Update a user
