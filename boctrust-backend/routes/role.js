@@ -75,6 +75,7 @@ router.get("/permission", async (req, res) => {
         "loanManagement",
         "loanDisbursment",
         "bookLoans",
+        "approveBookLoan",
         "approveTransactions",
       ],
       remita: [

@@ -4,8 +4,8 @@ const router = express.Router();
 
 // add token to environment variable
 const token = process.env.BANKONE_TOKEN;
-const baseUrl = "https://api.mybankone.com";
-// const baseUrl = "https://staging.mybankone.com";
+// const baseUrl = "https://api.mybankone.com";
+const baseUrl = "https://staging.mybankone.com";
 const mfbcode = "100579";
 
 // Create customer account endpoint (Done)

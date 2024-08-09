@@ -33,7 +33,7 @@ const PhotoCapture = ({ func }) => {
     <>
       <div className="Container" onClick={takePhotos}>
         <AiOutlineCamera className="CameraIcon" />
-        <p className="Text">Take a Photo</p>
+        <p className="Text">Take a Photo Now</p>
       </div>
 
       <div className="CaptureContainer">
