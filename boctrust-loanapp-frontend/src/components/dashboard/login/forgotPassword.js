@@ -23,7 +23,6 @@ const forgotPassword = async (username, email) => {
         const data = await response.json();
         return data;
     } catch (error) {
-        console.error('Error logging in:', error);
         return { success: false, error: 'Login failed' };
     }
 }

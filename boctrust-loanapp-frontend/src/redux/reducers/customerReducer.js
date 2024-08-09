@@ -1,40 +1,100 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import axios from 'axios';
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import axios, { AxiosError } from "axios";
 
 //fetch accounts
 const apiUrl = import.meta.env.VITE_BASE_URL;
-  
-const API_ENDPOINT = `${apiUrl}/api/customer/customers`;
+
+const API_ENDPOINT = `${apiUrl}/api/customer`;
 
 // Thunk to fetch account from the API
-export const fetchAllCustomer = createAsyncThunk('account/fetchAllCustomer', async () => {
-    const response = await axios.get(API_ENDPOINT);
-  return response.data;
-});
+export const fetchAllCustomer = createAsyncThunk(
+  "account/fetchAllCustomer",
+  async () => {
+    const response = await axios.get(`${API_ENDPOINT}/customers`);
+    return response.data;
+  }
+);
+// Thunk to fetch Single Customer
+export const fetchSingleCustomer = createAsyncThunk(
+  "account/fetchSingleCustomer",
+  async (customerId) => {
+    const response = await axios.get(`${API_ENDPOINT}/customer/${customerId}`);
+
+    return response.data;
+  }
+);
+
+// Thunk to COO Approval and Create Bank One account
+export const cooApprovalAndCreateBankoneAccount = createAsyncThunk(
+  "account/cooApprovalAndCreateBankoneAccount",
+  async (customerId, thunkAPI) => {
+    try {
+      await axios.put(`${apiUrl}/api/updatecustomer/approve/coo/${customerId}`);
+      await axios.post(
+        `${apiUrl}/api/bankone/newCustomerAccount/${customerId}`
+      );
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        return thunkAPI.rejectWithValue(error.response?.data?.message);
+      }
+      return thunkAPI.rejectWithValue("Could not Approve and Create Account");
+    }
+  }
+);
 
 // customer slice
 const customerSlice = createSlice({
-  name: 'customers',
+  name: "customers",
   initialState: {
     customers: [],
-    status: 'idle',
+    selectedCustomer: null,
+    loanFirstInfo: null,
+    status: "idle",
     error: null,
   },
-  reducers: {},
+  reducers: {
+    updateCustomerStateValues: (state, action) => {
+      state[action.payload.name] = action.payload.value;
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(fetchAllCustomer.pending, (state) => {
-        state.status = 'loading';
+        state.status = "loading";
       })
       .addCase(fetchAllCustomer.fulfilled, (state, action) => {
-        state.status = 'succeeded';
+        state.status = "succeeded";
         state.customers = action.payload;
       })
       .addCase(fetchAllCustomer.rejected, (state, action) => {
-        state.status = 'failed';
+        state.status = "failed";
+        state.error = action.error.message;
+      })
+      .addCase(fetchSingleCustomer.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(fetchSingleCustomer.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        state.selectedCustomer = action.payload;
+      })
+      .addCase(fetchSingleCustomer.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.error.message;
+      })
+
+      .addCase(cooApprovalAndCreateBankoneAccount.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(cooApprovalAndCreateBankoneAccount.fulfilled, (state) => {
+        state.status = "succeeded";
+      })
+      .addCase(cooApprovalAndCreateBankoneAccount.rejected, (state, action) => {
+        state.status = "failed";
         state.error = action.error.message;
       });
   },
 });
+
+export const { updateCustomerStateValues } = customerSlice.actions;
 
 export default customerSlice.reducer;

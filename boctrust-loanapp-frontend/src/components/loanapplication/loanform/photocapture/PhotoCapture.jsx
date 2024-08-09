@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 import PropTypes from "prop-types";
 import Webcam from "react-webcam";
 import { useRef, useState, useCallback } from "react";

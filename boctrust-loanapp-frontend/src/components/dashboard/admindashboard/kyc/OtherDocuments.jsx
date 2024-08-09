@@ -52,7 +52,8 @@ const OtherDocuments = ({ customerObj, setShowDocs }) => {
                 <th>Customer ID</th>
                 <th>Full Name</th>
                 <th>Employment Letters</th>
-                <th>Bank Statements/Slip</th>
+                <th>Bank Statements</th>
+                <th>Pay Slip</th>
                 <th>Time Stamp</th>
               </tr>
             </thead>
@@ -68,19 +69,34 @@ const OtherDocuments = ({ customerObj, setShowDocs }) => {
                 <td>{customerObj.customerId}</td>
                 <td>{customerObj.firstname + " " + customerObj.lastname}</td>
                 <td
-                  onClick={() => handleDocs(customerObj.employmentletter)} className="viewDocsBtn"
-                  style={styles.completed}>View</td>
+                  onClick={() => handleDocs(customerObj.employmentletter)}
+                  className="viewDocsBtn"
+                  style={styles.completed}
+                >
+                  View
+                </td>
                 <td
-                  onClick={() => handleDocs(customerObj.uploadpayslip)} className="viewDocsBtn"
-                  style={styles.approved}>View</td>
+                  onClick={() => handleDocs(customerObj.uploadbankstatement)}
+                  className="viewDocsBtn"
+                  style={styles.approved}
+                >
+                  View
+                </td>
+                <td
+                  onClick={() => handleDocs(customerObj.uploadpayslip)}
+                  className="viewDocsBtn"
+                  style={styles.approved}
+                >
+                  View
+                </td>
                 <td>-</td>
               </tr>
             </tbody>
           </Table>
         </div>
         <div className="checkBtn">
-          <BocButton 
-            margin="1rem 0 3rem 0" 
+          <BocButton
+            margin="1rem 0 3rem 0"
             bgcolor="#ecaa00"
             bradius="25px"
             width="200px"

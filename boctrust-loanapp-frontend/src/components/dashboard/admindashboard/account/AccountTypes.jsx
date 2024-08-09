@@ -120,7 +120,7 @@ const AccountTypes = () => {
     <>
       {!openAddAccountType ? (
         <div className="MainBox">
-          {admin || adminRoles.includes("add_new_account") ? (
+          {admin || adminRoles?.includes("add_new_account") ? (
             <div className="AddBtn">
               <BocButton
                 bgcolor="#ecaa00"
@@ -196,11 +196,11 @@ const AccountTypes = () => {
                               style={styles.select}
                             >
                               <option value="">Action</option>
-                              {admin || adminRoles.includes("edit_account") ? (
+                              {admin || adminRoles?.includes("edit_account") ? (
                                 <option value="edit">Edit</option>
                               ) : null}
                               {admin ||
-                              adminRoles.includes("delete_account") ? (
+                              adminRoles?.includes("delete_account") ? (
                                 <option value="delete">Delete</option>
                               ) : null}
                             </select>

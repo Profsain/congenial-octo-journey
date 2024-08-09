@@ -33,7 +33,7 @@ const AddEmployer = () => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify(values),
-    })
+    });
 
     // Reset form after submission
     resetForm();
@@ -42,7 +42,6 @@ const AddEmployer = () => {
     setTimeout(() => {
       setMessage("");
     }, 5000);
-
   };
 
   return (
@@ -54,16 +53,16 @@ const AddEmployer = () => {
           validationSchema={validationSchema}
           onSubmit={handleSubmit}
         >
-          <Form>
+          <Form className="appForm">
             <div style={{ padding: "0 1rem" }}>
               {" "}
-              <div className="FieldGroup">
+              <div className="FieldGroup mGroup">
                 <label htmlFor="employersId">Employers ID</label>
                 <Field
                   type="text"
                   name="employersId"
                   id="employersId"
-                  // className="Input"
+                  className="Input"
                 />
                 <ErrorMessage name="employersId" component="div" />
               </div>

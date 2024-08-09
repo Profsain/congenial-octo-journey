@@ -1,4 +1,4 @@
-// admin roles options 
+// admin roles options
 const adminRoles = [
   { value: "create_user", label: "Create User" },
   { value: "update_user", label: "Update User" },
@@ -27,8 +27,54 @@ const adminRoles = [
   { value: "credit_assesment_approval", label: "Credit Assesment Approval" },
   { value: "kyc_review", label: "KYC Review" },
   { value: "employer_manager", label: "Employer Manager" },
-  {  value: "manage_branch", label: "Manage Bank Branch" },
-
+  { value: "manage_branch", label: "Manage Bank Branch" },
 ];
 
 export default adminRoles;
+
+export const allUserRoles = {
+  operation_staff: {
+    can: [
+      "kycReviewManagement",
+      "readKycReview",
+      "readloans",
+      "loanManagement",
+    ],
+    shouldNotSee: [
+      "creaditAssessment",
+      "employerManament",
+      "userManagement",
+      "systemSetting",
+    ],
+  },
+  marketing_staff: {
+    can: ["readothers"],
+    shouldNotSee: [
+      "creaditAssessment",
+      "employerManament",
+      "userManagement",
+      "systemSetting",
+    ],
+  },
+  credit_analyst: {
+    can: ["creaditAssessment", "salaryHistoryCheck"],
+    shouldNotSee: [
+      "websiteManagement",
+      "employerManament",
+      "userManagement",
+      "systemSetting",
+    ],
+  },
+  coo: {
+    can: [
+      "approveTransactions",
+      "approveCreditAssesment",
+      "bookLoans",
+      "viewUsers",
+      "viewRemitaCollections",
+      "manageRemitaCollections",
+      "loadDisbursment",
+    ],
+    shouldNotSee: ["systemSetting"],
+  },
+};

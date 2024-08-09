@@ -96,8 +96,8 @@ const WithdrawRequestList = ({showCount, searchTerms}) => {
             {customerList?.length === 0 && <NoResult name="customer" />}
             {customerList?.map((customer) => (
               <tr key={customer._id}>
-                <td>{customer.banking.accountDetails.Message.FullName}</td>
-                <td>{customer.banking.accountDetails.Message.AccountNumber}</td>
+                <td>{customer.banking?.accountDetails?.Message.FullName}</td>
+                <td>{customer.banking?.accountDetails?.Message.AccountNumber}</td>
                 <td>{customer.loanamount}</td>
                 <td>{customer.deductions}</td>
                 <td style={styles.completed}>Active</td>

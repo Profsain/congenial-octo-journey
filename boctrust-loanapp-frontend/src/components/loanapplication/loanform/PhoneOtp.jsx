@@ -3,16 +3,14 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Modal, Button, Form } from "react-bootstrap";
 // import { authentication } from "../../../firebase-config";
-import { auth } from "../../../firebase/setup"
-import {
-  RecaptchaVerifier,
-  signInWithPhoneNumber,
-} from "firebase/auth";
+import { auth } from "../../../firebase/setup";
+import { RecaptchaVerifier, signInWithPhoneNumber } from "firebase/auth";
 
 import sendSMS from "../../../../utilities/sendSms";
 import EmailTemplate from "../../shared/EmailTemplate";
 import sendEmail from "../../../../utilities/sendEmail";
 import ReactDOMServer from "react-dom/server";
+import { toast } from "react-toastify";
 
 const styles = {
   error: {
@@ -22,9 +20,8 @@ const styles = {
   btnBox: {
     display: "flex",
     justifyContent: "flex-end",
-  }
+  },
 };
-
 
 const PhoneOtp = (props) => {
   const number = props.phonenumber;
@@ -40,22 +37,31 @@ const PhoneOtp = (props) => {
   const navigate = useNavigate();
 
   // generate recaptcha
-  const setUpRecaptcha = (number) => {
+  const setUpRecaptcha = async (number) => {
     const recaptchaVerifier = new RecaptchaVerifier(
       auth,
       "recaptcha-container",
-      {}
+      {
+        size: "invisible",
+        callback: () => {
+          // reCAPTCHA solved
+          console.log("reCAPTCHA solved");
+        },
+        "expired-callback": () => {
+          // Response expired
+          console.log("reCAPTCHA expired");
+        },
+      }
     );
-    recaptchaVerifier.render();
-    return signInWithPhoneNumber(auth, number, recaptchaVerifier);
-    
+
+    return await signInWithPhoneNumber(auth, number, recaptchaVerifier);
   };
 
   // handle otp request
   const requestOtp = async (e) => {
     e.preventDefault();
     const phone = "+234" + updatePhone.slice(1);
-    
+
     setErrorMsg("");
 
     if (updatePhone === "" || updatePhone === undefined)
@@ -66,26 +72,31 @@ const PhoneOtp = (props) => {
       setConfirmOtp(response);
       setFlag(true);
     } catch (error) {
-      console.error("Error setting up reCAPTCHA:", error);
-      setErrorMsg(`Invalid phone number: ${error.message}`);
+      // setErrorMsg(`Invalid phone number: ${error.message}`);
+      console.log(error);
+      toast.error("Error setting up reCAPTCHA:");
+      // throw new Error("Error setting up reCAPTCHA:", error);
     }
   };
 
-
   // send email notification
-  const handleSendEmail = () => {
-    const emailTemplateHtml = ReactDOMServer.renderToString(
-      <EmailTemplate
-        firstName={customerName}
-        content="Your loan application has been received. We will get back to you shortly."
-      />
-    );
-    const options = {
-      email: emailAddress,
-      subject: "Loan Application Notification",
-      html: emailTemplateHtml,
-    };
-    sendEmail(options);
+  const handleSendEmail = async () => {
+    try {
+      const emailTemplateHtml = ReactDOMServer.renderToString(
+        <EmailTemplate
+          firstName={customerName}
+          content="Your loan application has been received. We will get back to you shortly."
+        />
+      );
+      const options = {
+        email: emailAddress,
+        subject: "Loan Application Notification",
+        html: emailTemplateHtml,
+      };
+      sendEmail(options);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   // handle otp verification
@@ -98,11 +109,14 @@ const PhoneOtp = (props) => {
       await confirmOtp.confirm(otp);
       props.onHide(false);
       // submit customer details
-      handleSubmit();
+      await handleSubmit();
 
       // send loan application email and sms notification
-      sendSMS(number, "Your loan application has been received. We will get back to you shortly.");
-      handleSendEmail();
+      await sendSMS(
+        number,
+        "Your loan application has been received. We will get back to you shortly."
+      );
+      await handleSendEmail();
 
       navigate("/login");
     } catch (error) {
@@ -134,7 +148,7 @@ const PhoneOtp = (props) => {
             <Form.Group className="mb-3" controlId="formPhone">
               <Form.Control
                 type="text"
-                value={props.phonenumber}
+                value={updatePhone}
                 onChange={(e) => setUpdatePhone(e.target.value)}
               />
               <Form.Text className="text-muted">

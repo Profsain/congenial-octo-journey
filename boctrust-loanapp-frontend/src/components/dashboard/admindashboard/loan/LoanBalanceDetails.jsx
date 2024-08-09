@@ -81,10 +81,10 @@ const LoanBalanceDetails = ({ loanObj, show, handleClose, fullName }) => {
 };
 
 LoanBalanceDetails.propTypes = {
-  fullName: PropTypes.any,
+  fullName: PropTypes.string,
   handleClose: PropTypes.any,
   loanObj: PropTypes.shape({
-    Message: PropTypes.any
+    Message: PropTypes.string
   }),
   show: PropTypes.any
 }

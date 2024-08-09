@@ -10,7 +10,7 @@ import AccountTypes from "../account/AccountTypes";
 import CreditBureauDashboard from "../creditbureau/CreditBureauDashboard";
 import CustomersDashboard from "../customers/CustomersDashboard";
 import AddCustomer from "../customers/AddCustomer";
-import CustomersRequest from "../customers/CustomersRequest"
+import CustomersRequest from "../customers/CustomersRequest";
 import HomeDashboard from "./HomeDashboard";
 import Branches from "../branches/Branches";
 import MdasEmployers from "../employersmanager/MdasEmployers";
@@ -42,8 +42,8 @@ import RevenueReport from "../report/revenuereport/RevenueReport";
 import TransactionDashboard from "../transaction/TransactionDashboard";
 import UserManagerDashboard from "../usersmanager/UserManagerDashboard";
 import WebsiteManagerDashboard from "../website/WebsiteManagerDashboard";
-import WithdrawRequestDashboard from "../withdraw/WithdrawRequestDashboard";
-import WithdrawMethodDashboard from "../withdrawmethod/WithdrawMethodDashboard";
+// import WithdrawRequestDashboard from "../withdraw/WithdrawRequestDashboard";
+// import WithdrawMethodDashboard from "../withdrawmethod/WithdrawMethodDashboard";
 import AddWiki from "../website/AddWiki";
 import CustomerAsk from "../website/CustomerAsk";
 import StatementRules from "../employersmanager/StatementRules";
@@ -51,15 +51,21 @@ import AllWebsitePages from "../website/AllWebsitePages";
 import ContactForm from "../website/ContactForm";
 import LoanDisbursement from "../loan/LoanDisbursement";
 import BalanceEnquiry from "../loan/BalanceEnquiry";
-import CheckCustomer from "../loan/CheckCustomer";
-import GetLoan from "../loan/GetLoan";
-import CheckRepayment from "../loan/CheckRepayment";
 import LoanStatement from "../loan/LoanStatement";
-import LoanBalance from "../loan/LoanBalance";
 import PostJobs from "../website/PostJobs";
 import GeneralSettings from "../generalSetting/GeneralSettings";
 import EmailSetting from "../generalSetting/EmailSetting";
 import GoogleAnalytics from "../generalSetting/GoogleAnalytics";
+import DebitTransactions from "../nibssDirectDebit/DebitTransactions";
+import CollectionSummary from "../nibssDirectDebit/CollectionSummary";
+import DebitMandates from "../nibssDirectDebit/DebitMandates";
+import StopRestartCollections from "../nibssDirectDebit/StopRestartCollections";
+import EmploymentLetterRule from "../employersmanager/EmploymentLetterRule";
+import ManageUserRole from "../usersmanager/ManageUserRole";
+import ManageAccessControl from "../usersmanager/ManageAccessControl";
+import BookLoans from "../loan/BookLoans";
+import CompletedLoans from "../loan/CompletedLoans";
+import OverdueLoans from "../loan/CompletedLoans";
 
 const AdminDashboard = () => {
   const [showSidebar, setShowSidebar] = useState(false);
@@ -87,6 +93,18 @@ const AdminDashboard = () => {
       case "dashboard":
         setCurrentTitle("Dashboard");
         break;
+      case "debitTransactions":
+        setCurrentTitle("Loan Repayment - Debit Transactions");
+        break;
+      case "collectionsSummary":
+        setCurrentTitle("Loan Repayment - Collections Summary");
+        break;
+      case "debitMandates":
+        setCurrentTitle("Debit Mandate Rule");
+        break;
+      case "stopRestartCollections":
+        setCurrentTitle("Stop/Restart Collections");
+        break;
       case "branches":
         setCurrentTitle("Branches");
         break;
@@ -105,8 +123,14 @@ const AdminDashboard = () => {
       case "pendingloans":
         setCurrentTitle("Pending Loans");
         break;
-      case "activeloans":
-        setCurrentTitle("Active Loans");
+      case "bookloans":
+        setCurrentTitle("Book Loans");
+        break;
+      case "completedloans":
+        setCurrentTitle("Completed Loans");
+        break;
+      case "overdueloans":
+        setCurrentTitle("Overdue Loans");
         break;
       case "loancalculator":
         setCurrentTitle("Loan Calculator");
@@ -120,21 +144,11 @@ const AdminDashboard = () => {
       case "balanceenquiry":
         setCurrentTitle("Balance Enquiry");
         break;
-      case "checkcustomer":
-        setCurrentTitle("Check Customer");
-        break;
-      case "getloan":
-        setCurrentTitle("Get Loan");
-        break;
-      case "checkrepayment":
-        setCurrentTitle("Check Repayment Schedule");
-        break;
+
       case "loanstatement":
         setCurrentTitle("Loan Statement");
         break;
-      case "loanbalance":
-        setCurrentTitle("Loan Balance");
-        break;
+
       case "transfer":
         setCurrentTitle("Transfer Money");
         break;
@@ -147,9 +161,9 @@ const AdminDashboard = () => {
       case "accounttypes":
         setCurrentTitle("Account Types");
         break;
-      case "withdraw":
-        setCurrentTitle("Disbursement");
-        break;
+      // case "withdraw":
+      //   setCurrentTitle("Disbursement");
+      //   break;
       case "transaction":
         setCurrentTitle("Transaction History");
         break;
@@ -183,8 +197,17 @@ const AdminDashboard = () => {
       case "statementrules":
         setCurrentTitle("Employers/MDAs Manager");
         break;
+      case "employmentletter":
+        setCurrentTitle("Employers/MDAs Manager");
+        break;
       case "kyc":
         setCurrentTitle("Check Customer KYC Details");
+        break;
+      case "employmentLetters":
+        setCurrentTitle("Check Customer Employment Letters");
+        break;
+      case "bankStatements":
+        setCurrentTitle("Check Customer Bank Statements");
         break;
       case "governmentid":
         setCurrentTitle("Check Government ID card Details");
@@ -216,17 +239,17 @@ const AdminDashboard = () => {
       case "contactForm":
         setCurrentTitle("Contact Us Record");
         break;
-      case "withdrawmethod":
-        setCurrentTitle("Disbursement Methods");
-        break;
-      case "usermanager":
+      // case "withdrawmethod":
+      //   setCurrentTitle("Disbursement Methods");
+      //   break;
+      case "allusers":
         setCurrentTitle("User Manager");
         break;
-      case "userroles":
+      case "userrole":
         setCurrentTitle("User Roles");
         break;
-      case "accesscontrols":
-        setCurrentTitle("Access Controls");
+      case "accesscontrol":
+        setCurrentTitle(" Access Control");
         break;
       case "report":
         setCurrentTitle("Account Statement");
@@ -270,6 +293,14 @@ const AdminDashboard = () => {
     switch (currentComponent) {
       case "dashboard":
         return <HomeDashboard />;
+      case "debitTransactions":
+        return <DebitTransactions />;
+      case "collectionsSummary":
+        return <CollectionSummary />;
+      case "debitMandates":
+        return <DebitMandates />;
+      case "stopRestartCollections":
+        return <StopRestartCollections />;
       case "branches":
         return <Branches />;
       case "customer":
@@ -292,24 +323,23 @@ const AdminDashboard = () => {
         return <LoanDisbursement />;
       case "balanceenquiry":
         return <BalanceEnquiry />;
-      case "checkcustomer":
-        return <CheckCustomer />;
-      case "getloan":
-        return <GetLoan />;
-      case "checkrepayment":
-        return <CheckRepayment />;
+      case "bookloans":
+        return <BookLoans />;
+      case "completedloans":
+        return <CompletedLoans />;
+      case "overdueloans":
+        return <OverdueLoans />;
       case "loanstatement":
         return <LoanStatement />;
-      case "loanbalance":
-        return <LoanBalance />;
+
       case "repayment":
         return <RepaymentDashboard />;
       case "accounts":
         return <AccountDashboard />;
       case "accounttypes":
         return <AccountTypes />;
-      case "withdraw":
-        return <WithdrawRequestDashboard />;
+      // case "withdraw":
+      //   return <WithdrawRequestDashboard />;
       case "transaction":
         return <TransactionDashboard />;
       case "remita":
@@ -332,7 +362,13 @@ const AdminDashboard = () => {
         return <MandateRules />;
       case "statementrules":
         return <StatementRules />;
+      case "employmentletter":
+        return <EmploymentLetterRule />;
       case "kyc":
+        return <KycCheck />;
+      case "employmentLetters":
+        return <KycCheck />;
+      case "bankStatements":
         return <KycCheck />;
       case "governmentid":
         return <GovernmentID />;
@@ -354,10 +390,14 @@ const AdminDashboard = () => {
         return <ContactForm />;
       case "website":
         return <AllWebsitePages />;
-      case "usermanager":
+      case "allusers":
         return <UserManagerDashboard />;
-      case "withdrawmethod":
-        return <WithdrawMethodDashboard />;
+      case "userrole":
+        return <ManageUserRole />;
+      case "accesscontrol":
+        return <ManageAccessControl />;
+      // case "withdrawmethod":
+      //   return <WithdrawMethodDashboard />;
       case "report":
         return <AccountStatement />;
       case "accountbalance":
@@ -376,7 +416,7 @@ const AdminDashboard = () => {
         return <GeneralSettings />;
       case "email":
         return <EmailSetting />;
-      case "googleanalytic":
+      case "googleanalytics":
         return <GoogleAnalytics />;
       default:
         return null;
@@ -409,8 +449,8 @@ const AdminDashboard = () => {
               )}
             </div>
           </div>
-          <div className="col-10">
-            <div className="TopNavber">
+          <div className="col-10 ">
+            <div className="TopNavber mr-3">
               <TopNavber title={currentTitle} user={adminName} />
               {renderComponent()}
             </div>
