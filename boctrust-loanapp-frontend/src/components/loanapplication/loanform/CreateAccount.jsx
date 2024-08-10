@@ -8,6 +8,7 @@ import PhoneOtp from "./PhoneOtp";
 import "./Form.css";
 import axios from "axios";
 import { toast } from "react-toastify";
+import { IoIosArrowBack } from "react-icons/io";
 
 const passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/;
 
@@ -16,6 +17,7 @@ const CreateAccount = ({
   phoneNumber,
   customerEmail,
   customerName,
+  setShowLoanForm,
 }) => {
   const { values, setFieldValue } = useFormikContext();
   const { password, confirmpassword } = values;
@@ -69,7 +71,16 @@ const CreateAccount = ({
     <>
       <div className="SignUpContainer">
         <div className="container SignUpInner">
-          <Headline color="#000" text="Create Login / User Details" />
+          <div >
+            <button
+              onClick={() => setShowLoanForm(true)}
+              type="button"
+              className="btn btn-light"
+            >
+              <IoIosArrowBack />
+            </button>
+            <Headline color="#000" text="Create Login / User Details" />
+          </div>
           <div className="row">
             <div className="col-sm-12 col-md-8">
               <ConfirmField
@@ -145,6 +156,7 @@ const CreateAccount = ({
 
 CreateAccount.propTypes = {
   handleSubmit: PropTypes.func,
+  setShowLoanForm: PropTypes.func,
   phoneNumber: PropTypes.string,
   customerEmail: PropTypes.string,
   customerName: PropTypes.string,

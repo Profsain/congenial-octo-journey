@@ -309,13 +309,23 @@ const ConfirmData = ({ career }) => {
           <hr />
           <div className="InputRow">
             <ConfirmField
-              labelName="Bank Name"
-              fieldName="salarybankname"
+              labelName="Account Name"
+              fieldName="salaryaccountname"
               type="text"
               values={values}
               func={handleInputChange}
             />
             <div className="Space"></div>
+            <ConfirmField
+              labelName="Bank Name"
+              fieldName="bankcode"
+              type="text"
+              values={values}
+              func={handleInputChange}
+              disabled
+            />
+          </div>
+          <div className="w-50">
             <ConfirmField
               labelName="Account Number"
               fieldName="salaryaccountnumber"
@@ -335,7 +345,7 @@ const ConfirmData = ({ career }) => {
             <div className="InputRow">
               <ConfirmField
                 labelName="Bank Name"
-                fieldName="salarybankname"
+                fieldName="salaryaccountname"
                 type="text"
                 values={values}
                 func={handleInputChange}

@@ -2,6 +2,7 @@ import PropTypes from "prop-types";
 import "../../../loanapplication/loanform/Form.css";
 import Headline from "../../../shared/Headline";
 import { IoArrowBackOutline } from "react-icons/io5";
+import { filterBank } from "../../../loanapplication/loanform/fetchBanks";
 
 const KycViewDetails = ({ customer, setShowInfo }) => {
   return (
@@ -14,7 +15,7 @@ const KycViewDetails = ({ customer, setShowInfo }) => {
               onClick={() => setShowInfo(false)}
               className="bg-transparent cursor-pointer  "
             >
-              <IoArrowBackOutline size={20}/>
+              <IoArrowBackOutline size={20} />
             </span>
             <Headline
               align="left"
@@ -249,7 +250,7 @@ const KycViewDetails = ({ customer, setShowInfo }) => {
             <KycInput
               name="Bank Name"
               type="text"
-              value={customer?.salarybankname || null}
+              value={filterBank(customer?.bankcode) || null}
             />
             <div className="Space"></div>
             <KycInput

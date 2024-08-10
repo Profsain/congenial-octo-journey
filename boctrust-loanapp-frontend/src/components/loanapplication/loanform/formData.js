@@ -41,7 +41,7 @@ const formData = (formValues) => {
   formData.append("uploadpayslip", formValues.uploadpayslip);
 
   // financial info
-  formData.append("salarybankname", formValues.salarybankname);
+  formData.append("salaryaccountname", formValues.salaryaccountname);
   formData.append("salaryaccountnumber", formValues.salaryaccountnumber);
 
   formData.append("disbursementbankname", formValues.disbursementbankname);

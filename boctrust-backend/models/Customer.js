@@ -68,7 +68,7 @@ const customerSchema = new mongoose.Schema(
     uploadpayslip: String,
     uploadbankstatement: String,
 
-    salarybankname: String,
+    salaryaccountname: String,
     salaryaccountnumber: String,
     sameasaboveaccount: String,
     bankcode: String,

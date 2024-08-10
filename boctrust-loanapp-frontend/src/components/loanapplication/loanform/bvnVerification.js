@@ -57,9 +57,9 @@ const getBvnDetails = () => {
       }
 
       const data = await response.json();
-      console.log("data", data);
+   
       const accessToken = data.access_token;
-      console.log(`Access Token: ${accessToken}`);
+     
 
       // Step 3: Use the access token to call the API endpoints
       const apiEndpoint =

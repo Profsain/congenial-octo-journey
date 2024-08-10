@@ -1,6 +1,7 @@
 import PropTypes from "prop-types";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
+import { filterBank } from "./fetchBanks";
 
 const ConfirmField = ({
   labelName,
@@ -21,6 +22,8 @@ const ConfirmField = ({
     if (fieldName === "employerId") {
       const employerInfo = employers.find((employer) => employer._id === value);
       setFieldValue(employerInfo ? employerInfo.employersName : value);
+    } else if (fieldName === "bankcode") {
+      filterBank(value).then((data) => setFieldValue(data));
     } else {
       setFieldValue(value);
     }
