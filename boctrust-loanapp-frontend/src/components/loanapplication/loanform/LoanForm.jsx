@@ -64,7 +64,9 @@ const LoanForm = React.memo(function LoanFormComponent() {
     (state) => state.employersManagerReducer.employers.employers
   );
   const { allLoanOfficers } = useSelector((state) => state.loanOfficerReducer);
-  const { loanFirstInfo } = useSelector((state) => state.customerReducer);
+
+  //( For Development)
+  // const { loanFirstInfo } = useSelector((state) => state.customerReducer);
 
   // get start data from local storage
   const [careerType, setCareerType] = useState("");
@@ -76,15 +78,19 @@ const LoanForm = React.memo(function LoanFormComponent() {
   // fetch all commercial banks
   const [banks, setBanks] = useState([]);
 
-  // Temporarily Update the firstep Data from the redux store
+  // (Develpotment) Temporarily Update the firstep Data from the redux store
   useEffect(() => {
-    setFirstStepData(loanFirstInfo);
-  }, [loanFirstInfo]);
+    const data = localStorage.getItem("loanFirstInfo");
+    setFirstStepData(data && JSON.parse(data));
+  }, []);
 
-  // Temporarily Update the firstep Data from the redux store
+  // Fetch Officers, Products and Employers
   useEffect(() => {
     const getData = async () => {
       try {
+        //
+        // const res = await axios()
+
         await dispatch(fetchAllLoanOfficers());
         await dispatch(fetchProduct());
         await dispatch(fetchEmployers());
@@ -301,7 +307,7 @@ const LoanForm = React.memo(function LoanFormComponent() {
         formData.append("uploadpayslip", formValues.uploadpayslip);
 
         // financial info
-        formData.append("salarybankname", formValues.salarybankname);
+        formData.append("salaryaccountname", formValues.salaryaccountname);
         formData.append("salaryaccountnumber", formValues.salaryaccountnumber);
         formData.append("bankcode", formValues.bankcode);
         formData.append(
@@ -468,7 +474,7 @@ const LoanForm = React.memo(function LoanFormComponent() {
         }
       } else if (
         step === 3 &&
-        isFieldValid("salarybankname", ref) &&
+        isFieldValid("salaryaccountname", ref) &&
         isFieldValid("salaryaccountnumber", ref)
       ) {
         setStep(4);
@@ -671,7 +677,7 @@ const LoanForm = React.memo(function LoanFormComponent() {
                                           Colleague
                                         </option>
                                         <option value="agent">
-                                          Buctrust Agent
+                                          Boctrust Sales Agent
                                         </option>
                                         <option value="other">Other</option>
                                       </SelectField>
@@ -1088,11 +1094,11 @@ const LoanForm = React.memo(function LoanFormComponent() {
                                         onBlur={() => {
                                           ref.current?.setFieldValue(
                                             "disbursementbankname",
-                                            values.salarybankname
+                                            values.salaryaccountname
                                           );
                                         }}
                                         label="Salary Account Name"
-                                        name="salarybankname"
+                                        name="salaryaccountname"
                                         type="text"
                                       />
                                       <div className="Space"></div>
@@ -1120,11 +1126,6 @@ const LoanForm = React.memo(function LoanFormComponent() {
                                   <div className="w-50">
                                     <TextInput
                                       onBlur={() => {
-                                        console.log(
-                                          values.salaryaccountnumber,
-                                          "salaryaccountnumber"
-                                        );
-
                                         ref.current?.setFieldValue(
                                           "disbursementaccountnumber",
                                           values.salaryaccountnumber
@@ -1297,17 +1298,20 @@ const LoanForm = React.memo(function LoanFormComponent() {
                                       {careerType?.toLowerCase() ===
                                       "government employee" ? (
                                         <div>
-                                          <div>
-                                            <label>
-                                              <Field
-                                                type="radio"
-                                                name="deductions"
-                                                value="remita"
-                                              />
-                                            </label>
-                                            Deduction from salary via Remita
-                                            (Government employee)
-                                          </div>
+                                          {employer?.mandateRule
+                                            .allowStacking == "yes" && (
+                                            <div>
+                                              <label>
+                                                <Field
+                                                  type="radio"
+                                                  name="deductions"
+                                                  value="remita"
+                                                />
+                                              </label>
+                                              Deduction from salary via Remita
+                                              (Government employee)
+                                            </div>
+                                          )}
                                           <div>
                                             <label>
                                               <Field
@@ -1691,6 +1695,7 @@ const LoanForm = React.memo(function LoanFormComponent() {
                         phoneNumber={ref.current?.values.phonenumber}
                         customerEmail={ref.current?.values.email}
                         customerName={ref.current?.values.firstname}
+                        setShowLoanForm={setShowForm}
                       />
                     </div>
                   )}

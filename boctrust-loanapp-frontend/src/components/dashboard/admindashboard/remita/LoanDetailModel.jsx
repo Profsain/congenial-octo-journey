@@ -119,7 +119,7 @@ const LoanDetailModel = (props) => {
             />
             <DetailsCard
               title="Disbursement Bank"
-              text={customer.disbursementbankname || customer.salarybankname}
+              text={customer.disbursementbankname || customer.salaryaccountname}
             />
 
             <DetailsCard title="Income from employer" text="N250,000" />

@@ -58,7 +58,7 @@ const validationSchema = Yup.object({
   uploadpayslip: Yup.mixed().required("Required"),
 
   // bank details and disbursement
-  salarybankname: Yup.string().required("Required"),
+  salaryaccountname: Yup.string().required("Required"),
   bankcode: Yup.string().required("Required"),
   salaryaccountnumber: Yup.string()
     .required("Required")

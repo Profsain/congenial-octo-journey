@@ -41,7 +41,7 @@ const initialValues = ({ loanamount, careertype, captureImg, deductions }) => ({
   uploadpayslip: "",
 
   // financial information
-  salarybankname: "",
+  salaryaccountname: "",
   salaryaccountnumber: "",
   bankcode: "",
   disbursementbankname: "",

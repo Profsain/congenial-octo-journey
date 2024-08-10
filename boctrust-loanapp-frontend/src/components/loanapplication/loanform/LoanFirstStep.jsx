@@ -21,7 +21,7 @@ import { ToastContainer, toast } from "react-toastify";
 // toast styles
 import "react-toastify/dist/ReactToastify.css";
 // import { useNavigate } from "react-router-dom";
-import { updateCustomerStateValues } from "../../../redux/reducers/customerReducer";
+// import { updateCustomerStateValues } from "../../../redux/reducers/customerReducer";
 
 // loan form component
 const LoanFirstStep = ({ data }) => {
@@ -44,11 +44,7 @@ const LoanFirstStep = ({ data }) => {
   // fetch loan product
   const dispatch = useDispatch();
 
-  const loanProducts = useSelector(
-    (state) => state.productReducer.products
-  );
-
-  
+  const loanProducts = useSelector((state) => state.productReducer.products);
 
   // const navigate = useNavigate();
 
@@ -89,7 +85,9 @@ const LoanFirstStep = ({ data }) => {
     setNoofmonth(noOfMonths);
 
     // find product
-    const product = loanProducts?.find((product) => product.ProductCode === productId);
+    const product = loanProducts?.find(
+      (product) => product.ProductCode === productId
+    );
 
     // get interest rate
     const loanRate = product?.InterestRate || 1;
@@ -126,9 +124,12 @@ const LoanFirstStep = ({ data }) => {
   };
 
   // send data to redux store
-  const productId = ref.current?.values.loanproduct || initialLoanProduct?.ProductCode;
+  const productId =
+    ref.current?.values.loanproduct || initialLoanProduct?.ProductCode;
 
-  const product = loanProducts?.find((product) => product.ProductCode === productId);
+  const product = loanProducts?.find(
+    (product) => product.ProductCode === productId
+  );
 
   // handle bvn verification
   // const [showLoanForm, setShowLoanForm] = useState(false);
@@ -151,18 +152,32 @@ const LoanFirstStep = ({ data }) => {
     });
 
     // Store the Information In Redux Store Instead of DB
-    dispatch(
-      updateCustomerStateValues({
-        name: "loanFirstInfo",
-        value: {
-          bvn,
-          loanAmount: loanamount,
-          careerType: careertype,
-          numberOfMonths: noofmonth,
-          loanTotalRepayment: loanRepaymentTotal,
-          monthlyRepayment,
-          loanProduct: product,
-        },
+    // dispatch(
+    //   updateCustomerStateValues({
+    //     name: "loanFirstInfo",
+    //     value: {
+    //       bvn,
+    //       loanAmount: loanamount,
+    //       careerType: careertype,
+    //       numberOfMonths: noofmonth,
+    //       loanTotalRepayment: loanRepaymentTotal,
+    //       monthlyRepayment,
+    //       loanProduct: product,
+    //     },
+    //   })
+    // );
+
+    //Store the information in Local Storage
+    localStorage.setItem(
+      "loanFirstInfo",
+      JSON.stringify({
+        bvn,
+        loanAmount: loanamount,
+        careerType: careertype,
+        numberOfMonths: noofmonth,
+        loanTotalRepayment: loanRepaymentTotal,
+        monthlyRepayment,
+        loanProduct: product,
       })
     );
 

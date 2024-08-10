@@ -40,7 +40,7 @@ export const bookedLoans = [
       officialemail: "okpabicounsel@gmail.com",
       uploadpayslip: "",
       uploadbankstatement: "undefined",
-      salarybankname: "Zenith",
+      salaryaccountname: "Zenith",
       salaryaccountnumber: "1231231212",
       bankcode: "000",
       disbursementbankname: "",

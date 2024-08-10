@@ -2,7 +2,7 @@
   background-image: url("../../../assets/images/formbg1.png");
   background-size: cover;
   background-repeat: no-repeat;
-  padding: 200px 150px;
+  padding: 90px 150px;
 }
 
 .hLine {
@@ -247,7 +247,7 @@ label {
   background-image: url("../../../assets/images/signupbg.png");
   background-position: center;
   background-repeat: no-repeat;
-  padding: 10rem;
+  padding: 5rem 10rem;
 }
 
 .SignUpInner {
