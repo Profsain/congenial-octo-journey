@@ -15,7 +15,7 @@ import NoResult from "../../../shared/NoResult";
 import sortByCreatedAt from "../../shared/sortedByDate";
 import { fetchCompletedLoan } from "../../../../redux/reducers/loanReducer";
 
-const OverdueLoans = () => {
+const CompletedLoans = () => {
   const styles = {
     head: {
       color: "#fff",
@@ -231,4 +231,4 @@ const OverdueLoans = () => {
   );
 };
 
-export default OverdueLoans;
+export default CompletedLoans;

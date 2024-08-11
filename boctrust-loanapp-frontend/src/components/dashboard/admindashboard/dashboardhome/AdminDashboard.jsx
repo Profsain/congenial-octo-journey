@@ -70,7 +70,7 @@ import ProductPageEditor from "../website/ProductPageEditor";
 import BoardOfDirectorEditor from "../website/BoardOfDirectorEditor";
 import BookLoans from "../loan/BookLoans";
 import CompletedLoans from "../loan/CompletedLoans";
-import OverdueLoans from "../loan/CompletedLoans";
+import OverdueLoans from "../loan/OverdueLoans";
 
 
 const AdminDashboard = () => {

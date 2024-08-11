@@ -16,19 +16,35 @@ import NoResult from "../../../shared/NoResult";
 import sortByCreatedAt from "../../shared/sortedByDate";
 import { customerApprovalEnum } from "../../../../lib/userRelated";
 
-const CompletedLoans = () => {
+const OverdueLoans = () => {
   const styles = {
     head: {
       color: "#fff",
+      paddingBottom: "1rem",
     },
-    approved: {
-      color: "#5cc51c",
+    approvedBtn: {
+      backgroundColor: "#5cc51c",
+      color: "white",
+      border: "none",
+      borderRadius: "16px",
+      width: "70PX",
+      cursor: "pointer",
     },
-    completed: {
-      color: "#f64f4f",
+    startBtn: {
+      backgroundColor: "#ecaa00",
+      color: "white",
+      border: "none",
+      borderRadius: "16px",
+      width: "70PX",
+      cursor: "pointer",
     },
-    padding: {
-      color: "#ecaa00",
+    stopBtn: {
+      backgroundColor: "#f64f4f",
+      color: "white",
+      border: "none",
+      borderRadius: "16px",
+      width: "70PX",
+      cursor: "pointer",
     },
     message: {
       textAlign: "center",
@@ -157,25 +173,22 @@ const CompletedLoans = () => {
           <div className="ListSec">
             <DashboardHeadline
               height="52px"
-              mspacer="2rem 0 -2.25rem -1rem"
+              mspacer="2rem 0 -3rem -3rem"
               bgcolor="#145098"
             ></DashboardHeadline>
             <div style={styles.table}>
               <Table borderless hover responsive="sm">
                 <thead style={styles.head}>
                   <tr>
-                    <th>Loan ID</th>
-                    <th>Loan Product</th>
-                    <th>Borrower</th>
-                    <th>A/C Number</th>
-                    <th>Release Date</th>
-                    <th>Applied Amount</th>
-                    <th>Status</th>
-                    <th>Action</th>
+                    <th>Date Due</th>
+                    <th>Customer Name</th>
+                    <th>Account Number</th>
+                    <th>Due Loan Amount</th>
+                    <th>Direct Debit</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {sortByCreatedAt(customerList)?.length === 0 && (
+                  {/* {sortByCreatedAt(customerList)?.length === 0 && (
                     <NoResult name="customer" />
                   )}
                   {customerList?.map((customer) => {
@@ -217,7 +230,31 @@ const CompletedLoans = () => {
                         )}
                       </tr>
                     );
-                  })}
+                  })} */}
+
+                  <tr>
+                    <td>24-05-2024</td>
+                    <td>Tunji Adams</td>
+                    <td>745787666</td>
+                    <td>N54,0900</td>
+                    <td><button style={styles.startBtn}>Start</button></td>
+                  </tr>
+                  <tr>
+                    <td>25-05-2024</td>
+                    <td>Tinuke Banks</td>
+                    <td>745787666</td>
+                    <td>N64,0900</td>
+                    <td>
+                      <button style={styles.approvedBtn}>Active</button>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>26-05-2024</td>
+                    <td>Solanke Adamsora</td>
+                    <td>745787666</td>
+                    <td>N40,000</td>
+                    <td><button style={styles.stopBtn}>Stop</button></td>
+                  </tr>
                 </tbody>
               </Table>
             </div>
@@ -243,4 +280,4 @@ const CompletedLoans = () => {
   );
 };
 
-export default CompletedLoans;
+export default OverdueLoans;

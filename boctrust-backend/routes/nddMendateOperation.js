@@ -2,20 +2,20 @@ const express = require('express');
 const router = express.Router();
 const fetchAccessToken = require('../utils/nddAccessToken');
 
-const BASE_URL = 'https://apitest.nibss-plc.com.ng/ndd/v2';
+const BASE_URL = 'https://apitest.nibss-plc.com.ng/mandate/v1';
 
 // Route to create a mandate direct debit
-app.post('/createMandateDirectDebit', async (req, res) => {
+app.post('/createMandate', async (req, res) => {
   try {
     const accessToken = await fetchAccessToken();
-    const formData = new URLSearchParams(req.body); // Assuming form data is in req.body
+    const formData = req.body; 
 
-    const response = await fetch(`${BASE_URL}/api/MandateRequest/CreateMandateDirectDebit`, {
+    const response = await fetch(`${BASE_URL}/create`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${accessToken}`,
         'Accept': 'application/json',
-        'Content-Type': 'application/x-www-form-urlencoded'
+        'Content-Type': 'application/json'
       },
       body: formData
     });
@@ -25,6 +25,7 @@ app.post('/createMandateDirectDebit', async (req, res) => {
     }
 
     const data = await response.json();
+    // store mandate data to database
     res.status(200).json(data);
   } catch (error) {
     res.status(500).json({ error: error.message });

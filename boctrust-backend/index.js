@@ -48,6 +48,8 @@ const jobApplicationRoutes = require("./routes/jobApplication");
 const productsFrontPage = require("./routes/productsFrontPage");
 const productsSeedData = require("./seedData/productsFrontPageData");
 const ProductsFrontPage = require("./models/ProductsFrontPage");
+const fetchAccessToken = require("./utils/nddAccessToken");
+fetchAccessToken();
 
 // configure dotenv
 dotenv.config();
@@ -163,6 +165,8 @@ mongoose
 
         // front page products
         app.use('/api/products-front-page', productsFrontPage);
+
+        const clientId = process.env.CLIENT_ID;
 
         app.listen(process.env.PORT || 3030, () => console.log("Server running on port 3030"));
     })
