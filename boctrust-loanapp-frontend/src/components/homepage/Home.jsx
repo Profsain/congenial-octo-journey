@@ -10,8 +10,6 @@ import HomeCarousel from "./carousel/HomeCarousel";
 import Overview from "./overview/Overview";
 import Calculator from "./calculator/Calculator";
 import BlogList from "./blogexperience/BlogList";
-// import LoanForm from "../loanapplication/loanform/LoanForm";
-// import ReactDOMServer from "react-dom/server";
 
 
 const Home = () => {
@@ -44,8 +42,6 @@ const Home = () => {
       <div data-aos="fade-up">
         <BlogList />
       </div>
-
-      {/* <button onClick={handleSendEmail}>Send Email</button> */}
     </>
   );
 };
