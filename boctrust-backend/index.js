@@ -48,8 +48,6 @@ const jobApplicationRoutes = require("./routes/jobApplication");
 const productsFrontPage = require("./routes/productsFrontPage");
 const productsSeedData = require("./seedData/productsFrontPageData");
 const ProductsFrontPage = require("./models/ProductsFrontPage");
-const fetchAccessToken = require("./utils/nddAccessToken");
-fetchAccessToken();
 
 // configure dotenv
 dotenv.config();

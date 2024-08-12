@@ -1,53 +1,48 @@
-// This file contains a utility function that fetches the access token from the NIBSS API
-const dotenv = require('dotenv');
+const querystring = require('querystring'); 
 
-// Configure dotenv
-dotenv.config();
-
-// Utility function to fetch the access token
-const fetchAccessToken = async () => {
-  // Your NIBSS credentials
+async function fetchAccessToken() {
   const clientId = process.env.CLIENT_ID;
   const clientSecret = process.env.CLIENT_SECRET;
   const baseUrl = process.env.NIBSS_BASE_URL;
-  const apiKey = process.env.NIBSS_API_KEY;
-  console.log("Fetching access token..");
+
+  // Define the URL of the API endpoint
+  const url = `${baseUrl}/reset`;
+
+  // Define the request payload
+  const requestBody = {
+    client_id: clientId,
+    scope: `${clientId}/.default`,
+    client_secret: clientSecret,
+    grant_type: 'client_credentials'
+  };
 
   try {
-    // Prepare the body data as JSON
-    const bodyData = {
-      client_id: clientId,
-      scope: `${clientId}/.default`,
-      client_secret: clientSecret,
-      // api_key: apiKey,
-      grant_type: 'client_credentials'
-    };
-
-    console.log("Body Data:", JSON.stringify(bodyData));
-
-    // Fetch the access token
-    const response = await fetch(`${baseUrl}/v2/reset`, {
-      method: 'POST',
+    // Make the API request using fetch
+    const response = await fetch(url, {
+      method: 'POST', // HTTP method to be used for the request
       headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/x-www-form-urlencoded', // Specify the content type
       },
-      body: JSON.stringify(bodyData) // Convert the body data to a JSON string
+      body: querystring.stringify(requestBody) // Convert the requestBody object to a URL-encoded string
     });
 
-    if (!response.ok) {
-      const responseBody = await response.text(); // Retrieve response body for debugging
-      console.log(responseBody);
-      throw new Error(`Error: ${response.status}`);
+    // Check if the response was successful
+    if (response.ok) {
+      // Parse the JSON response body
+      const data = await response.json();
+      console.log('Access token:', data.access_token);
+      return data.access_token; // Return the access token
+    } else {
+      // Handle errors if the response was not successful
+      const errorData = await response.json();
+      console.error('Error:', errorData);
+      throw new Error(`Error: ${errorData.error_description}`);
     }
-
-    const data = await response.json();
-    console.log("Token Data:", data);
-    return data.access_token;
   } catch (error) {
-    console.error("Error fetching access token: ", error);
+    // Handle network or other errors
+    console.error('Fetch error:', error);
+    throw error;
   }
-};
+}
 
-// Export function
 module.exports = fetchAccessToken;
