@@ -54,7 +54,7 @@ const LoanFirstStep = ({ data }) => {
 
   useEffect(() => {
     setInitialLoanProduct(
-      loanProducts?.find((item) => item.ProductName === "TERM DEPOSIT")
+      loanProducts?.find((item) => item.ProductCode === "305")
     );
   }, [loanProducts]);
 
@@ -128,7 +128,7 @@ const LoanFirstStep = ({ data }) => {
     ref.current?.values.loanproduct || initialLoanProduct?.ProductCode;
 
   const product = loanProducts?.find(
-    (product) => product.ProductCode === productId
+    (product) => product?.ProductCode === productId
   );
 
   // handle bvn verification
@@ -168,18 +168,7 @@ const LoanFirstStep = ({ data }) => {
     // );
 
     //Store the information in Local Storage
-    localStorage.setItem(
-      "loanFirstInfo",
-      JSON.stringify({
-        bvn,
-        loanAmount: loanamount,
-        careerType: careertype,
-        numberOfMonths: noofmonth,
-        loanTotalRepayment: loanRepaymentTotal,
-        monthlyRepayment,
-        loanProduct: product,
-      })
-    );
+    localStorage.setItem("loanFirstInfo", raw);
 
     // send data to database and redirect to bvn verification page
     await fetch(`${apiUrl}/api/tempdata/tempdata`, {
@@ -304,8 +293,8 @@ const LoanFirstStep = ({ data }) => {
                                   >
                                     {loanProducts?.map((product) => (
                                       <option
-                                        key={product.ProductCode}
-                                        value={product.ProductCode}
+                                        key={product?.ProductCode}
+                                        value={product?.ProductCode}
                                       >
                                         {product.ProductName}
                                       </option>
