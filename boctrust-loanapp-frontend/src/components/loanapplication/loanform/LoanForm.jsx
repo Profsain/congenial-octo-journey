@@ -82,14 +82,14 @@ const LoanForm = React.memo(function LoanFormComponent() {
   const [monthlyRepayment, setMonthlyRepayment] = useState("");
   const [product, setProduct] = useState({});
   const [showReconfirmBvn, setShowReconfirmBvn] = useState(false);
-  const [firstStepData, setFirstStepData] = useState();
+  const [firstStepData, setFirstStepData] = useState({});
   // fetch all commercial banks
   const [banks, setBanks] = useState([]);
 
   // (Develpotment) Temporarily Update the firstep Data from the redux store
   useEffect(() => {
     const data = localStorage.getItem("loanFirstInfo");
-    setFirstStepData(data && JSON.parse(data));
+    data && setFirstStepData(JSON.parse(data));
   }, []);
 
   // Fetch Officers, Products and Employers
