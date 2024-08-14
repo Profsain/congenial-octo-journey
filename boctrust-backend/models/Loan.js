@@ -26,10 +26,9 @@ const loanSchema = new mongoose.Schema(
     accountOfficer: {
       type: String,
     },
-    loanproduct: {
-      type: String,
-      required: true,
-    },
+    // loanproduct: {
+    //   type: String,
+    // },
     disbursementstatus: {
       type: String,
       enum: ["approved", "pending", "disbursed", "stopped"],
