@@ -117,7 +117,7 @@ const LoanForm = React.memo(function LoanFormComponent() {
   useEffect(() => {
     // set showReconfirmBvn modal after 30 seconds
     const timer = setTimeout(() => {
-      setShowReconfirmBvn(true);
+      setShowReconfirmBvn(false);
     }, 30000);
 
     // Cleanup function to clear the timer
@@ -169,16 +169,18 @@ const LoanForm = React.memo(function LoanFormComponent() {
     if (formValues) {
       ref.current?.setValues(formValues);
       fileValues.map((item) => {
+        console.log(item, "item")
         ref.current?.setFieldValue(
           item,
           getFile(
             item,
-            `${item}_for_${ref.current.firstname}_${ref.current.firstname}`
+            `${item}_for_${formValues.firstname}_${formValues.lastname}`
           )
         );
       });
     }
   };
+
 
   // scroll to the top of the page
   useEffect(() => {
