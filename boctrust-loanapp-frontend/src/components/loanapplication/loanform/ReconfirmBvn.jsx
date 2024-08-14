@@ -5,7 +5,7 @@ import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
 import PageLoader from "../../dashboard/shared/PageLoader";
 
-const ReconfirmBvn = ({ setFirstStepData, show, setShow }) => {
+const ReconfirmBvn = ({ show, setShow }) => {
   const styles = {
     title: {
       color: "#145088",
@@ -64,8 +64,8 @@ const ReconfirmBvn = ({ setFirstStepData, show, setShow }) => {
       return;
     }
 
-    const data = await response.json();
-    setFirstStepData(data.data);
+    // const data = await response.json();
+    // setFirstStepData(data.data);
     setLoading(false);
     setShow(false);
   };

@@ -161,7 +161,6 @@ const LoanForm = React.memo(function LoanFormComponent() {
     if (formValues) {
       ref.current?.setValues(formValues);
       fileValues.map((item) => {
-        console.log(item, "item")
         ref.current?.setFieldValue(
           item,
           getFile(
@@ -172,7 +171,6 @@ const LoanForm = React.memo(function LoanFormComponent() {
       });
     }
   };
-
 
   // scroll to the top of the page
   useEffect(() => {
@@ -277,7 +275,7 @@ const LoanForm = React.memo(function LoanFormComponent() {
         formData.append("loantotalrepayment", loanRepaymentTotal);
         formData.append("monthlyrepayment", monthlyRepayment);
         formData.append("careertype", formValues.careertype);
-        formData.append("loanproduct", product._id);
+        formData.append("loanproduct", product?.ProductCode);
         formData.append("loanpurpose", formValues.loanpurpose);
         formData.append("otherpurpose", formValues.otherpurpose);
         formData.append("bvnnumber", formValues.bvnnumber);
