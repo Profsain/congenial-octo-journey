@@ -1,17 +1,20 @@
 import { fileValues } from "../src/components/loanapplication/loanform/formInitialValue";
 import { base64ToFile, fileToBase64 } from "./fileStringConversion";
 
-export const storeInLocalStorage = ({ key, value }) => {
+export const storeInLocalStorage = async ({ key, value }) => {
   let nonFileFields = {};
-  Object.keys(value).map((fieldKey) => {
+
+  for (const fieldKey of Object.keys(value)) {
     if (fileValues.includes(fieldKey)) {
-      value[fieldKey] && saveFile(fieldKey, value[fieldKey]);
+      if (value[fieldKey]) {
+        await saveFile(fieldKey, value[fieldKey]);
+      }
     } else {
       nonFileFields[fieldKey] = value[fieldKey];
     }
+  }
 
-    localStorage.setItem(key, JSON.stringify(nonFileFields));
-  });
+  localStorage.setItem(key, JSON.stringify(nonFileFields));
 };
 
 export const getFromLocalStorage = (key) => {
@@ -23,8 +26,10 @@ export const deleteFromLocalStorage = (key) => {
 };
 
 export const getFile = (key, filename) => {
-  console.log(key, filename);
   const base64File = localStorage.getItem(key);
+
+  console.log(base64File, `base64File for ${key}`);
+
   return base64File ? base64ToFile(base64File, filename) : null;
 };
 
