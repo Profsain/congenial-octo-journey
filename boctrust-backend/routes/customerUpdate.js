@@ -311,7 +311,7 @@ router.put("/approve/co/:customerId", async (req, res) => {
     res.json(customer);
   } catch (err) {
     console.log(err);
-    res.status(500).json({ error: "Failed to update decisionSummary" });
+    res.status(500).json({ error: "Failed Credit Officer Approval" });
   }
 });
 
@@ -326,13 +326,17 @@ router.put("/approve/hoc/:customerId", async (req, res) => {
     updateObject["creditCheck.decisionSummary.headOfCreditApprovalStatus"] =
       "approved";
 
-    const customer = await Loan.findByIdAndUpdate(
+    const customer = await Customer.findByIdAndUpdate(
       customerId,
       {
         $set: updateObject,
       },
       { new: true }
     );
+
+    if (!customer) {
+      return res.status(404).json({ error: "Customer Not Found" });
+    }
 
     // Update the Loan Status
     await Loan.findOneAndUpdate(
@@ -346,7 +350,7 @@ router.put("/approve/hoc/:customerId", async (req, res) => {
 
     res.json(customer);
   } catch (err) {
-    res.status(500).json({ error: "Failed to update decisionSummary" });
+    res.status(500).json({ error: "Failed to Head of Credit Approval" });
   }
 });
 
@@ -368,6 +372,10 @@ router.put("/approve/coo/:customerId", async (req, res) => {
       { new: true }
     );
 
+    if (!customer) {
+      return res.status(404).json({ error: "Customer Not Found" });
+    }
+
     // Update the Loan Status
     await Loan.findOneAndUpdate(
       {
@@ -381,7 +389,7 @@ router.put("/approve/coo/:customerId", async (req, res) => {
     res.json(customer);
   } catch (err) {
     console.log(err);
-    res.status(500).json({ error: "Failed to update decisionSummary" });
+    res.status(500).json({ error: "Failed to Approve by COO" });
   }
 });
 

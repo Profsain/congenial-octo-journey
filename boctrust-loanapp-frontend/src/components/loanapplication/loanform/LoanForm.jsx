@@ -18,7 +18,7 @@ import PhotoCapture from "./photocapture/PhotoCapture";
 import PhotocaptureStatic from "./photocapture/PhotocaptureStatic";
 import ConfirmData from "./ConfirmData";
 import CreateAccount from "./CreateAccount";
-import initialValues from "./formInitialValue";
+import initialValues, { fileValues } from "./formInitialValue";
 // function
 import convertFile from "../../../../utilities/convertFile";
 import dataURItoBlob from "../../../../utilities/dataURItoBlob";
@@ -34,6 +34,7 @@ import { calcDaysDiffFromNow } from "../../../../utilities/calcDaysDiff";
 import { fetchAllLoanOfficers } from "../../../redux/reducers/loanOfficerReducer";
 import {
   deleteFromLocalStorage,
+  getFile,
   getFromLocalStorage,
   storeInLocalStorage,
 } from "../../../../utilities/localStorage";
@@ -116,7 +117,7 @@ const LoanForm = React.memo(function LoanFormComponent() {
   useEffect(() => {
     // set showReconfirmBvn modal after 30 seconds
     const timer = setTimeout(() => {
-      setShowReconfirmBvn(false);
+      setShowReconfirmBvn(true);
     }, 30000);
 
     // Cleanup function to clear the timer
@@ -164,7 +165,19 @@ const LoanForm = React.memo(function LoanFormComponent() {
 
   const updateFormValues = () => {
     const formValues = getFromLocalStorage("onbaordData");
-    formValues && ref.current?.setValues(formValues);
+
+    if (formValues) {
+      ref.current?.setValues(formValues);
+      fileValues.map((item) => {
+        ref.current?.setFieldValue(
+          item,
+          getFile(
+            item,
+            `${item}_for_${ref.current.firstname}_${ref.current.firstname}`
+          )
+        );
+      });
+    }
   };
 
   // scroll to the top of the page
@@ -283,6 +296,7 @@ const LoanForm = React.memo(function LoanFormComponent() {
         formData.append("otherpurpose", formValues.otherpurpose);
         formData.append("bvnnumber", formValues.bvnnumber);
         formData.append("title", formValues.title);
+        formData.append("gender", formValues.gender);
         formData.append("firstname", formValues.firstname);
         formData.append("lastname", formValues.lastname);
         formData.append("phonenumber", formValues.phonenumber);
@@ -385,6 +399,8 @@ const LoanForm = React.memo(function LoanFormComponent() {
         });
 
         deleteFromLocalStorage("onbaordData");
+        deleteFromLocalStorage("loanFirstInfo");
+        fileValues.map((item) => deleteFromLocalStorage(item));
       }
     } catch (error) {
       const errorResponse = await res.json();
@@ -427,6 +443,7 @@ const LoanForm = React.memo(function LoanFormComponent() {
       isFieldValid("lastname", ref) &&
       isFieldValid("phonenumber", ref) &&
       isFieldValid("dob", ref) &&
+      isFieldValid("gender", ref) &&
       isFieldValid("email", ref) &&
       isFieldValid("maritalstatus", ref) &&
       isFieldValid("noofdependent", ref) &&
@@ -598,14 +615,23 @@ const LoanForm = React.memo(function LoanFormComponent() {
                                         type="text"
                                       />
                                     </div>
-
-                                    <TextInput
-                                      label="Phone Number"
-                                      name="phonenumber"
-                                      type="tel"
-                                      placeholder="08012345678"
-                                    />
-
+                                    <div className="InputRow">
+                                      <TextInput
+                                        label="Phone Number"
+                                        name="phonenumber"
+                                        type="tel"
+                                        placeholder="08012345678"
+                                      />
+                                      <div className="Space"></div>
+                                      <SelectField
+                                        label="Select Gender"
+                                        name="gender"
+                                      >
+                                        <option value=""></option>
+                                        <option value="male">Male</option>
+                                        <option value="female">Female</option>
+                                      </SelectField>
+                                    </div>
                                     {/* Input row sectioin */}
                                     <div className="InputRow">
                                       <TextInput

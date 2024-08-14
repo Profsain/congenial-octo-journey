@@ -30,7 +30,6 @@ const styles = {
   },
   head: {
     color: "#fff",
-    fontSize: "1rem",
   },
   approved: {
     color: "#5cc51c",
@@ -134,7 +133,7 @@ const CreditBureauDashboard = () => {
 
   const filterCustomers = () => {
     if (admin.role === "credit analyst") {
-      console.log(searchCustomer, "searchCustomer")
+      console.log(searchCustomer, "searchCustomer");
       const filteredCustomers = searchCustomer?.filter((customer) => {
         return (
           customer.creditCheck.assignment.isCreditAnalystAssigned === false ||
@@ -243,8 +242,9 @@ const CreditBureauDashboard = () => {
           {status === "loading" && <PageLoader />}
           <div className="RBox">
             <DashboardHeadline
+              fontSize="0.2rem"
               height="52px"
-              mspacer="2rem 0 -2.55rem -1rem"
+              mspacer="2rem 0 -3.25rem -1rem"
               bgcolor="#145098"
             ></DashboardHeadline>
             <div style={styles.table}>
@@ -290,7 +290,7 @@ const CreditBureauDashboard = () => {
 
                       <td>N{customer.loan?.loanamount}</td>
                       <td
-                        className="cursor-pointer text-underline"
+                        className="cursor-pointer text-primary underline text-underline"
                         onClick={() => {
                           setCustomerInfo(customer);
                         }}

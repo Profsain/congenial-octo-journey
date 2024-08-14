@@ -8,6 +8,7 @@ const initialValues = ({ loanamount, careertype, captureImg, deductions }) => ({
   otherpurpose: "",
   bvnnumber: "",
   title: "",
+  gender: "",
   firstname: "",
   lastname: "",
   email: "",
@@ -75,3 +76,12 @@ const initialValues = ({ loanamount, careertype, captureImg, deductions }) => ({
 });
 
 export default initialValues;
+
+export const fileValues = [
+  "photocapture",
+  "uploadpayslip",
+  "marketerClientPic",
+  "valididcard",
+  "signature",
+  "employmentletter",
+];

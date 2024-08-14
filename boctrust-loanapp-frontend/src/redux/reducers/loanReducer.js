@@ -7,17 +7,24 @@ const apiUrl = import.meta.env.VITE_BASE_URL;
 
 const API_ENDPOINT = `${apiUrl}/api`;
 
-// Thunk to fetch account from the API
+// Thunk to fetch Loans from the API
+export const fetchLoans = createAsyncThunk("account/fetchLoans", async () => {
+  const response = await axios.get(`${API_ENDPOINT}/loans`);
+
+  return response.data;
+});
+
+// Thunk to fetch All Loans from the API
 export const fetchAllLoans = createAsyncThunk(
   "account/fetchAllLoans",
   async () => {
-    const response = await axios.get(`${API_ENDPOINT}/loans`);
+    const response = await axios.get(`${API_ENDPOINT}/loans/all`);
 
     return response.data;
   }
 );
 
-// Thunk to fetch account from the API
+// Thunk to fetch Pending Loans from the API
 export const fetchPendingLoans = createAsyncThunk(
   "account/fetchPendingLoans",
   async () => {
@@ -27,23 +34,21 @@ export const fetchPendingLoans = createAsyncThunk(
   }
 );
 
-// Thunk to fetch account from the API
-export const fetchUnbookedOrBookedLoans = createAsyncThunk(
-  "account/fetchUnbookedOrBookedLoans",
+// Thunk to fetch Unbooked Loans from the API
+export const fetchUnbookedLoans = createAsyncThunk(
+  "account/fetchUnbookedLoans",
   async () => {
-    const response = await axios.get(
-      `${API_ENDPOINT}/loans/booked-or-unbooked`
-    );
+    const response = await axios.get(`${API_ENDPOINT}/loans/unbooked`);
 
     return response.data;
   }
 );
 
 // Thunk to fetch account from the API
-export const fetchBookedOrDisbursedLoans = createAsyncThunk(
-  "account/fetchBookedOrDisbursedLoans",
+export const fetchBookedLoans = createAsyncThunk(
+  "account/fetchBookedLoans",
   async () => {
-    await axios.get(`${API_ENDPOINT}/loans/booked-or-disbursed`);
+    await axios.get(`${API_ENDPOINT}/loans/booked`);
 
     return bookedLoans;
   }
@@ -131,8 +136,8 @@ const loanSlice = createSlice({
   initialState: {
     allLoans: null,
     pendingLoans: null,
-    unbookedBookedLoans: null,
-    bookedDisbursedLoans: null,
+    unbookedLoans: null,
+    bookedLoans: null,
     completedLoans: null,
     selectedCustomerLoan: null,
     loanFirstInfo: null,
@@ -146,6 +151,17 @@ const loanSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
+      .addCase(fetchLoans.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(fetchLoans.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        state.allLoans = action.payload;
+      })
+      .addCase(fetchLoans.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.error.message;
+      })
       .addCase(fetchAllLoans.pending, (state) => {
         state.status = "loading";
       })
@@ -168,25 +184,25 @@ const loanSlice = createSlice({
         state.status = "failed";
         state.error = action.error.message;
       })
-      .addCase(fetchUnbookedOrBookedLoans.pending, (state) => {
+      .addCase(fetchUnbookedLoans.pending, (state) => {
         state.status = "loading";
       })
-      .addCase(fetchUnbookedOrBookedLoans.fulfilled, (state, action) => {
+      .addCase(fetchUnbookedLoans.fulfilled, (state, action) => {
         state.status = "succeeded";
-        state.unbookedBookedLoans = action.payload;
+        state.unbookedLoans = action.payload;
       })
-      .addCase(fetchUnbookedOrBookedLoans.rejected, (state, action) => {
+      .addCase(fetchUnbookedLoans.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.error.message;
       })
-      .addCase(fetchBookedOrDisbursedLoans.pending, (state) => {
+      .addCase(fetchBookedLoans.pending, (state) => {
         state.status = "loading";
       })
-      .addCase(fetchBookedOrDisbursedLoans.fulfilled, (state, action) => {
+      .addCase(fetchBookedLoans.fulfilled, (state, action) => {
         state.status = "succeeded";
-        state.bookedDisbursedLoans = action.payload;
+        state.bookedLoans = action.payload;
       })
-      .addCase(fetchBookedOrDisbursedLoans.rejected, (state, action) => {
+      .addCase(fetchBookedLoans.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.error.message;
       })

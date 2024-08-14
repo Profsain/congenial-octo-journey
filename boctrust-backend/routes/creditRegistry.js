@@ -21,7 +21,7 @@ router.post('/getreport', async (req, res) => {
     }
     
     // check if customerId.SearchResult is empty
-    if (customerId.SearchResult.length === 0) {
+    if ( !customerId?.SearchResult || customerId?.SearchResult?.length === 0) {
         res.status(404).json({
             message: "Customer not found"
         });

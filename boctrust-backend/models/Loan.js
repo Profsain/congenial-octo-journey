@@ -16,9 +16,10 @@ const loanSchema = new mongoose.Schema(
         "unbooked",
         "booked",
         "completed",
+        "declined",
       ],
     },
-    bookingApproval: {
+    bookingInitiated: {
       type: Boolean,
       default: false,
     },
@@ -27,7 +28,7 @@ const loanSchema = new mongoose.Schema(
     },
     loanproduct: {
       type: String,
-      required: true
+      required: true,
     },
     disbursementstatus: {
       type: String,
@@ -49,6 +50,25 @@ const loanSchema = new mongoose.Schema(
     loantotalrepayment: String,
     loanpurpose: [String],
     otherpurpose: String,
+    collateralDetails: String,
+    collateralType: String,
+    computationMode: {
+      type: String,
+      enum: ["0", "1"],
+      default: "0",
+    },
+    interestAccrualCommencementDate: String,
+    principalPaymentFrequency: {
+      type: String,
+      enum: ["0", "1", "2", "3", "4", "5"],
+      default: "0",
+    },
+    interestPaymentFrequency: {
+      type: String,
+      enum: ["0", "1", "2", "3", "4", "5"],
+      default: "0",
+    },
+    moratorium: String,
   },
   { timestamps: true }
 );

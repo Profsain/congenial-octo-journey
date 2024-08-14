@@ -192,4 +192,19 @@ router.get("/", async (req, res) => {
   }
 });
 
+router.get("/:code", async (req, res) => {
+  try {
+    const productCode = req.params.code;
+
+    const response = await axios.get(
+      `${baseUrl}/BankOneWebAPI/api/Product/GetByCode/2?authToken=${token}&productCode=${productCode}`
+    );
+
+    res.json(response.data);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Failed to loan Products" });
+  }
+});
+
 module.exports = router; // export router

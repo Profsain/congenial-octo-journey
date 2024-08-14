@@ -35,6 +35,7 @@ const customerSchema = new mongoose.Schema(
     email: { type: String, unique: true, required: true },
     phonenumber: String,
     dob: String,
+    gender: String,
     maritalstatus: String,
     noofdependent: String,
     educationlevel: String,
@@ -246,7 +247,7 @@ const customerSchema = new mongoose.Schema(
       },
       isKycApproved: {
         type: Boolean,
-        default: false,
+        default: null,
       },
       timestamps: {
         type: Date,
@@ -261,6 +262,10 @@ const customerSchema = new mongoose.Schema(
     myLoansBalance: {
       type: String,
       default: "0.00",
+    },
+    loanproduct: {
+      type: String,
+      required: true,
     },
     totalLoanBalance: {
       type: String,

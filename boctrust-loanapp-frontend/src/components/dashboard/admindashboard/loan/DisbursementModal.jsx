@@ -2,6 +2,7 @@ import PropTypes from "prop-types";
 import { Modal, Button } from "react-bootstrap";
 import Headline from "../../../shared/Headline";
 import RowCard from "../remita/RowCard";
+import DisplayLoanProductName from "../../shared/DisplayLoanProductName";
 
 const DisbursementModal = ({
   loanObj,
@@ -20,7 +21,9 @@ const DisbursementModal = ({
       >
         <Modal.Header closeButton>
           <Modal.Title>
-            <Headline text={loanObj?.customer.banking?.accountDetails.Message.FullName} />
+            <Headline
+              text={loanObj?.customer.banking?.accountDetails.Message.FullName}
+            />
           </Modal.Title>
         </Modal.Header>
         <Modal.Body>
@@ -35,7 +38,7 @@ const DisbursementModal = ({
           <hr />
           <RowCard
             title="Loan Product:"
-            text={loanObj.loanproduct.productName || "General Loan"}
+            text={<DisplayLoanProductName loan={loanObj} />}
           />
           <hr />
           <RowCard title="Loan Amount:" text={loanObj.loanamount} />
@@ -50,14 +53,13 @@ const DisbursementModal = ({
           <Button variant="secondary" onClick={handleClose}>
             Close
           </Button>
-            <Button onClick={handleApproval} variant="primary">
-              Reject
-            </Button>
-       
-            <Button onClick={handleRejection} variant="primary">
-              Disburse
-            </Button>
-       
+          <Button onClick={handleApproval} variant="primary">
+            Reject
+          </Button>
+
+          <Button onClick={handleRejection} variant="primary">
+            Disburse
+          </Button>
         </Modal.Footer>
       </Modal>
     </>

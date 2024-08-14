@@ -52,7 +52,7 @@ const HomeDashboard = () => {
               loan?.loanstatus === "with coo" || loan?.loanstatus === "unbooked"
           ) || [],
         withCredit:
-          allLoans?.filter((loan) => loan?.loanstatus === "with credit") || [],
+          allLoans?.filter((loan) => loan?.loanstatus === "with credit"  &&  loan?.customer?.kyc?.isKycApproved === true ) || [],
 
         withOperations:
           allLoans?.filter((loan) => loan?.loanstatus === "with operations") ||
@@ -63,6 +63,7 @@ const HomeDashboard = () => {
       });
     }
   }, [allLoans]);
+
 
   // check
   return (

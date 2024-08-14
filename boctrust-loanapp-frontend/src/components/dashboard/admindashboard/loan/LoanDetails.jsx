@@ -3,6 +3,7 @@ import PropTypes from "prop-types";
 import { Modal, Button } from "react-bootstrap";
 import Headline from "../../../shared/Headline";
 import RowCard from "../remita/RowCard";
+import DisplayLoanProductName from "../../shared/DisplayLoanProductName";
 
 const LoanDetails = ({
   loanObj,
@@ -74,7 +75,7 @@ const LoanDetails = ({
           <hr />
           <RowCard
             title="Loan Product:"
-            text={loanObj.loanproduct.productName || "General Loan"}
+            text={<DisplayLoanProductName loan={loanObj} />}
           />
           <hr />
           <RowCard title="Loan Amount:" text={loanObj.loanamount} />

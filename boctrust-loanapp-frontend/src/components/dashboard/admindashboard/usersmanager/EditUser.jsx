@@ -107,7 +107,7 @@ const EditUser = (props) => {
         toast.error(errorResponse?.error || "Something Went Wrong");
       }
     } catch (error) {
-      toast.error(error?.reponse?.data?.error || "Something Went Wrong");
+      toast.error(error?.response?.data?.error || "Something Went Wrong");
     } finally {
       setIsLoading(false);
     }

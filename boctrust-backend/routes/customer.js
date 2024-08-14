@@ -80,9 +80,8 @@ router.post("/customer", multipleUpload, async (req, res) => {
   try {
     const customer = await CustomerModel.create(req.body);
 
-    const loan = await Loan.create({
+    await Loan.create({
       customer: customer._id,
-      loanproduct: req.body.loanproduct,
       loanamount: req.body.loanamount,
       monthlyrepayment: req.body.monthlyrepayment,
       buyoverloan: req.body.buyoverloan,

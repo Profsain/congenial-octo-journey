@@ -13,6 +13,7 @@ import LoanDetails from "./LoanDetails";
 import NoResult from "../../../shared/NoResult";
 import sortByCreatedAt from "../../shared/sortedByDate";
 import { fetchCompletedLoan } from "../../../../redux/reducers/loanReducer";
+import DisplayLoanProductName from "../../shared/DisplayLoanProductName";
 
 const BalanceEnquiry = () => {
   const styles = {
@@ -42,7 +43,11 @@ const BalanceEnquiry = () => {
   const status = useSelector((state) => state.customerReducer.status);
 
   useEffect(() => {
-    dispatch(fetchCompletedLoan());
+    const getData = async () => {
+      await dispatch(fetchCompletedLoan());
+    };
+
+    getData();
   }, [dispatch]);
 
   const [showCount, setShowCount] = useState(10);
@@ -50,6 +55,7 @@ const BalanceEnquiry = () => {
 
   const [show, setShow] = useState(false);
   const [loanObj, setLoanObj] = useState({});
+
   // handle close loan details
   const handleClose = () => {
     setLoanObj({});
@@ -145,7 +151,9 @@ const BalanceEnquiry = () => {
                       <td>
                         {loan?.customer?.banking?.accountDetails?.Message.Id}
                       </td>
-                      <td>{loan.loanproduct.productName || "General Loan"}</td>
+                      <td>
+                        <DisplayLoanProductName loan={loan} />
+                      </td>
                       <td>
                         {
                           loan?.customer.banking?.accountDetails?.Message

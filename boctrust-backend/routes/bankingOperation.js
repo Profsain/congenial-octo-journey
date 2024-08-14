@@ -1,6 +1,10 @@
 const express = require("express");
 const Customer = require("../models/Customer");
+const Loan = require("../models/Loan");
+const { default: axios } = require("axios");
 const router = express.Router();
+const nodemailer = require("nodemailer");
+const EmailTemplate = require("../utils/emailTemp");
 
 // add token to environment variable
 const token = process.env.BANKONE_TOKEN;
@@ -74,42 +78,65 @@ router.post("/createCustomerAccount", async (req, res) => {
 });
 
 // loan creation endpoint (verify)
-router.post("/createLoan", async (req, res) => {
-  // check req body
-  if (Object.keys(req.body).length === 0) {
-    return res.status(400).json({ error: "Request body is empty. Try again" });
-  }
+router.post("/createLoan/:loanId", async (req, res) => {
+  const { loanId } = req.params;
+  if (!loanId)
+    return res.status(400).json({ error: "Bad Request! No LoanId " });
+
+  const loanAndCustomer = await Loan.findById(loanId).populate("customer");
+
+  if (!loanAndCustomer)
+    return res.status(404).json({ error: "Loan Does not Exist" });
 
   // get the loan creation request payload from the request body
-  const { _id, salaryaccountnumber, numberofmonth, loanamount } = req.body;
+  const {
+    _id,
+    customer: { banking },
+    numberofmonth,
+    loanamount,
+    loanproduct,
+    collateralDetails,
+    collateralType,
+    computationMode,
+    interestAccrualCommencementDate,
+    principalPaymentFrequency,
+    interestPaymentFrequency,
+    moratorium,
+  } = loanAndCustomer;
 
-  const accountNumber = salaryaccountnumber;
-  const customerId = req.body.banking?.accountDetails?.Message.CustomerID;
+  const { data: loanProductDetails } = await axios.get(
+    `${baseUrl}/BankOneWebAPI/api/Product/GetByCode/2?authToken=${token}&productCode=${loanproduct}`
+  );
+
+  if (!loanProductDetails)
+    return res.status(404).json({ error: "Loan Product Does not Exist" });
+
+  const customerId = banking?.accountDetails?.CustomerID;
+  const accountNumber = banking?.accountDetails?.AccountNumber;
   // convert number of month to number of days
   const tenure = Number(numberofmonth) * 30;
-  // remove comma from loan amount
-  const loanAmount = loanamount?.replace(/,/g, "");
-  const interestRate = req.body?.interestRate || 5;
+
 
   // Define the loan creation request payload here
   const loanRequestPayload = {
     TransactionTrackingRef: _id,
-    LoanProductCode: 300,
+    LoanProductCode: loanproduct,
     CustomerID: customerId,
     LinkedAccountNumber: accountNumber,
-    CollateralDetails: "string",
-    CollateralType: "string",
-    ComputationMode: 0,
+    CollateralDetails: collateralDetails,
+    CollateralType: collateralType,
+    ComputationMode: computationMode,
     Tenure: tenure,
-    Moratorium: 30,
-    InterestAccrualCommencementDate: new Date().toISOString(),
-    Amount: Number(loanAmount),
-    InterestRate: interestRate,
-    PrincipalPaymentFrequency: 2,
-    InterestPaymentFrequency: 2,
-    LoanFeeIDs: [],
+    Moratorium: moratorium,
+    InterestAccrualCommencementDate: new Date(
+      interestAccrualCommencementDate
+    ).toISOString(),
+    Amount: loanamount,
+    InterestRate: loanProductDetails.InterestRate,
+    PrincipalPaymentFrequency: principalPaymentFrequency,
+    InterestPaymentFrequency: interestPaymentFrequency,
   };
-  console.log("payloan", loanRequestPayload);
+
   const options = {
     method: "POST",
     headers: {
@@ -131,10 +158,40 @@ router.post("/createLoan", async (req, res) => {
       );
     }
     const result = await response.json();
+
     console.log("Result", result);
-    res.status(200).json({
-      message: "Loan created successfully",
-      data: result,
+
+    if (!result.IsSuccessful) {
+      return res.status(400).json({ error: result.Message });
+    }
+
+    // Send an email with the password reset link
+    const transporter = nodemailer.createTransport({
+      host: "smtp-relay.brevo.com",
+      port: 587,
+      secure: false,
+      auth: {
+        user: "boctrustebusiness@gmail.com",
+        pass: password,
+      },
+    });
+
+    const mailOptions = {
+      from: "Boctrust MFB Ltd",
+      to: loanAndCustomer.customer?.email,
+      subject: "Your Loan Has Been Booked for Disbursement",
+      html: EmailTemplate(),
+    };
+
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        return res.status(500).json({ message: "Failed to send Email" });
+      }
+
+      res.status(201).json({
+        message: "Loan created successfully and Email Sent",
+        data: result,
+      });
     });
   } catch (error) {
     res
@@ -143,68 +200,109 @@ router.post("/createLoan", async (req, res) => {
   }
 });
 
-// create customer and account endpoint (Done)
-router.post("/newCustomerAccount/:customerId", async (req, res) => {
-  const { customerId } = req.params;
-
-  const customer = await Customer.findById(customerId);
-
-  if (!customer)
-    return res.status(500).json({ error: "No Customer with provided ID" });
-
+const getCustomerAccountInfoByTrackingRef = async (trackinRef) => {
   const options = {
-    method: "POST",
+    method: "GET",
     headers: {
       accept: "application/json",
       "content-type": "application/json",
     },
-    body: JSON.stringify({
-      TransactionTrackingRef: customer._id,
-
-      AccountOpeningTrackingRef: customer._id,
-      ProductCode: "",
-      LastName: customer.firstname,
-
-      OtherNames: customer.lastname,
-
-      BVN: customer.bvnnumber,
-
-      PhoneNo: customer.phonenumber,
-
-      PlaceOfBirth: customer.stateoforigin,
-
-      DateOfBirth: customer.dob,
-
-      Address: customer.houseaddress,
-
-      NextOfKinPhoneNo: customer.nkinphonenumber,
-
-      NextOfKinName: `${customer.nkinfirstname} ${customer.nkinlastname}`,
-
-      HasSufficientInfoOnAccountInfo: true,
-
-      Email: customer.email,
-    }),
   };
 
-  fetch(
-    `${baseUrl}/BankOneWebAPI/api/Account/CreateCustomerAndAccount/2?authToken=${token}`,
+  const res = await fetch(
+    `${baseUrl}/BankOneWebAPI/api/Account/GetAccountByTransactionTrackingRef/2?authToken=${token}&transactionTrackingRef=${trackinRef}`,
     options
-  )
-    .then((response) => {
-      if (!response.ok) {
-        throw new Error("Network response was not ok");
+  );
+  const data = await res.json();
+
+  if (!res.ok) {
+    throw new Error(data);
+  }
+
+  return data;
+};
+
+// create customer and account endpoint (Done)
+router.post("/newCustomerAccount/:customerId", async (req, res) => {
+  const { customerId } = req.params;
+
+  try {
+    const customer = await Customer.findById(customerId);
+    const loan = await Loan.findOne({ customer: customer?._id });
+
+    const productCode = customer?.loanproduct || loan?.loanproduct;
+
+    if (!customer)
+      return res.status(500).json({ error: "No Customer with provided ID" });
+
+    const options = {
+      method: "POST",
+      headers: {
+        accept: "application/json",
+        "content-type": "application/json",
+      },
+      body: JSON.stringify({
+        TransactionTrackingRef: customer._id,
+
+        AccountOpeningTrackingRef: customer._id,
+
+        ProductCode: productCode,
+
+        LastName: customer.firstname,
+
+        OtherNames: customer.lastname,
+
+        BVN: customer.bvnnumber,
+
+        PhoneNo: customer.phonenumber,
+
+        PlaceOfBirth: customer.stateoforigin,
+
+        DateOfBirth: customer.dob,
+
+        Address: customer.houseaddress,
+
+        NextOfKinPhoneNo: customer.nkinphonenumber,
+
+        NextOfKinName: `${customer.nkinfirstname} ${customer.nkinlastname}`,
+
+        HasSufficientInfoOnAccountInfo: true,
+
+        Email: customer.email,
+        Gender: customer.gender || "male",
+      }),
+    };
+
+    const response = await fetch(
+      `${baseUrl}/BankOneWebAPI/api/Account/CreateCustomerAndAccount/2?authToken=${token}`,
+      options
+    );
+
+    const newAccSuccessData = await response.json();
+
+    if (!response.ok) {
+      throw new Error("Network response was not ok");
+    }
+
+    const accountInfo = await getCustomerAccountInfoByTrackingRef(
+      newAccSuccessData?.TransactionTrackingRef || customer._id
+    );
+
+    const updatedCustomer = await Customer.findByIdAndUpdate(
+      customer._id,
+      {
+        "banking.accountDetails": accountInfo,
+        "banking.isAccountCreated": true,
+      },
+      {
+        new: true,
       }
-      return response.json();
-    })
-    .then((data) => {
-      // Handle the data as needed
-      res.json(data); // Send the response to the client
-    })
-    .catch((err) => {
-      console.error(err);
-      res.status(500).json({ error: "Internal Server Error" }); // Handle errors and send a response to the client
-    });
+    );
+
+    res.json(updatedCustomer);
+  } catch (err) {
+    res.status(500).json({ error: err?.message });
+  }
 });
 
 // bankone balance enquiry endpoint  (Done)

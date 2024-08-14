@@ -3,6 +3,7 @@ import "../../../loanapplication/loanform/Form.css";
 import Headline from "../../../shared/Headline";
 import { IoArrowBackOutline } from "react-icons/io5";
 import { filterBank } from "../../../loanapplication/loanform/fetchBanks";
+import { useEffect, useState } from "react";
 
 const KycViewDetails = ({ customer, setShowInfo }) => {
   return (
@@ -250,7 +251,7 @@ const KycViewDetails = ({ customer, setShowInfo }) => {
             <KycInput
               name="Bank Name"
               type="text"
-              value={filterBank(customer?.bankcode) || null}
+              value={customer?.bankcode || null}
             />
             <div className="Space"></div>
             <KycInput
@@ -335,6 +336,16 @@ KycViewDetails.propTypes = {
 export default KycViewDetails;
 
 const KycInput = ({ name, type, value }) => {
+  const [inputValue, setInputValue] = useState("");
+
+  useEffect(() => {
+    if (name === "Bank Name") {
+      filterBank(value).then((data) => setInputValue(data));
+    } else {
+      setInputValue(value);
+    }
+  }, [name, value]);
+
   return (
     <div className="d-flex flex-column ">
       <label htmlFor={name}>{name}</label>
@@ -342,7 +353,7 @@ const KycInput = ({ name, type, value }) => {
         type={type}
         className="TextInput border"
         name={name}
-        value={value || ""}
+        value={inputValue || ""}
       />
     </div>
   );

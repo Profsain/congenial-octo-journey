@@ -524,14 +524,14 @@ const CreditCheckhtmlForm = ({
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ bvn }),
         });
-        console.log(response, "response")
+
+        const data = await response.json();
         if (!response.ok) {
           setBureauLoading(false);
           setNoReport(true);
-          throw new Error("Network response was not ok");
+          throw new Error(data.message);
         }
 
-        const data = await response.json();
         setBureauLoading(false);
         // set first central report
         if (reportType === "consumer_report") {
@@ -548,7 +548,7 @@ const CreditCheckhtmlForm = ({
         // updateBureauLoading("success");
       } catch (error) {
         setBureauLoading(false);
-        throw new Error(error.message);
+        return toast.error(error?.message || "Something Went Wrong");
       }
     }
 
@@ -569,11 +569,11 @@ const CreditCheckhtmlForm = ({
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ bvn }),
         });
+        const data = await response.json();
         if (!response.ok) {
-          throw new Error("Network response was not ok");
+          throw new Error(data.message);
         }
 
-        const data = await response.json();
         // set  report
         if (reportType === "consumer_basic") {
           clearReport();
@@ -595,7 +595,7 @@ const CreditCheckhtmlForm = ({
       } catch (error) {
         setBureauLoading(false);
         setNoCRC(false);
-        throw new Error(error.message);
+        return toast.error(error.message);
       }
     }
 
@@ -608,11 +608,11 @@ const CreditCheckhtmlForm = ({
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ bvn }),
         });
+        const data = await response.json();
         if (!response.ok) {
-          throw new Error("Network response was not ok");
+          throw new Error(data.message);
         }
 
-        const data = await response.json();
         // set  report
         setPDFContent(data.data.Reports[0].PDFContent);
 
@@ -627,7 +627,7 @@ const CreditCheckhtmlForm = ({
         }, 5000);
       } catch (error) {
         setBureauLoading(false);
-        throw new Error(error.message);
+        return toast.error(error.message);
       }
     }
 
@@ -638,7 +638,7 @@ const CreditCheckhtmlForm = ({
       );
       console.log(res);
     } catch (error) {
-      toast.error(error?.reponse?.data?.error || "Something Went Wrong");
+      toast.error(error?.response?.data?.error || "Something Went Wrong");
     }
   };
 
@@ -1054,7 +1054,7 @@ const CreditCheckhtmlForm = ({
           </div>
 
           {/* credit registry report */}
-          <div className="row" style={{ width: "100vw" }}>
+          <div className="row" style={{ width: "100%" }}>
             {PDFContent ? (
               <div style={{ width: "80%", height: "100vh" }}>
                 <h3>Credit Registry Report</h3>
@@ -1064,7 +1064,15 @@ const CreditCheckhtmlForm = ({
                 />
               </div>
             ) : (
-              <h4 style={{color: "red", paddingBottom: "3rem", textAlign: "center"}}>No Credit Registry Report</h4>
+              <h4
+                style={{
+                  color: "red",
+                  paddingBottom: "3rem",
+                  textAlign: "center",
+                }}
+              >
+                No Credit Registry Report
+              </h4>
             )}
           </div>
 
