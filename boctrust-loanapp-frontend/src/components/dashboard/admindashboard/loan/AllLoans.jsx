@@ -13,7 +13,8 @@ import LoanDetails from "./LoanDetails";
 import NoResult from "../../../shared/NoResult";
 import sortByCreatedAt from "../../shared/sortedByDate";
 import { loanStatusEnum } from "../../../../lib/userRelated";
-import { fetchAllLoans } from "../../../../redux/reducers/loanReducer";
+import { fetchLoans } from "../../../../redux/reducers/loanReducer";
+import DisplayLoanProductName from "../../shared/DisplayLoanProductName";
 
 const AllLoans = ({ showCount, searchTerms }) => {
   const styles = {
@@ -48,7 +49,7 @@ const AllLoans = ({ showCount, searchTerms }) => {
 
   useEffect(() => {
     const getData = async () => {
-      await dispatch(fetchAllLoans());
+      await dispatch(fetchLoans());
     };
     getData();
   }, [dispatch, show]);
@@ -116,11 +117,16 @@ const AllLoans = ({ showCount, searchTerms }) => {
               sortByCreatedAt(loansList)?.map((loan) => {
                 return (
                   <tr key={loan._id}>
-                    <td>{loan.banking?.accountDetails?.Message.Id}</td>
-                    <td>{loan.loanproduct.productName || "General Loan"}</td>
                     <td>
-                      {loan.banking?.accountDetails?.Message.FullName ??
-                        `${loan?.customer.firstname} ${loan?.customer.lastname}`}
+                      {loan?.customer?.banking?.accountDetails?.Message.Id}
+                    </td>
+                    <td>
+                      <DisplayLoanProductName loan={loan} />
+                    </td>
+                    <td>
+                      {loan?.customer?.banking?.accountDetails?.Message
+                        .FullName ??
+                        `${loan?.customer?.firstname} ${loan?.customer?.lastname}`}
                     </td>
                     <td>
                       {
@@ -133,7 +139,8 @@ const AllLoans = ({ showCount, searchTerms }) => {
                     <td
                       style={styles.padding}
                       className={
-                        loan?.customer?.kyc?.loanstatus === loanStatusEnum.completed
+                        loan?.customer?.kyc?.loanstatus ===
+                        loanStatusEnum.completed
                           ? "text-success"
                           : "text-warning"
                       }

@@ -8,9 +8,18 @@ router.get("/", async (req, res) => {
   try {
     const loans = await Loan.find({
       loanstatus: { $ne: "with operations" },
-    })
-      .populate("customer")
-      .populate("loanproduct");
+    }).populate("customer");
+
+    return res.status(200).json(loans);
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+});
+
+// Get all loan
+router.get("/all", async (req, res) => {
+  try {
+    const loans = await Loan.find().populate("customer");
     return res.status(200).json(loans);
   } catch (error) {
     return res.status(500).json({ error: error.message });
@@ -22,50 +31,59 @@ router.get("/pending", async (req, res) => {
   try {
     const loans = await Loan.find({
       loanstatus: { $in: ["with credit", "with coo"] },
-    })
-      .populate("customer")
-      .populate("loanproduct");
+    }).populate("customer");
     return res.status(200).json(loans);
   } catch (error) {
     return res.status(500).json({ error: error.message });
   }
 });
 
-// Get all pending laons loan
-router.get("/pending", async (req, res) => {
+// Get all Unbooked laons
+router.get("/unbooked", async (req, res) => {
   try {
     const loans = await Loan.find({
-      loanstatus: { $in: ["with credit", "with coo"] },
-    })
-      .populate("customer")
-      .populate("loanproduct");
-    return res.status(200).json(loans);
-  } catch (error) {
-    return res.status(500).json({ error: error.message });
-  }
-});
-// Get all both booked and Unbooked laons
-router.get("/booked-or-unbooked", async (req, res) => {
-  try {
-    const loans = await Loan.find({
-      loanstatus: { $in: ["unbooked", "booked"] },
-    })
-      .populate("customer")
-      .populate("loanproduct");
+      loanstatus: "unbooked",
+    }).populate("customer");
+
     return res.status(200).json(loans);
   } catch (error) {
     return res.status(500).json({ error: error.message });
   }
 });
 
-// Get all Booked and Disbursed laons loan
-router.get("/booked-or-disbursed", async (req, res) => {
+// Get all Booked loans
+router.get("/booked", async (req, res) => {
   try {
     const loans = await Loan.find({
-      loanstatus: { $in: ["booked", "completed"] },
-    })
-      .populate("customer")
-      .populate("loanproduct");
+      loanstatus: "booked",
+    }).populate("customer");
+
+    return res.status(200).json(loans);
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+});
+
+// Get all Disbursed laons loan
+router.get("/disbursed", async (req, res) => {
+  try {
+    const loans = await Loan.find({
+      loanstatus: "completed",
+    }).populate("customer");
+
+    return res.status(200).json(loans);
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+});
+
+// Get all Disbursed laons loan
+router.get("/declined", async (req, res) => {
+  try {
+    const loans = await Loan.find({
+      loanstatus: "declined",
+    }).populate("customer");
+
     return res.status(200).json(loans);
   } catch (error) {
     return res.status(500).json({ error: error.message });
@@ -106,6 +124,7 @@ router.put("/:id", async (req, res) => {
     return res.status(500).json({ error: error.message });
   }
 });
+
 // Update loan
 router.put("/status/:id", async (req, res) => {
   try {
@@ -241,6 +260,28 @@ router.put("/:customerId/update/:loanId", async (req, res) => {
 // Endpoint to Book loans by Operations Officers
 router.put("/book/:loanId", async (req, res) => {
   const { loanId } = req.params;
+  try {
+    let updateData = { ...req.body, bookingInitiated: true };
+    // Find the customer by ID
+    const loan = await Loan.findByIdAndUpdate(loanId, updateData, {
+      new: true,
+    });
+
+    if (!loan) {
+      return res.status(404).json({ error: "Loan not found" });
+    }
+
+    // Return the allLoans array
+    res.status(200).json(loan);
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Endpoint to Approve Booked loans by COO
+router.put("/approved-book/:loanId", async (req, res) => {
+  const { loanId } = req.params;
 
   try {
     // Find the customer by ID
@@ -253,28 +294,7 @@ router.put("/book/:loanId", async (req, res) => {
     }
 
     // Return the allLoans array
-    res.status(200).json(customerLoans);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-// Endpoint to Approve Booked loans by COO
-router.put("/approved-book/:loanId", async (req, res) => {
-  const { loanId } = req.params;
-
-  try {
-    // Find the customer by ID
-    const loan = await Loan.findByIdAndUpdate(loanId, {
-      bookingApproval: true,
-    });
-
-    if (!loan) {
-      return res.status(404).json({ error: "Loan not found" });
-    }
-
-    // Return the allLoans array
-    res.status(200).json(customerLoans);
+    res.status(200).json(loan);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

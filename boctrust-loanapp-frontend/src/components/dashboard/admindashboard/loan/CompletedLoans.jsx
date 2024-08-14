@@ -14,6 +14,7 @@ import NotificationBox from "../../shared/NotificationBox";
 import NoResult from "../../../shared/NoResult";
 import sortByCreatedAt from "../../shared/sortedByDate";
 import { fetchCompletedLoan } from "../../../../redux/reducers/loanReducer";
+import DisplayLoanProductName from "../../shared/DisplayLoanProductName";
 
 const OverdueLoans = () => {
   const styles = {
@@ -172,7 +173,7 @@ const OverdueLoans = () => {
                               ?.Id || "N/A"}
                           </td>
                           <td>
-                            {loan?.loanproduct.productName || "General Loan"}
+                            <DisplayLoanProductName loan={loan} />
                           </td>
                           <td>
                             {loan?.customer?.banking?.accountDetails?.Message

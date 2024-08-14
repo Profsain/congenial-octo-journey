@@ -14,6 +14,7 @@ import NotificationBox from "../../shared/NotificationBox";
 import NoResult from "../../../shared/NoResult";
 import sortByCreatedAt from "../../shared/sortedByDate";
 import { fetchPendingLoans } from "../../../../redux/reducers/loanReducer";
+import DisplayLoanProductName from "../../shared/DisplayLoanProductName";
 
 const PaddingLoans = () => {
   const styles = {
@@ -176,7 +177,7 @@ const PaddingLoans = () => {
                               ?.Id || "N/A"}
                           </td>
                           <td>
-                            {loan?.loanproduct.productName || "General Loan"}
+                            <DisplayLoanProductName loan={loan} />
                           </td>
                           <td>
                             {loan?.customer.banking?.accountDetails?.Message

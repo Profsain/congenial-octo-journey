@@ -14,6 +14,7 @@ export const fetchAllCustomersLoans = createAsyncThunk(
     return response.data;
   }
 );
+
 // Thunk to fetch Single Customer and Loan
 export const fetchSingleCustomerLoans = createAsyncThunk(
   "customersLoans/fetchSingleCustomerLoans",
@@ -23,7 +24,6 @@ export const fetchSingleCustomerLoans = createAsyncThunk(
     return response.data;
   }
 );
-
 
 // customer slice
 const customersLoansSlice = createSlice({
@@ -53,7 +53,7 @@ const customersLoansSlice = createSlice({
         state.status = "failed";
         state.error = action.error.message;
       })
-      
+
       .addCase(fetchSingleCustomerLoans.pending, (state) => {
         state.status = "loading";
       })

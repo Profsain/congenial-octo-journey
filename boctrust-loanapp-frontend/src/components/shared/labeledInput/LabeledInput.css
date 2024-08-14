@@ -1,6 +1,6 @@
 .input__wrapper {
   display: grid;
-  gap: .3rem;
+  gap: 0.3rem;
 }
 
 .input__wrapper > label {
@@ -8,10 +8,17 @@
   margin-top: 0 !important;
 }
 
-.input__wrapper > input, .input__wrapper > textarea, .input__wrapper select{
-    border: 1px solid grey;
-    font-size: 18px;
-    height: 3.5rem
+.input__wrapper > input,
+.input__wrapper > textarea,
+.input__wrapper select {
+  border: 1px solid grey;
+  font-size: 18px;
+  height: 3.5rem;
+  border-radius: 0.4rem;
+  padding: 10px
 }
 
 
+.input__wrapper > textarea {
+  min-height: 130px;
+}

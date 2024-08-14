@@ -7,6 +7,7 @@ const LabeledInput = ({
   value,
   placeholder,
   isTextArea,
+  isDate,
   className,
   setInputValue,
 }) => {
@@ -24,8 +25,16 @@ const LabeledInput = ({
             name={name}
             value={value}
             onChange={setInputValue}
-            className={className}
+            className={`${className} `}
             placeholder={placeholder || `Enter your ${label}`}
+          />
+        ) : isDate ? (
+          <input
+            type="date"
+            name={name}
+            value={value}
+            onChange={setInputValue}
+            className={className}
           />
         ) : (
           <input
@@ -47,6 +56,7 @@ LabeledInput.propTypes = {
   value: PropTypes.string,
   placeholder: PropTypes.string,
   isTextArea: PropTypes.bool,
+  isDate: PropTypes.bool,
   className: PropTypes.string,
   setInputValue: PropTypes.func,
 };

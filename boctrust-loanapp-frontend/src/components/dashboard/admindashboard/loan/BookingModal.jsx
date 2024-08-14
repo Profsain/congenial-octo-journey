@@ -2,9 +2,14 @@ import { Modal, Button } from "react-bootstrap";
 import Headline from "../../../shared/Headline";
 import PropTypes from "prop-types";
 import LabeledInput from "../../../shared/labeledInput/LabeledInput";
-import { useState } from "react";
-import { DatePicker } from "@mui/x-date-pickers";
+import { useEffect, useState } from "react";
 import LabeledSelect from "../../../shared/labeledInput/LabeledSelect";
+import "./BookModal.css";
+import { toast } from "react-toastify";
+import axios from "axios";
+import { useDispatch } from "react-redux";
+import PageLoader from "../../shared/PageLoader";
+import { fetchUnbookedLoans } from "../../../../redux/reducers/loanReducer";
 
 const computationModeList = [
   {
@@ -53,12 +58,57 @@ const BookingModal = ({ selectedLoan, show, handleClose }) => {
     principalPaymentFrequency: "",
     interestPaymentFrequency: "",
   });
+  const [isLoading, setIsLoading] = useState(false);
+
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    setBookingDetails({
+      collateralDetails: selectedLoan?.collateralDetails || "",
+      collateralType: selectedLoan?.collateralType || "",
+      computationMode: selectedLoan?.computationMode || "",
+      moratorium: selectedLoan?.moratorium || "",
+      interestAccrualCommencementDate:
+        selectedLoan?.interestAccrualCommencementDate || "",
+      principalPaymentFrequency: selectedLoan?.principalPaymentFrequency || "",
+      interestPaymentFrequency: selectedLoan?.interestPaymentFrequency || "",
+    });
+  }, [selectedLoan]);
 
   const handleOnchange = (e) => {
     const name = e.target.name;
     const value = e.target.value;
 
     setBookingDetails({ ...bookingDetails, [name]: value });
+  };
+
+  const handleIniateBooking = async () => {
+    const BaseURL = import.meta.env.VITE_BASE_URL;
+    try {
+      setIsLoading(true);
+      await axios.put(`${BaseURL}/api/loans/book/${selectedLoan._id}`);
+
+      await dispatch(fetchUnbookedLoans());
+    } catch (error) {
+      toast.error(error?.response?.data?.error || "Something went Wrong");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  const handleApproveBooking = async () => {
+    const BaseURL = import.meta.env.VITE_BASE_URL;
+    try {
+      setIsLoading(true);
+      await axios.put(`${BaseURL}/api/loans/approved-book/${selectedLoan._id}`);
+
+      await dispatch(fetchUnbookedLoans());
+      handleClose()
+    } catch (error) {
+      
+      toast.error(error?.response?.data?.error || "Something went Wrong");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -68,6 +118,7 @@ const BookingModal = ({ selectedLoan, show, handleClose }) => {
         onHide={handleClose}
         backdrop="static"
         keyboard={false}
+        className="booking__modal"
       >
         <Modal.Header closeButton>
           <div>
@@ -90,6 +141,7 @@ const BookingModal = ({ selectedLoan, show, handleClose }) => {
             label={"Collateral Details"}
             value={bookingDetails.collateralDetails}
             setInputValue={handleOnchange}
+            isTextArea
           />
           <hr />
           <LabeledInput
@@ -115,25 +167,13 @@ const BookingModal = ({ selectedLoan, show, handleClose }) => {
             setInputValue={handleOnchange}
           />
           <hr />
+
           <LabeledInput
-            name={"moratorium"}
-            label={"Moratorium"}
-            value={bookingDetails.moratorium}
+            name={"interestAccrualCommencementDate"}
+            label="Interest Accrual Commencement Date"
+            value={bookingDetails.interestAccrualCommencementDate}
             setInputValue={handleOnchange}
-          />
-          <hr />
-          <DatePicker
-            style={{
-              width: "100%",
-            }}
-            label="Controlled picker"
-            // value={bookingDetails.interestAccrualCommencementDate}
-            onChange={(newDate) =>
-              setBookingDetails({
-                ...bookingDetails,
-                interestAccrualCommencementDate: newDate,
-              })
-            }
+            isDate
           />
           <hr />
 
@@ -162,9 +202,25 @@ const BookingModal = ({ selectedLoan, show, handleClose }) => {
             Close
           </Button>
 
-          {/* <Button onClick={handleApproval} variant="primary">
-            Approve
-          </Button> */}
+          {selectedLoan.bookingInitiated ? (
+            <Button
+              disabled={isLoading}
+              onClick={handleApproveBooking}
+              variant="primary"
+              className="d-flex"
+            >
+              {isLoading && <PageLoader width="20px" />} Approve Booking
+            </Button>
+          ) : (
+            <Button
+              disabled={isLoading}
+              onClick={handleIniateBooking}
+              variant="primary"
+              className="d-flex"
+            >
+              {isLoading && <PageLoader width="20px" />} Book Loan
+            </Button>
+          )}
         </Modal.Footer>
       </Modal>
     </>

@@ -12,6 +12,7 @@ import searchList from "../../../../../utilities/searchListFunc";
 import LoanDetails from "./LoanDetails";
 import NoResult from "../../../shared/NoResult";
 import sortByCreatedAt from "../../shared/sortedByDate";
+import DisplayLoanProductName from "../../shared/DisplayLoanProductName";
 
 const LoanStatement = () => {
   const styles = {
@@ -153,7 +154,9 @@ const LoanStatement = () => {
                       <td>
                         {loan?.customer?.banking?.accountDetails?.Message.Id}
                       </td>
-                      <td>{loan.loanproduct.productName || "General Loan"}</td>
+                      <td>
+                        <DisplayLoanProductName loan={loan} />
+                      </td>
                       <td>
                         {
                           loan?.customer?.banking?.accountDetails?.Message

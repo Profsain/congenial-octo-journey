@@ -17,8 +17,9 @@ import { GrView } from "react-icons/gr";
 import { IoMdCheckmarkCircleOutline } from "react-icons/io";
 import { FcCancel } from "react-icons/fc";
 import { toast } from "react-toastify";
-import { fetchUnbookedOrBookedLoans } from "../../../../redux/reducers/loanReducer";
+import { fetchUnbookedLoans } from "../../../../redux/reducers/loanReducer";
 import BookingModal from "./BookingModal";
+import DisplayLoanProductName from "../../shared/DisplayLoanProductName";
 
 const BookLoans = () => {
   const styles = {
@@ -45,9 +46,9 @@ const BookLoans = () => {
     },
   };
 
-  // fetch all customer
+  // fetch all Loans
   const dispatch = useDispatch();
-  const { unbookedBookedLoans } = useSelector((state) => state.loanReducer);
+  const { unbookedLoans } = useSelector((state) => state.loanReducer);
 
   const status = useSelector((state) => state.customerReducer.status);
 
@@ -69,7 +70,7 @@ const BookLoans = () => {
 
   useEffect(() => {
     const getData = async () => {
-      await dispatch(fetchUnbookedOrBookedLoans());
+      await dispatch(fetchUnbookedLoans());
     };
 
     getData();
@@ -95,28 +96,24 @@ const BookLoans = () => {
 
   // handle show loan details
   const handleShow = (id) => {
-    if (!unbookedBookedLoans) return;
-    const loan = unbookedBookedLoans.find((loan) => loan._id === id);
+    if (!unbookedLoans) return;
+    const loan = unbookedLoans.find((loan) => loan._id === id);
     setLoanObj(loan);
     setShow(true);
   };
 
   // search customer list
-  const [loansList, setLoansList] = useState(unbookedBookedLoans);
+  const [loansList, setLoansList] = useState(unbookedLoans);
   const [selectedLoan, setSelectedLoan] = useState(null);
   // update loansList to show 10 customers on page load
   // or on count changes
   useEffect(() => {
-    setLoansList(unbookedBookedLoans?.slice(0, showCount));
-  }, [unbookedBookedLoans, showCount]);
+    setLoansList(unbookedLoans?.slice(0, showCount));
+  }, [unbookedLoans, showCount]);
 
   // update loansList on search
   const handleSearch = () => {
-    const currSearch = searchList(
-      unbookedBookedLoans,
-      searchTerms,
-      "agreefullname"
-    );
+    const currSearch = searchList(unbookedLoans, searchTerms, "agreefullname");
     setLoansList(currSearch?.slice(0, showCount));
   };
 
@@ -132,40 +129,45 @@ const BookLoans = () => {
     }
   };
 
-  const tableOptions = [
-    {
-      className: "",
-      icon: <GrView />,
-      label: "View Details",
-      func: (loan) => handleShow(loan._id),
-    },
-    {
-      className: "text-primary",
-      icon: <IoMdCheckmarkCircleOutline />,
-      label: canUserBook
-        ? "Book Loan"
-        : canUserApprove
-        ? "Approve Booking"
-        : "",
-      isDisabled: (loan) =>
-        (canUserBook && loan.bookingApproval) ||
-        (canUserApprove && loan.bookingApproval),
-      func: (loan) => {
-        console.log(loan, "Something");
-        setSelectedLoan(loan);
-        setShowBookModal(true);
+  const getTableOptions = (loan) => {
+    console.log(canUserApprove, "canUserApprove");
+    const tableOptions = [
+      {
+        className: "",
+        icon: <GrView />,
+        label: "View Details",
+        func: () => handleShow(loan._id),
       },
-    },
-    {
-      className: "text-danger",
-      icon: <FcCancel />,
-      label: "Reject Loan",
-      isDisabled: (loan) =>
-        (canUserBook && loan.bookingApproval) ||
-        (canUserApprove && loan.bookingApproval),
-      func: (customer) => handleShow(customer._id),
-    },
-  ];
+      {
+        className: "text-primary",
+        icon: <IoMdCheckmarkCircleOutline />,
+        label: canUserBook
+          ? "Book Loan"
+          : canUserApprove
+          ? "Approve Booking"
+          : "",
+        isDisabled:
+          (canUserBook && !canUserApprove && loan.bookingInitiated) ||
+          (canUserApprove &&
+            (!loan.bookingInitiated || loan.loanstatus === "booked")),
+        func: () => {
+          setSelectedLoan(loan);
+          setShowBookModal(true);
+        },
+      },
+      {
+        className: "text-danger",
+        icon: <FcCancel />,
+        label: "Reject Loan",
+        isDisabled: (loan) =>
+          (canUserBook && loan.bookingApproval) ||
+          (canUserApprove && loan.bookingApproval),
+        func: (customer) => handleShow(customer._id),
+      },
+    ];
+
+    return tableOptions;
+  };
 
   return (
     <>
@@ -211,13 +213,13 @@ const BookLoans = () => {
               <Table borderless hover responsive="sm">
                 <thead style={styles.head}>
                   <tr>
-                    <th>Loan ID</th>
+                    <th>S/N</th>
                     <th>Loan Product</th>
                     <th>Borrower</th>
-                    <th>A/C Number</th>
                     <th>Release Date</th>
                     <th>Applied Amount</th>
-                    <th>Status</th>
+                    <th>Book Status</th>
+                    <th>Loan Status</th>
 
                     {canUserManage && <th>Action</th>}
                   </tr>
@@ -227,28 +229,30 @@ const BookLoans = () => {
                     <NoResult name="customer" />
                   )}
                   {loansList &&
-                    loansList?.map((loan) => {
+                    loansList?.map((loan, index) => {
                       return (
                         <tr key={loan.id}>
+                          <td>{index + 1}</td>
                           <td>
-                            {loan?.customer.banking?.accountDetails?.Message
-                              ?.Id || "N/A"}
+                            <DisplayLoanProductName loan={loan} />
                           </td>
                           <td>
-                            {loan?.loanproduct.productName || "General Loan"}
-                          </td>
-                          <td>
-                            {loan?.customer.banking?.accountDetails?.Message
+                            {loan?.customer?.banking?.accountDetails?.Message
                               ?.FullName ||
-                              `${loan?.customer.firstname} ${loan?.customer.lastname}`}
+                              `${loan?.customer?.firstname} ${loan?.customer?.lastname}`}
                           </td>
-                          <td>
-                            {loan?.banking?.accountDetails?.Message
-                              .AccountNumber || "N/A"}
-                          </td>
+
                           <td>{getDateOnly(loan?.createdAt)}</td>
                           <td>N{loan?.loanamount}</td>
-
+                          <td className="booking_status">
+                            {loan.bookingInitiated ? (
+                              <span className="booking_initaited">
+                                Initaited
+                              </span>
+                            ) : (
+                              <span className="booking_pending">Pending</span>
+                            )}
+                          </td>
                           <td style={styles.padding}>
                             {capitalizeEachWord(loan?.loanstatus)}
                           </td>
@@ -256,8 +260,7 @@ const BookLoans = () => {
                           {canUserManage && (
                             <td>
                               <TableOptionsDropdown
-                                loan={loan}
-                                items={tableOptions}
+                                items={getTableOptions(loan)}
                               />
                             </td>
                           )}

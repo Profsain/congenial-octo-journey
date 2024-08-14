@@ -5,7 +5,7 @@ import styles from "./tableOptionsDropdown.module.css";
 import { useOnClickOutside } from "../../../../../hooks/useOnclickOutside";
 import PageLoader from "../PageLoader";
 
-const TableOptionsDropdown = ({ items, loan }) => {
+const TableOptionsDropdown = ({ items }) => {
   const [showDropdown, setShowDropdown] = useState(false);
 
   const ref = useRef(null);
@@ -25,11 +25,10 @@ const TableOptionsDropdown = ({ items, loan }) => {
           {items.map((item, index) => (
             <button
               key={index}
-              onClick={() => item.func(loan)}
+              onClick={() => item.func()}
               className={` ${item.className}`}
-              disabled={(item?.isDisabled && item?.isDisabled(loan)) || false}
+              disabled={item?.isDisabled || false}
             >
-              {console.log(item?.isDisabled && item?.isDisabled(loan))}
               {item?.isLoading && <PageLoader width="10" />}
               {item.label}
             </button>

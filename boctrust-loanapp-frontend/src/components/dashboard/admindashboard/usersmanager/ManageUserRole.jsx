@@ -90,7 +90,7 @@ const ManageUserRole = () => {
       setSelectedRole(null);
       setShowAddNew(false);
     } catch (error) {
-      toast.error(error?.reponse?.data?.error || "Something Went Wrong");
+      toast.error(error?.response?.data?.error || "Something Went Wrong");
     } finally {
       setIsLoading(false);
     }

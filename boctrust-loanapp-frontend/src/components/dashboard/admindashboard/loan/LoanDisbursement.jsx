@@ -13,11 +13,12 @@ import LoanDetails from "./LoanDetails";
 import NoResult from "../../../shared/NoResult";
 import DisbursementModal from "./DisbursementModal";
 import sortByCreatedAt from "../../shared/sortedByDate";
-import { fetchBookedOrDisbursedLoans } from "../../../../redux/reducers/loanReducer";
+import { fetchBookedLoans } from "../../../../redux/reducers/loanReducer";
 import TableOptionsDropdown from "../../shared/tableOptionsDropdown/TableOptionsDropdown";
 import { GrView } from "react-icons/gr";
 import { IoMdCheckmarkCircleOutline } from "react-icons/io";
 import { FcCancel } from "react-icons/fc";
+import DisplayLoanProductName from "../../shared/DisplayLoanProductName";
 
 const LoanDisbursement = () => {
   const styles = {
@@ -48,7 +49,7 @@ const LoanDisbursement = () => {
   const [canUserDisburse, setCanUserDisburse] = useState(false);
   const [canUserApprove, setCanUserApprove] = useState(false);
 
-  const { bookedDisbursedLoans } = useSelector((state) => state.loanReducer);
+  const { bookedLoans } = useSelector((state) => state.loanReducer);
 
   const [showCount, setShowCount] = useState(10);
   const [searchTerms, setSearchTerms] = useState("");
@@ -65,7 +66,7 @@ const LoanDisbursement = () => {
   const currentUser = useSelector((state) => state.adminAuth.user);
 
   // search customer list
-  const [loansList, setLoansList] = useState(bookedDisbursedLoans);
+  const [loansList, setLoansList] = useState(bookedLoans);
 
   const status = useSelector((state) => state.customerReducer.status);
 
@@ -82,7 +83,7 @@ const LoanDisbursement = () => {
 
   useEffect(() => {
     const getData = async () => {
-      await dispatch(fetchBookedOrDisbursedLoans());
+      await dispatch(fetchBookedLoans());
     };
 
     getData();
@@ -91,8 +92,8 @@ const LoanDisbursement = () => {
   // update loansList to show 10 customers on page load
   // or on count changes
   useEffect(() => {
-    setLoansList(bookedDisbursedLoans?.slice(0, showCount));
-  }, [bookedDisbursedLoans, showCount]);
+    setLoansList(bookedLoans?.slice(0, showCount));
+  }, [bookedLoans, showCount]);
 
   // handle close loan details
   const handleClose = () => {
@@ -102,8 +103,8 @@ const LoanDisbursement = () => {
 
   // handle show loan details
   const handleView = (id) => {
-    if (!bookedDisbursedLoans) return;
-    const loan = bookedDisbursedLoans.find((customer) => customer._id === id);
+    if (!bookedLoans) return;
+    const loan = bookedLoans.find((customer) => customer._id === id);
     setLoanObj(loan);
     setShow(true);
   };
@@ -123,7 +124,7 @@ const LoanDisbursement = () => {
 
     try {
       // Process loan approval
-      const loan = bookedDisbursedLoans.find((customer) => customer._id === id);
+      const loan = bookedLoans.find((customer) => customer._id === id);
       setLoanObj(loan);
 
       // Create loan and disburse in bankone
@@ -143,7 +144,7 @@ const LoanDisbursement = () => {
 
   const handleRejection = async (id) => {
     // process loan rejection
-    const loan = bookedDisbursedLoans.find((customer) => customer._id === id);
+    const loan = bookedLoans.find((customer) => customer._id === id);
     setLoanObj(loan);
 
     // setProcessing to true after 5 second
@@ -161,13 +162,9 @@ const LoanDisbursement = () => {
 
   // update loansList on search
   const handleSearch = () => {
-    // check bookedDisbursedLoans is not empty
-    if (!bookedDisbursedLoans) return;
-    const currSearch = searchList(
-      bookedDisbursedLoans,
-      searchTerms,
-      "agreefullname"
-    );
+    // check bookedLoans is not empty
+    if (!bookedLoans) return;
+    const currSearch = searchList(bookedLoans, searchTerms, "agreefullname");
     setLoansList(currSearch?.slice(0, showCount));
   };
 
@@ -175,38 +172,41 @@ const LoanDisbursement = () => {
     handleSearch();
   }, [searchTerms]);
 
-  const tableOptions = [
-    {
-      className: "",
-      icon: <GrView />,
-      label: "View Details",
-      func: (customer) => handleView(customer._id),
-    },
-    {
-      className: "text-primary",
-      icon: <IoMdCheckmarkCircleOutline />,
-      label: canUserDisburse
-        ? "Disburse Loan"
-        : canUserApprove
-        ? "Approve Disbursement"
-        : "",
-      isDisabled: (loan) =>
-        (canUserDisburse && loan.disbursementstatus === "disbursed") ||
-        (canUserApprove && loan.disbursementstatus !== "disbursed"),
-      isLoading: approveDisburseLoading,
-      func: (loan) => handleInitiateDisbursement(loan),
-    },
-    {
-      className: "text-danger",
-      icon: <FcCancel />,
-      label: "Reject Loan",
-      isDisabled: (loan) =>
-        (canUserDisburse && loan.disbursementstatus === "disbursed") ||
-        (canUserApprove && loan.disbursementstatus === "approved"),
-      isLoading: rejectLoading,
-      func: (loan) => handleRejection(loan._id),
-    },
-  ];
+  const getTableOptions = (loan) => {
+    const tableOptions = [
+      {
+        className: "",
+        icon: <GrView />,
+        label: "View Details",
+        func: () => handleView(loan._id),
+      },
+      {
+        className: "text-primary",
+        icon: <IoMdCheckmarkCircleOutline />,
+        label: canUserDisburse
+          ? "Disburse Loan"
+          : canUserApprove
+          ? "Approve Disbursement"
+          : "",
+        isDisabled:
+          (canUserDisburse && loan.disbursementstatus === "disbursed") ||
+          (canUserApprove && loan.disbursementstatus !== "disbursed"),
+        isLoading: approveDisburseLoading,
+        func: (loan) => handleInitiateDisbursement(loan),
+      },
+      {
+        className: "text-danger",
+        icon: <FcCancel />,
+        label: "Reject Loan",
+        isDisabled: (loan) =>
+          (canUserDisburse && loan.disbursementstatus === "disbursed") ||
+          (canUserApprove && loan.disbursementstatus === "approved"),
+        isLoading: rejectLoading,
+        func: (loan) => handleRejection(loan._id),
+      },
+    ];
+    return tableOptions;
+  };
 
   return (
     <>
@@ -269,7 +269,9 @@ const LoanDisbursement = () => {
                       <td>
                         {loan?.customer?.banking?.accountDetails?.Message.Id}
                       </td>
-                      <td>{loan.loanproduct.productName || "General Loan"}</td>
+                      <td>
+                        <DisplayLoanProductName loan={loan} />
+                      </td>
                       <td>
                         {
                           loan?.customer?.banking?.accountDetails?.Message
@@ -300,8 +302,7 @@ const LoanDisbursement = () => {
                         {canUserManage && (
                           <td>
                             <TableOptionsDropdown
-                              loan={loan}
-                              items={tableOptions}
+                              items={getTableOptions(loan)}
                             />
                           </td>
                         )}

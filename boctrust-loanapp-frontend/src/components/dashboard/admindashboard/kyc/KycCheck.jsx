@@ -166,13 +166,15 @@ const KycCheck = () => {
       body: JSON.stringify(data),
     });
 
-    await fetch(`${apiUrl}/api/loans/status/${currentCustomer.loan._id}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        loanstatus: "with credit",
-      }),
-    });
+    if (isKycApproved === true) {
+      await fetch(`${apiUrl}/api/loans/status/${currentCustomer.loan._id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          loanstatus: "with credit",
+        }),
+      });
+    }
 
     await dispatch(fetchAllCustomersLoans());
     setShowKycDetails(false);
@@ -207,6 +209,7 @@ const KycCheck = () => {
       toDate: "",
     });
     dispatch(fetchAllCustomersLoans());
+
     setSearchCustomer(customers);
   };
 
@@ -216,10 +219,6 @@ const KycCheck = () => {
     dateRange,
     "createdAt"
   );
-
-  useEffect(() => {
-    setSearchCustomer(customers);
-  }, [customers]);
 
   useEffect(() => {
     setSearchCustomer(searchData);
@@ -302,18 +301,28 @@ const KycCheck = () => {
                               >
                                 Done
                               </BocButton>
-                            ) : (
+                            ) : customer.kyc.isKycApproved === null ? (
                               <a href="#kycSection">
                                 <BocButton
                                   bradius="12px"
                                   fontSize="14px"
                                   margin="0 4px"
-                                  bgcolor="#f64f4f"
+                                  bgcolor="#f59e0b"
                                   func={() => handleStartCheck(customer._id)}
                                 >
                                   Check
                                 </BocButton>
                               </a>
+                            ) : (
+                              <BocButton
+                                bradius="12px"
+                                fontSize="14px"
+                                margin="0 4px"
+                                bgcolor="#f43f5e"
+                                func={() => handleStartCheck(customer._id)}
+                              >
+                                Canceled
+                              </BocButton>
                             )}
                           </div>
                         </td>
@@ -597,9 +606,9 @@ const KycCheck = () => {
                   fontSize="18px"
                   margin="8px 28px"
                   bgcolor="#f64f4f"
-                  func={() => setShowKycDetails(false)}
+                  func={handleSaveCheck}
                 >
-                  Invalid/Cancel
+                  Invalidate/Cancel
                 </BocButton>
                 {!progress ? (
                   <BocButton
@@ -609,7 +618,7 @@ const KycCheck = () => {
                     bgcolor="#145098"
                     func={handleSaveCheck}
                   >
-                    Valid
+                    Validate/Approve
                   </BocButton>
                 ) : (
                   <PageLoader />
