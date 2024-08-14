@@ -15,12 +15,12 @@ import "./Form.css";
 import calculatorfunc from "../../shared/calculatorfunc";
 
 // bvn verification function
-import { bvnVerification } from "./bvnVerification";
+// import { bvnVerification } from "./bvnVerification";
 import { ToastContainer, toast } from "react-toastify";
 
 // toast styles
 import "react-toastify/dist/ReactToastify.css";
-// import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 // import { updateCustomerStateValues } from "../../../redux/reducers/customerReducer";
 
 // loan form component
@@ -46,7 +46,7 @@ const LoanFirstStep = ({ data }) => {
 
   const loanProducts = useSelector((state) => state.productReducer.products);
 
-  // const navigate = useNavigate();
+  const navigate = useNavigate();
 
   useEffect(() => {
     dispatch(fetchProduct());
@@ -181,8 +181,8 @@ const LoanFirstStep = ({ data }) => {
       .then((response) => response.json())
       .then(() => {
         // search for bvn details and verify
-        bvnVerification();
-        // navigate("/app/nibbs-login")
+        // bvnVerification();
+        navigate("/app/nibbs-login")
         // set show loan form to true
         // setShowLoanForm(true);
       });
