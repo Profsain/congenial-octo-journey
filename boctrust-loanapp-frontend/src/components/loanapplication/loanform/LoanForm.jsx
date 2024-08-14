@@ -117,7 +117,7 @@ const LoanForm = React.memo(function LoanFormComponent() {
   useEffect(() => {
     // set showReconfirmBvn modal after 30 seconds
     const timer = setTimeout(() => {
-      setShowReconfirmBvn(false);
+      setShowReconfirmBvn(true);
     }, 30000);
 
     // Cleanup function to clear the timer
