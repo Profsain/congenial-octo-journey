@@ -161,6 +161,7 @@ const LoanForm = React.memo(function LoanFormComponent() {
     if (formValues) {
       ref.current?.setValues(formValues);
       fileValues.map((item) => {
+        console.log(item, "item")
         ref.current?.setFieldValue(
           item,
           getFile(

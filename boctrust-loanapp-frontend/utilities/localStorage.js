@@ -5,7 +5,7 @@ export const storeInLocalStorage = ({ key, value }) => {
   let nonFileFields = {};
   Object.keys(value).map((fieldKey) => {
     if (fileValues.includes(fieldKey)) {
-      saveFile(fieldKey, value[fieldKey]);
+      value[fieldKey] && saveFile(fieldKey, value[fieldKey]);
     } else {
       nonFileFields[fieldKey] = value[fieldKey];
     }
@@ -23,6 +23,7 @@ export const deleteFromLocalStorage = (key) => {
 };
 
 export const getFile = (key, filename) => {
+  console.log(key, filename);
   const base64File = localStorage.getItem(key);
   return base64File ? base64ToFile(base64File, filename) : null;
 };
