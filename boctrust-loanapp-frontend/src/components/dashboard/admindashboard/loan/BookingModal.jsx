@@ -86,7 +86,10 @@ const BookingModal = ({ selectedLoan, show, handleClose }) => {
     const BaseURL = import.meta.env.VITE_BASE_URL;
     try {
       setIsLoading(true);
-      await axios.put(`${BaseURL}/api/loans/book/${selectedLoan._id}`);
+      await axios.put(
+        `${BaseURL}/api/loans/book/${selectedLoan._id}`,
+        bookingDetails
+      );
 
       await dispatch(fetchUnbookedLoans());
     } catch (error) {
@@ -99,12 +102,18 @@ const BookingModal = ({ selectedLoan, show, handleClose }) => {
     const BaseURL = import.meta.env.VITE_BASE_URL;
     try {
       setIsLoading(true);
+      await axios.post(
+        `${BaseURL}/api/bankone/newCustomerAccount/${selectedLoan?.customer?._id}`
+      );
+      await axios.post(
+        `${BaseURL}/api/bankone/createLoan/${selectedLoan?._id}`
+      );
       await axios.put(`${BaseURL}/api/loans/approved-book/${selectedLoan._id}`);
 
       await dispatch(fetchUnbookedLoans());
-      handleClose()
+      handleClose();
     } catch (error) {
-      
+      console.log(error);
       toast.error(error?.response?.data?.error || "Something went Wrong");
     } finally {
       setIsLoading(false);
@@ -127,8 +136,8 @@ const BookingModal = ({ selectedLoan, show, handleClose }) => {
 
               <Headline
                 text={
-                  selectedLoan.customer?.banking?.accountDetails?.Message
-                    .FullName ||
+                  selectedLoan.customer?.banking?.accountDetails
+                    ?.CustomerName ||
                   `${selectedLoan?.customer?.firstname} ${selectedLoan?.customer?.lastname}`
                 }
               />

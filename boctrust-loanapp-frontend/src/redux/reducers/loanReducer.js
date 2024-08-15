@@ -1,6 +1,5 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import axios, { AxiosError } from "axios";
-import { bookedLoans } from "../../mockdatabase/loans";
+import axios from "axios";
 
 //fetch accounts
 const apiUrl = import.meta.env.VITE_BASE_URL;
@@ -48,18 +47,18 @@ export const fetchUnbookedLoans = createAsyncThunk(
 export const fetchBookedLoans = createAsyncThunk(
   "account/fetchBookedLoans",
   async () => {
-    await axios.get(`${API_ENDPOINT}/loans/booked`);
+    const res = await axios.get(`${API_ENDPOINT}/loans/booked`);
 
-    return bookedLoans;
+    return res.data;
   }
 );
 // Thunk to fetch account from the API
 export const fetchCompletedLoan = createAsyncThunk(
   "account/fetchCompletedLoan",
   async () => {
-    await axios.get(`${API_ENDPOINT}/loans/completed`);
+    const res = await axios.get(`${API_ENDPOINT}/loans/disbursed`);
 
-    return bookedLoans;
+    return res.data;
   }
 );
 
@@ -70,63 +69,6 @@ export const fetchCustomerLoans = createAsyncThunk(
     const response = await axios.get(`${API_ENDPOINT}/loans/${customerId}`);
 
     return response.data;
-  }
-);
-
-// Thunk to fetch account from the API
-export const bookLoan = createAsyncThunk(
-  "account/bookLoans",
-  async (loanId, thunkAPI) => {
-    try {
-      await axios.put(`${apiUrl}/api/loans/book/${loanId}`);
-    } catch (error) {
-      if (error instanceof AxiosError) {
-        return thunkAPI.rejectWithValue(error.response?.data?.message);
-      }
-      return thunkAPI.rejectWithValue("Could not Book Loan");
-    }
-  }
-);
-// Thunk to fetch account from the API
-export const approveBookedLoan = createAsyncThunk(
-  "account/approveBookedLoan",
-  async (loanId, thunkAPI) => {
-    try {
-      await axios.put(`${apiUrl}/api/loans/approved-book/${loanId}`);
-    } catch (error) {
-      if (error instanceof AxiosError) {
-        return thunkAPI.rejectWithValue(error.response?.data?.message);
-      }
-      return thunkAPI.rejectWithValue("Could Approve and Create Account");
-    }
-  }
-);
-
-export const disburseLoan = createAsyncThunk(
-  "account/disburseLoan",
-  async (loanId, thunkAPI) => {
-    try {
-      await axios.put(`${apiUrl}/api/loans/disburse/${loanId}`);
-    } catch (error) {
-      if (error instanceof AxiosError) {
-        return thunkAPI.rejectWithValue(error.response?.data?.message);
-      }
-      return thunkAPI.rejectWithValue("Could Approve and Create Account");
-    }
-  }
-);
-
-export const approveDisburseLoan = createAsyncThunk(
-  "account/approveDisburseLoan",
-  async (loanId, thunkAPI) => {
-    try {
-      await axios.put(`${apiUrl}/api/loans/approve-disburse/${loanId}`);
-    } catch (error) {
-      if (error instanceof AxiosError) {
-        return thunkAPI.rejectWithValue(error.response?.data?.message);
-      }
-      return thunkAPI.rejectWithValue("Could Approve and Create Account");
-    }
   }
 );
 

@@ -1,16 +1,15 @@
-
-import PropTypes from "prop-types"
+import PropTypes from "prop-types";
 import { RotatingLines } from "react-loader-spinner";
 
-const PageLoader = ({width="96"}) => {
-    const style = {
-        display: "flex",
-        placeContent: "center",
-    }
+const PageLoader = ({ width = "96", strokeColor = "#ecaa00" }) => {
+  const style = {
+    display: "flex",
+    placeContent: "center",
+  };
   return (
     <div style={style}>
       <RotatingLines
-        strokeColor="#ecaa00"
+        strokeColor={strokeColor}
         strokeWidth="5"
         animationDuration="0.75"
         width={width}
@@ -18,10 +17,11 @@ const PageLoader = ({width="96"}) => {
       />
     </div>
   );
-}
+};
 
 PageLoader.propTypes = {
-  width: PropTypes.string
-}
+  width: PropTypes.string,
+  strokeColor: PropTypes.string,
+};
 
-export default PageLoader
+export default PageLoader;

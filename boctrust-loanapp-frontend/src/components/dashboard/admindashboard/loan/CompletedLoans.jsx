@@ -167,22 +167,22 @@ const OverdueLoans = () => {
                   {loanList &&
                     loanList?.map((loan) => {
                       return (
-                        <tr key={loan.id}>
+                        <tr key={loan._id}>
                           <td>
-                            {loan.customer?.banking?.accountDetails?.Message
-                              ?.Id || "N/A"}
+                            {loan.customer?.banking?.accountDetails
+                              ?.CustomerID || "N/A"}
                           </td>
                           <td>
                             <DisplayLoanProductName loan={loan} />
                           </td>
                           <td>
-                            {loan?.customer?.banking?.accountDetails?.Message
-                              ?.FullName ||
+                            {loan?.customer?.banking?.accountDetails
+                              ?.CustomerName ||
                               `${loan?.customer?.firstname} ${loan?.customer?.lastname}`}
                           </td>
                           <td>
-                            {loan?.customer?.banking?.accountDetails?.Message
-                              .AccountNumber || "N/A"}
+                            {loan?.customer?.banking?.accountDetails
+                              ?.AccountNumber || "N/A"}
                           </td>
                           <td>{getDateOnly(loan?.createdAt)}</td>
                           <td>N{loan?.loanamount}</td>

@@ -112,27 +112,23 @@ const AllLoans = ({ showCount, searchTerms }) => {
             </tr>
           </thead>
           <tbody>
-            {loansList?.length === 0 && <NoResult name="customer" />}
+            {loansList?.length === 0 && <NoResult name="Loan" />}
             {loansList &&
               sortByCreatedAt(loansList)?.map((loan) => {
                 return (
                   <tr key={loan._id}>
                     <td>
-                      {loan?.customer?.banking?.accountDetails?.Message.Id}
+                      {loan?.customer?.banking?.accountDetails?.CustomerID}
                     </td>
                     <td>
                       <DisplayLoanProductName loan={loan} />
                     </td>
                     <td>
-                      {loan?.customer?.banking?.accountDetails?.Message
-                        .FullName ??
+                      {loan?.customer?.banking?.accountDetails?.CustomerName ??
                         `${loan?.customer?.firstname} ${loan?.customer?.lastname}`}
                     </td>
                     <td>
-                      {
-                        loan.customer?.banking?.accountDetails?.Message
-                          ?.AccountNumber
-                      }
+                      {loan.customer?.banking?.accountDetails?.AccountNumber}
                     </td>
                     <td>{getDateOnly(loan.createdAt)}</td>
                     <td>N{loan.loanamount}</td>
@@ -145,7 +141,6 @@ const AllLoans = ({ showCount, searchTerms }) => {
                           : "text-warning"
                       }
                     >
-                      {" "}
                       {capitalizeEachWord(loan.loanstatus)}
                     </td>
                     <td>

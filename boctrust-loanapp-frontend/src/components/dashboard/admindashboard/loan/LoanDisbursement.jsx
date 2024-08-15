@@ -1,7 +1,6 @@
 import PropTypes from "prop-types";
 import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchAllCustomer } from "../../../../redux/reducers/customerReducer";
 import Table from "react-bootstrap/Table";
 import "../../Dashboard.css";
 import DashboardHeadline from "../../shared/DashboardHeadline";
@@ -11,7 +10,7 @@ import getDateOnly from "../../../../../utilities/getDate";
 import searchList from "../../../../../utilities/searchListFunc";
 import LoanDetails from "./LoanDetails";
 import NoResult from "../../../shared/NoResult";
-import DisbursementModal from "./DisbursementModal";
+// import DisbursementModal from "./DisbursementModal";
 import sortByCreatedAt from "../../shared/sortedByDate";
 import { fetchBookedLoans } from "../../../../redux/reducers/loanReducer";
 import TableOptionsDropdown from "../../shared/tableOptionsDropdown/TableOptionsDropdown";
@@ -19,6 +18,9 @@ import { GrView } from "react-icons/gr";
 import { IoMdCheckmarkCircleOutline } from "react-icons/io";
 import { FcCancel } from "react-icons/fc";
 import DisplayLoanProductName from "../../shared/DisplayLoanProductName";
+import TransferMoney from "./transferMoney/TransferMoney";
+import axios from "axios";
+import { toast } from "react-toastify";
 
 const LoanDisbursement = () => {
   const styles = {
@@ -56,6 +58,8 @@ const LoanDisbursement = () => {
 
   const [show, setShow] = useState(false);
   const [loanObj, setLoanObj] = useState({});
+
+  const [loanUserAccounts, setLoanUserAccounts] = useState(null);
 
   // handle loan approval
   const [showDisburse, setShowDisburse] = useState(false);
@@ -109,55 +113,57 @@ const LoanDisbursement = () => {
     setShow(true);
   };
 
-  const handleInitiateDisbursement = async () => {
+  const handleInitiateDisbursement = async (payload) => {
     try {
       setApproveDisburseLoading(true);
+
+      await axios.put(`${apiUrl}/api/loans/disburse/${loanObj._id}`, payload);
+      await dispatch(fetchBookedLoans());
+      toast.success("Loan Disbursement Initiated and Pending Approval");
     } catch (error) {
+      toast.error(error?.response?.data?.error);
       console.log(error);
     } finally {
       setApproveDisburseLoading(false);
     }
   };
 
-  const handleApproval = async (id) => {
-    setApproveDisburseLoading(true);
-
+  const handleApproval = async () => {
     try {
-      // Process loan approval
-      const loan = bookedLoans.find((customer) => customer._id === id);
-      setLoanObj(loan);
+      setApproveDisburseLoading(true);
 
-      // Create loan and disburse in bankone
-      await fetch(`${apiUrl}/api/bankone/createLoan`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(loan),
-      });
-
-      dispatch(fetchAllCustomer());
+      await axios.put(`${apiUrl}/api/loans/approve-disburse/${loanObj._id}`);
+      await dispatch(fetchBookedLoans());
+      toast.success("Loan has been successfully disbursed");
     } catch (error) {
-      console.error("Error:", error.message);
+      console.log(error);
+      toast.error(error?.response?.data?.error);
     } finally {
       setApproveDisburseLoading(false);
     }
   };
 
   const handleRejection = async (id) => {
-    // process loan rejection
-    const loan = bookedLoans.find((customer) => customer._id === id);
-    setLoanObj(loan);
+    try {
+      // process loan rejection
+      const loan = bookedLoans.find((customer) => customer._id === id);
+      setLoanObj(loan);
 
-    // setProcessing to true after 5 second
-    setTimeout(() => {
-      setRejectLoading(false);
-    }, 5000);
+      // setProcessing to true after 5 second
+      setTimeout(() => {
+        setRejectLoading(false);
+      }, 5000);
 
-    dispatch(fetchAllCustomer());
+      await dispatch(fetchBookedLoans());
+    } catch (error) {
+      toast.error(error?.response?.data?.error);
+    }
   };
 
   // handle close disburse model
   const handleCloseDisburse = () => {
     setShowDisburse(false);
+    setLoanUserAccounts(null);
   };
 
   // update loansList on search
@@ -190,9 +196,28 @@ const LoanDisbursement = () => {
           : "",
         isDisabled:
           (canUserDisburse && loan.disbursementstatus === "disbursed") ||
-          (canUserApprove && loan.disbursementstatus !== "disbursed"),
+          (canUserApprove &&
+            loan.disbursementstatus == "approved" &&
+            loan.loanstatus === "completed"),
         isLoading: approveDisburseLoading,
-        func: (loan) => handleInitiateDisbursement(loan),
+        func: async () => {
+          try {
+            setLoanObj(loan);
+            setShowDisburse(true);
+            const response = await axios.get(
+              `${apiUrl}/api/bankone/getCustomerAccountsByBankoneId/${loan.customer?.banking?.accountDetails?.CustomerID}`
+            );
+
+            setLoanUserAccounts(
+              response.data?.Accounts?.map((item) => ({
+                label: item.NUBAN,
+                value: item.NUBAN,
+              }))
+            );
+          } catch (error) {
+            toast.error(error.message);
+          }
+        },
       },
       {
         className: "text-danger",
@@ -267,22 +292,16 @@ const LoanDisbursement = () => {
                   return (
                     <tr key={loan._id}>
                       <td>
-                        {loan?.customer?.banking?.accountDetails?.Message.Id}
+                        {loan?.customer?.banking?.accountDetails?.CustomerID}
                       </td>
                       <td>
                         <DisplayLoanProductName loan={loan} />
                       </td>
                       <td>
-                        {
-                          loan?.customer?.banking?.accountDetails?.Message
-                            .FullName
-                        }
+                        {loan?.customer?.banking?.accountDetails?.CustomerName}
                       </td>
                       <td>
-                        {
-                          loan?.customer?.banking?.accountDetails?.Message
-                            ?.AccountNumber
-                        }
+                        {loan?.customer?.banking?.accountDetails?.AccountNumber}
                       </td>
                       <td>{getDateOnly(loan.createdAt)}</td>
                       <td>N{loan.loanamount}</td>
@@ -323,15 +342,19 @@ const LoanDisbursement = () => {
             loanObj={loanObj}
           />
         )}
-
-        {/* show disbursement modal */}
-        {show && (
-          <DisbursementModal
+        {showDisburse && (
+          <TransferMoney
             show={showDisburse}
-            handleClose={handleCloseDisburse}
             loanObj={loanObj}
-            handleApproval={() => handleApproval(loanObj._id)}
-            handleRejection={() => handleRejection(loanObj._id)}
+            debitAccounts={loanUserAccounts}
+            handleClose={handleCloseDisburse}
+            action={
+              canUserDisburse && loanObj?.disbursementstatus === "pending"
+                ? handleInitiateDisbursement
+                : canUserApprove
+                ? handleApproval
+                : () => {}
+            }
           />
         )}
       </div>

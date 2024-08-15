@@ -24,12 +24,11 @@ export const fetchSingleCustomer = createAsyncThunk(
   }
 );
 
-// Thunk to COO Approval and Create Bank One account
-export const cooApprovalAndCreateBankoneAccount = createAsyncThunk(
-  "account/cooApprovalAndCreateBankoneAccount",
+// Thunk to  Create Bank One account
+export const createBankoneCustomer = createAsyncThunk(
+  "account/createBankoneCustomer",
   async (customerId, thunkAPI) => {
     try {
-      await axios.put(`${apiUrl}/api/updatecustomer/approve/coo/${customerId}`);
       await axios.post(
         `${apiUrl}/api/bankone/newCustomerAccount/${customerId}`
       );
@@ -82,13 +81,13 @@ const customerSlice = createSlice({
         state.error = action.error.message;
       })
 
-      .addCase(cooApprovalAndCreateBankoneAccount.pending, (state) => {
+      .addCase(createBankoneCustomer.pending, (state) => {
         state.status = "loading";
       })
-      .addCase(cooApprovalAndCreateBankoneAccount.fulfilled, (state) => {
+      .addCase(createBankoneCustomer.fulfilled, (state) => {
         state.status = "succeeded";
       })
-      .addCase(cooApprovalAndCreateBankoneAccount.rejected, (state, action) => {
+      .addCase(createBankoneCustomer.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.error.message;
       });
