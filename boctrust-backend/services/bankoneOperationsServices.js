@@ -1,7 +1,8 @@
 const { default: axios } = require("axios");
 
 const getCustomerAccountInfoByTrackingRef = async (trackinRef) => {
-  const options = {
+    const baseUrl = process.env.BANKONE_BASE_URL;
+    const options = {
     method: "GET",
     headers: {
       accept: "application/json",
