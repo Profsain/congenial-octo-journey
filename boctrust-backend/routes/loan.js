@@ -2,6 +2,10 @@ const express = require("express");
 const router = express.Router();
 const Loan = require("../models/Loan"); // Import Loan model
 const Customer = require("../models/Customer");
+const {
+  handleInterBankTransfer,
+} = require("../services/bankoneOperationsServices");
+const { generateTransactionRef } = require("../utils/generateTransactionRef");
 
 // Get all loan
 router.get("/", async (req, res) => {
@@ -299,14 +303,20 @@ router.put("/approved-book/:loanId", async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+
 // Endpoint for Operations to disburse loans
 router.put("/disburse/:loanId", async (req, res) => {
   const { loanId } = req.params;
+  const { amount, debitAccount, notes, creditAccountName } = req.body;
+  if (!amount || !debitAccount || !notes || !creditAccountName) {
+    return res.status(400).json({ error: "Missing Fields" });
+  }
 
   try {
     // Find the customer by ID
     const loan = await Loan.findByIdAndUpdate(loanId, {
       disbursementstatus: "disbursed",
+      debursementDetails: { ...req.body, amount: amount * 100 },
     });
 
     if (!loan) {
@@ -314,7 +324,7 @@ router.put("/disburse/:loanId", async (req, res) => {
     }
 
     // Return the allLoans array
-    res.status(200).json(customerLoans);
+    res.status(200).json(loan);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -323,11 +333,42 @@ router.put("/disburse/:loanId", async (req, res) => {
 // Endpoint for Operations to disburse loans
 router.put("/approve-disburse/:loanId", async (req, res) => {
   const { loanId } = req.params;
-
+  const token = process.env.BANKONE_TOKEN;
   try {
+    const loanAndCustomer = await Loan.findById(loanId).populate("customer");
+
+    if (!loanAndCustomer)
+      return res.status(404).json({ message: "Customer not found" });
+
+    const transferRequestPayload = {
+      Amount: loanAndCustomer?.debursementDetails?.amount,
+      PayerAccountNumber: loanAndCustomer?.debursementDetails?.debitAccount,
+      Payer: loanAndCustomer?.customer?.banking?.accountDetails?.CustomerName,
+      ReceiverAccountNumber:
+        loanAndCustomer?.customer?.disbursementaccountnumber,
+      ReceiverBankCode: loanAndCustomer?.customer.bankcode,
+      ReceiverName: loanAndCustomer?.debursementDetails?.creditAccountName,
+      Narration: loanAndCustomer?.debursementDetails?.notes,
+      TransactionReference: `TF${
+        loanAndCustomer?.customer?.banking?.accountDetails?.CustomerID
+      }${generateTransactionRef()}`,
+      Token: token,
+    };
+
+    const transactionResponse = await handleInterBankTransfer(
+      transferRequestPayload
+    );
+
+    // if (transactionResponse?.Status === "Failed") {
+    //   return res
+    //     .status(400)
+    //     .json({ error: transactionResponse.ResponseMessage });
+    // }
+
     // Find the customer by ID
     const loan = await Loan.findByIdAndUpdate(loanId, {
       disbursementstatus: "approved",
+      loanstatus: "completed",
     });
 
     if (!loan) {
@@ -335,7 +376,7 @@ router.put("/approve-disburse/:loanId", async (req, res) => {
     }
 
     // Return the allLoans array
-    res.status(200).json(customerLoans);
+    res.status(200).json({ message: "Money Sent Successfully" });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

@@ -167,7 +167,8 @@ const LoanForm = React.memo(function LoanFormComponent() {
     const formValues = getFromLocalStorage("onbaordData");
 
     if (formValues) {
-      ref.current?.setValues(formValues);
+      console.log(formValues, "formValues");
+
       fileValues.map((item) => {
         ref.current?.setFieldValue(
           item,
@@ -180,10 +181,13 @@ const LoanForm = React.memo(function LoanFormComponent() {
     }
   };
 
+  useEffect(() => {
+    updateFormValues();
+  }, []);
+
   // scroll to the top of the page
   useEffect(() => {
     window.scrollTo(0, 0);
-    updateFormValues();
   }, [step, showForm]);
 
   // update photocapture value when captureImg change
@@ -461,9 +465,9 @@ const LoanForm = React.memo(function LoanFormComponent() {
       isFieldValid("valididcard", ref)
     ) {
       if (step === 1) {
+        storeInLocalStorage({ key: "onbaordData", value: ref.current?.values });
         setStep(2);
         setStepImg("https://i.imgur.com/DPMDjLy.png");
-        storeInLocalStorage({ key: "onbaordData", value: ref.current?.values });
       } else if (
         step === 2 &&
         (isFieldValid("employerId", ref) ||
@@ -494,13 +498,13 @@ const LoanForm = React.memo(function LoanFormComponent() {
                 Number(employer?.mandateRule?.mandateDuration.split(" ")[0])
             : true
         ) {
-          setStep(3);
-
-          setStepImg("https://i.imgur.com/DPMDjLy.png");
           storeInLocalStorage({
             key: "onbaordData",
             value: ref.current?.values,
           });
+          setStep(3);
+
+          setStepImg("https://i.imgur.com/DPMDjLy.png");
         } else {
           return notify(
             "Please You are not Eligible to Apply for loan on this platform"
@@ -511,20 +515,20 @@ const LoanForm = React.memo(function LoanFormComponent() {
         isFieldValid("salaryaccountname", ref) &&
         isFieldValid("salaryaccountnumber", ref)
       ) {
+        storeInLocalStorage({ key: "onbaordData", value: ref.current?.values });
         setStep(4);
         setStepImg("https://i.imgur.com/DPMDjLy.png");
-        storeInLocalStorage({ key: "onbaordData", value: ref.current?.values });
       } else if (
         step === 4 &&
         ref.current?.values.signature
         // && ref.current?.values.photocapture
       ) {
-        setStep(5);
-        setStepImg("https://i.imgur.com/DPMDjLy.png");
         storeInLocalStorage({
           key: "onbaordData",
           value: ref.current?.values,
         });
+        setStep(5);
+        setStepImg("https://i.imgur.com/DPMDjLy.png");
       } else {
         console.log(ref.current?.values, " ref.current?.values");
         notify("Please Enter Valid Details for all Fields");

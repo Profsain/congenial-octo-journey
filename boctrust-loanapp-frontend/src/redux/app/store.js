@@ -21,6 +21,7 @@ import siteContentReducer from "../reducers/siteContentReducer";
 import directors from "../reducers/boardDirectorReducer";
 import frontPageProductReducer from "../reducers/frontPageProductsReducer";
 import loanReducer from "../reducers/loanReducer";
+import transactionReducer from "../reducers/transactionReducer";
 
 // create a store
 const store = configureStore({
@@ -37,6 +38,7 @@ const store = configureStore({
     accountReducer,
     customerReducer,
     loanReducer,
+    transactionReducer,
     disbursementMethodReducer,
     adminUserReducer,
     loanOfficerReducer,

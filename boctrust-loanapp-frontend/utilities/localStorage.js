@@ -28,8 +28,6 @@ export const deleteFromLocalStorage = (key) => {
 export const getFile = (key, filename) => {
   const base64File = localStorage.getItem(key);
 
-  console.log(base64File, `base64File for ${key}`);
-
   return base64File ? base64ToFile(base64File, filename) : null;
 };
 

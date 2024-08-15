@@ -57,7 +57,7 @@ const LoanDetails = ({
           <Modal.Title>
             <Headline
               text={
-                loanObj.customer?.banking?.accountDetails?.Message.FullName ||
+                loanObj.customer?.banking?.accountDetails?.CustomerName ||
                 `${loanObj?.customer?.firstname} ${loanObj?.customer?.lastname}`
               }
             />
@@ -66,7 +66,7 @@ const LoanDetails = ({
         <Modal.Body>
           <RowCard
             title="Loan ID:"
-            text={loanObj.customer.banking?.accountDetails?.Message.Id}
+            text={loanObj.customer.banking?.accountDetails?.CustomerID}
           />
           <hr />
           <RowCard title="Valid BVN:" text={loanObj.customer.bvnnumber} />

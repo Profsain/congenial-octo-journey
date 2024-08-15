@@ -10,6 +10,7 @@ const LabeledInput = ({
   isDate,
   className,
   setInputValue,
+  disabled,
 }) => {
   return (
     <div>
@@ -22,6 +23,7 @@ const LabeledInput = ({
         </label>
         {isTextArea ? (
           <textarea
+            disabled={disabled}
             name={name}
             value={value}
             onChange={setInputValue}
@@ -32,6 +34,7 @@ const LabeledInput = ({
           <input
             type="date"
             name={name}
+            disabled={disabled}
             value={value}
             onChange={setInputValue}
             className={className}
@@ -39,6 +42,7 @@ const LabeledInput = ({
         ) : (
           <input
             name={name}
+            disabled={disabled}
             value={value}
             onChange={setInputValue}
             className={className}
@@ -56,6 +60,7 @@ LabeledInput.propTypes = {
   value: PropTypes.string,
   placeholder: PropTypes.string,
   isTextArea: PropTypes.bool,
+  disabled: PropTypes.bool,
   isDate: PropTypes.bool,
   className: PropTypes.string,
   setInputValue: PropTypes.func,

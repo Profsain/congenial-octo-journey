@@ -1,5 +1,12 @@
 const mongoose = require("mongoose");
 
+const DisbursmentSchema = new mongoose.Schema({
+  amount: Number,
+  debitAccount: String,
+  notes: String,
+  creditAccountName: String,
+});
+
 const loanSchema = new mongoose.Schema(
   {
     customer: {
@@ -33,6 +40,9 @@ const loanSchema = new mongoose.Schema(
       type: String,
       enum: ["approved", "pending", "disbursed", "stopped"],
       default: "pending",
+    },
+    debursementDetails: {
+      type: DisbursmentSchema,
     },
     deductions: String,
     loanamount: Number,

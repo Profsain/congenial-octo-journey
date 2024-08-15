@@ -5,6 +5,10 @@ const { default: axios } = require("axios");
 const router = express.Router();
 const nodemailer = require("nodemailer");
 const EmailTemplate = require("../utils/emailTemp");
+const {
+  getCustomerAccountInfoByTrackingRef,
+  handleInterBankTransfer,
+} = require("../services/bankoneOperationsServices");
 
 // add token to environment variable
 const token = process.env.BANKONE_TOKEN;
@@ -80,6 +84,7 @@ router.post("/createCustomerAccount", async (req, res) => {
 // loan creation endpoint (verify)
 router.post("/createLoan/:loanId", async (req, res) => {
   const { loanId } = req.params;
+
   if (!loanId)
     return res.status(400).json({ error: "Bad Request! No LoanId " });
 
@@ -91,10 +96,9 @@ router.post("/createLoan/:loanId", async (req, res) => {
   // get the loan creation request payload from the request body
   const {
     _id,
-    customer: { banking },
+    customer: { banking, loanproduct },
     numberofmonth,
     loanamount,
-    loanproduct,
     collateralDetails,
     collateralType,
     computationMode,
@@ -108,19 +112,22 @@ router.post("/createLoan/:loanId", async (req, res) => {
     `${baseUrl}/BankOneWebAPI/api/Product/GetByCode/2?authToken=${token}&productCode=${loanproduct}`
   );
 
+  // console.log(loanProductDetails, "loanProductDetails")
+
   if (!loanProductDetails)
     return res.status(404).json({ error: "Loan Product Does not Exist" });
 
   const customerId = banking?.accountDetails?.CustomerID;
+
   const accountNumber = banking?.accountDetails?.AccountNumber;
+
   // convert number of month to number of days
   const tenure = Number(numberofmonth) * 30;
-
 
   // Define the loan creation request payload here
   const loanRequestPayload = {
     TransactionTrackingRef: _id,
-    LoanProductCode: loanproduct,
+    LoanProductCode: loanProductDetails.ProductCode,
     CustomerID: customerId,
     LinkedAccountNumber: accountNumber,
     CollateralDetails: collateralDetails,
@@ -200,28 +207,6 @@ router.post("/createLoan/:loanId", async (req, res) => {
   }
 });
 
-const getCustomerAccountInfoByTrackingRef = async (trackinRef) => {
-  const options = {
-    method: "GET",
-    headers: {
-      accept: "application/json",
-      "content-type": "application/json",
-    },
-  };
-
-  const res = await fetch(
-    `${baseUrl}/BankOneWebAPI/api/Account/GetAccountByTransactionTrackingRef/2?authToken=${token}&transactionTrackingRef=${trackinRef}`,
-    options
-  );
-  const data = await res.json();
-
-  if (!res.ok) {
-    throw new Error(data);
-  }
-
-  return data;
-};
-
 // create customer and account endpoint (Done)
 router.post("/newCustomerAccount/:customerId", async (req, res) => {
   const { customerId } = req.params;
@@ -291,7 +276,16 @@ router.post("/newCustomerAccount/:customerId", async (req, res) => {
     const updatedCustomer = await Customer.findByIdAndUpdate(
       customer._id,
       {
-        "banking.accountDetails": accountInfo,
+        "banking.accountDetails": {
+          AccessLevel: accountInfo.AccessLevel,
+          AccountNumber: accountInfo.AccountNumber,
+          AccountStatus: accountInfo.AccountStatus,
+          AccountType: accountInfo.AccountType,
+          CustomerID: accountInfo.CustomerID,
+          CustomerName: accountInfo.CustomerName,
+          AccountTier: accountInfo.AccountTier,
+          DateCreated: accountInfo.DateCreated,
+        },
         "banking.isAccountCreated": true,
       },
       {
@@ -308,7 +302,6 @@ router.post("/newCustomerAccount/:customerId", async (req, res) => {
 // bankone balance enquiry endpoint  (Done)
 router.get("/balanceEnquiry/:accountNumber", (req, res) => {
   const { accountNumber } = req.params; // Get the account number from the URL parameters
-  console.log("Account No", accountNumber);
 
   // Construct the URL with the provided account number
   const apiUrl = `${baseUrl}/BankOneWebAPI/api/Account/GetAccountByAccountNumber/2?authtoken=${token}&accountNumber=${accountNumber}&computewithdrawableBalance=false`;
@@ -329,7 +322,7 @@ router.get("/balanceEnquiry/:accountNumber", (req, res) => {
     })
     .then((data) => {
       // Handle the data as needed
-      console.log("Data", data);
+
       res.json(data); // Send the response to the client
     })
     .catch((err) => {
@@ -369,39 +362,91 @@ router.get("/getCustomerById/:customerId", (req, res) => {
     });
 });
 
+//  Return list of all the account a customer has
+
+router.get("/getCustomerAccountsByBankoneId/:customerId", async (req, res) => {
+  const { customerId } = req.params;
+  try {
+    const response = await axios.get(
+      `${baseUrl}/BankOneWebAPI/api/Account/GetAccountsByCustomerId/2?customerId=${customerId}&authToken=${token}`
+    );
+
+    return res.json(response.data);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+router.post("/accountNameEnquiry", async (req, res) => {
+  const { bankCode, accountNumber } = req.body;
+  try {
+    const response = await axios.post(
+      `${baseUrl}/thirdpartyapiservice/apiservice/Transfer/NameEnquiry`,
+
+      {
+        AccountNumber: accountNumber,
+
+        BankCode: bankCode,
+
+        Token: token,
+      }
+    );
+
+    return res.json(response.data);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+router.get("/getUserTransactions/:accountNumber", async (req, res) => {
+  const { accountNumber } = req.params;
+  const { fromDate, toDate, numberOfItems } = req.query;
+  const url = `${baseUrl}/BankOneWebAPI/api/Account/GetTransactions/2?authtoken=${token}&accountNumber=${accountNumber}`;
+  if (fromDate) {
+    url + `?fromDate=${fromDate}`;
+    toDate && url + `&toDate=${toDate}`;
+    numberOfItems && url + `&numberOfItems=${numberOfItems}`;
+  } else {
+    url + `?numberOfItems=${numberOfItems}`;
+  }
+
+  try {
+    const response = await axios.get(url);
+
+    return res.json(response.data);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // interbank transfer endpoint
-router.post("/interbankTransfer", (req, res) => {
+router.post("/interbankTransfer/:customerId", async (req, res) => {
+  const { customerId } = req.params;
+  const { amount, debitAccount, notes, creditAccountName } = req.body;
+
+  if (!amount || !debitAccount || !notes || !creditAccountName) {
+    return res.status(400).json({ message: "Missing Details" });
+  }
+
+  const customer = await Customer.findById(customerId);
+
+  if (!customer) return res.status(404).json({ message: "Customer not found" });
+
   // Define the interbank transfer request payload here
   const transferRequestPayload = {
-    Amount: "5000",
-    PayerAccountNumber: "1100037557",
-    Payer: "Sylvestre Rice",
-    ReceiverAccountNumber: "2100036200",
-    ReceiverBankCode: "076",
-    Narration: "Trf to Jason Bourne",
-    TransactionReference: "TF24107924",
-    Token: "c175cfbe-e036-487b-9cc5-d8dfd21999ad",
+    Amount: amount * 100,
+    PayerAccountNumber: debitAccount,
+    Payer: customer?.banking?.accountDetails?.CustomerName,
+    ReceiverAccountNumber: customer?.disbursementaccountnumber,
+    ReceiverBankCode: customer.bankcode,
+    ReceiverName: creditAccountName,
+    Narration: notes,
+    TransactionReference: `TF${
+      customer?.banking?.accountDetails?.CustomerID
+    }-${new Date().getMilliseconds()}`,
+    Token: token,
   };
-
-  const options = {
-    method: "POST",
-    headers: {
-      accept: "application/json",
-      "content-type": "application/json",
-    },
-    body: JSON.stringify(transferRequestPayload),
-  };
-
-  // Construct the URL for interbank transfer
-  const apiUrl = `${baseUrl}/thirdpartyapiservice/apiservice/Transfer/InterBankTransfer`;
-
-  fetch(apiUrl, options)
-    .then((response) => {
-      if (!response.ok) {
-        throw new Error("Network response was not ok");
-      }
-      return response.json();
-    })
+  handleInterBankTransfer(transferRequestPayload)
     .then((data) => {
       // Handle the data as needed
       res.json(data); // Send the response to the client

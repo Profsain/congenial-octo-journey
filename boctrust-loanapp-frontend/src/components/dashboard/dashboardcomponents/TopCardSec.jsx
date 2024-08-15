@@ -2,18 +2,57 @@ import PropTypes from "prop-types";
 import { Row, Col } from "react-bootstrap";
 import FigCard from "../shared/FigCard";
 import "../Dashboard.css";
+import { useEffect, useState } from "react";
+import axios from "axios";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchUserTransactions } from "../../../redux/reducers/transactionReducer";
+
+const BaseURL = import.meta.env.VITE_BASE_URL;
 
 const TopCardSec = ({ user }) => {
   // console.log("TopCardSec", user);
-  const balance = user?.balance || "0.00";
-  const totalBalance = user?.totalBalance || "0.00";
-  const upcomingPayments = user?.upcomingPayments || "0.00";
 
-  const recentTransaction = user?.transactions || [];
-  const recentTransactionData = recentTransaction[0] || {};
-   const isEmpty = Object.keys(recentTransactionData).length === 0;
+  const [useBalance, setUserBalance] = useState({
+    balance: "0.00",
+    totalBalance: "0.00",
+  });
+  const [upcomingPayments, setUpcomingPayments] = useState("0.00");
+  const [recentTransaction, setRecentTransaction] = useState(null);
 
-  console.log("Recent Transaction", isEmpty);
+  const { userTransactions } = useSelector((state) => state.transactionReducer);
+
+  const dispatch = useDispatch(0);
+
+  useEffect(() => {
+    const getData = async () => {
+      if (!user) return;
+      try {
+        const response = axios.get(
+          `${BaseURL}/api/bankone/balanceEnquiry/${user?.banking?.accountDetails?.AccountNumber}`
+        );
+
+        setUserBalance({
+          totalBalance: response.data.AvailableBalance,
+          balance: response.data.WithdrawableBalance,
+        });
+        setUpcomingPayments("0.00");
+
+        await dispatch(
+          fetchUserTransactions(user.banking?.accountDetails?.AccountNumber)
+        );
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    getData();
+  }, [user]);
+
+  useEffect(() => {
+    if (userTransactions && userTransactions.length > 0) {
+      setRecentTransaction(userTransactions[0]);
+    }
+  }, [userTransactions]);
 
   return (
     <div className="TopCard">
@@ -26,7 +65,7 @@ const TopCardSec = ({ user }) => {
               src="images/whitenaira.png"
               alt="naira"
             />
-            <h5 className="FigNum">{balance}</h5>
+            <h5 className="FigNum">{useBalance.balance}</h5>
             <p>Balance</p>
           </FigCard>
         </Col>
@@ -39,7 +78,7 @@ const TopCardSec = ({ user }) => {
               src="images/whitenaira.png"
               alt="naira"
             />
-            <h5 className="FigNum">{totalBalance}</h5>
+            <h5 className="FigNum">{useBalance.totalBalance}</h5>
             <p>Total Balance</p>
           </FigCard>
         </Col>
@@ -59,7 +98,7 @@ const TopCardSec = ({ user }) => {
 
         <Col xs={6} md={3}>
           <FigCard classname="YellowCard MobCard">
-            {isEmpty ? (
+            {!recentTransaction || recentTransaction.length === 0 ? (
               <div id="CardText">
                 <p>No recent transaction data available.</p>
               </div>

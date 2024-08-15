@@ -226,7 +226,7 @@ const BookLoans = () => {
                 </thead>
                 <tbody>
                   {loansList && sortByCreatedAt(loansList)?.length === 0 && (
-                    <NoResult name="customer" />
+                    <NoResult name="Loan" />
                   )}
                   {loansList &&
                     loansList?.map((loan, index) => {

@@ -2,10 +2,7 @@ import { useEffect, useState } from "react";
 import "../../dashboardcomponents/transferdashboard/Transfer.css";
 import "./Credit.css";
 import PropTypes from "prop-types";
-import {
-  cooApprovalAndCreateBankoneAccount,
-  fetchSingleCustomer,
-} from "../../../../redux/reducers/customerReducer";
+import { fetchSingleCustomer } from "../../../../redux/reducers/customerReducer";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import { format } from "date-fns";
@@ -165,13 +162,9 @@ const DecisionSummary = ({ customerId }) => {
       } else if (
         approvalStatus.cooApprovalStatus == customerApprovalEnum.pending
       ) {
-        const res = await dispatch(
-          cooApprovalAndCreateBankoneAccount(customerId)
+        await axios.put(
+          `${apiUrl}/api/updatecustomer/approve/coo/${customerId}`
         );
-
-        if (res.type.includes("rejected")) {
-          return toast.error(res?.payload || "Something went wrong");
-        }
       }
       await dispatch(fetchSingleCustomer(customerId));
       toast.success("Customer Approval Success");
