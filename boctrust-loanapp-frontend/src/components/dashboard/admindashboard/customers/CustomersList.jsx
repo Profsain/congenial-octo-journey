@@ -1,4 +1,4 @@
-import PropTypes from "prop-types"
+import PropTypes from "prop-types";
 import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchAllCustomer } from "../../../../redux/reducers/customerReducer";
@@ -12,7 +12,6 @@ import NoResult from "../../../shared/NoResult";
 import capitalizeEachWord from "../../../../../utilities/capitalizeFirstLetter";
 import searchList from "../../../../../utilities/searchListFunc";
 import sortByCreatedAt from "../../shared/sortedByDate";
-
 
 const CustomersList = ({ showCount, searchTerms }) => {
   const styles = {
@@ -77,7 +76,6 @@ const CustomersList = ({ showCount, searchTerms }) => {
     }
   }, [customers, showCount]);
 
-
   // update customerList on search
   const handleSearch = () => {
     const currSearch = searchList(customers, searchTerms, `firstname`);
@@ -117,14 +115,17 @@ const CustomersList = ({ showCount, searchTerms }) => {
                   <td>
                     <img
                       className="CustomerImg"
-                      src={customer.photocaptureImg}
+                      src={
+                        customer.photocaptureImg.includes("undefined")
+                          ? "/images/avater.jpg"
+                          : customer.photocaptureImg
+                      }
                       alt={customer.firstname}
                     />
                   </td>
                   <td>
                     {/* {customer?.banking.accountDetails.Message.AccountNumber || "-"} */}
-                    {customer?.banking?.accountDetails?.Message
-                      ?.AccountNumber || "-"}
+                    {customer?.banking?.accountDetails?.AccountNumber || "-"}
                   </td>
                   <td>{customer.firstname}</td>
                   <td>{customer.lastname}</td>
@@ -156,7 +157,7 @@ const CustomersList = ({ showCount, searchTerms }) => {
 
 CustomersList.propTypes = {
   searchTerms: PropTypes.string,
-  showCount: PropTypes.number
-}
+  showCount: PropTypes.number,
+};
 
 export default CustomersList;

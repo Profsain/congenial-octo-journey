@@ -97,6 +97,30 @@
   color: #145098;
 }
 
+.employer__letterContainer label,
+.employer__letterContainer input,
+.employer__letterContainer select {
+  margin: 0 !important;
+}
+
+.employer__letterContainer .employer__letterForm {
+  display: grid;
+  gap: 2rem;
+}
+
+.employer__letterContainer .MandateLabel{
+  font-size: 0.9rem;
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  margin-top: 1rem;
+}
+
+.employer__letterContainer .FieldGroup .errorMsg {
+  color: rgb(132, 20, 20);
+  font-size: 0.8rem;
+}
+
 .selected__employer {
   width: 50%;
   height: 300px;
@@ -143,4 +167,3 @@
 .no__maxTenure > label {
   margin-top: 0 !important;
 }
-

@@ -109,7 +109,7 @@ const LoanForm = React.memo(function LoanFormComponent() {
   useEffect(() => {
     // set showReconfirmBvn modal after 30 seconds
     const timer = setTimeout(() => {
-      setShowReconfirmBvn(true);
+      setShowReconfirmBvn(false);
     }, 30000);
 
     // Cleanup function to clear the timer
@@ -378,21 +378,27 @@ const LoanForm = React.memo(function LoanFormComponent() {
 
         // send formData to database
 
-        await fetch(`${apiUrl}/api/customer/customer`, {
+        const res = await fetch(`${apiUrl}/api/customer/customer`, {
           method: "POST",
           mode: "cors",
           enctype: "multipart/form-data",
           body: formData,
         });
 
+        const responsePayload = await res.json();
+
+        if (!res.ok) {
+          return toast.error(responsePayload.response.data.error);
+        }
+        toast.success("Customer Account Created!!!");
         deleteFromLocalStorage("onbaordData");
         deleteFromLocalStorage("loanFirstInfo");
         fileValues.map((item) => deleteFromLocalStorage(item));
       }
     } catch (error) {
-      const errorResponse = await res.json();
       console.log(error);
-      toast.error(errorResponse?.error || "Something Went Wrong");
+      toast.error(error.message || "Something Went Wrong");
+      throw new Error(error.message);
     }
 
     // setSubmitting(false);
@@ -543,12 +549,10 @@ const LoanForm = React.memo(function LoanFormComponent() {
         {/* formik form */}
         <div>
           <Formik
-            initialValues={initialValues({
-              captureImg,
-            })}
+            initialValues={initialValues({})}
             validationSchema={validationSchema}
             onSubmit={handleSubmit}
-            enableReinitialize={true}
+            // enableReinitialize={true}
             innerRef={ref}
             encType="multipart/form-data"
           >
@@ -1601,12 +1605,15 @@ const LoanForm = React.memo(function LoanFormComponent() {
                                     />
                                     <div id="CapturePhoto">
                                       <PhotoCapture
-                                        func={(imageSrc) => {
+                                        preFunction={() =>
                                           storeInLocalStorage({
                                             key: "onbaordData",
                                             value: ref.current?.values,
-                                          });
+                                          })
+                                        }
+                                        func={(imageSrc) => {
                                           setCaptureImg(imageSrc);
+                                          updateFormValues();
                                         }}
                                       />
                                     </div>

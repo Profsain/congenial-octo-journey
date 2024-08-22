@@ -58,16 +58,13 @@ const EmploymentLetterRule = () => {
     const id = values.addEmployer;
     const apiUrl = import.meta.env.VITE_BASE_URL;
     // Handle form submission logic here
-    await fetch(
-      `${apiUrl}/api/agency/employers/${id}/employment-letter`,
-      {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(values),
-      }
-    );
+    await fetch(`${apiUrl}/api/agency/employers/${id}/employment-letter`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(values),
+    });
 
     // Reset form after submission
     resetForm();
@@ -80,7 +77,7 @@ const EmploymentLetterRule = () => {
   };
 
   return (
-    <div>
+    <div className="employer__letterContainer">
       <div className="TransContainer">
         <DashboardHeadline>Create New Employment Letter Rule</DashboardHeadline>
         <Formik
@@ -88,42 +85,20 @@ const EmploymentLetterRule = () => {
           validationSchema={validationSchema}
           onSubmit={handleSubmit}
         >
-          <Form>
-            <div className="FieldRow">
-              <div className="FieldGroup">
-                <label htmlFor="ruleTitle">Rule Title</label>
-                <Field
-                  type="text"
-                  name="ruleTitle"
-                  id="ruleTitle"
-                  className="Input"
-                ></Field>
-                <ErrorMessage name="ruleTitle" component="div" />
-              </div>
-
-              <div className="FieldGroup">
-                <label htmlFor="maximumTenure">Maximum Tenure</label>
-                <Field
-                  as="select"
-                  name="maximumTenure"
-                  id="maximumTenure"
-                  className="Select"
-                >
-                  <option value="" label="Select tenure" />
-                  {tenures.map((option) => (
-                    <option
-                      key={option.value}
-                      value={option.value}
-                      label={option.label}
-                    />
-                  ))}
-                </Field>
-                <ErrorMessage name="maximumTenure" component="div" />
-              </div>
+          <Form className="employer__letterForm">
+            <div className="FieldGroup">
+              <label htmlFor="ruleTitle">Rule Title</label>
+              <Field
+                type="text"
+                name="ruleTitle"
+                id="ruleTitle"
+                className="Input"
+              ></Field>
+              <ErrorMessage className="errorMsg" name="ruleTitle" component="div" />
             </div>
 
             <div className="FieldRow">
-              <div className="RadioCon">
+              {/* <div className="RadioCon">
                 <label htmlFor="rule">Rule</label>
                 <div className="Input">
                   <label className="MandateLabel">
@@ -147,6 +122,36 @@ const EmploymentLetterRule = () => {
                 </div>
 
                 <ErrorMessage name="rule" component="div" />
+              </div> */}
+
+              <div className="FieldGroup">
+                <label htmlFor="maximumTenure">Maximum Tenure</label>
+                <Field
+                  as="select"
+                  name="maximumTenure"
+                  id="maximumTenure"
+                  className="Select"
+                >
+                  <option value="" label="Select tenure" />
+                  {tenures.map((option) => (
+                    <option
+                      key={option.value}
+                      value={option.value}
+                      label={option.label}
+                    />
+                  ))}
+                </Field>
+                <ErrorMessage className="errorMsg" name="maximumTenure" component="div" />
+
+                <label className="MandateLabel">
+                  <Field
+                    type="checkbox"
+                    name="noMaxTenure"
+                    value="tenure"
+                    className="Gap"
+                  />
+                  No Maximum Tenure
+                </label>
               </div>
 
               <div className="FieldGroup">
@@ -157,7 +162,17 @@ const EmploymentLetterRule = () => {
                   id="maximumAmount"
                   className="Input"
                 ></Field>
-                <ErrorMessage name="maximumAmount" component="div" />
+                <ErrorMessage className="errorMsg" name="maximumAmount" component="div" />
+
+                <label className="MandateLabel">
+                  <Field
+                    type="checkbox"
+                    name="noMaxAmount"
+                    value="amount"
+                    className="Gap"
+                  />
+                  No Maximum Amount
+                </label>
               </div>
             </div>
 
@@ -191,7 +206,7 @@ const EmploymentLetterRule = () => {
                     />
                   ))}
                 </Field>
-                <ErrorMessage name="addEmployer" component="div" />
+                <ErrorMessage  className="errorMsg" name="addEmployer" component="div" />
               </div>
             </div>
 
@@ -203,7 +218,7 @@ const EmploymentLetterRule = () => {
 
             <div className="BtnContainer">
               <BocButton
-                fontSize="1.6rem"
+                fontSize="1rem"
                 type="submit"
                 bgcolor="#ecaa00"
                 bradius="18px"

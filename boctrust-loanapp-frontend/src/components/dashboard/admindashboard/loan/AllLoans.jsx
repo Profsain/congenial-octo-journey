@@ -89,7 +89,7 @@ const AllLoans = ({ showCount, searchTerms }) => {
   }, [searchTerms]);
 
   return (
-    <>
+    <div className="loans__tableContainer">
       {/* data loader */}
       {status === "loading" && <PageLoader />}
       <DashboardHeadline
@@ -102,11 +102,12 @@ const AllLoans = ({ showCount, searchTerms }) => {
           <thead style={styles.head}>
             <tr>
               <th>Loan ID</th>
+              <th>Type</th>
               <th>Loan Product</th>
               <th>Borrower</th>
               <th>A/C Number</th>
               <th>Date</th>
-              <th>Applied Amount</th>
+              <th>Amount</th>
               <th>Status</th>
               <th>Action</th>
             </tr>
@@ -119,6 +120,21 @@ const AllLoans = ({ showCount, searchTerms }) => {
                   <tr key={loan._id}>
                     <td>
                       {loan?.customer?.banking?.accountDetails?.CustomerID}
+                    </td>
+                    <td>
+                      {loan.deductions === "remita" ? (
+                        <img
+                          src="/images/remita-logo.jpg"
+                          alt=""
+                          className=""
+                        />
+                      ) : (
+                        <img
+                          src="/images/nibss.jpg"
+                          alt=""
+                          className=""
+                        />
+                      )}
                     </td>
                     <td>
                       <DisplayLoanProductName loan={loan} />
@@ -165,7 +181,7 @@ const AllLoans = ({ showCount, searchTerms }) => {
       {show && (
         <LoanDetails show={show} handleClose={handleClose} loanObj={loanObj} />
       )}
-    </>
+    </div>
   );
 };
 

@@ -91,18 +91,3 @@ input:active {
   margin: auto 0;
 }
 
-.bookloan__container .booking_status .booking_pending,
-.bookloan__container .booking_status .booking_initaited {
-  display: grid;
-  place-content: center;
-  border-radius: 1rem;
-}
-
-.bookloan__container .booking_status > .booking_pending {
-  background: #fde68a;
-  color: #d97706;
-}
-.bookloan__container .booking_status > .booking_initaited {
-  background: #bbf7d0;
-  color: #16a34a;
-}

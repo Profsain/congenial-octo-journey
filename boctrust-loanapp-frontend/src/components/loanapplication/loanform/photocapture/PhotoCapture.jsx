@@ -5,13 +5,22 @@ import { useRef, useState, useCallback } from "react";
 import { AiOutlineCamera } from "react-icons/ai";
 import "./Photocapture.css";
 
-const PhotoCapture = ({ func }) => {
+const PhotoCapture = ({ preFunction, func }) => {
   const webcamRef = useRef(null);
   const [imgSrc, setImgSrc] = useState(null);
 
   // Create capture function
   const capture = useCallback(() => {
+    preFunction();
     const imageSrc = webcamRef.current.getScreenshot();
+    // const video = webcamRef.current.video;
+    // const canvas = document.createElement("canvas");
+    // canvas.width = video.videoWidth;
+    // canvas.height = video.videoHeight;
+    // const ctx = canvas.getContext("2d");
+    // ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+    // const imageSrc = canvas.toDataURL("image/jpeg", 0.8);
+    console.log(imageSrc, "imageSrc")
     setImgSrc(imageSrc);
     func(imageSrc);
   }, [webcamRef]);
@@ -70,6 +79,7 @@ const PhotoCapture = ({ func }) => {
 
 PhotoCapture.propTypes = {
   func: PropTypes.func,
+  preFunction: PropTypes.func,
 };
 
 export default PhotoCapture;

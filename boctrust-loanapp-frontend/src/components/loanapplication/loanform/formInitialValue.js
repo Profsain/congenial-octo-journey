@@ -1,6 +1,6 @@
 const initialValues = ({ loanamount, careertype, captureImg, deductions }) => ({
-  loanamount: loanamount,
-  careertype: careertype,
+  loanamount: loanamount || "",
+  careertype: careertype || "",
   numberofmonth: "",
   loanpurpose: [],
   loanproduct: "",
@@ -66,7 +66,7 @@ const initialValues = ({ loanamount, careertype, captureImg, deductions }) => ({
   agreefullname: "",
   agreedate: "",
   signature: "",
-  photocapture: captureImg,
+  photocapture: captureImg || "",
   marketerClientPic: "",
   haveagent: "",
   agentcode: "",

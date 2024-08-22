@@ -20,6 +20,7 @@ const OverdueLoans = () => {
   const styles = {
     head: {
       color: "#fff",
+      fontSize: ".9rem",
     },
     approved: {
       color: "#5cc51c",
@@ -27,9 +28,7 @@ const OverdueLoans = () => {
     completed: {
       color: "#f64f4f",
     },
-    padding: {
-      color: "#ecaa00",
-    },
+
     message: {
       textAlign: "center",
       fontSize: "1.2rem",
@@ -135,7 +134,7 @@ const OverdueLoans = () => {
             </div>
           </DashboardHeadline>
         </div>
-        <div>
+        <div >
           {/* data loader */}
           {status === "loading" && <PageLoader />}
 
@@ -167,7 +166,7 @@ const OverdueLoans = () => {
                   {loanList &&
                     loanList?.map((loan) => {
                       return (
-                        <tr key={loan._id}>
+                        <tr key={loan._id} >
                           <td>
                             {loan.customer?.banking?.accountDetails
                               ?.CustomerID || "N/A"}
@@ -186,8 +185,10 @@ const OverdueLoans = () => {
                           </td>
                           <td>{getDateOnly(loan?.createdAt)}</td>
                           <td>N{loan?.loanamount}</td>
-                          <td style={styles.padding}>
-                            {capitalizeEachWord(loan?.loanstatus)}
+                          <td>
+                            <span className="badge_success">
+                              {capitalizeEachWord(loan?.loanstatus)}
+                            </span>
                           </td>
                           {canUserManage && (
                             <td>

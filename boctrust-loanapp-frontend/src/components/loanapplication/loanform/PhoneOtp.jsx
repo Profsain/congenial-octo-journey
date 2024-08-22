@@ -79,7 +79,6 @@ const PhoneOtp = (props) => {
 
   // handle otp request
   const requestOtp = async (e) => {
-    setLoading(true);
     e.preventDefault();
     const phone = "+234" + updatePhone.slice(1);
 
@@ -88,13 +87,12 @@ const PhoneOtp = (props) => {
     if (updatePhone === "" || updatePhone === undefined)
       return setErrorMsg("Please enter a valid phone number");
     try {
+      setLoading(true);
       const response = await setUpRecaptcha(phone);
-    if(response){
-      setConfirmOtp(response);
-      setFlag(true);
-    }
-
-      
+      if (response) {
+        setConfirmOtp(response);
+        setFlag(true);
+      }
     } catch (error) {
       // setErrorMsg(`Invalid phone number: ${error.message}`);
       console.log(error, "Some erro");
@@ -137,6 +135,7 @@ const PhoneOtp = (props) => {
     if (otp === "" || otp.length !== 6)
       return setErrorMsg("Please enter a valid OTP");
     try {
+      setLoading(true);
       setErrorMsg("");
       await confirmOtp.confirm(otp);
       props.onHide(false);
@@ -154,6 +153,8 @@ const PhoneOtp = (props) => {
     } catch (error) {
       console.error("Error verifying OTP:", error);
       setErrorMsg(`Error verifying OTP: ${error.message}`);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -193,7 +194,7 @@ const PhoneOtp = (props) => {
                 Cancel
               </Button>{" "}
               &nbsp; &nbsp; &nbsp; &nbsp;
-              <Button variant="primary" type="submit">
+              <Button disabled={isLoading} variant="primary" type="submit">
                 {isLoading ? <PageLoader width="10px" /> : "Send OTP"}
               </Button>
             </div>
@@ -216,8 +217,8 @@ const PhoneOtp = (props) => {
                 Resend OTP
               </Button>{" "}
               &nbsp; &nbsp; &nbsp; &nbsp;
-              <Button variant="primary" type="submit">
-                Verify OTP
+              <Button disabled={isLoading} variant="primary" type="submit">
+                {isLoading ? <PageLoader width="10px" /> : "Verify OTP"}
               </Button>
             </div>
           </Form>

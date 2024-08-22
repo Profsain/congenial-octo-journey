@@ -69,6 +69,23 @@ button:disabled {
   margin-top: 0 !important;
   max-width: 100% !important;
 }
+.badge_pending,
+.badge_success {
+  padding: 8px;
+  border-radius: 1rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.badge_success {
+  color: rgb(7, 130, 89);
+  background-color: rgb(209 250 229);
+}
+
+.badge_pending {
+  background: #fde68a;
+  color: #d97706;
+}
 
 @media screen and (max-width: 600px) {
   .Welcome {
