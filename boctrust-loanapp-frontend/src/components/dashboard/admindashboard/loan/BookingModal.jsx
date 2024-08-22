@@ -21,6 +21,8 @@ const computationModeList = [
     label: "EMI Loan",
   },
 ];
+
+
 const frequencyList = [
   {
     value: "0",
@@ -92,6 +94,8 @@ const BookingModal = ({ selectedLoan, show, handleClose }) => {
       );
 
       await dispatch(fetchUnbookedLoans());
+      toast.success("Booking Initiated and Pending Approval")
+      handleClose()
     } catch (error) {
       toast.error(error?.response?.data?.error || "Something went Wrong");
     } finally {
@@ -111,6 +115,7 @@ const BookingModal = ({ selectedLoan, show, handleClose }) => {
       await axios.put(`${BaseURL}/api/loans/approved-book/${selectedLoan._id}`);
 
       await dispatch(fetchUnbookedLoans());
+      toast.success("Loan Booking Approved")
       handleClose();
     } catch (error) {
       console.log(error);
@@ -222,7 +227,7 @@ const BookingModal = ({ selectedLoan, show, handleClose }) => {
             </Button>
           ) : (
             <Button
-              disabled={isLoading}
+              disabled={isLoading || selectedLoan?.bookingInitiated}
               onClick={handleIniateBooking}
               variant="primary"
               className="d-flex"

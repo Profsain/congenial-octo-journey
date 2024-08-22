@@ -108,6 +108,7 @@ const MdasEmployers = () => {
                   <th>Employer ID</th>
                   <th>Employer Name</th>
                   <th>Mandate Rule</th>
+
                   <th>Onboarding Date</th>
                   <th>Max Loan Tenure</th>
                   <th>Actions</th>

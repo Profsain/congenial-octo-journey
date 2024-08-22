@@ -115,11 +115,11 @@ const SideNavMain = ({ onMenuItemClick }) => {
               <li id="customer" onClick={onMenuItemClick}>
                 All Customers
               </li>
-              {superAdmin || adminRoles?.includes("customer_request") ? (
+              {/* {superAdmin || adminRoles?.includes("customer_request") ? (
                 <li id="customerrequest" onClick={onMenuItemClick}>
                   Customer Request
                 </li>
-              ) : null}
+              ) : null} */}
             </ul>
           </div>
         ) : null}

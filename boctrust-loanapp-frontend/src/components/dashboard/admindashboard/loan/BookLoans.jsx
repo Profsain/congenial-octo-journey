@@ -130,7 +130,6 @@ const BookLoans = () => {
   };
 
   const getTableOptions = (loan) => {
-    console.log(canUserApprove, "canUserApprove");
     const tableOptions = [
       {
         className: "",
@@ -246,11 +245,11 @@ const BookLoans = () => {
                           <td>N{loan?.loanamount}</td>
                           <td className="booking_status">
                             {loan.bookingInitiated ? (
-                              <span className="booking_initaited">
+                              <span className="badge_success">
                                 Initaited
                               </span>
                             ) : (
-                              <span className="booking_pending">Pending</span>
+                              <span className="badge_pending">Pending</span>
                             )}
                           </td>
                           <td style={styles.padding}>
