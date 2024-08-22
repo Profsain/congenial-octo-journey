@@ -1621,18 +1621,6 @@ const LoanForm = React.memo(function LoanFormComponent() {
                                     />
                                     <div id="CapturePhoto">
                                       {openCapture ? (
-                                        // <PhotoCapture
-                                        //   preFunction={() =>
-                                        //   storeInLocalStorage({
-                                        //     key: "onbaordData",
-                                        //     value: ref.current?.values,
-                                        //   })
-                                        // }
-                                        // func={(imageSrc) => {
-                                        //   setCaptureImg(imageSrc);
-                                        //   updateFormValues();
-                                        // }}
-                                        // />
                                         <PhotoCapture func={setCaptureImg} />
                                       ) : (
                                         <PhotocaptureStatic
