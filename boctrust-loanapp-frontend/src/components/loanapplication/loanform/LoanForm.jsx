@@ -162,12 +162,11 @@ const LoanForm = React.memo(function LoanFormComponent() {
   const [employmentLetter, setEmploymentLetter] = useState("");
   const [signature, setSignature] = useState("");
   const [marketerClientPic, setMarketerClientPic] = useState("");
-
   const updateFormValues = () => {
     const formValues = getFromLocalStorage("onbaordData");
 
     if (formValues) {
-      console.log(formValues, "formValues");
+      // console.log(formValues, "formValues");
 
       fileValues.map((item) => {
         ref.current?.setFieldValue(
@@ -1621,29 +1620,25 @@ const LoanForm = React.memo(function LoanFormComponent() {
                                       text="Confirm your Identity"
                                     />
                                     <div id="CapturePhoto">
-
-                                      
-
                                       {openCapture ? (
-                                        <PhotoCapture
-                                          preFunction={() =>
-                                          storeInLocalStorage({
-                                            key: "onbaordData",
-                                            value: ref.current?.values,
-                                          })
-                                        }
-                                        func={(imageSrc) => {
-                                          setCaptureImg(imageSrc);
-                                          updateFormValues();
-                                        }}
-                                        />
+                                        // <PhotoCapture
+                                        //   preFunction={() =>
+                                        //   storeInLocalStorage({
+                                        //     key: "onbaordData",
+                                        //     value: ref.current?.values,
+                                        //   })
+                                        // }
+                                        // func={(imageSrc) => {
+                                        //   setCaptureImg(imageSrc);
+                                        //   updateFormValues();
+                                        // }}
+                                        // />
+                                        <PhotoCapture func={setCaptureImg} />
                                       ) : (
                                         <PhotocaptureStatic
                                           func={handleOpenCapture}
                                         />
                                       )}
-                                      
-
                                     </div>
                                     <Headline
                                       fontSize="16px"

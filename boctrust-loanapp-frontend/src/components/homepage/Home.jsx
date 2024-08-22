@@ -11,7 +11,6 @@ import Overview from "./overview/Overview";
 import Calculator from "./calculator/Calculator";
 import BlogList from "./blogexperience/BlogList";
 
-
 const Home = () => {
   useEffect(() => {
     AOS.init({
