@@ -15,6 +15,7 @@ import TextInput from "./formcomponents/TextInput";
 import SelectField from "./formcomponents/SelectField";
 import "./Form.css";
 import PhotoCapture from "./photocapture/PhotoCapture";
+import PhotocaptureStatic from "./photocapture/PhotocaptureStatic";
 import ConfirmData from "./ConfirmData";
 import CreateAccount from "./CreateAccount";
 import initialValues, { fileValues } from "./formInitialValue";
@@ -42,6 +43,13 @@ const apiUrl = import.meta.env.VITE_BASE_URL;
 
 // loan form component
 const LoanForm = React.memo(function LoanFormComponent() {
+  // open photo capture fix code start
+  const [openCapture, setOpenCapture] = useState(false);
+  const handleOpenCapture = () => {
+    setOpenCapture(true);
+  };
+  // capture fix code end
+
   // Function to initialize the bvn details extraction after redirect to clallback url
   const initializeApp = () => {
     const urlSearchParams = new URLSearchParams(window.location.search);
@@ -206,7 +214,15 @@ const LoanForm = React.memo(function LoanFormComponent() {
     if (marketerClientPic) {
       ref.current?.setFieldValue("marketerClientPic", marketerClientPic);
     }
-  }, [captureImg, idCard, paySlip, employmentLetter, marketerClientPic, signature, bankStatements]);
+  }, [
+    captureImg,
+    idCard,
+    paySlip,
+    employmentLetter,
+    marketerClientPic,
+    signature,
+    bankStatements,
+  ]);
 
   // get current formik value
   const ref = useRef();
@@ -360,6 +376,7 @@ const LoanForm = React.memo(function LoanFormComponent() {
         formData.append("acceptterms", formValues.acceptterms);
         formData.append("acceptpolicy", formValues.acceptpolicy);
         formData.append("sharemyremita", formValues.sharemyremita);
+        formData.append("agreenibbsdebit", formValues.agreeNibbsDebit);
         formData.append("agreefullname", formValues.agreefullname);
         formData.append("agreedate", formValues.agreedate);
         formData.append("signature", formValues.signature);
@@ -1604,8 +1621,12 @@ const LoanForm = React.memo(function LoanFormComponent() {
                                       text="Confirm your Identity"
                                     />
                                     <div id="CapturePhoto">
-                                      <PhotoCapture
-                                        preFunction={() =>
+
+                                      
+
+                                      {openCapture ? (
+                                        <PhotoCapture
+                                          preFunction={() =>
                                           storeInLocalStorage({
                                             key: "onbaordData",
                                             value: ref.current?.values,
@@ -1615,7 +1636,14 @@ const LoanForm = React.memo(function LoanFormComponent() {
                                           setCaptureImg(imageSrc);
                                           updateFormValues();
                                         }}
-                                      />
+                                        />
+                                      ) : (
+                                        <PhotocaptureStatic
+                                          func={handleOpenCapture}
+                                        />
+                                      )}
+                                      
+
                                     </div>
                                     <Headline
                                       fontSize="16px"
