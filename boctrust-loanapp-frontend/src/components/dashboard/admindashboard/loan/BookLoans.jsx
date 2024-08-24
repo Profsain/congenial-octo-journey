@@ -140,14 +140,18 @@ const BookLoans = () => {
       {
         className: "text-primary",
         icon: <IoMdCheckmarkCircleOutline />,
-        label: canUserBook
-          ? "Book Loan"
-          : canUserApprove
-          ? "Approve Booking"
-          : "",
+        label:
+          canUserBook &&
+          (!canUserApprove || !loan.bookingInitiated)
+            ? "Book Loan"
+            : canUserApprove ||
+              (canUserBook && canUserApprove && loan.bookingInitiated)
+            ? "Approve Booking"
+            : "",
         isDisabled:
           (canUserBook && !canUserApprove && loan.bookingInitiated) ||
           (canUserApprove &&
+            !canUserBook &&
             (!loan.bookingInitiated || loan.loanstatus === "booked")),
         func: () => {
           setSelectedLoan(loan);
@@ -245,9 +249,7 @@ const BookLoans = () => {
                           <td>N{loan?.loanamount}</td>
                           <td className="booking_status">
                             {loan.bookingInitiated ? (
-                              <span className="badge_success">
-                                Initaited
-                              </span>
+                              <span className="badge_success">Initaited</span>
                             ) : (
                               <span className="badge_pending">Pending</span>
                             )}
