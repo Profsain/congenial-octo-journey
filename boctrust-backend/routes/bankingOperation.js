@@ -234,7 +234,7 @@ router.post("/newCustomerAccount/:customerId", async (req, res) => {
 
         AccountOpeningTrackingRef: customer._id,
 
-        ProductCode: "208",
+        ProductCode: "104",
 
         LastName: customer.firstname,
 
