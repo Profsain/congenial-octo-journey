@@ -89,6 +89,7 @@ const customerSchema = new mongoose.Schema(
     acceptterms: String,
     acceptpolicy: String,
     sharemyremita: Boolean,
+    agreenibbsdebit: Boolean,
     agreefullname: String,
     agreedate: String,
     signature: String,

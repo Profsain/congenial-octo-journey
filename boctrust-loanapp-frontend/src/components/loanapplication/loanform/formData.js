@@ -73,6 +73,7 @@ const formData = (formValues) => {
   formData.append("acceptterms", formValues.acceptterms);
   formData.append("acceptpolicy", formValues.acceptpolicy);
   formData.append("sharemyremita", formValues.sharemyremita);
+  formData.append("agreeNibbsDebit", formValues.agreeNibbsDebit);
   formData.append("agreefullname", formValues.agreefullname);
   formData.append("agreedate", formValues.agreedate);
   formData.append("signature", formValues.signature);
