@@ -12,14 +12,16 @@ const axiosInstance = axios.create({
   baseURL: baseUrl,
 });
 
+// https://staging.mybankone.com/BankOneWebAPI/api/AccountOfficer/Get/2?authToken=0552974c-0abe-4ff9-a9ef-5ee363b52b53&mfbCode=100579
+
 // Update a user
 router.get("/", async (req, res) => {
   try {
-    const res = await axiosInstance.get(
+    const response = await axiosInstance.get(
       `/BankOneWebAPI/api/AccountOfficer/Get/2?authToken=${token}&mfbCode=${mfbcode}`
     );
 
-    return res.status(200).json(res.data);
+    return res.status(200).json(response.data);
   } catch (error) {
     return res.status(500).json({ error: error.message });
   }

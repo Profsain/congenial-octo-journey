@@ -87,7 +87,7 @@ const RemitaDashboard = () => {
   };
 
   // Filter customers by remitaStatus
-  const remitaCustomers = customers.filter(
+  const remitaCustomers = customers?.filter(
     (customer) => customer?.remita?.remitaStatus === "processed"
   );
 
@@ -101,7 +101,7 @@ const RemitaDashboard = () => {
   // Filter customer list by search term
   useEffect(() => {
     setFilteredData(
-      remitaCustomers.filter((customer) =>
+      remitaCustomers?.filter((customer) =>
         customer.firstname.toLowerCase().includes(searchTerm.toLowerCase())
       )
     );
@@ -110,7 +110,7 @@ const RemitaDashboard = () => {
   // Filter customer list by date
   useEffect(() => {
     setFilteredDateData(
-      remitaCustomers.filter(
+      remitaCustomers?.filter(
         (customer) =>
           customer.createdAt >= dateRange.fromDate &&
           customer.createdAt <= dateRange.toDate
