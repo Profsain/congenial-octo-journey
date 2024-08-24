@@ -40,7 +40,7 @@ router.post("/createCustomerAccount", async (req, res) => {
     body: JSON.stringify({
       TransactionTrackingRef: _id,
       AccountOpeningTrackingRef: _id,
-      ProductCode: "101",
+      ProductCode: "104",
       CustomerID: _id,
       LastName: lastname,
       OtherNames: firstname,
@@ -127,7 +127,8 @@ router.post("/createLoan/:loanId", async (req, res) => {
   // Define the loan creation request payload here
   const loanRequestPayload = {
     TransactionTrackingRef: _id,
-    LoanProductCode: loanProductDetails.ProductCode,
+    // LoanProductCode: loanProductDetails.ProductCode,
+    LoanProductCode: "305",
     CustomerID: customerId,
     LinkedAccountNumber: accountNumber,
     CollateralDetails: collateralDetails,
@@ -143,6 +144,8 @@ router.post("/createLoan/:loanId", async (req, res) => {
     PrincipalPaymentFrequency: principalPaymentFrequency,
     InterestPaymentFrequency: interestPaymentFrequency,
   };
+
+  console.log(loanRequestPayload, "loanRequestPayload")
 
   const options = {
     method: "POST",
@@ -231,7 +234,7 @@ router.post("/newCustomerAccount/:customerId", async (req, res) => {
 
         AccountOpeningTrackingRef: customer._id,
 
-        ProductCode: productCode,
+        ProductCode: "104",
 
         LastName: customer.firstname,
 
@@ -264,10 +267,19 @@ router.post("/newCustomerAccount/:customerId", async (req, res) => {
     );
 
     const newAccSuccessData = await response.json();
+    console.log(newAccSuccessData, "newAccSuccessData")
 
     if (!response.ok) {
       throw new Error("Network response was not ok");
     }
+    if (!newAccSuccessData.IsSuccessful) {
+      return res.status(400).json({ error: newAccSuccessData.Message });
+    }
+
+    console.log(
+      newAccSuccessData?.TransactionTrackingRef,
+      "newAccSuccessData?.TransactionTrackingRef"
+    );
 
     const accountInfo = await getCustomerAccountInfoByTrackingRef(
       newAccSuccessData?.TransactionTrackingRef || customer._id

@@ -47,6 +47,7 @@ router.get("/unbooked", async (req, res) => {
   try {
     const loans = await Loan.find({
       loanstatus: "unbooked",
+      deductions:  { $ne: "remita" },
     }).populate("customer");
 
     return res.status(200).json(loans);
@@ -60,6 +61,7 @@ router.get("/booked", async (req, res) => {
   try {
     const loans = await Loan.find({
       loanstatus: "booked",
+      deductions:  { $ne: "remita" },
     }).populate("customer");
 
     return res.status(200).json(loans);

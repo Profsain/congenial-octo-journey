@@ -1,8 +1,7 @@
 /* eslint-disable no-undef */
 
-import{ useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchAllCustomer } from "../../../../redux/reducers/customerReducer";
 import { Table } from "react-bootstrap";
 import BocButton from "../../shared/BocButton";
 import DashboardHeadline from "../../shared/DashboardHeadline";
@@ -20,6 +19,7 @@ import useSearchByDate from "../../../../../utilities/useSearchByDate.js";
 import useSearchByDateRange from "../../../../../utilities/useSearchByDateRange.js";
 import sortByCreatedAt from "../../shared/sortedByDate.js";
 import getDateOnly from "../../../../../utilities/getDate";
+import { fetchLoans } from "../../../../redux/reducers/loanReducer.js";
 
 const CheckSalaryHistory = () => {
   const styles = {
@@ -46,19 +46,18 @@ const CheckSalaryHistory = () => {
   };
 
   const dispatch = useDispatch();
-  const customers = useSelector(
-    (state) => state.customerReducer.customers.customer
-  );
-  const status = useSelector((state) => state.customerReducer.status);
+  const { allLoans, status } = useSelector((state) => state.loanReducer);
+
   const [customerObj, setCustomerObj] = useState({});
   const [openDetails, setOpenDetails] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [customerList, setCustomerList] = useState([]);
+  const [loanList, setLoanList] = useState([]);
 
   useEffect(() => {
-    dispatch(fetchAllCustomer()).catch((error) =>
-      console.error("Error fetching customers:", error)
-    );
+    const getData = async () => {
+      await dispatch(fetchLoans());
+    };
+    getData();
   }, [dispatch]);
 
   const scrollToDetails = () => {
@@ -76,7 +75,8 @@ const CheckSalaryHistory = () => {
     setIsLoading(true);
     try {
       const apiUrl = import.meta.env.VITE_BASE_URL;
-      const customer = customers.find((customer) => customer._id === id);
+      const loan = allLoans.find((loan) => loan._id === id);
+      const customer = loan ? loan.customer : {};
       const response = await fetch(`${apiUrl}/api/remita/get-salary-history`, {
         method: "POST",
         headers: {
@@ -100,7 +100,7 @@ const CheckSalaryHistory = () => {
       await updateSalaryHistory(customer._id, data);
       setIsLoading(false);
       setOpenDetails(true);
-      dispatch(fetchAllCustomer());
+      dispatch(fetchLoans());
     } catch (error) {
       console.error("Error checking salary:", error);
       setIsLoading(false);
@@ -109,7 +109,9 @@ const CheckSalaryHistory = () => {
 
   const handleView = (id) => {
     scrollToDetails();
-    const customer = customers.find((customer) => customer._id === id);
+    const loan = allLoans.find((loan) => loan._id === id);
+
+    const customer = loan ? loan.customer : {};
     setCustomerObj(customer);
     setOpenDetails(true);
   };
@@ -117,7 +119,8 @@ const CheckSalaryHistory = () => {
   const handleAction = async (e, id) => {
     e.preventDefault();
     const actionBtn = e.target.innerText;
-    const customer = customers.find((customer) => customer._id === id);
+    const loan = allLoans.find((loan) => loan._id === id);
+    const customer = loan ? loan.customer : {};
     const data = customer.remita.remitaDetails;
     try {
       if (actionBtn === "Process") {
@@ -125,7 +128,7 @@ const CheckSalaryHistory = () => {
       } else if (actionBtn === "Drop") {
         await updateSalaryHistory(id, data, "dropped");
       }
-      dispatch(fetchAllCustomer());
+      dispatch(fetchLoans());
     } catch (error) {
       console.error("Error handling action:", error);
     }
@@ -133,50 +136,50 @@ const CheckSalaryHistory = () => {
 
   // check if customer is kyc approved and deductions is remita
   useEffect(() => {
-    if (customers?.length > 0) {
-      const result = customers.filter(
-        (customer) =>
-          customer.kyc.isKycApproved && customer.deductions === "remita"
+    if (allLoans?.length > 0) {
+      const result = allLoans.filter(
+        (loan) =>
+          loan?.customer?.kyc.isKycApproved && loan.deductions === "remita"
       );
 
-      setCustomerList(result);
-    } 
-  }, [customers]);
+      setLoanList(result);
+    }
+  }, [allLoans]);
 
   const { searchTerm, setSearchTerm, filteredData } = useSearch(
-    customerList,
+    loanList,
     "firstname"
   );
 
   const [dateRange, setDateRange] = useState({ fromDate: "", toDate: "" });
 
   useEffect(() => {
-    setCustomerList(filteredData);
+    setLoanList(filteredData);
   }, [searchTerm, filteredData]);
 
   // handle search by date
-  const { filteredDateData } = useSearchByDate(customerList, "createdAt");
+  const { filteredDateData } = useSearchByDate(loanList, "createdAt");
 
   const searchByDate = () => {
-    setCustomerList(filteredDateData);
+    setLoanList(filteredDateData);
   };
 
   // handle list reload
   const handleReload = () => {
     setDateRange({ fromDate: "", toDate: "" });
-    dispatch(fetchAllCustomer());
-    setCustomerList(customerList);
+    dispatch(fetchLoans());
+    setLoanList(loanList);
   };
 
   // handle search by date range
   const { searchData } = useSearchByDateRange(
-    customerList,
+    loanList,
     dateRange,
     "createdAt"
   );
 
   useEffect(() => {
-    setCustomerList(searchData);
+    setLoanList(searchData);
   }, [searchData]);
 
   return (
@@ -213,19 +216,19 @@ const CheckSalaryHistory = () => {
               </tr>
             </thead>
             <tbody>
-              {customerList?.length === 0 && <NoResult name="customer" />}
-              {sortByCreatedAt(customerList)?.map((customer) => (
-                <tr key={customer._id}>
-                  <td>{customer.firstname}</td>
-                  <td>{customer.lastname}</td>
-                  <td>{customer.salaryaccountnumber}</td>
-                  <td>{customer.bvnnumber}</td>
-                  <td>{getDateOnly(customer.createdAt)}</td>
-                  {customer.remita?.isRemitaCheck ? (
+              {loanList?.length === 0 && <NoResult name="Remita Loan Request" />}
+              {sortByCreatedAt(loanList)?.map((loan) => (
+                <tr key={loan.customer._id}>
+                  <td>{loan.customer.firstname}</td>
+                  <td>{loan.customer.lastname}</td>
+                  <td>{loan.customer.salaryaccountnumber}</td>
+                  <td>{loan.customer.bvnnumber}</td>
+                  <td>{getDateOnly(loan.customer.createdAt)}</td>
+                  {loan.customer.remita?.isRemitaCheck ? (
                     <td
                       style={styles.pending}
                       className="startBtn"
-                      onClick={() => handleView(customer._id)}
+                      onClick={() => handleView(loan.customer._id)}
                     >
                       View
                     </td>
@@ -233,13 +236,13 @@ const CheckSalaryHistory = () => {
                     <td
                       style={styles.pending}
                       className="startBtn"
-                      onClick={() => handleCheck(customer._id)}
+                      onClick={() => handleCheck(loan.customer._id)}
                     >
                       Start
                     </td>
                   )}
                   <td>
-                    {customer.remita?.remitaStatus === "processed" && (
+                    {loan.customer.remita?.remitaStatus === "processed" && (
                       <div>
                         <BocButton
                           bradius="12px"
@@ -252,7 +255,7 @@ const CheckSalaryHistory = () => {
                         </BocButton>
                       </div>
                     )}
-                    {customer.remita?.remitaStatus === "dropped" && (
+                    {loan.customer.remita?.remitaStatus === "dropped" && (
                       <div>
                         <BocButton
                           bradius="12px"
@@ -265,7 +268,7 @@ const CheckSalaryHistory = () => {
                         </BocButton>
                       </div>
                     )}
-                    {customer.remita?.remitaStatus === "pending" && (
+                    {loan.customer.remita?.remitaStatus === "pending" && (
                       <div>
                         <BocButton
                           bradius="12px"
@@ -273,7 +276,7 @@ const CheckSalaryHistory = () => {
                           width="90px"
                           margin="0 4px"
                           bgcolor="#145088"
-                          func={(e) => handleAction(e, customer._id)}
+                          func={(e) => handleAction(e, loan.customer._id)}
                         >
                           Process
                         </BocButton>
@@ -283,7 +286,7 @@ const CheckSalaryHistory = () => {
                           width="90px"
                           margin="0 4px"
                           bgcolor="#f64f4f"
-                          func={(e) => handleAction(e, customer._id)}
+                          func={(e) => handleAction(e, loan.customer._id)}
                         >
                           Drop
                         </BocButton>
