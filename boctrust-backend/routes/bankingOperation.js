@@ -8,6 +8,8 @@ const EmailTemplate = require("../utils/emailTemp");
 const {
   getCustomerAccountInfoByTrackingRef,
   handleInterBankTransfer,
+  getAccountProduct,
+  getLoanProduct,
 } = require("../services/bankoneOperationsServices");
 
 // add token to environment variable
@@ -93,10 +95,17 @@ router.post("/createLoan/:loanId", async (req, res) => {
   if (!loanAndCustomer)
     return res.status(404).json({ error: "Loan Does not Exist" });
 
+  const loanProduct = await getLoanProduct({
+    careertype: loanAndCustomer.customer.careertype,
+    deductions: loanAndCustomer.deductions,
+    otheremployername: loanAndCustomer.customer.otheremployername,
+    loanproduct: 305,
+  });
+
   // get the loan creation request payload from the request body
   const {
     _id,
-    customer: { banking, loanproduct },
+    customer: { banking },
     numberofmonth,
     loanamount,
     collateralDetails,
@@ -108,14 +117,7 @@ router.post("/createLoan/:loanId", async (req, res) => {
     moratorium,
   } = loanAndCustomer;
 
-  const { data: loanProductDetails } = await axios.get(
-    `${baseUrl}/BankOneWebAPI/api/Product/GetByCode/2?authToken=${token}&productCode=${loanproduct}`
-  );
-
   // console.log(loanProductDetails, "loanProductDetails")
-
-  if (!loanProductDetails)
-    return res.status(404).json({ error: "Loan Product Does not Exist" });
 
   const customerId = banking?.accountDetails?.CustomerID;
 
@@ -128,7 +130,7 @@ router.post("/createLoan/:loanId", async (req, res) => {
   const loanRequestPayload = {
     TransactionTrackingRef: _id,
     // LoanProductCode: loanProductDetails.ProductCode,
-    LoanProductCode: "305",
+    LoanProductCode: loanProduct.ProductCode,
     CustomerID: customerId,
     LinkedAccountNumber: accountNumber,
     CollateralDetails: collateralDetails,
@@ -144,8 +146,6 @@ router.post("/createLoan/:loanId", async (req, res) => {
     PrincipalPaymentFrequency: principalPaymentFrequency,
     InterestPaymentFrequency: interestPaymentFrequency,
   };
-
-  console.log(loanRequestPayload, "loanRequestPayload")
 
   const options = {
     method: "POST",
@@ -168,8 +168,6 @@ router.post("/createLoan/:loanId", async (req, res) => {
       );
     }
     const result = await response.json();
-
-    console.log("Result", result);
 
     if (!result.IsSuccessful) {
       return res.status(400).json({ error: result.Message });
@@ -214,14 +212,23 @@ router.post("/createLoan/:loanId", async (req, res) => {
 router.post("/newCustomerAccount/:customerId", async (req, res) => {
   const { customerId } = req.params;
 
+  console.log(customerId, "customerId");
+  console.log(customerId, "customerId");
+
   try {
     const customer = await Customer.findById(customerId);
     const loan = await Loan.findOne({ customer: customer?._id });
 
-    const productCode = customer?.loanproduct || loan?.loanproduct;
-
     if (!customer)
       return res.status(500).json({ error: "No Customer with provided ID" });
+
+    const accountProduct = await getAccountProduct({
+      careertype: customer.careertype,
+      deductions: loan.deductions,
+      otheremployername: customer.otheremployername,
+    });
+
+    console.log(accountProduct, "accountProduct");
 
     const options = {
       method: "POST",
@@ -234,7 +241,7 @@ router.post("/newCustomerAccount/:customerId", async (req, res) => {
 
         AccountOpeningTrackingRef: customer._id,
 
-        ProductCode: "104",
+        ProductCode: accountProduct.ProductCode,
 
         LastName: customer.firstname,
 
@@ -267,7 +274,7 @@ router.post("/newCustomerAccount/:customerId", async (req, res) => {
     );
 
     const newAccSuccessData = await response.json();
-    console.log(newAccSuccessData, "newAccSuccessData")
+    console.log(newAccSuccessData, "newAccSuccessData");
 
     if (!response.ok) {
       throw new Error("Network response was not ok");
@@ -297,6 +304,7 @@ router.post("/newCustomerAccount/:customerId", async (req, res) => {
           CustomerName: accountInfo.CustomerName,
           AccountTier: accountInfo.AccountTier,
           DateCreated: accountInfo.DateCreated,
+          AccountProductCode: accountProduct.ProductCode,
         },
         "banking.isAccountCreated": true,
       },
