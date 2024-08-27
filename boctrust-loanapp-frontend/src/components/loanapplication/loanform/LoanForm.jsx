@@ -493,12 +493,15 @@ const LoanForm = React.memo(function LoanFormComponent() {
           ? ref.current?.values.employmentletter
           : true)
       ) {
+
         // checkin the applicaat service duration is >= the madate rule set by the employer and exepting applicats whith no employer madate and bisiness owners
         if (
           careerType !== "business owner" && employer?.mandateRule
             ? (calcDaysDiffFromNow(ref.current?.values.employmentstartdate) <
                 Number(employer?.mandateRule?.mandateDuration.split(" ")[0]) &&
-                employer?.mandateRule.allowStacking == "yes") ||
+                employer?.mandateRule.allowStacking == "yes" &&
+                calcDaysDiffFromNow(ref.current?.values.employmentstartdate) >=
+                  parseInt(employer.mandateRule.secondaryDuration)) ||
               calcDaysDiffFromNow(ref.current?.values.employmentstartdate) >=
                 Number(employer?.mandateRule?.mandateDuration.split(" ")[0])
             : true
@@ -1349,30 +1352,46 @@ const LoanForm = React.memo(function LoanFormComponent() {
                                       "government employee" ? (
                                         <div>
                                           {employer?.mandateRule
-                                            .allowStacking == "yes" && (
+                                            .allowStacking == "yes" &&
+                                            calcDaysDiffFromNow(
+                                              values.employmentstartdate
+                                            ) >=
+                                              parseInt(
+                                                employer.mandateRule
+                                                  .secondaryDuration
+                                              ) && (
+                                              <div>
+                                                <label>
+                                                  <Field
+                                                    type="radio"
+                                                    name="deductions"
+                                                    value="remita"
+                                                  />
+                                                </label>
+                                                Deduction from salary via Remita
+                                                (Government employee)
+                                              </div>
+                                            )}
+                                          {calcDaysDiffFromNow(
+                                            values.employmentstartdate
+                                          ) >=
+                                            parseInt(
+                                              employer.mandateRule.mandateDuration.split(
+                                                " "
+                                              )[0]
+                                            ) && (
                                             <div>
                                               <label>
                                                 <Field
                                                   type="radio"
                                                   name="deductions"
-                                                  value="remita"
+                                                  value="ippis"
                                                 />
                                               </label>
-                                              Deduction from salary via Remita
+                                              Deduction from source via IPPIS
                                               (Government employee)
                                             </div>
                                           )}
-                                          <div>
-                                            <label>
-                                              <Field
-                                                type="radio"
-                                                name="deductions"
-                                                value="ippis"
-                                              />
-                                            </label>
-                                            Deduction from source via IPPIS
-                                            (Government employee)
-                                          </div>
                                         </div>
                                       ) : (
                                         <>
