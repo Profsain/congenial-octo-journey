@@ -42,23 +42,23 @@ const multipleUpload = upload.fields([
 
 // Create a new customer
 router.post("/customer", multipleUpload, async (req, res) => {
-  if (req.files.valididcard) {
+  if (req.files.valididcard?.length > 0) {
     req.body.valididcard = req.files.valididcard[0].filename;
   }
-  if (req.files.uploadpayslip) {
+  if (req.files.uploadpayslip?.length > 0) {
     req.body.uploadpayslip = req.files.uploadpayslip[0].filename;
   }
-  if (req.files.uploadbankstatement) {
+  if (req.files.uploadbankstatement?.length > 0) {
     req.body.uploadbankstatement = req.files.uploadbankstatement[0].filename;
   }
-  if (req.files.signature) {
+  if (req.files.signature?.length > 0) {
     req.body.signature = req.files.signature[0].filename;
   }
-  if (req.files.photocapture) {
+  if (req.files.photocapture?.length > 0) {
     req.body.photocapture = req.files.photocapture[0].filename;
   }
-  if (req.files.employmentletter) {
-    req.body.photocapture = req.files.employmentletter[0].filename;
+  if (req.files.employmentletter?.length > 0) {
+    req.body.employmentletter = req.files.employmentletter[0].filename;
   }
 
   // hash password

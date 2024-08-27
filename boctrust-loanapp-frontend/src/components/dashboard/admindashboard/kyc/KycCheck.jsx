@@ -566,7 +566,7 @@ const KycCheck = () => {
                       />
                     ) : (
                       <img
-                        src="https://shorturl.at/dexyZ"
+                        src="/images/avater.jpg"
                         alt="face-capture"
                         className="FaceCapture"
                       />
