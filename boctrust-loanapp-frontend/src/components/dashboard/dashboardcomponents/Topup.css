@@ -1,0 +1,80 @@
+/* General Modal Styles */
+.loan-modal .modal-header {
+  background-color: #007bff;
+  color: white;
+}
+
+.loan-modal .modal-title {
+  font-weight: bold;
+}
+
+.loan-modal .modal-body {
+  padding: 2rem;
+}
+
+.loan-modal .form-control {
+  border-radius: 8px;
+  padding: 12px;
+  border: 1px solid #dee2e6;
+}
+
+.loan-modal .form-control:focus {
+  border-color: #007bff;
+  box-shadow: none;
+}
+
+.loan-modal #sendRequestButton {
+  background-color: #ecaa00;
+  border-color: #ecaa00;
+  font-weight: bold;
+}
+
+.loan-modal #sendRequestButton:hover {
+  background-color: #ecaa00;
+}
+
+.loan-modal .form-control {
+  border-radius: 8px;
+  padding: 12px;
+  border: 1px solid #dee2e6;
+}
+
+.loan-modal .form-control:focus {
+  border-color: #007bff;
+  box-shadow: none;
+}
+
+.loan-topup-container {
+  display: flex;
+  justify-content: center;
+  /* margin-top: 20px; */
+  margin-left: 18px;
+}
+
+.loan-topup-button {
+  padding: 10px 20px;
+  font-size: 16px;
+  color: #fff;
+  background-color: #ecaa00;
+  border: none;
+  border-radius: 16px;
+  cursor: pointer;
+  animation: blink 2s infinite;
+  transition: background-color 0.3s ease;
+}
+
+.loan-topup-button:hover {
+  background-color: #ecaa00;
+}
+
+@keyframes blink {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+  100% {
+    opacity: 1;
+  }
+}

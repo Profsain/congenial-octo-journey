@@ -49,6 +49,9 @@ const productsFrontPage = require("./routes/productsFrontPage");
 const productsSeedData = require("./seedData/productsFrontPageData");
 const ProductsFrontPage = require("./models/ProductsFrontPage");
 
+// nibss direct debit
+const directDebitRoutes = require("./routes/nddMendateOperation")
+
 // configure dotenv
 dotenv.config();
 
@@ -163,6 +166,9 @@ mongoose
 
         // front page products
         app.use('/api/products-front-page', productsFrontPage);
+
+        // nibss direct debit
+        app.use('/api/direct-debit', directDebitRoutes);
 
         app.listen(process.env.PORT || 3030, () => console.log("Server running on port 3030"));
     })

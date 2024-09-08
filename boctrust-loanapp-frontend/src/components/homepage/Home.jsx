@@ -10,7 +10,8 @@ import HomeCarousel from "./carousel/HomeCarousel";
 import Overview from "./overview/Overview";
 import Calculator from "./calculator/Calculator";
 import BlogList from "./blogexperience/BlogList";
-
+import DashboardHome from "../dashboard/dashboardcomponents/DashboardHome";
+// import TopNavber from "../dashboard/topnavbar/TopNavber"
 
 const Home = () => {
   useEffect(() => {
@@ -42,6 +43,10 @@ const Home = () => {
       <div data-aos="fade-up">
         <BlogList />
       </div>
+
+      {/* <TopNavber /> */}
+
+      <DashboardHome />
     </>
   );
 };
