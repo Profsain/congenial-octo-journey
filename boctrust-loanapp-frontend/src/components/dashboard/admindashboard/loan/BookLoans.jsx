@@ -102,6 +102,8 @@ const BookLoans = () => {
     setShow(true);
   };
 
+
+
   // search customer list
   const [loansList, setLoansList] = useState(unbookedLoans);
   const [selectedLoan, setSelectedLoan] = useState(null);

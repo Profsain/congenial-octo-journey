@@ -87,6 +87,12 @@ button:disabled {
   color: #d97706;
 }
 
+.error__msg{
+  font-size: 12px;
+  color: #f43f5e;
+  height: 13px;
+}
+
 @media screen and (max-width: 600px) {
   .Welcome {
     display: none;

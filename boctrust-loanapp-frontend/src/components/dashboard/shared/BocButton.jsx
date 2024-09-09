@@ -20,15 +20,18 @@ const BocButton = ({
     border: "none",
     borderRadius: bradius,
     padding: "16px",
-    display: "grid",
-    placeContent: "center",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    gap: ".3rem",
     fontSize: fontSize,
     fontWeight: "500",
     cursor: cursor,
-    width: width,
+    minWidth: width,
     height: height || "40px",
     margin: margin,
     textTransform: "capitalize",
+
   };
 
   return (

@@ -12,6 +12,9 @@ import customerReducer from "../reducers/customerReducer";
 import customersLoansReducer from "../reducers/customersLoansReducer";
 import disbursementMethodReducer from "../reducers/disbursementMethodReducer";
 import employersManagerReducer from "../reducers/employersManagerReducer";
+import mandateRuleReducer from "../reducers/mandateRuleReducer";
+import statementRuleReducer from "../reducers/statementRuleReducer";
+import employerLetterRuleReducer from "../reducers/employerLetterRuleReducer";
 import adminUserReducer from "../reducers/adminUserReducer";
 import loanOfficerReducer from "../reducers/loanOfficerReducer";
 import authReducer from "../reducers/adminAuthReducer";
@@ -43,6 +46,9 @@ const store = configureStore({
     adminUserReducer,
     loanOfficerReducer,
     employersManagerReducer,
+    employerLetterRuleReducer,
+    mandateRuleReducer,
+    statementRuleReducer,
     user: userSlice,
     adminAuth: authReducer,
     settingReducer,
