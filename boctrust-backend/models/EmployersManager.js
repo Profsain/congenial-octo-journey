@@ -19,77 +19,17 @@ const EmployerSchema = mongoose.Schema(
       type: Date,
       default: Date.now,
     },
-    mandateIssued: {
-      type: String,
-      default: "false",
-    },
     mandateRule: {
-      mandateTitle: {
-        type: String,
-        trim: true,
-        default: "No Mandate Rule",
-      },
-      mandateUser: {
-        type: String,
-        trim: true,
-        default: "Default User",
-      },
-      mandateDuration: {
-        type: String,
-        trim: true,
-        default: "0 Months",
-      },
-      dateCreated: {
-        type: Date,
-        default: Date.now,
-      },
-      allowStacking: {
-        type: String,
-        default: false,
-      },
-      secondaryDuration: {
-        type: String,
-        default: false,
-      },
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "MandateRule",
     },
     statementRule: {
-      ruleActive: {
-        type: Boolean,
-        defualt: false,
-      },
-      ruleTitle: {
-        type: String,
-        trim: true,
-        default: "Statement Title",
-      },
-      maximumTenure: {
-        type: String,
-        trim: true,
-        default: "0 Months",
-      },
-      maximumAmount: {
-        type: String,
-        trim: true,
-        default: "0.00",
-      },
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "StatementRule",
     },
     employerLetterRule: {
-      ruleActive: {
-        type: Boolean,
-        defualt: false,
-      },
-      ruleTitle: {
-        type: String,
-        trim: true,
-      },
-      maximumTenure: {
-        type: String,
-        trim: true,
-      },
-      maximumAmount: {
-        type: String,
-        trim: true,
-      },
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "EmployerLetterRule",
     },
   },
   { timestamps: true }

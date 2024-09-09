@@ -212,8 +212,6 @@ router.post("/createLoan/:loanId", async (req, res) => {
 router.post("/newCustomerAccount/:customerId", async (req, res) => {
   const { customerId } = req.params;
 
-  console.log(customerId, "customerId");
-  console.log(customerId, "customerId");
 
   try {
     const customer = await Customer.findById(customerId);
@@ -228,7 +226,7 @@ router.post("/newCustomerAccount/:customerId", async (req, res) => {
       otheremployername: customer.otheremployername,
     });
 
-    console.log(accountProduct, "accountProduct");
+  
 
     const options = {
       method: "POST",
@@ -267,6 +265,8 @@ router.post("/newCustomerAccount/:customerId", async (req, res) => {
         Gender: customer.gender || "male",
       }),
     };
+
+    console.log(options, "options")
 
     const response = await fetch(
       `${baseUrl}/BankOneWebAPI/api/Account/CreateCustomerAndAccount/2?authToken=${token}`,

@@ -91,3 +91,12 @@ input:active {
   margin: auto 0;
 }
 
+.mandateRule__containerList {
+  margin-top: 4rem;
+}
+
+.mandateRule__containerList > div:first-child {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

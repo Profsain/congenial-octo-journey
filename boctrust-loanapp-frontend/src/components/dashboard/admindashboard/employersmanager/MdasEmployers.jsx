@@ -90,6 +90,8 @@ const MdasEmployers = () => {
     setAction(true);
   };
 
+
+
   return (
     <>
       <div style={styles.container} className="DCard">
@@ -119,9 +121,9 @@ const MdasEmployers = () => {
                   <tr key={employer._id}>
                     <td>{employer.employersId}</td>
                     <td>{employer.employersName}</td>
-                    <td>{employer.mandateRule.mandateTitle}</td>
+                    <td>{employer?.mandateRule?.mandateTitle}</td>
                     <td>{getDateOnly(employer.dateAdded)}</td>
-                    <td>{employer.statementRule.maximumTenure}</td>
+                    <td>{employer?.statementRule?.maximumTenure}</td>
                     <td>
                       <BocButton
                         id={employer._id}

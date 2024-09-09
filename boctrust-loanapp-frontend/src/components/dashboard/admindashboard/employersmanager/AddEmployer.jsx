@@ -1,51 +1,88 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import DashboardHeadline from "../../shared/DashboardHeadline";
 import "../../dashboardcomponents/transferdashboard/Transfer.css";
 import BocButton from "../../shared/BocButton";
+import SelectField from "../../../loanapplication/loanform/formcomponents/SelectField";
+import { toast } from "react-toastify";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchEmployerLetterRules } from "../../../../redux/reducers/employerLetterRuleReducer";
+import { fetchStatementRules } from "../../../../redux/reducers/statementRuleReducer";
+import { fetchMandateRules } from "../../../../redux/reducers/mandateRuleReducer";
+import PageLoader from "../../shared/PageLoader";
 
 // Define validation schema using Yup
 const validationSchema = Yup.object().shape({
   employersId: Yup.string().required("Employers ID is required"),
   employersName: Yup.string().required("Employers name is required"),
   employersAddress: Yup.string().required("Employer address is required"),
-  dateAdded: Yup.string().required("Date is required"),
-  mandateIssued: Yup.string().required("Mandate is required"),
 });
 
 const initialValues = {
   employersId: "",
   employersName: "",
   employersAddress: "",
-  dateAdded: "",
-  mandateIssued: "",
+  mandateRule: "",
+  statementRule: "",
+  employerLetterRule: "",
 };
 
 const AddEmployer = () => {
   const [message, setMessage] = useState(null);
-  const handleSubmit = async (values, { resetForm }) => {
-    const apiUrl = import.meta.env.VITE_BASE_URL;
-    // Handle form submission logic here
-    await fetch(`${apiUrl}/api/agency/employers`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(values),
-    });
+  const [isLoading, setIsLoading] = useState(false);
+  const dispatch = useDispatch();
 
-    // Reset form after submission
-    resetForm();
-    // Set message after successful submission
-    setMessage("Employer added successfully");
-    setTimeout(() => {
-      setMessage("");
-    }, 5000);
+  const { employerLetterRules } = useSelector(
+    (state) => state.employerLetterRuleReducer
+  );
+  const { statementRules } = useSelector((state) => state.statementRuleReducer);
+  const { mandateRules } = useSelector((state) => state.mandateRuleReducer);
+
+  useEffect(() => {
+    const getData = async () => {
+      try {
+        await dispatch(fetchEmployerLetterRules());
+        await dispatch(fetchStatementRules());
+        await dispatch(fetchMandateRules());
+      } catch (error) {
+        toast.error(error.message);
+      }
+    };
+
+    getData();
+  }, []);
+
+  const handleSubmit = async (values, { resetForm }) => {
+    try {
+      setIsLoading(true);
+      const apiUrl = import.meta.env.VITE_BASE_URL;
+      // Handle form submission logic here
+      await fetch(`${apiUrl}/api/agency/employers`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(values),
+      });
+
+      // Reset form after submission
+      resetForm();
+      // Set message after successful submission
+      setMessage("Employer added successfully");
+      toast.success("Employer added successfully");
+      setTimeout(() => {
+        setMessage("");
+      }, 5000);
+    } catch (error) {
+      toast.error(error.message);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
-    <div>
+    <div className="add__employerContainer">
       <div className="TransContainer">
         <DashboardHeadline>Add New Employer</DashboardHeadline>
         <Formik
@@ -54,8 +91,7 @@ const AddEmployer = () => {
           onSubmit={handleSubmit}
         >
           <Form className="appForm">
-            <div style={{ padding: "0 1rem" }}>
-              {" "}
+            <div className="FieldRow">
               <div className="FieldGroup mGroup">
                 <label htmlFor="employersId">Employers ID</label>
                 <Field
@@ -64,11 +100,13 @@ const AddEmployer = () => {
                   id="employersId"
                   className="Input"
                 />
-                <ErrorMessage name="employersId" component="div" />
+                <ErrorMessage
+                  name="employersId"
+                  component="div"
+                  className="error__msg"
+                />
               </div>
-            </div>
 
-            <div className="FieldRow">
               <div className="FieldGroup">
                 <label htmlFor="employersName">Employers Name</label>
                 <Field
@@ -77,9 +115,15 @@ const AddEmployer = () => {
                   id="employersName"
                   className="Input"
                 />
-                <ErrorMessage name="employersName" component="div" />
+                <ErrorMessage
+                  name="employersName"
+                  component="div"
+                  className="error__msg"
+                />
               </div>
+            </div>
 
+            <div className="FieldRow">
               <div className="FieldGroup">
                 <label htmlFor="employersAddress">Employers Address</label>
                 <Field
@@ -88,46 +132,82 @@ const AddEmployer = () => {
                   id="employersAddress"
                   className="Input"
                 />
-                <ErrorMessage name="employersAddress" component="div" />
+                <ErrorMessage
+                  name="employersAddress"
+                  component="div"
+                  className="error__msg"
+                />
+              </div>
+
+              <div className="FieldGroup">
+                <SelectField label="Mandate Rule" name="mandateRule">
+                  <option value="">Select</option>
+                  {/* <option value="000">No Bank</option> */}
+                  {mandateRules ? (
+                    mandateRules?.map((mandateRule) => {
+                      return (
+                        <option key={mandateRule._id} value={mandateRule._id}>
+                          {mandateRule.mandateTitle}
+                        </option>
+                      );
+                    })
+                  ) : (
+                    <div>
+                      <PageLoader width="28px" />
+                    </div>
+                  )}
+                </SelectField>
+                <div className="error__msg" />
               </div>
             </div>
 
             <div className="FieldRow">
               <div className="FieldGroup">
-                <label htmlFor="dateAdded">Date Added</label>
-                <Field
-                  type="date"
-                  name="dateAdded"
-                  id="dateAdded"
-                  className="Input"
-                />
-                <ErrorMessage name="dateAdded" component="div" />
+                <SelectField label="Statement Rule" name="statementRule">
+                  <option value="">Select</option>
+                  {/* <option value="000">No Bank</option> */}
+                  {statementRules ? (
+                    statementRules?.map((statementRule) => {
+                      return (
+                        <option
+                          key={statementRule._id}
+                          value={statementRule._id}
+                        >
+                          {statementRule.ruleTitle}
+                        </option>
+                      );
+                    })
+                  ) : (
+                    <div>
+                      <PageLoader width="28px" />
+                    </div>
+                  )}
+                </SelectField>
+                <div className="error__msg" />
               </div>
 
-              <div className="RadioCon">
-                <label htmlFor="mandateIssued">Mandate Issued</label>
-                <div className="Input">
-                  <label className="MandateLabel">
-                    <Field
-                      type="radio"
-                      name="mandateIssued"
-                      value="true"
-                      className="Gap"
-                    />
-                    Yes
-                  </label>
-                  <label className="MandateLabel">
-                    <Field
-                      type="radio"
-                      name="mandateIssued"
-                      value="false"
-                      className="Gap"
-                    />
-                    No
-                  </label>
-                </div>
-
-                <ErrorMessage name="mandateIssued" component="div" />
+              <div className="FieldGroup">
+                <SelectField
+                  label="Employment Letter Rule"
+                  name="employerLetterRule"
+                >
+                  <option value="">Select</option>
+                  {/* <option value="000">No Bank</option> */}
+                  {employerLetterRules ? (
+                    employerLetterRules?.map((employerRule) => {
+                      return (
+                        <option key={employerRule._id} value={employerRule._id}>
+                          {employerRule.ruleTitle}
+                        </option>
+                      );
+                    })
+                  ) : (
+                    <div>
+                      <PageLoader width="28px" />
+                    </div>
+                  )}
+                </SelectField>
+                <div className="error__msg" />
               </div>
             </div>
 
@@ -138,12 +218,14 @@ const AddEmployer = () => {
             )}
             <div className="BtnContainer">
               <BocButton
-                fontSize="1.6rem"
+                fontSize="1.2rem"
                 type="submit"
                 bgcolor="#ecaa00"
-                bradius="18px"
+                bradius="16px"
+                width={"200px"}
               >
                 Add Employer
+                {isLoading && <PageLoader strokeColor="#fff" width="20px" />}
               </BocButton>
             </div>
           </Form>

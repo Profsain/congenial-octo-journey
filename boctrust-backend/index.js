@@ -21,6 +21,9 @@ const disbursementRoutes = require("./routes/disbursementMethod");
 const adminRoutes = require("./routes/adminUser");
 const bankoneAccountOfficers = require("./routes/bankoneAccountOfficers");
 const employersManagerRoutes = require("./routes/employersManager");
+const mandateRuleRoutes = require("./routes/mandateRule");
+const statementRuleRoutes = require("./routes/statementRule");
+const employerLetterRuleRoutes = require("./routes/employmentLetterRule");
 // bankone operation routes
 const bankOneOperationRoutes = require("./routes/bankingOperation");
 const bankOneProductsRoutes = require("./routes/bankoneProducts");
@@ -125,6 +128,9 @@ mongoose
         app.use('/api/account', accountRoutes);
         app.use('/api/disbursement', disbursementRoutes);
         app.use('/api/agency', employersManagerRoutes);
+        app.use('/api/mandate-rule', mandateRuleRoutes);
+        app.use('/api/statement-rule', statementRuleRoutes);
+        app.use('/api/employer-letter-rule', employerLetterRuleRoutes);
         // admin routes
         app.use('/api/admin', adminRoutes);
         app.use('/api/account-officers', bankoneAccountOfficers);

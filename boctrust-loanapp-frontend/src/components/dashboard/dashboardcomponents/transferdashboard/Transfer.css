@@ -2,7 +2,6 @@
   background-color: #e7e7e7;
   padding: 0.2rem 1rem 3rem 1rem;
   margin-top: 2rem;
-  margin-right: 3rem;
   border-radius: 18px;
 }
 .FieldGroup {
@@ -13,7 +12,6 @@
   width: 100%;
 }
 .FieldGroup .Input {
-  max-width: 460px;
   width: 100%;
 }
 
@@ -47,7 +45,7 @@
   height: calc(1.5em + 0.75rem + 2px);
   line-height: 2.5;
   transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
-  width: 460px;
+  width: 100%;
 }
 
 .BtnContainer {
@@ -67,9 +65,9 @@
   bottom: 0.2rem;
 }
 
-.MandateLabel {
+/* .MandateLabel {
   margin: -3rem 1rem 0 1rem;
-}
+} */
 
 .Gap {
   margin-right: 1rem;
@@ -97,10 +95,63 @@
   color: #145098;
 }
 
+.add__employerContainer .appForm,
+.add__mandateRule .appForm,
+.employer__letterContainer .appForm {
+  display: grid;
+  gap: 2rem;
+}
+
+.add__employerContainer select {
+  border-radius: 0.25rem !important;
+  border: 1px solid #ced4da;
+  border-radius: 0.25rem;
+  box-shadow: none;
+  color: #495057;
+  display: block;
+  font-size: 1.3rem;
+  height: calc(1.5em + 0.75rem + 2px);
+  line-height: 2.5;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.add__employerContainer label,
+.add__mandateRule label,
+.employer__letterContainer label {
+  padding-bottom: 8px;
+  font-size: 18px;
+  color: #475569;
+  font-weight: 600;
+}
+
+.add__mandateRule label,
+.add__mandateRule input,
+.add__mandateRule select,
 .employer__letterContainer label,
 .employer__letterContainer input,
-.employer__letterContainer select {
+.employer__letterContainer select,
+.add__employerContainer label,
+.add__employerContainer input,
+.add__employerContainer select {
   margin: 0 !important;
+}
+
+.add__mandateRule form {
+  margin-top: 2rem;
+  display: grid;
+  gap: 2rem;
+}
+
+.add__mandateRule form .Input {
+  display: flex;
+  gap: 2rem;
+  align-items: center;
+  padding: 0 1rem;
+}
+.add__mandateRule form .Input .MandateLabel {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
 }
 
 .employer__letterContainer .employer__letterForm {
@@ -108,12 +159,14 @@
   gap: 2rem;
 }
 
-.employer__letterContainer .MandateLabel{
+.employer__letterContainer .MandateLabel,
+.add__statementContainer .MandateLabel {
   font-size: 0.9rem;
   display: flex;
   gap: 1rem;
   align-items: center;
-  margin-top: 1rem;
+  margin-top: 0.5rem;
+  color: #f59e0b;
 }
 
 .employer__letterContainer .FieldGroup .errorMsg {

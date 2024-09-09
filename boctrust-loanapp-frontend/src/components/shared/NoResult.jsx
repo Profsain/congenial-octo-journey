@@ -7,6 +7,7 @@ const NoResult = ({ name }) => {
         color: "#145098",
         fontSize: "1.5rem",
         paddingTop: "2rem",
+        width: "100%",
     }
 
   return (

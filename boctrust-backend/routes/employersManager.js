@@ -1,13 +1,17 @@
 const express = require("express");
 const router = express.Router();
 const Employer = require("../models/EmployersManager"); // import Employer model
+const { findByIdAndUpdate } = require("../models/Role");
 
 // Employer API Endpoints
 // get all Employer posts endpoint
 router.get("/employers", async (req, res) => {
   try {
     // get all Employer posts from database
-    const employers = await Employer.find();
+    const employers = await Employer.find()
+      .populate("mandateRule")
+      .populate("statementRule")
+      .populate("employerLetterRule");
     // return success response
     return res.status(200).json({ employers });
   } catch (error) {
@@ -23,18 +27,13 @@ router.post("/employers", (req, res) => {
       employersId,
       employersName,
       employersAddress,
-      dateAdded,
-      mandateIssued,
+      mandateRule,
+      statementRule,
+      employerLetterRule,
     } = req.body;
 
     // Validate required fields
-    if (
-      !employersId ||
-      !employersName ||
-      !employersAddress ||
-      !dateAdded ||
-      !mandateIssued
-    ) {
+    if (!employersId || !employersName || !employersAddress || !mandateRule) {
       return res.status(400).json({ error: "All fields are required" });
     }
 
@@ -43,8 +42,9 @@ router.post("/employers", (req, res) => {
       employersId,
       employersName,
       employersAddress,
-      dateAdded,
-      mandateIssued,
+      mandateRule,
+      statementRule,
+      employerLetterRule,
     });
 
     // Save Employer
@@ -70,90 +70,20 @@ router.put("/employers/:id", async (req, res) => {
     }
 
     // get Employer data from request body
-    const {
-      employersName,
-      employersAddress,
-      mandateTitle,
-      mandateDuration,
-      maximumTenure,
-      maximumAmount,
-    } = req.body;
+    const { employersName, employersAddress, mandateRule } = req.body;
     // validate required fields
-    if (
-      !employersName ||
-      !employersAddress ||
-      !mandateTitle ||
-      !mandateDuration ||
-      !maximumTenure ||
-      !maximumAmount
-    ) {
+    if (!employersName || !employersAddress || !mandateRule) {
       return res.status(400).json({ error: "All fields are required" });
     }
 
-    // update Employer object
-    employer.employersName = employersName || employer.employersName;
-    employer.employersAddress = employersAddress || employer.employersAddress;
-    employer.mandateRule.mandateTitle =
-      mandateTitle || employer.mandateRule.mandateTitle;
-    employer.mandateRule.mandateDuration =
-      mandateDuration || employer.mandateRule.mandateDuration;
-    employer.statementRule.maximumTenure =
-      maximumTenure || employer.statementRule.maximumTenure;
-    employer.statementRule.maximumAmount =
-      maximumAmount || employer.statementRule.maximumAmount;
-
-    // save Employer
-    await employer.save();
+    const response = await Employer.findByIdAndUpdate(id, req.body);
 
     // return success response
-    return res.status(200).json({ success: "Employer updated successfully" });
+    return res
+      .status(200)
+      .json({ employer: response, success: "Employer updated successfully" });
   } catch (error) {
     return res.status(500).json({ error: error.message });
-  }
-});
-
-// Define a route to update the mandateRule for an employer by ID
-router.put("/employers/:id/mandateRule", async (req, res) => {
-  const { id } = req.params;
-
-  try {
-    // Find the employer by ID
-    const employer = await Employer.findById(id);
-
-    if (!employer) {
-      return res.status(404).json({ error: "Employer not found" });
-    }
-
-    // Update the mandateRule object with the data from the request body
-    const {
-      mandateTitle,
-      mandateUser,
-      mandateDuration,
-      allowStacking,
-      dateCreated,
-      secondaryDuration,
-    } = req.body;
-
-    employer.mandateRule.mandateTitle =
-      mandateTitle || employer.mandateRule.mandateTitle;
-    employer.mandateRule.mandateUser =
-      mandateUser || employer.mandateRule.mandateUser;
-    employer.mandateRule.mandateDuration =
-      mandateDuration || employer.mandateRule.mandateDuration;
-    employer.mandateRule.dateCreated =
-      dateCreated || employer.mandateRule.dateCreated;
-    employer.mandateRule.allowStacking =
-      allowStacking || employer.mandateRule.allowStacking;
-    employer.mandateRule.secondaryDuration =
-      secondaryDuration || employer.mandateRule.secondaryDuration;
-
-    // Save the updated employer
-    await employer.save();
-
-    res.json({ message: "MandateRule updated successfully", employer });
-  } catch (error) {
-    console.error("Error updating mandateRule:", error);
-    res.status(500).json({ error: "Internal server error" });
   }
 });
 
@@ -197,7 +127,7 @@ router.delete("/employers/:id", async (req, res) => {
     const { id } = req.params;
 
     // find Employer by id and delete
-    const employer = await Employer.findByIdAndDelete(id);
+    await Employer.findByIdAndDelete(id);
 
     // return success response
     return res.status(200).json({ success: "Employer deleted successfully" });
