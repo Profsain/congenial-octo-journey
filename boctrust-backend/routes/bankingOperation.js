@@ -262,7 +262,16 @@ router.post("/newCustomerAccount/:customerId", async (req, res) => {
         HasSufficientInfoOnAccountInfo: true,
 
         Email: customer.email,
+
         Gender: customer.gender || "male",
+
+        AccountOfficerCode: "52",
+
+        NotificationPreference: "3",
+
+        TransactionPermission: "0",
+
+        AccountTier: 1
       }),
     };
 
