@@ -1,7 +1,7 @@
 import PropTypes from "prop-types";
 import { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { fetchProduct } from "../../../../redux/reducers/productReducer";
+import { fetchSelectedProduct } from "../../../../redux/reducers/productReducer";
 import Table from "react-bootstrap/Table";
 import "../../Dashboard.css";
 import DashboardHeadline from "../../shared/DashboardHeadline";
@@ -32,12 +32,14 @@ const LoanProductsList = ({ count, searchTerm, admin, adminRoles }) => {
   // fetch products
   const dispatch = useDispatch();
   useEffect(() => {
-    dispatch(fetchProduct());
+    dispatch(fetchSelectedProduct());
   }, [dispatch]);
 
   const products = useSelector(
-    (state) => state.productReducer.products.products
+    (state) => state.productReducer.products
   );
+
+
   const status = useSelector((state) => state.productReducer.status);
   const [productsList, setProductsList] = useState(products);
   const [editLoanProduct, setEditLoanProduct] = useState({});
@@ -75,7 +77,7 @@ const LoanProductsList = ({ count, searchTerm, admin, adminRoles }) => {
       },
     });
 
-    dispatch(fetchProduct());
+    dispatch(fetchSelectedProduct());
     setAction(false);
   };
 
@@ -112,10 +114,10 @@ const LoanProductsList = ({ count, searchTerm, admin, adminRoles }) => {
             <Table borderless hover responsive="sm">
               <thead style={styles.head}>
                 <tr>
+                  <th>Code</th>
                   <th>Name</th>
                   <th>Interest Rate</th>
-                  <th>Interest Type</th>
-                  <th>Max Term</th>
+
                   <th>Term Period</th>
                   <th>Action</th>
                 </tr>
@@ -124,11 +126,11 @@ const LoanProductsList = ({ count, searchTerm, admin, adminRoles }) => {
                 {productsList?.length === 0 && <NoResult name="Product" />}
                 {productsList?.map((product) => (
                   <tr key={product._id}>
-                    <td>{product.productName}</td>
-                    <td>{product.interestRate.toFixed(2)}%</td>
-                    <td>{product.interestType}</td>
-                    <td>{product.maxTerm}</td>
-                    <td>{product.termPeriod}</td>
+                    <td>{product?.ProductCode}</td>
+                    <td>{product?.ProductName}</td>
+                    <td>{product?.InterestRate}</td>
+                    <td>{product?.Tenure}</td>
+
                     <td>
                       <div>
                         <select

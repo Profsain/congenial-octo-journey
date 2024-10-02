@@ -7,7 +7,7 @@ import validationSchema from "./formvalidation";
 import initialValues from "./formInitialValue";
 // fetch data from api
 import { useDispatch, useSelector } from "react-redux";
-import { fetchProduct } from "../../../redux/reducers/productReducer";
+import { fetchSelectedProduct } from "../../../redux/reducers/productReducer";
 import Headline from "../../shared/Headline";
 import TextInput from "./formcomponents/TextInput";
 // import LoanForm from "./LoanForm";
@@ -49,7 +49,7 @@ const LoanFirstStep = ({ data }) => {
   // const navigate = useNavigate();
 
   useEffect(() => {
-    dispatch(fetchProduct());
+    dispatch(fetchSelectedProduct());
   }, [dispatch]);
 
   useEffect(() => {

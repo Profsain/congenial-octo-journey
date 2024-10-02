@@ -242,7 +242,7 @@ const LoanDisbursement = () => {
           (canUserApprove && loan.disbursementstatus === "approved"),
         isLoading: rejectLoading,
         func: () => {
-          console.log("Loading");
+       
           setLoanObj(loan);
           setAction(true);
         },

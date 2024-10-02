@@ -1,62 +1,73 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import PropTypes from "prop-types";
-import { useFormik } from "formik";
+import { Field, useFormik } from "formik";
 import * as Yup from "yup";
 import DashboardHeadline from "../../shared/DashboardHeadline";
 import "../../dashboardcomponents/transferdashboard/Transfer.css";
 import BocButton from "../../shared/BocButton";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchProduct } from "../../../../redux/reducers/productReducer";
+import axios from "axios";
 
 // Define validation schema using Yup
 const validationSchema = Yup.object().shape({
-  productName: Yup.string().required("Product name is required"),
-  category: Yup.string().required("Category is required"),
-  productImage: Yup.string().required("Product image is required"),
-  benefits: Yup.string().required("Benefits is required"),
-  features: Yup.string().required("Features is required"),
-  interestRate: Yup.number().required("Interest rate is required"),
-  interestType: Yup.string().required("Interest type is required"),
-  maxTerm: Yup.string().required("Max term is required"),
-  termPeriod: Yup.string().required("Term period is required"),
-  note: Yup.string().required("Note is required"),
+  productCode: Yup.string().required("Product code is required"),
+  // category: Yup.string().required("Category is required"),
+  // productImage: Yup.string().required("Product image is required"),
+  // benefits: Yup.string().required("Benefits is required"),
+  // features: Yup.string().required("Features is required"),
+  // interestRate: Yup.number().required("Interest rate is required"),
+  // interestType: Yup.string().required("Interest type is required"),
+  // maxTerm: Yup.string().required("Max term is required"),
+  // termPeriod: Yup.string().required("Term period is required"),
+  // note: Yup.string().required("Note is required"),
 });
 
 const initialValues = {
-  productName: "",
-  category: "",
-  productImage: "",
-  benefits: "",
-  features: "",
-  interestRate: "",
-  interestType: "",
-  maxTerm: "",
-  termPeriod: "",
-  note: "",
+  productCode: "",
+  // category: "",
+  // productImage: "",
+  // benefits: "",
+  // features: "",
+  // interestRate: "",
+  // interestType: "",
+  // maxTerm: "",
+  // termPeriod: "",
+  // note: "",
 };
 
 const AddNewLoanProduct = ({ func }) => {
   const [notification, setNotification] = useState("");
 
+  const loanProducts = useSelector((state) => state.productReducer.products);
+
+  const dispatch = useDispatch();
+
+ 
+
+  useEffect(() => {
+    dispatch(fetchProduct());
+  }, [dispatch]);
+
   const handleSubmit = async (values, { setSubmitting, resetForm }) => {
     const apiUrl = import.meta.env.VITE_BASE_URL;
     // Handle form submission logic here
     // create form data
-    const formData = new FormData();
-    formData.append("productName", values.productName);
-    formData.append("category", values.category);
-    formData.append("productImage", values.productImage);
-    formData.append("benefits", values.benefits);
-    formData.append("features", values.features);
-    formData.append("interestRate", values.interestRate);
-    formData.append("interestType", values.interestType);
-    formData.append("maxTerm", values.maxTerm);
-    formData.append("termPeriod", values.termPeriod);
-    formData.append("note", values.note);
+    // const formData = new FormData();
+    // formData.append("productName", values.productName);
+    // formData.append("category", values.category);
+    // formData.append("productImage", values.productImage);
+    // formData.append("benefits", values.benefits);
+    // formData.append("features", values.features);
+    // formData.append("interestRate", values.interestRate);
+    // formData.append("interestType", values.interestType);
+    // formData.append("maxTerm", values.maxTerm);
+    // formData.append("termPeriod", values.termPeriod);
+    // formData.append("note", values.note);
 
     // send form data to server
-    await fetch(`${apiUrl}/api/product/products`, {
-      method: "POST",
-      enctype: "multipart/form-data",
-      body: formData,
+    await axios.post(`${apiUrl}/api/product/products`, {
+      productCode: values.productCode,
     });
 
     // set open add branch component to true
@@ -84,21 +95,24 @@ const AddNewLoanProduct = ({ func }) => {
       <form onSubmit={formik.handleSubmit} encType="multipart/form-data">
         <div className="FieldRow">
           <div className="FieldGroup">
-            <label htmlFor="productName">Product Name</label>
-            <input
-              type="text"
-              name="productName"
-              id="productName"
-              className="Input"
+            <label htmlFor="productName">Product</label>
+            <select
+              name="productCode"
               onChange={formik.handleChange}
-              value={formik.values.productName}
-            />
-            {formik.errors.productName && formik.touched.productName ? (
-              <div className="Error">{formik.errors.productName}</div>
+              value={formik.values.productCode}
+            >
+              {  loanProducts && loanProducts?.map((product) => (
+                <option key={product?.ProductCode} value={product?.ProductCode}>
+                  {product.ProductName}
+                </option>
+              ))}
+            </select>
+            {formik.errors.productCode && formik.touched.productCode ? (
+              <div className="Error">{formik.errors.productCode}</div>
             ) : null}
           </div>
 
-          <div className="FieldGroup">
+          {/* <div className="FieldGroup">
             <label htmlFor="category">Category </label>
             <input
               type="text"
@@ -111,10 +125,10 @@ const AddNewLoanProduct = ({ func }) => {
             {formik.errors.category && formik.touched.category ? (
               <div className="Error">{formik.errors.category}</div>
             ) : null}
-          </div>
+          </div> */}
         </div>
 
-        <div className="FieldRow">
+        {/* <div className="FieldRow">
           <div className="FieldGroup">
             <label htmlFor="features">Features</label>
             <input
@@ -144,9 +158,9 @@ const AddNewLoanProduct = ({ func }) => {
               <div className="Error">{formik.errors.benefits}</div>
             ) : null}
           </div>
-        </div>
+        </div> */}
 
-        <div className="FieldRow">
+        {/* <div className="FieldRow">
           <div className="FieldGroup">
             <label htmlFor="interestRate">Interest Rate</label>
             <input
@@ -246,7 +260,7 @@ const AddNewLoanProduct = ({ func }) => {
               <div className="Error">{formik.errors.note}</div>
             ) : null}
           </div>
-        </div>
+        </div> */}
 
         <div className="Notification">
           <p>{notification}</p>
