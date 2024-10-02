@@ -249,7 +249,7 @@ const LoanForm = React.memo(function LoanFormComponent() {
       "deductions",
       calcDaysDiffFromNow(ref.current?.values.employmentstartdate) <
         Number(employer?.mandateRule?.mandateDuration.split(" ")[0]) &&
-        employer?.mandateRule.allowStacking == "yes"
+        employer?.mandateRule?.allowStacking == "yes"
         ? "remita"
         : calcDaysDiffFromNow(ref.current?.values.employmentstartdate) >=
             Number(employer?.mandateRule?.mandateDuration.split(" ")[0]) &&
@@ -499,9 +499,9 @@ const LoanForm = React.memo(function LoanFormComponent() {
           careerType !== "business owner" && employer?.mandateRule
             ? (calcDaysDiffFromNow(ref.current?.values.employmentstartdate) <
                 Number(employer?.mandateRule?.mandateDuration.split(" ")[0]) &&
-                employer?.mandateRule.allowStacking == "yes" &&
+                employer?.mandateRule?.allowStacking == "yes" &&
                 calcDaysDiffFromNow(ref.current?.values.employmentstartdate) >=
-                  parseInt(employer.mandateRule.secondaryDuration)) ||
+                  parseInt(employer?.mandateRule?.secondaryDuration)) ||
               calcDaysDiffFromNow(ref.current?.values.employmentstartdate) >=
                 Number(employer?.mandateRule?.mandateDuration.split(" ")[0])
             : true
@@ -1351,14 +1351,12 @@ const LoanForm = React.memo(function LoanFormComponent() {
                                       {careerType?.toLowerCase() ===
                                       "government employee" ? (
                                         <div>
-                                          {employer?.mandateRule
-                                            .allowStacking == "yes" &&
+                                          {employer?.mandateRule?.allowStacking == "yes" &&
                                             calcDaysDiffFromNow(
                                               values.employmentstartdate
                                             ) >=
                                               parseInt(
-                                                employer.mandateRule
-                                                  .secondaryDuration
+                                                employer.mandateRule?.secondaryDuration
                                               ) && (
                                               <div>
                                                 <label>
@@ -1376,7 +1374,7 @@ const LoanForm = React.memo(function LoanFormComponent() {
                                             values.employmentstartdate
                                           ) >=
                                             parseInt(
-                                              employer.mandateRule.mandateDuration.split(
+                                              employer?.mandateRule?.mandateDuration.split(
                                                 " "
                                               )[0]
                                             ) && (
