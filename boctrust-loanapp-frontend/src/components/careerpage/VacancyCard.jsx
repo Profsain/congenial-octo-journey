@@ -5,7 +5,7 @@ import "./Career.css";
 
 const VacancyCard = ({
   id,
-  img = "images/hiring.jpg",
+  img = "/images/hiring.jpg",
   title,
   description,
   postdate,

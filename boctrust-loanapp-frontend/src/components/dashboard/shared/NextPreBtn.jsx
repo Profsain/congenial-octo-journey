@@ -35,11 +35,11 @@ const NextPreBtn = ({prevFunc, nextFunc, count}) => {
     <div style={styles.container}>
       <div style={styles.btnBox}>
         <button style={styles.btn} id="PrevBtn" value="prev" onClick={prevFunc}>
-          <img style={styles.img} src="images/arrowleft.png" alt="prev"/>{" "}
+          <img style={styles.img} src="/images/arrowleft.png" alt="prev"/>{" "}
         </button>
         <p style={styles.p}>{ count}</p>
         <button style={styles.btn} id="NextBtn" value="next" onClick={(e)=> nextFunc(e)}>
-          <img style={styles.img} src="images/arrowright.png" alt="next" />
+          <img style={styles.img} src="/images/arrowright.png" alt="next" />
         </button>
       </div>
     </div>

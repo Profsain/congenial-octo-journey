@@ -1241,7 +1241,7 @@ const LoanForm = React.memo(function LoanFormComponent() {
                                       <div className="InputRow">
                                         <div>
                                           <img
-                                            src="images/naira.png"
+                                            src="/images/naira.png"
                                             alt=""
                                             className="NairaI FinNaira"
                                           />
@@ -1254,7 +1254,7 @@ const LoanForm = React.memo(function LoanFormComponent() {
                                         <div className="Space"></div>
                                         <div>
                                           <img
-                                            src="images/naira.png"
+                                            src="/images/naira.png"
                                             alt=""
                                             className="NairaI
                                           FinNaira FinNaira2"

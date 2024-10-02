@@ -21,6 +21,8 @@ import DisplayLoanProductName from "../../shared/DisplayLoanProductName";
 import TransferMoney from "./transferMoney/TransferMoney";
 import axios from "axios";
 import { toast } from "react-toastify";
+import ActionNotification from "../../shared/ActionNotification";
+import { nigerianCurrencyFormat } from "../../../../../utilities/formatToNiaraCurrency";
 
 const LoanDisbursement = () => {
   const styles = {
@@ -37,6 +39,9 @@ const LoanDisbursement = () => {
     },
     completed: {
       color: "#ecaa00 ",
+    },
+    disbursed: {
+      color: "#2563eb",
     },
     pending: {
       color: "#f64f4f",
@@ -65,6 +70,8 @@ const LoanDisbursement = () => {
   const [showDisburse, setShowDisburse] = useState(false);
   const [approveDisburseLoading, setApproveDisburseLoading] = useState(false);
   const [rejectLoading, setRejectLoading] = useState(false);
+
+  const [action, setAction] = useState(false);
 
   // current login admin user
   const currentUser = useSelector((state) => state.adminAuth.user);
@@ -189,16 +196,21 @@ const LoanDisbursement = () => {
       {
         className: "text-primary",
         icon: <IoMdCheckmarkCircleOutline />,
-        label: canUserDisburse
-          ? "Disburse Loan"
-          : canUserApprove
-          ? "Approve Disbursement"
-          : "",
+        label:
+          canUserDisburse && (!canUserApprove || !loan.debursementDetails)
+            ? "Disburse Loan"
+            : canUserApprove &&
+              canUserDisburse &&
+              canUserApprove &&
+              loan.debursementDetails
+            ? "Approve"
+            : "",
         isDisabled:
-          (canUserDisburse && loan.disbursementstatus === "disbursed") ||
+          (canUserDisburse && !canUserApprove && loan.debursementDetails) ||
           (canUserApprove &&
-            loan.disbursementstatus == "approved" &&
-            loan.loanstatus === "completed"),
+            !canUserDisburse &&
+            (!loan.debursementDetails ||
+              loan.disbursementstatus === "approved")),
         isLoading: approveDisburseLoading,
         func: async () => {
           try {
@@ -222,12 +234,18 @@ const LoanDisbursement = () => {
       {
         className: "text-danger",
         icon: <FcCancel />,
-        label: "Reject Loan",
-        isDisabled: (loan) =>
-          (canUserDisburse && loan.disbursementstatus === "disbursed") ||
+        label: "Reject",
+        isDisabled:
+          (canUserDisburse &&
+            !canUserApprove &&
+            loan.disbursementstatus === "disbursed") ||
           (canUserApprove && loan.disbursementstatus === "approved"),
         isLoading: rejectLoading,
-        func: (loan) => handleRejection(loan._id),
+        func: () => {
+          console.log("Loading");
+          setLoanObj(loan);
+          setAction(true);
+        },
       },
     ];
     return tableOptions;
@@ -256,7 +274,7 @@ const LoanDisbursement = () => {
                 placeholder="Search by name"
                 onChange={(e) => setSearchTerms(e.target.value)}
               />
-              <img src="images/search.png" alt="search-icon" />
+              <img src="/images/search.png" alt="search-icon" />
             </div>
           </div>
         </DashboardHeadline>
@@ -304,17 +322,17 @@ const LoanDisbursement = () => {
                         {loan?.customer?.banking?.accountDetails?.AccountNumber}
                       </td>
                       <td>{getDateOnly(loan.createdAt)}</td>
-                      <td>N{loan.loanamount}</td>
+                      <td>{nigerianCurrencyFormat.format(loan?.loanamount)}</td>
 
                       <td>
                         {loan.disbursementstatus === "pending" ? (
-                          <p style={styles.pending}>Pending</p>
+                          <p className="badge_pending">Pending</p>
                         ) : loan.disbursementstatus === "approved" ? (
-                          <p style={styles.approved}>Disbursed</p>
+                          <p className="badge_success">Approved</p>
                         ) : loan.disbursementstatus === "stopped" ? (
-                          <p style={styles.pending}>Stopped</p>
+                          <p className="badge_error">Stopped</p>
                         ) : (
-                          <p style={styles.completed}>Rejected</p>
+                          <p className="badge_info">Disbursed</p>
                         )}
                       </td>
                       <td>
@@ -348,6 +366,13 @@ const LoanDisbursement = () => {
             loanObj={loanObj}
             debitAccounts={loanUserAccounts}
             handleClose={handleCloseDisburse}
+            btnText={
+              canUserDisburse && loanObj?.disbursementstatus === "pending"
+                ? "Send "
+                : canUserApprove
+                ? "Approve"
+                : ""
+            }
             action={
               canUserDisburse && loanObj?.disbursementstatus === "pending"
                 ? handleInitiateDisbursement
@@ -357,6 +382,16 @@ const LoanDisbursement = () => {
             }
           />
         )}
+
+        <ActionNotification
+          show={action}
+          handleClose={() => setAction(false)}
+          handleProceed={() => {
+            if (loanObj?._id) {
+              handleRejection(loanObj?._id);
+            }
+          }}
+        />
       </div>
     </>
   );

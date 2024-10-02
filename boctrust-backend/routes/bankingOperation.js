@@ -17,6 +17,7 @@ const token = process.env.BANKONE_TOKEN;
 const baseUrl = process.env.BANKONE_BASE_URL;
 
 const mfbcode = "100579";
+const password = process.env.EMAIL_PASSWORD;
 
 // Create customer account endpoint (Done)
 router.post("/createCustomerAccount", async (req, res) => {
@@ -142,10 +143,12 @@ router.post("/createLoan/:loanId", async (req, res) => {
       interestAccrualCommencementDate
     ).toISOString(),
     Amount: loanamount,
-    InterestRate: loanProductDetails.InterestRate,
+    InterestRate: loanProduct.InterestRate,
     PrincipalPaymentFrequency: principalPaymentFrequency,
     InterestPaymentFrequency: interestPaymentFrequency,
   };
+
+ 
 
   const options = {
     method: "POST",
@@ -168,6 +171,7 @@ router.post("/createLoan/:loanId", async (req, res) => {
       );
     }
     const result = await response.json();
+   
 
     if (!result.IsSuccessful) {
       return res.status(400).json({ error: result.Message });
@@ -185,14 +189,15 @@ router.post("/createLoan/:loanId", async (req, res) => {
     });
 
     const mailOptions = {
-      from: "Boctrust MFB Ltd",
+      from: "ebusiness@boctrustmfb.com",
       to: loanAndCustomer.customer?.email,
       subject: "Your Loan Has Been Booked for Disbursement",
-      html: EmailTemplate(),
+      html: EmailTemplate({}),
     };
 
     transporter.sendMail(mailOptions, (error, info) => {
       if (error) {
+        console.log(error, "message error");
         return res.status(500).json({ message: "Failed to send Email" });
       }
 
@@ -201,7 +206,29 @@ router.post("/createLoan/:loanId", async (req, res) => {
         data: result,
       });
     });
+
+
+     setTimeout(async () => {
+      try {
+        // Second API request (same data or different as per requirement)
+        console.log(apiUrl, options)
+        const secondResponse  = await fetch(apiUrl, options);
+
+     
+        console.log(secondResponse, "secondLoanResponse")
+        if (!secondResponse || !secondResponse.ok ) {
+          throw new Error(
+            `HTTP error! BankOne Loan creation failed. Status: ${secondResponse.status}`
+          );
+        }
+        const result = await secondResponse.json();
+        console.log(result, "result")
+      } catch (error) {
+        console.error('Error in second loan request:', error);
+      }
+    }, 30000);
   } catch (error) {
+    console.log(error);
     res
       .status(500)
       .json({ error: "Internal Server Error BankOne Loan creation" });
@@ -211,7 +238,6 @@ router.post("/createLoan/:loanId", async (req, res) => {
 // create customer and account endpoint (Done)
 router.post("/newCustomerAccount/:customerId", async (req, res) => {
   const { customerId } = req.params;
-
 
   try {
     const customer = await Customer.findById(customerId);
@@ -225,8 +251,6 @@ router.post("/newCustomerAccount/:customerId", async (req, res) => {
       deductions: loan.deductions,
       otheremployername: customer.otheremployername,
     });
-
-  
 
     const options = {
       method: "POST",
@@ -271,11 +295,11 @@ router.post("/newCustomerAccount/:customerId", async (req, res) => {
 
         TransactionPermission: "0",
 
-        AccountTier: 1
+        AccountTier: 1,
       }),
     };
 
-    console.log(options, "options")
+   
 
     const response = await fetch(
       `${baseUrl}/BankOneWebAPI/api/Account/CreateCustomerAndAccount/2?authToken=${token}`,
@@ -283,7 +307,7 @@ router.post("/newCustomerAccount/:customerId", async (req, res) => {
     );
 
     const newAccSuccessData = await response.json();
-    console.log(newAccSuccessData, "newAccSuccessData");
+
 
     if (!response.ok) {
       throw new Error("Network response was not ok");
@@ -292,10 +316,7 @@ router.post("/newCustomerAccount/:customerId", async (req, res) => {
       return res.status(400).json({ error: newAccSuccessData.Message });
     }
 
-    console.log(
-      newAccSuccessData?.TransactionTrackingRef,
-      "newAccSuccessData?.TransactionTrackingRef"
-    );
+  
 
     const accountInfo = await getCustomerAccountInfoByTrackingRef(
       newAccSuccessData?.TransactionTrackingRef || customer._id
@@ -324,6 +345,7 @@ router.post("/newCustomerAccount/:customerId", async (req, res) => {
 
     res.json(updatedCustomer);
   } catch (err) {
+    console.log(err);
     res.status(500).json({ error: err?.message });
   }
 });

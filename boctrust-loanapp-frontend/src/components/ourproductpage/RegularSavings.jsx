@@ -4,7 +4,7 @@ const RegularSavings = () => {
   return (
       <OurProduct
           productTitle="regular savings"
-          headerImg="images/regular-savings.jpg"
+          headerImg="/images/regular-savings.jpg"
       />
   )
 }

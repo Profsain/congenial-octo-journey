@@ -4,7 +4,7 @@ const SalaryAdvance = () => {
   return (
     <OurProduct
       productTitle="salary advance"
-      headerImg="images/salary-advance.jpg"
+      headerImg="/images/salary-advance.jpg"
     />
   );
 };

@@ -96,7 +96,7 @@ const FacialCapture = () => {
             <Headline fontSize="24px" text=" Application Facial Capture View" />
             <div className="Capture DCard">
               <img
-                src="images/demofacial.png"
+                src="/images/demofacial.png"
                 alt="face-capture"
                 className="FaceCapture"
               />
@@ -111,7 +111,7 @@ const FacialCapture = () => {
             {/* <div>
               <Headline fontSize="24px" text="Signature View" />
               <img
-                src="images/signature1.png"
+                src="/images/signature1.png"
                 alt="official signature"
                 className="Signature"
               />

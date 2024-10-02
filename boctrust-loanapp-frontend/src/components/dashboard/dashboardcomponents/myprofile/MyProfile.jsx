@@ -27,7 +27,7 @@ const MyProfile = () => {
     <div style={styles.container} className="PCon">
       <div>
         <img
-          src={user.photocaptureImg || "images/profileavaterlg.png"}
+          src={user.photocaptureImg || "/images/profileavaterlg.png"}
           alt="profile-image"
           style={styles.img}
         />

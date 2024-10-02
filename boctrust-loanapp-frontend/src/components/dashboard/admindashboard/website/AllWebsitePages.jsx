@@ -24,7 +24,7 @@ const AllWebsitePages = () => {
                 </div>
                 <div className="FormGroup SBox">
                   <input name="search" placeholder="Search" />
-                  <img src="images/search.png" alt="search-icon" />
+                  <img src="/images/search.png" alt="search-icon" />
                 </div>
               </div>
             </DashboardHeadline>

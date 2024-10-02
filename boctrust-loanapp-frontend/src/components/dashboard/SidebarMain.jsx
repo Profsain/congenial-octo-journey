@@ -1,6 +1,6 @@
 import PropTypes from "prop-types";
 import { useSelector } from "react-redux";
-import {useNavigate} from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import "./Dashboard.css";
 
@@ -27,28 +27,26 @@ const SidebarMain = ({ onMenuItemClick }) => {
     <div className="NavIcons SideMain FixSideNav">
       <div className="BrandCon">
         <div className=" LgLogo">
-          <img src="images/dlogo.png" alt="boctrust-logo" />
+          <img src="/images/dlogo.png" alt="boctrust-logo" />
         </div>
         <p>Customer</p>
       </div>
-      <div id="dashboard" className="IconBox" onClick={onMenuItemClick}>
-        <img
-          id="dashboard"
-          onClick={onMenuItemClick}
-          src="images/ddashboard.png"
-          alt="dashboard"
-        />
-        <p id="dashboard" onClick={onMenuItemClick}>
-          Dashboard
-        </p>
-      </div>
+      <Link
+        id="dashboard"
+        to="/dashboard"
+        className="IconBox"
+        onClick={onMenuItemClick}
+      >
+        <img id="dashboard" src="/images/ddashboard.png" alt="dashboard" />
+        <p id="dashboard">Dashboard</p>
+      </Link>
 
       <div onMouseOver={openSubLoan} onMouseLeave={closeSubLoan}>
         <div id="myloan" className="IconBox" onClick={onMenuItemClick}>
           <img
             id="myloan"
             onClick={onMenuItemClick}
-            src="images/dmyloan.png"
+            src="/images/dmyloan.png"
             alt="loan"
           />
           <p id="myloan" onClick={onMenuItemClick}>
@@ -58,105 +56,125 @@ const SidebarMain = ({ onMenuItemClick }) => {
         {isLoanOpen ? (
           <div className="SubItem">
             <ul>
-              <li id="myloan" onClick={onMenuItemClick}>
-                All Loans
+              <li>
+                <Link
+                  id="myloan"
+                  onClick={onMenuItemClick}
+                  to={"/dashboard/loans"}
+                >
+                  All Loans
+                </Link>
               </li>
-              <li id="applyloan" onClick={onMenuItemClick}>
-                Apply for Loan
+              <li>
+                <Link
+                  id="applyloan"
+                  onClick={onMenuItemClick}
+                  to={"/dashboard/loans/apply"}
+                >
+                  Apply for Loan
+                </Link>
               </li>
-              <li id="loancalculator" onClick={onMenuItemClick}>
-                Loan Calculator
+              <li>
+                <Link
+                  id="loancalculator"
+                  onClick={onMenuItemClick}
+                  to={"/dashboard/loans/calculator"}
+                >
+                  Loan Calculator
+                </Link>
               </li>
             </ul>
           </div>
         ) : null}
       </div>
 
-      <div id="loanrepayment" className="IconBox" onClick={onMenuItemClick}>
-        <img
-          id="loanrepayment"
-          onClick={onMenuItemClick}
-          src="images/dtransfer.png"
-          alt="repayment"
-        />
-        <p id="loanrepayment" onClick={onMenuItemClick}>
-          Repayments
-        </p>
-      </div>
+      <Link
+        to={"/dashboard/repayment"}
+        id="loanrepayment"
+        className="IconBox"
+        onClick={onMenuItemClick}
+      >
+        <img id="loanrepayment" src="/images/dtransfer.png" alt="repayment" />
+        <p id="loanrepayment">Repayments</p>
+      </Link>
 
       {customerCareer !== "government employee" ? (
-        <div id="transfer" className="IconBox" onClick={onMenuItemClick}>
-          <img
-            id="transfer"
-            onClick={onMenuItemClick}
-            src="images/dtransfer.png"
-            alt="transfer"
-          />
-          <p id="transfer" onClick={onMenuItemClick}>
-            Transfer Money
-          </p>
-        </div>
+        <Link
+          to={"/dashboard/transfer"}
+          id="transfer"
+          className="IconBox"
+          onClick={onMenuItemClick}
+        >
+          <img id="transfer" src="/images/dtransfer.png" alt="transfer" />
+          <p id="transfer">Transfer Money</p>
+        </Link>
       ) : null}
 
       {customerCareer !== "government employee" &&
       customerCareer !== "private employee" ? (
-        <div id="withdraw" className="IconBox" onClick={onMenuItemClick}>
-          <img
-            id="withdraw"
-            onClick={onMenuItemClick}
-            src="images/dtransfer.png"
-            alt="withdraw"
-          />
-          <p id="withdraw" onClick={onMenuItemClick}>
-            Withdrawal
-          </p>
-        </div>
+        <Link
+          to={"/dashboard/withdraw"}
+          id="withdraw"
+          className="IconBox"
+          onClick={onMenuItemClick}
+        >
+          <img id="withdraw" src="/images/dtransfer.png" alt="withdraw" />
+          <p id="withdraw">Withdrawal</p>
+        </Link>
       ) : null}
 
-      <div id="transaction" className="IconBox" onClick={onMenuItemClick}>
+      <Link
+        to={"/dashboard/transactions"}
+        id="transaction"
+        className="IconBox"
+        onClick={onMenuItemClick}
+      >
         <img
           id="transaction"
           onClick={onMenuItemClick}
-          src="images/daccount.png"
+          src="/images/daccount.png"
           alt="account"
         />
         <p id="transaction" onClick={onMenuItemClick}>
           Account Transactions
         </p>
-      </div>
+      </Link>
 
       {currentUser?.deductions === "remita" ? (
-        <div id="remita" className="IconBox" onClick={onMenuItemClick}>
+        <Link
+          to={"/dashboard/remita"}
+          id="remita"
+          className="IconBox"
+          onClick={onMenuItemClick}
+        >
           <img
             id="remita"
             onClick={onMenuItemClick}
-            src="images/dreport.png"
+            src="/images/dreport.png"
             alt="profile"
           />
           <p id="remita" onClick={onMenuItemClick}>
             Remita History
           </p>
-        </div>
+        </Link>
       ) : null}
 
-      <div id="profile" className="IconBox" onClick={onMenuItemClick}>
-        <img
-          id="profile"
-          onClick={onMenuItemClick}
-          src="images/dprofile.png"
-          alt="profile"
-        />
-        <p id="profile" onClick={onMenuItemClick}>
-          Profile
-        </p>
-      </div>
+      <Link
+        to={"/dashboard/profile"}
+        id="profile"
+        className="IconBox"
+        onClick={onMenuItemClick}
+      >
+        <img id="profile" src="/images/dprofile.png" alt="profile" />
+        <p id="profile">Profile</p>
+      </Link>
 
       <div onMouseOver={openSubReport} onMouseLeave={closeSubReport}>
         <div id="report" className="IconBox" onClick={onMenuItemClick}>
           <img
             id="report"
             onClick={onMenuItemClick}
-            src="images/dreport.png"
+            src="/images/dreport.png"
             alt="report"
           />
           <p id="report" onClick={onMenuItemClick}>
@@ -166,14 +184,32 @@ const SidebarMain = ({ onMenuItemClick }) => {
         {isReportOpen ? (
           <div className="SubItem">
             <ul>
-              <li id="report" onClick={onMenuItemClick}>
-                Account Statement
+              <li>
+                <Link
+                  id="report"
+                  onClick={onMenuItemClick}
+                  to={"/dashboard/report"}
+                >
+                  Account Statement
+                </Link>
               </li>
-              <li id="transactionreport" onClick={onMenuItemClick}>
-                Transaction Report
+              <li onClick={onMenuItemClick}>
+                <Link
+                  id="transactionreport"
+                  onClick={onMenuItemClick}
+                  to={"/dashboard/report/transaction"}
+                >
+                  Transaction Report
+                </Link>
               </li>
-              <li id="accountbalance" onClick={onMenuItemClick}>
-                Account Balance
+              <li>
+                <Link
+                  id="accountbalance"
+                  onClick={onMenuItemClick}
+                  to={"/dashboard/report/accountbalance"}
+                >
+                  Account Balance
+                </Link>
               </li>
             </ul>
           </div>

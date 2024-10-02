@@ -40,7 +40,7 @@ const TopNav = ({ settings }) => {
         <div className="BrandCon">
           <Link to="/">
             <img
-              src="../images/boclogo.jpeg"
+              src="/images/boclogo.jpeg"
               alt="Boctrust Microfinance Bank Logo"
               width="150px"
             />
@@ -55,7 +55,7 @@ const TopNav = ({ settings }) => {
         </div>
         <div>
           <button className="CallUs">Licenced by CBN</button>
-          <img src="images/cbn.jpeg" alt="cbn" height={40} />
+          <img src="/images/cbn.jpeg" alt="cbn" height={40} />
         </div>
       </div>
 

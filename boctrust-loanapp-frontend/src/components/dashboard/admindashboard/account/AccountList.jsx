@@ -109,12 +109,12 @@ const AccountList = ({ showCount, searchTerms }) => {
             {sortByCreatedAt(customerList)?.map((customer) => (
               <tr key={customer._id}>
                 <td>
-                  {customer.banking?.accountDetails?.Message.AccountNumber}
+                  {customer.banking?.accountDetails?.Message?.AccountNumber}
                 </td>
-                <td>{customer.banking?.accountDetails?.Message.FullName}</td>
-                <td>{customer.banking?.accountDetails?.Message.Id}</td>
-                <td>{handleGetAgent(customer.agentcode) || "Boctrust"}</td>
-                <td style={styles.completed}>Active</td>
+                <td>{customer.banking?.accountDetails?.Message?.FullName}</td>
+                <td>{customer.banking?.accountDetails?.Message?.Id}</td>
+                <td>{handleGetAgent(customer?.agentcode) || "Boctrust"}</td>
+                <td style={styles?.completed}>Active</td>
                 {/* <td>
                   <select name="action" id="action">
                     <option value="">Action</option>

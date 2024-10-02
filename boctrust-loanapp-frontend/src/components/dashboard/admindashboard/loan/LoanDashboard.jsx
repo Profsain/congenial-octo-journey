@@ -33,7 +33,7 @@ const LoanDashboard = () => {
                 placeholder="Search by name"
                 onChange={(e) => setSearchTerms(e.target.value)}
               />
-              <img src="images/search.png" alt="search-icon" />
+              <img src="/images/search.png" alt="search-icon" />
             </div>
           </div>
         </DashboardHeadline>

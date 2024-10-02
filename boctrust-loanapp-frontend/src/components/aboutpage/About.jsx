@@ -40,7 +40,7 @@ const About = () => {
 
   return (
     <>
-      <Header imgurl="images/boctrustviewl.png" />
+      <Header imgurl="/images/boctrustviewl.png" />
       <TopCardSection weAre={whoWeAreHomeText} mission={missionStatement} />
       <div className="container">
         <div>

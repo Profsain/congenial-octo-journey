@@ -27,7 +27,7 @@ const RemitaHistory = () => {
   return (
     <div>
       <div style={styles.container}>
-        <img width="130px" src="images/remita-logo.jpg" alt="remita-logo" />
+        <img width="130px" src="/images/remita-logo.jpg" alt="remita-logo" />
       </div>
       <div className="TReport">
         <Table borderless hover responsive="sm" className="DTable">

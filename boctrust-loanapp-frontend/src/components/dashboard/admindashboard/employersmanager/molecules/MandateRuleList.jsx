@@ -67,7 +67,7 @@ const MandateRuleList = () => {
 
   const handleDeleteMandateRule = async (rule) => {
     try {
-      console.log(rule, "rule")
+      
       const apiUrl = import.meta.env.VITE_BASE_URL;
       // Handle form submission logic here
       await fetch(`${apiUrl}/api/mandate-rule/${rule._id}`, {
