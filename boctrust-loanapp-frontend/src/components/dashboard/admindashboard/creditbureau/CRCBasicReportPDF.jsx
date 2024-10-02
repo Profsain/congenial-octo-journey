@@ -158,8 +158,8 @@ const CRCBasicReportPDF = ({ report, formData, title }) => {
         <Page size="A4" style={styles.page}>
           <View style={styles.section}>
             <div style={styles.hori}>
-              <Image src="images/crclogo.jpg" alt="logo" style={styles.logo} />
-              <Image src="images/boclogo.jpeg" alt="logo" style={styles.logo} />
+              <Image src="/images/crclogo.jpg" alt="logo" style={styles.logo} />
+              <Image src="/images/boclogo.jpeg" alt="logo" style={styles.logo} />
               <Text> Credit Check Report</Text>
             </div>
           </View>
@@ -169,7 +169,7 @@ const CRCBasicReportPDF = ({ report, formData, title }) => {
               <div style={styles.hori}>
                 <Text style={styles.title}>Enquiry Input Details</Text>
                 <Image
-                  src="images/avater.jpg"
+                  src="/images/avater.jpg"
                   alt="logo"
                   style={styles.avatar}
                 />

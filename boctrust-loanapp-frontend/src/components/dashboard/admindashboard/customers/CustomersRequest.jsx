@@ -51,7 +51,7 @@ const CustomersRequest = () => {
               <td>
                 <img
                   className="CustomerImg"
-                  src="images/c1.png"
+                  src="/images/c1.png"
                   alt=""
                 />
               </td>
@@ -93,7 +93,7 @@ const CustomersRequest = () => {
               <td>
                 <img
                   className="CustomerImg"
-                  src="images/c2.png"
+                  src="/images/c2.png"
                   alt=""
                 />
               </td>
@@ -135,7 +135,7 @@ const CustomersRequest = () => {
               <td>
                 <img
                   className="CustomerImg"
-                  src="images/c3.png"
+                  src="/images/c3.png"
                   alt=""
                 />
               </td>
@@ -177,7 +177,7 @@ const CustomersRequest = () => {
               <td>
                 <img
                   className="CustomerImg"
-                  src="images/c4.png"
+                  src="/images/c4.png"
                   alt=""
                 />
               </td>
@@ -219,7 +219,7 @@ const CustomersRequest = () => {
               <td>
                 <img
                   className="CustomerImg"
-                  src="images/c5.png"
+                  src="/images/c5.png"
                   alt=""
                 />
               </td>
@@ -261,7 +261,7 @@ const CustomersRequest = () => {
               <td>
                 <img
                   className="CustomerImg"
-                  src="images/c6.png"
+                  src="/images/c6.png"
                   alt=""
                 />
               </td>

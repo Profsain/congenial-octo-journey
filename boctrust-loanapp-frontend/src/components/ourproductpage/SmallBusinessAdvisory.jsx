@@ -4,7 +4,7 @@ const SmallBusinessAdvisory = () => {
   return (
     <OurProduct
       productTitle="small business advisory"
-      headerImg="images/small-business.jpg"
+      headerImg="/images/small-business.jpg"
     />
   );
 };

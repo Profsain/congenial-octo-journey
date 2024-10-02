@@ -7,7 +7,8 @@ const EmailTemplate = ({
   buttonLink = "https://boctrustmfb.com/",
   cta = "In the meantime, check out our customer-first product",
   closingRemarks = "Thank you for choosing Boctrust MFB Ltd",
-}) => `
+}) => {
+  return `
 
 <!DOCTYPE html>
 <html>
@@ -83,5 +84,6 @@ const EmailTemplate = ({
 
 
 `;
+};
 
 module.exports = EmailTemplate;

@@ -20,6 +20,7 @@ import { toast } from "react-toastify";
 import { fetchUnbookedLoans } from "../../../../redux/reducers/loanReducer";
 import BookingModal from "./BookingModal";
 import DisplayLoanProductName from "../../shared/DisplayLoanProductName";
+import { nigerianCurrencyFormat } from "../../../../../utilities/formatToNiaraCurrency";
 
 const BookLoans = () => {
   const styles = {
@@ -102,8 +103,6 @@ const BookLoans = () => {
     setShow(true);
   };
 
-
-
   // search customer list
   const [loansList, setLoansList] = useState(unbookedLoans);
   const [selectedLoan, setSelectedLoan] = useState(null);
@@ -143,8 +142,7 @@ const BookLoans = () => {
         className: "text-primary",
         icon: <IoMdCheckmarkCircleOutline />,
         label:
-          canUserBook &&
-          (!canUserApprove || !loan.bookingInitiated)
+          canUserBook && (!canUserApprove || !loan.bookingInitiated)
             ? "Book Loan"
             : canUserApprove ||
               (canUserBook && canUserApprove && loan.bookingInitiated)
@@ -198,7 +196,7 @@ const BookLoans = () => {
                   placeholder="Search by name"
                   onChange={(e) => setSearchTerms(e.target.value)}
                 />
-                <img src="images/search.png" alt="search-icon" />
+                <img src="/images/search.png" alt="search-icon" />
               </div>
             </div>
           </DashboardHeadline>
@@ -248,7 +246,9 @@ const BookLoans = () => {
                           </td>
 
                           <td>{getDateOnly(loan?.createdAt)}</td>
-                          <td>N{loan?.loanamount}</td>
+                          <td>
+                            {nigerianCurrencyFormat.format(loan?.loanamount)}
+                          </td>
                           <td className="booking_status">
                             {loan.bookingInitiated ? (
                               <span className="badge_success">Initaited</span>

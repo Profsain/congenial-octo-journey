@@ -69,6 +69,7 @@ const getAccountProduct = async ({
 
     return response?.data;
   } catch (error) {
+    console.log(error);
     console.error(
       "There was a problem with the fetch operation:",
       error?.message
@@ -104,7 +105,7 @@ const getLoanProduct = async ({
         : 305;
 
     const { data } = await axios.get(
-      `${baseUrl}/BankOneWebAPI/api/Product/GetByCode/2?authToken=${token}&productCode=${customerAccountProductCode}`
+      `${baseUrl}/BankOneWebAPI/api/Product/GetByCode/2?authToken=${token}&productCode=${401}`
     );
 
     return data;

@@ -9,13 +9,13 @@ const Dashboard = () => {
 
 
   return (
-    <div className="DashboardContainer">
+    <>
       {currentUser?.userType === "staff" || currentUser?.userType === "super_admin"  ? (
         <AdminDashboard />
       ) : (
         <CustomerDashboard />
       )}
-    </div>
+    </>
   );
 };
 

@@ -82,7 +82,7 @@ const Career = () => {
 
   return (
     <>
-      <Header imgurl="images/boccareer.jpg" />
+      <Header imgurl="/images/boccareer.jpg" />
       <div className="container-fluid">
         <div className="container TopContainer">
           <Headline spacer="48px 0" text="Welcome to BoctrustMFB Careers" />
@@ -148,7 +148,7 @@ const Career = () => {
                         </p>
                         <img
                           className="ImgCard"
-                          src="images/bocstruststaff4.jpg"
+                          src="/images/bocstruststaff4.jpg"
                           alt="boctrust social impact"
                         />
                       </div>
@@ -172,7 +172,7 @@ const Career = () => {
                         </p>
                         <img
                           className="ImgCard"
-                          src="images/social.avif"
+                          src="/images/social.avif"
                           alt="boctrust staff growth"
                         />
                       </div>
@@ -196,7 +196,7 @@ const Career = () => {
                         </p>
                         <img
                           className="ImgCard"
-                          src="images/staff1.avif"
+                          src="/images/staff1.avif"
                           alt="boctrust teamwork"
                         />
                       </div>
@@ -243,7 +243,7 @@ const Career = () => {
                         </p>
                         <img
                           className="ImgCard"
-                          src="images/bocstrusonline.avif"
+                          src="/images/bocstrusonline.avif"
                           alt="boctrust technology"
                         />
                       </div>

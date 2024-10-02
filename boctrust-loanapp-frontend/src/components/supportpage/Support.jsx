@@ -152,7 +152,7 @@ const Support = () => {
 
   return (
     <>
-      <Header imgurl="images/bocsupport.png" />
+      <Header imgurl="/images/bocsupport.png" />
       <div className="container-fluid" style={styles.container}>
         <SearchBox
           headlineTxt="How can we help you today?"

@@ -7,9 +7,9 @@ import "../Home.css";
 const HomeCarousel = ({ content }) => {
   // Slide images
   const images = [
-    "images/slide1update.jpg",
-    "images/bocslide2.jpg",
-    "images/bocslide3.jpg",
+    "/images/slide1update.jpg",
+    "/images/bocslide2.jpg",
+    "/images/bocslide3.jpg",
   ];
 
   // Carousel top card

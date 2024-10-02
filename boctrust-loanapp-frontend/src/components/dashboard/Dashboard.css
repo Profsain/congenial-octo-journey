@@ -52,6 +52,10 @@
   font-weight: 700;
 }
 
+.SideMain a {
+  color: inherit;
+}
+
 .IconBox {
   display: flex;
   justify-content: center;

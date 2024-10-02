@@ -4,7 +4,7 @@ const MicroInsuranceAdvisory = () => {
   return (
     <OurProduct
       productTitle="micro insurance advisory"
-      headerImg="images/micro-insurance.jpg"
+      headerImg="/images/micro-insurance.jpg"
     />
   );
 };

@@ -17,7 +17,7 @@ const LoanStep = () => {
                 />
               }
               description="Our loan application form will ask for every relevant information needed to complete your application online. This will include loan details, your personal information, employer information, and."
-              imgsrc="images/form1.png"
+              imgsrc="/images/form1.png"
             />
           </Col>
           <Col xs={12} md={6}>
@@ -41,7 +41,7 @@ const LoanStep = () => {
                 />
               }
               description="In line with the Industry's best practices, our in-house team checks you application to know if you qualify for a loan. If you qualify, a message i sent to you conforming your application..."
-              imgsrc="images/form2.png"
+              imgsrc="/images/form2.png"
             />
           </Col>
           <Col xs={12} md={6}>
@@ -51,7 +51,7 @@ const LoanStep = () => {
                 <Headline color="#fff" text="Wait for your money to arrive" />
               }
               description="Once application is approved, you would be contacted and your require loan would be disbursed to you. In addition to your loan, we also provide financial advisory services to help you better manage your finances."
-              imgsrc="images/form3.png"
+              imgsrc="/images/form3.png"
             />
           </Col>
         </Row>

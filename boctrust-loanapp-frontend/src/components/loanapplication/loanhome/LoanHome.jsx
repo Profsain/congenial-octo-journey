@@ -37,7 +37,7 @@ const LoanHome = () => {
         <LoanFirstStep data={startObject} />
       ) : (
         <div className="LoanHome">
-          <Header imgurl="images/boctrustformheader.jpg" />
+          <Header imgurl="/images/boctrustformheader.jpg" />
           <div className="TopSection">
             <div className="TopText">
               <Headline
@@ -75,7 +75,7 @@ const LoanHome = () => {
                       spacer="0"
                       text="How much do you need?"
                     />
-                    <img src="images/naira.png" alt="" className="NairaIcon" />
+                    <img src="/images/naira.png" alt="" className="NairaIcon" />
                     {/* <input
                       className="Field"
                       id="loanamount"

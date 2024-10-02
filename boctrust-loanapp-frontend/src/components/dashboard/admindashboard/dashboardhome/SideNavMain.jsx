@@ -3,6 +3,7 @@ import { useSelector } from "react-redux";
 import PropTypes from "prop-types";
 import "../../Dashboard.css";
 import handleAdminRoles from "../../../../../utilities/getAdminRoles";
+import { Link } from "react-router-dom";
 
 const SideNavMain = ({ onMenuItemClick }) => {
   const [isCustomerOpen, setIsCustomerOpen] = useState(false);
@@ -74,46 +75,48 @@ const SideNavMain = ({ onMenuItemClick }) => {
     <div className="NavIcons SideMain FixSideNav">
       <div className="BrandCon">
         <div className=" LgLogo">
-          <img src="images/dlogo.png" alt="boctrust-logo" />
+          <img src="/images/dlogo.png" alt="boctrust-logo" />
         </div>
         <p className="text-capitalize">{currentUser?.userRole?.label}</p>
       </div>
 
-      <div id="dashboard" className="IconBox" onClick={onMenuItemClick}>
-        <img
-          id="dashboard"
-          onClick={onMenuItemClick}
-          src="images/ddashboard.png"
-          alt="dashboard"
-        />
-        <p id="dashboard" onClick={onMenuItemClick}>
-          Dashboard
-        </p>
-      </div>
+      <Link
+        id="dashboard"
+        to="/dashboard"
+        onClick={onMenuItemClick}
+        className="IconBox"
+      >
+        <img src="/images/ddashboard.png" alt="dashboard" />
+        <p>Dashboard</p>
+      </Link>
 
-      <div id="branches" className="IconBox" onClick={onMenuItemClick}>
-        <img
-          id="branches"
-          onClick={onMenuItemClick}
-          src="images/dmda.png"
-          alt="branches"
-        />
-        <p id="branches" onClick={onMenuItemClick}>
-          Branches
-        </p>
-      </div>
+      <Link
+        id="branches"
+        to="/dashboard/branches"
+        onClick={onMenuItemClick}
+        className="IconBox"
+      >
+        <img src="/images/dmda.png" alt="branches" />
+        <p>Branches</p>
+      </Link>
 
       {/* Menu with sub item */}
       <div onMouseOver={openSubCustomer} onMouseLeave={closeSubCustomer}>
         <div className="IconBox">
-          <img src="images/dprofile.png" alt="customer" />
+          <img src="/images/dprofile.png" alt="customer" />
           <p>Customers</p>
         </div>
         {isCustomerOpen ? (
           <div className="SubItem">
             <ul>
-              <li id="customer" onClick={onMenuItemClick}>
-                All Customers
+              <li>
+                <Link
+                  id="customer"
+                  onClick={onMenuItemClick}
+                  to={"/dashboard/customers"}
+                >
+                  All Customers
+                </Link>
               </li>
               {/* {superAdmin || adminRoles?.includes("customer_request") ? (
                 <li id="customerrequest" onClick={onMenuItemClick}>
@@ -129,44 +132,104 @@ const SideNavMain = ({ onMenuItemClick }) => {
 
       <div onMouseOver={openSubLoan} onMouseLeave={closeSubLoan}>
         <div className="IconBox">
-          <img src="images/dmyloan.png" alt="loan" />
+          <img src="/images/dmyloan.png" alt="loan" />
           <p>Loans</p>
         </div>
         {isLoanOpen ? (
           <div className="SubItem">
             <ul>
-              <li id="myloan" onClick={onMenuItemClick}>
-                All Loans
+              <li>
+                <Link
+                  id="myloan"
+                  onClick={onMenuItemClick}
+                  to="/dashboard/loans"
+                >
+                  All Loans
+                </Link>
               </li>
-              <li id="pendingloans" onClick={onMenuItemClick}>
-                Pending Loan
+              <li>
+                <Link
+                  id="pendingloans"
+                  onClick={onMenuItemClick}
+                  to="/dashboard/loans/pending"
+                >
+                  Pending Loan
+                </Link>
               </li>
-              <li id="bookloans" onClick={onMenuItemClick}>
-                Book Loans
+              <li>
+                <Link
+                  id="bookloans"
+                  onClick={onMenuItemClick}
+                  to="/dashboard/loans/book"
+                >
+                  Book Loans
+                </Link>
               </li>
 
               {/* updated */}
-              <li id="loandisbursement" onClick={onMenuItemClick}>
-                Disburse Loans
+              <li>
+                <Link
+                  id="loandisbursement"
+                  onClick={onMenuItemClick}
+                  to="/dashboard/loans/disburse"
+                >
+                  Disburse Loans
+                </Link>
               </li>
-              <li id="completedloans" onClick={onMenuItemClick}>
-                Completed Loans
+              <li>
+                <Link
+                  id="completedloans"
+                  onClick={onMenuItemClick}
+                  to="/dashboard/loans/completed"
+                >
+                  Completed Loans
+                </Link>
               </li>
-              <li id="overdueloans" onClick={onMenuItemClick}>
-                Overdue Loans
+              <li>
+                <Link
+                  id="overdueloans"
+                  onClick={onMenuItemClick}
+                  to="/dashboard/loans/overdue"
+                >
+                  Overdue Loans
+                </Link>
               </li>
-              <li id="loanproducts" onClick={onMenuItemClick}>
-                Loan Products
+              <li>
+                <Link
+                  id="loanproducts"
+                  onClick={onMenuItemClick}
+                  to="/dashboard/loans/products"
+                >
+                  Loan Products
+                </Link>
               </li>
-              <li id="loancalculator" onClick={onMenuItemClick}>
-                Loan Calculator
+              <li>
+                <Link
+                  id="loancalculator"
+                  onClick={onMenuItemClick}
+                  to="/dashboard/loans/calculator"
+                >
+                  Loan Calculator
+                </Link>
               </li>
-              <li id="balanceenquiry" onClick={onMenuItemClick}>
-                Balance Enquiry
+              <li>
+                <Link
+                  id="balanceenquiry"
+                  onClick={onMenuItemClick}
+                  to="/dashboard/loans/balanceenquiry"
+                >
+                  Balance Enquiry
+                </Link>
               </li>
 
-              <li id="loanstatement" onClick={onMenuItemClick}>
-                Loan A/C Statement
+              <li>
+                <Link
+                  id="loanstatement"
+                  onClick={onMenuItemClick}
+                  to="/dashboard/loans/loanstatement"
+                >
+                  Loan A/C Statement
+                </Link>
               </li>
             </ul>
           </div>
@@ -174,32 +237,47 @@ const SideNavMain = ({ onMenuItemClick }) => {
       </div>
 
       {/* repayment menu */}
-      <div id="repayment" className="IconBox" onClick={onMenuItemClick}>
+      <Link
+        to="/dashboard/repayment"
+        id="repayment"
+        className="IconBox"
+        onClick={onMenuItemClick}
+      >
         <img
           id="repayment"
           onClick={onMenuItemClick}
-          src="images/dtransfer.png"
+          src="/images/dtransfer.png"
           alt="repayment"
         />
-        <p id="repayment" onClick={onMenuItemClick}>
-          Repayments
-        </p>
-      </div>
+        <p>Repayments</p>
+      </Link>
 
       {/* account menu */}
       <div onMouseOver={openSubAccount} onMouseLeave={closeSubAccount}>
         <div className="IconBox">
-          <img src="images/daccount.png" alt="accounts" />
+          <img src="/images/daccount.png" alt="accounts" />
           <p>Accounts</p>
         </div>
         {isAccountOpen ? (
           <div className="SubItem">
             <ul>
-              <li id="accounts" onClick={onMenuItemClick}>
-                All Accounts
+              <li>
+                <Link
+                  id="accounts"
+                  onClick={onMenuItemClick}
+                  to="/dashboard/accounts"
+                >
+                  All Accounts
+                </Link>
               </li>
-              <li id="accounttypes" onClick={onMenuItemClick}>
-                Account Types
+              <li>
+                <Link
+                  id="accounttypes"
+                  onClick={onMenuItemClick}
+                  to="/dashboard/accounts/types"
+                >
+                  Account Types
+                </Link>
               </li>
             </ul>
           </div>
@@ -211,7 +289,7 @@ const SideNavMain = ({ onMenuItemClick }) => {
         <img
           id="withdraw"
           onClick={onMenuItemClick}
-          src="images/dwithdraw.png"
+          src="/images/dwithdraw.png"
           alt="withdrawer"
         />
         <p id="withdraw" onClick={onMenuItemClick}>
@@ -219,41 +297,63 @@ const SideNavMain = ({ onMenuItemClick }) => {
         </p>
       </div> */}
 
-      <div id="transaction" className="IconBox" onClick={onMenuItemClick}>
-        <img
-          id="transaction"
-          onClick={onMenuItemClick}
-          src="images/daccount.png"
-          alt="transaction"
-        />
-        <p id="transaction" onClick={onMenuItemClick}>
-          Transactions
-        </p>
-      </div>
+      <Link
+        id="transaction"
+        onClick={onMenuItemClick}
+        to="/dashboard/transactions"
+        className="IconBox"
+      >
+        <img id="transaction" src="/images/daccount.png" alt="transaction" />
+        <p>Transactions</p>
+      </Link>
 
       {/* NIBSS Menu with sub item */}
       <div onMouseOver={openSubItem} onMouseLeave={closeSubItem}>
         <div className="IconBox">
-          <img src="images/dwithdraw.png" alt="nibss" />
+          <img src="/images/dwithdraw.png" alt="nibss" />
           <p>NIBSS Direct Debit</p>
         </div>
         {isOpen ? (
           <div className="SubItem">
             <ul>
-              <li id="debitTransactions" onClick={onMenuItemClick}>
-                Debit Transactions
+              <li>
+                <Link
+                  id="debitTransactions"
+                  onClick={onMenuItemClick}
+                  to="/dashboard/nibbs"
+                >
+                  Debit Transactions
+                </Link>
               </li>
               {superAdmin || adminRoles?.includes("manage_nibss") ? (
-                <li id="collectionsSummary" onClick={onMenuItemClick}>
-                  Collections Summary
+                <li>
+                  <Link
+                    id="collectionsSummary"
+                    onClick={onMenuItemClick}
+                    to="/dashboard/nibbs/collectionsSummary"
+                  >
+                    Collections Summary
+                  </Link>
                 </li>
               ) : null}
-              <li id="debitMandates" onClick={onMenuItemClick}>
-                Debit Mandates
+              <li>
+                <Link
+                  id="debitMandates"
+                  onClick={onMenuItemClick}
+                  to="/dashboard/nibbs/debitMandates"
+                >
+                  Debit Mandates
+                </Link>
               </li>
               {superAdmin || adminRoles?.includes("manage_nibss") ? (
-                <li id="stopRestartCollections" onClick={onMenuItemClick}>
-                  Stop/Restart Collections
+                <li>
+                  <Link
+                    id="stopRestartCollections"
+                    onClick={onMenuItemClick}
+                    to="/dashboard/nibbs/stopRestartCollections"
+                  >
+                    Stop/Restart Collections
+                  </Link>
                 </li>
               ) : null}
             </ul>
@@ -263,31 +363,61 @@ const SideNavMain = ({ onMenuItemClick }) => {
 
       <div onMouseOver={openSubRemita} onMouseLeave={closeSubRemita}>
         <div className="IconBox">
-          <img src="images/dremita.png" alt="remita" />
+          <img src="/images/dremita.png" alt="remita" />
           <p>Remita Collections</p>
         </div>
         {isRemitaOpen ? (
           <div className="SubItem">
             <ul>
               {superAdmin || adminRoles?.includes("get_salary_history") ? (
-                <li id="checksalaryhistory" onClick={onMenuItemClick}>
-                  Check Salary History
+                <li>
+                  <Link
+                    id="checksalaryhistory"
+                    onClick={onMenuItemClick}
+                    to="/dashboard/remita"
+                  >
+                    Check Salary History
+                  </Link>
                 </li>
               ) : null}
 
-              <li id="remita" onClick={onMenuItemClick}>
-                Loan Disbursements
+              <li>
+                <Link
+                  id="remita"
+                  onClick={onMenuItemClick}
+                  to="/dashboard/remita/disbursement"
+                >
+                  Loan Disbursements
+                </Link>
               </li>
 
-              <li id="collectionnotifications" onClick={onMenuItemClick}>
-                Collection Notification
+              <li>
+                <Link
+                  id="collectionnotifications"
+                  onClick={onMenuItemClick}
+                  to="/dashboard/remita/notification"
+                >
+                  Collection Notification
+                </Link>
               </li>
-              <li id="mandatehistory" onClick={onMenuItemClick}>
-                Mandate History
+              <li>
+                <Link
+                  id="mandatehistory"
+                  onClick={onMenuItemClick}
+                  to="/dashboard/remita/mandatehistory"
+                >
+                  Mandate History
+                </Link>
               </li>
               {superAdmin || adminRoles?.includes("stop_remita_loan") ? (
-                <li id="stopcollections" onClick={onMenuItemClick}>
-                  Stop Collections
+                <li>
+                  <Link
+                    id="stopcollections"
+                    onClick={onMenuItemClick}
+                    to="/dashboard/remita/stopcollections"
+                  >
+                    Stop Collections
+                  </Link>
                 </li>
               ) : null}
             </ul>
@@ -296,42 +426,70 @@ const SideNavMain = ({ onMenuItemClick }) => {
       </div>
 
       {(superAdmin || !shouldNotSee?.includes("creditAssessment")) && (
-        <div id="creditbureau" className="IconBox" onClick={onMenuItemClick}>
-          <img
-            id="creditbureau"
-            onClick={onMenuItemClick}
-            src="images/dreport.png"
-            alt="creditbureau"
-          />
-          <p id="creditbureau" onClick={onMenuItemClick}>
-            Credit Assessment
-          </p>
-        </div>
+        <Link
+          to="/dashboard/creditbureau"
+          id="creditbureau"
+          className="IconBox"
+          onClick={onMenuItemClick}
+        >
+          <img id="creditbureau" src="/images/dreport.png" alt="creditbureau" />
+          <p id="creditbureau">Credit Assessment</p>
+        </Link>
       )}
 
       {superAdmin || !shouldNotSee?.includes("employerManager") ? (
         <div onMouseOver={openSubEmployer} onMouseLeave={closeSubEmployer}>
           <div className="IconBox">
-            <img src="images/dmda.png" alt="mdas" />
+            <img src="/images/dmda.png" alt="mdas" />
             <p>Employer Manager</p>
           </div>
           {isEmployerOpen ? (
             <div className="SubItem">
               <ul>
-                <li id="addemployer" onClick={onMenuItemClick}>
-                  Add Employer
+                <li>
+                  <Link
+                    id="mdas"
+                    onClick={onMenuItemClick}
+                    to="/dashboard/mdas"
+                  >
+                    All Employers
+                  </Link>
                 </li>
-                <li id="mandaterules" onClick={onMenuItemClick}>
-                  Mandate Rules
+                <li>
+                  <Link
+                    id="addemployer"
+                    onClick={onMenuItemClick}
+                    to="/dashboard/mdas/addemployer"
+                  >
+                    Add Employer
+                  </Link>
                 </li>
-                <li id="statementrules" onClick={onMenuItemClick}>
-                  Statement Rules
+                <li>
+                  <Link
+                    id="mandaterules"
+                    onClick={onMenuItemClick}
+                    to="/dashboard/mdas/mandaterules"
+                  >
+                    Mandate Rules
+                  </Link>
                 </li>
-                <li id="employmentletter" onClick={onMenuItemClick}>
-                  Employment Letter
+                <li>
+                  <Link
+                    id="statementrules"
+                    onClick={onMenuItemClick}
+                    to="/dashboard/mdas/statementrules"
+                  >
+                    Statement Rules
+                  </Link>
                 </li>
-                <li id="mdas" onClick={onMenuItemClick}>
-                  All Employers
+                <li>
+                  <Link
+                    id="employmentletter"
+                    onClick={onMenuItemClick}
+                    to="/dashboard/mdas/employmentletter"
+                  >
+                    Employment Letter
+                  </Link>
                 </li>
               </ul>
             </div>
@@ -342,24 +500,44 @@ const SideNavMain = ({ onMenuItemClick }) => {
       {superAdmin || !shouldNotSee?.includes("kycReview") ? (
         <div onMouseOver={openSubKyc} onMouseLeave={closeSubKyc}>
           <div className="IconBox">
-            <img src="images/dkyc.png" alt="kyc" />
+            <img src="/images/dkyc.png" alt="kyc" />
             <p>KYC Review</p>
           </div>
 
           {isKycOpen ? (
             <div className="SubItem">
               <ul>
-                <li id="kyc" onClick={onMenuItemClick}>
-                  Do KYC Review
+                <li>
+                  <Link id="kyc" onClick={onMenuItemClick} to="/dashboard/kyc">
+                    Do KYC Review
+                  </Link>
                 </li>
-                <li id="signature" onClick={onMenuItemClick}>
-                  Review Report
+                <li>
+                  <Link
+                    id="report"
+                    onClick={onMenuItemClick}
+                    to="/dashboard/kyc/report"
+                  >
+                    Review Report
+                  </Link>
                 </li>
-                <li id="employmentLetters" onClick={onMenuItemClick}>
-                  Employment Letters
+                <li>
+                  <Link
+                    id="employmentLetters"
+                    onClick={onMenuItemClick}
+                    to="/dashboard/kyc/employmentLetters"
+                  >
+                    Employment Letters
+                  </Link>
                 </li>
-                <li id="bankStatements" onClick={onMenuItemClick}>
-                  Bank Statement
+                <li>
+                  <Link
+                    id="bankStatements"
+                    onClick={onMenuItemClick}
+                    to="/dashboard/kyc/bankStatements"
+                  >
+                    Bank Statement
+                  </Link>
                 </li>
               </ul>
             </div>
@@ -368,7 +546,7 @@ const SideNavMain = ({ onMenuItemClick }) => {
       ) : null}
       <div onMouseOver={openSubWebManager} onMouseLeave={closeSubWebManager}>
         <div className="IconBox">
-          <img src="images/dwebsite.png" alt="webmanager" />
+          <img src="/images/dwebsite.png" alt="webmanager" />
           <p>Website Manager</p>
         </div>
 
@@ -378,35 +556,95 @@ const SideNavMain = ({ onMenuItemClick }) => {
               {/* <li id="website" onClick={onMenuItemClick}>
                 All Pages
               </li> */}
-              <li id="webmanager" onClick={onMenuItemClick}>
-                Blogs
+              <li>
+                <Link
+                  id="webmanager"
+                  onClick={onMenuItemClick}
+                  to="/dashboard/webmanager"
+                >
+                  Blogs
+                </Link>
               </li>
-              <li id="contactForm" onClick={onMenuItemClick}>
-                Contact Form
+              <li>
+                <Link
+                  id="contactForm"
+                  onClick={onMenuItemClick}
+                  to="/dashboard/webmanager/contactForm"
+                >
+                  Contact Form
+                </Link>
               </li>
-              <li id="addwiki" onClick={onMenuItemClick}>
-                Wikis/FAQs
+              <li>
+                <Link
+                  id="addwiki"
+                  onClick={onMenuItemClick}
+                  to="/dashboard/webmanager/addwiki"
+                >
+                  Wikis/FAQs
+                </Link>
               </li>
-              <li id="customerAsk" onClick={onMenuItemClick}>
-                Customer Enquiry
+              <li>
+                <Link
+                  id="customerAsk"
+                  onClick={onMenuItemClick}
+                  to="/dashboard/webmanager/customerAsk"
+                >
+                  Customer Enquiry
+                </Link>
               </li>
-              <li id="career" onClick={onMenuItemClick}>
-                Career
+              <li>
+                <Link
+                  id="career"
+                  onClick={onMenuItemClick}
+                  to="/dashboard/webmanager/career"
+                >
+                  Career
+                </Link>
               </li>
-              <li id="job-applicants" onClick={onMenuItemClick}>
-                Job Applications
+              <li>
+                <Link
+                  id="job-applicants"
+                  onClick={onMenuItemClick}
+                  to="/dashboard/webmanager/job-applicants"
+                >
+                  Job Applications
+                </Link>
               </li>
-              <li id="homeEditor" onClick={onMenuItemClick}>
-                Home Page
+              <li>
+                <Link
+                  id="homeEditor"
+                  onClick={onMenuItemClick}
+                  to="/dashboard/webmanager/homeEditor"
+                >
+                  Home Page
+                </Link>
               </li>
-              <li id="aboutEditor" onClick={onMenuItemClick}>
-                About Page
+              <li>
+                <Link
+                  id="aboutEditor"
+                  onClick={onMenuItemClick}
+                  to="/dashboard/webmanager/aboutEditor"
+                >
+                  About Page
+                </Link>
               </li>
-              <li id="boardEditor" onClick={onMenuItemClick}>
-                Directors
+              <li>
+                <Link
+                  id="boardEditor"
+                  onClick={onMenuItemClick}
+                  to="/dashboard/webmanager/boardEditor"
+                >
+                  Directors
+                </Link>
               </li>
-              <li id="productEditor" onClick={onMenuItemClick}>
-                Products Page
+              <li>
+                <Link
+                  id="productEditor"
+                  onClick={onMenuItemClick}
+                  to="/dashboard/webmanager/productEditor"
+                >
+                  Products Page
+                </Link>
               </li>
             </ul>
           </div>
@@ -417,7 +655,7 @@ const SideNavMain = ({ onMenuItemClick }) => {
         <img
           id="withdrawmethod"
           onClick={onMenuItemClick}
-          src="images/dwithdrawmethod.png"
+          src="/images/dwithdrawmethod.png"
           alt="withdrawmethod"
         />
         <p id="withdrawmethod" onClick={onMenuItemClick}>
@@ -431,20 +669,38 @@ const SideNavMain = ({ onMenuItemClick }) => {
           onMouseLeave={closeSubUserManager}
         >
           <div className="IconBox">
-            <img src="images/dusermanage.png" alt="usermanager" />
+            <img src="/images/dusermanage.png" alt="usermanager" />
             <p>User Manager</p>
           </div>
           {isUserManagerOpen ? (
             <div className="SubItem">
               <ul>
-                <li id="allusers" onClick={onMenuItemClick}>
-                  All Users
+                <li>
+                  <Link
+                    id="allusers"
+                    onClick={onMenuItemClick}
+                    to="/dashboard/users"
+                  >
+                    All Users
+                  </Link>
                 </li>
-                <li id="userrole" onClick={onMenuItemClick}>
-                  User Roles
+                <li>
+                  <Link
+                    id="userrole"
+                    onClick={onMenuItemClick}
+                    to="/dashboard/roles"
+                  >
+                    User Roles
+                  </Link>
                 </li>
-                <li id="accesscontrol" onClick={onMenuItemClick}>
-                  Access Control
+                <li>
+                  <Link
+                    id="accesscontrol"
+                    onClick={onMenuItemClick}
+                    to="/dashboard/accesscontrol"
+                  >
+                    Access Control
+                  </Link>
                 </li>
               </ul>
             </div>
@@ -454,21 +710,39 @@ const SideNavMain = ({ onMenuItemClick }) => {
 
       <div onMouseOver={openSubReports} onMouseLeave={closeSubReports}>
         <div className="IconBox">
-          <img src="images/dreport.png" alt="report" />
+          <img src="/images/dreport.png" alt="report" />
           <p>Reports</p>
         </div>
 
         {isReportsOpen ? (
           <div className="SubItem">
             <ul>
-              <li id="report" onClick={onMenuItemClick}>
-                Account Statement
+              <li>
+                <Link
+                  id="report"
+                  onClick={onMenuItemClick}
+                  to="/dashboard/report/account-statement"
+                >
+                  Account Statement
+                </Link>
               </li>
-              <li id="accountbalance" onClick={onMenuItemClick}>
-                Account Balance
+              <li>
+                <Link
+                  id="accountbalance"
+                  onClick={onMenuItemClick}
+                  to="/dashboard/report/accountbalance"
+                >
+                  Account Balance
+                </Link>
               </li>
-              <li id="loanreporting" onClick={onMenuItemClick}>
-                Loan Report
+              <li>
+                <Link
+                  id="loanreporting"
+                  onClick={onMenuItemClick}
+                  to="/dashboard/report/loan"
+                >
+                  Loan Report
+                </Link>
               </li>
             </ul>
           </div>
@@ -478,21 +752,39 @@ const SideNavMain = ({ onMenuItemClick }) => {
       {(superAdmin || !shouldNotSee?.includes("userManager")) && (
         <div onMouseOver={openSubSetting} onMouseLeave={closeSubSetting}>
           <div className="IconBox">
-            <img src="images/dreport.png" alt="report" />
+            <img src="/images/dreport.png" alt="report" />
             <p>Settings</p>
           </div>
 
           {isSettingOpen ? (
             <div className="SubItem">
               <ul>
-                <li id="general" onClick={onMenuItemClick}>
-                  General
+                <li>
+                  <Link
+                    id="general"
+                    onClick={onMenuItemClick}
+                    to="/dashboard/settings"
+                  >
+                    General
+                  </Link>
                 </li>
-                <li id="email" onClick={onMenuItemClick}>
-                  Email
+                <li>
+                  <Link
+                    id="email"
+                    onClick={onMenuItemClick}
+                    to="/dashboard/settings/email"
+                  >
+                    Email
+                  </Link>
                 </li>
-                <li id="googleanalytics" onClick={onMenuItemClick}>
-                  Google Analytics
+                <li>
+                  <Link
+                    id="googleanalytics"
+                    onClick={onMenuItemClick}
+                    to="/dashboard/settings/googleanalytics"
+                  >
+                    Google Analytics
+                  </Link>
                 </li>
               </ul>
             </div>

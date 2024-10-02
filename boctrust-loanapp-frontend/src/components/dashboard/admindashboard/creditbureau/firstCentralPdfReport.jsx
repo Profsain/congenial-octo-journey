@@ -193,11 +193,11 @@ const FirstCentralPdfReport = ({ report }) => {
           <View style={styles.section}>
             <div style={styles.hori}>
               <Image
-                src="images/firstcentrallogo.jpeg"
+                src="/images/firstcentrallogo.jpeg"
                 alt="logo"
                 style={styles.logo}
               />
-              <Image src="images/boclogo.jpeg" alt="logo" style={styles.logo} />
+              <Image src="/images/boclogo.jpeg" alt="logo" style={styles.logo} />
               <Text>Detailed Credit Check Report</Text>
             </div>
           </View>
@@ -207,7 +207,7 @@ const FirstCentralPdfReport = ({ report }) => {
               <div style={styles.hori}>
                 <Text style={styles.title}>Enquiry Input Details</Text>
                 <Image
-                  src="images/avater.jpg"
+                  src="/images/avater.jpg"
                   alt="logo"
                   style={styles.avatar}
                 />

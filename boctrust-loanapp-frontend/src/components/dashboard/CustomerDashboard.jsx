@@ -1,11 +1,7 @@
 /* eslint-disable no-undef */
 import { useState, useEffect } from "react";
-import { useSelector } from "react-redux/es/hooks/useSelector";
 // import { useNavigate } from "react-router-dom";
-import SidebarIcons from "./SidebarIcons";
 import "./Dashboard.css";
-import SidebarMain from "./SidebarMain";
-import TopNavber from "./topnavbar/TopNavber";
 import DashboardHome from "./dashboardcomponents/DashboardHome";
 import MyLoan from "./dashboardcomponents/myloan/MyLoan";
 import ApplyLoan from "./dashboardcomponents/myloan/ApplyLoan";
@@ -19,10 +15,11 @@ import TransactionReport from "./dashboardcomponents/report/TransactionReport";
 import AccountBalance from "./dashboardcomponents/report/AccountBalance";
 import AccountTransaction from "./dashboardcomponents/account/AccountTransaction";
 import RemitaHistory from "./dashboardcomponents/remita/RemitaHistory";
+import { Route, Routes } from "react-router-dom";
+import CustomerLayout from "../../layouts/CustomerLayout";
 
 const CustomerDashboard = () => {
   // get current login user
-  const user = useSelector((state) => state.adminAuth.user);
   const [showSidebar, setShowSidebar] = useState(false);
   const [currentComponent, setCurrentComponent] = useState("dashboard");
   const [currentTitle, setCurrentTitle] = useState("Dashboard");
@@ -36,18 +33,9 @@ const CustomerDashboard = () => {
   //   }
   // }, [user, navigate]);
 
-  const userName = user?.firstname + " " + user?.lastname;
 
-  const handleMouseOver = () => {
-    setShowSidebar(true);
-  };
-
-  const handleMouseOut = () => {
-    setShowSidebar(false);
-  };
 
   const handleMenuItemClick = (e) => {
-    e.preventDefault();
     const id = e.target.id;
     setCurrentComponent(id);
     switch (id) {
@@ -98,38 +86,38 @@ const CustomerDashboard = () => {
   };
 
   // handle component rendering
-  const renderComponent = () => {
-    switch (currentComponent) {
-      case "dashboard":
-        return <DashboardHome />;
-      case "myloan":
-        return <MyLoan />;
-      case "applyloan":
-        return <ApplyLoan />;
-      case "loancalculator":
-        return <LoanCalculator />;
-      case "loanrepayment":
-        return <LoanPayment />;
-      case "transfer":
-        return <TransferMoney />;
-      case "withdraw":
-        return <WithdrawMoney />;
-      case "transaction":
-        return <AccountTransaction />;
-      case "remita":
-        return <RemitaHistory />;
-      case "profile":
-        return <MyProfile />;
-      case "report":
-        return <Report />;
-      case "transactionreport":
-        return <TransactionReport />;
-      case "accountbalance":
-        return <AccountBalance />;
-      default:
-        return null;
-    }
-  };
+  // const renderComponent = () => {
+  //   switch (currentComponent) {
+  //     case "dashboard":
+  //       return <DashboardHome />;
+  //     case "myloan":
+  //       return <MyLoan />;
+  //     case "applyloan":
+  //       return <ApplyLoan />;
+  //     case "loancalculator":
+  //       return <LoanCalculator />;
+  //     case "loanrepayment":
+  //       return <LoanPayment />;
+  //     case "transfer":
+  //       return <TransferMoney />;
+  //     case "withdraw":
+  //       return <WithdrawMoney />;
+  //     case "transaction":
+  //       return <AccountTransaction />;
+  //     case "remita":
+  //       return <RemitaHistory />;
+  //     case "profile":
+  //       return <MyProfile />;
+  //     case "report":
+  //       return <Report />;
+  //     case "transactionreport":
+  //       return <TransactionReport />;
+  //     case "accountbalance":
+  //       return <AccountBalance />;
+  //     default:
+  //       return null;
+  //   }
+  // };
 
   // scroll to the top of the page
   useEffect(() => {
@@ -137,37 +125,42 @@ const CustomerDashboard = () => {
   }, [currentComponent]);
 
   return (
-    <div className="DashboardContainer">
-      {/* mobile navbar  */}
-      <div className="MobileNav">
-        {!showSidebar ? (
-          <div className="SideNavIcon" onMouseOver={handleMouseOver}>
-            <SidebarIcons />
-          </div>
-        ) : (
-          <div className="SideNavMain" onMouseLeave={handleMouseOut}>
-            <SidebarMain onMenuItemClick={handleMenuItemClick} />
-          </div>
-        )}
-      </div>
+    <Routes>
+      <Route
+        element={
+          <CustomerLayout
+            showSidebar={showSidebar}
+            setShowSidebar={setShowSidebar}
+            currentTitle={currentTitle}
+            onMenuItemClick={handleMenuItemClick}
+          />
+        }
+      >
+        <Route path="/" element={<DashboardHome />} />
 
-      <div className="container-fluid">
-        <div className="row">
-          <div className="col-sm-12 col-md-2 SideNavContainer">
-            {/* desktop navbar  */}
-            <div className="DesktopNav">
-              <SidebarMain onMenuItemClick={handleMenuItemClick} />
-            </div>
-          </div>
-          <div className="col-sm-12 col-md-10">
-            <div className="TopNavber">
-              <TopNavber title={currentTitle} user={userName} />
-            </div>
-            {renderComponent()}
-          </div>
-        </div>
-      </div>
-    </div>
+        <Route path="loans">
+          <Route index element={<MyLoan />} />
+
+          <Route path="apply" element={<ApplyLoan />} />
+          <Route path="calculator" element={<LoanCalculator />} />
+        </Route>
+        <Route path="repayment" element={<LoanPayment />} />
+        <Route path="transfer" element={<TransferMoney />} />
+        <Route path="withdraw" element={<WithdrawMoney />} />
+        <Route path="transactions" element={<AccountTransaction />} />
+       
+        <Route path="remita">
+          <Route index element={<RemitaHistory />} />
+        </Route>
+        <Route path="profile" element={<MyProfile />} />
+
+        <Route path="report">
+          <Route index element={<Report />} />
+          <Route path="transaction" element={<TransactionReport />} />
+          <Route path="accountbalance" element={<AccountBalance />} />
+        </Route>
+      </Route>
+    </Routes>
   );
 };
 

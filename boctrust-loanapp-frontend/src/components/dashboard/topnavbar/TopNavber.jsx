@@ -8,10 +8,10 @@ const TopNavber = ({ title, user="Femi Akinwade" }) => {
         <h4 id="Title">{title}</h4>
       </div>
       <div className="Inline Profile">
-        <img src="images/notificationicon.png" alt="alert" />
+        <img src="/images/notificationicon.png" alt="alert" />
         <div className="Inline UserCard">
           <p>{user}</p>
-          <img src="images/smallavater.png" alt="user" />
+          <img src="/images/smallavater.png" alt="user" />
         </div>
       </div>
     </div>

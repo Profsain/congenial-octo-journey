@@ -4,7 +4,7 @@ const AssetBackedFinancing = () => {
   return (
     <OurProduct
       productTitle="asset backed financing"
-      headerImg="images/asset-finance.jpg"
+      headerImg="/images/asset-finance.jpg"
     />
   );
 };

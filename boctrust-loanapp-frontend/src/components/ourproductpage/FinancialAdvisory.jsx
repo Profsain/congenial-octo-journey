@@ -4,7 +4,7 @@ const FinancialAdvisory = () => {
   return (
     <OurProduct
       productTitle="financial advisory"
-      headerImg="images/financial-advisory.jpg"
+      headerImg="/images/financial-advisory.jpg"
     />
   );
 };

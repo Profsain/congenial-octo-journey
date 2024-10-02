@@ -1,6 +1,5 @@
 /* eslint-disable no-undef */
 import { useState } from "react";
-import PropTypes from "prop-types";
 import { useFormik } from "formik";
 import BocButton from "../../shared/BocButton";
 import DashboardHeadline from "../../shared/DashboardHeadline";
@@ -11,6 +10,7 @@ import { userTypes } from "../../../../lib/userRelated";
 import { useSelector } from "react-redux";
 import PageLoader from "../../shared/PageLoader";
 import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 
 const initialValues = {
   fullName: "",
@@ -23,9 +23,11 @@ const initialValues = {
   userType: "",
 };
 
-const CreateNewAdmin = ({ func }) => {
+const CreateNewAdmin = () => {
   const [notification, setNotification] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+
+  const navigate = useNavigate();
 
   const { rolesAndPermission } = useSelector((state) => state.adminUserReducer);
 
@@ -87,9 +89,6 @@ const CreateNewAdmin = ({ func }) => {
     }
   };
 
-  const handleClose = () => {
-    func(false);
-  };
 
   const formik = useFormik({
     initialValues,
@@ -288,7 +287,7 @@ const CreateNewAdmin = ({ func }) => {
                 type="button"
                 bgcolor="gray"
                 bradius="18px"
-                func={handleClose}
+                func={() => navigate(-1)}
                 width={"200px"}
               >
                 Cancel
@@ -312,8 +311,5 @@ const CreateNewAdmin = ({ func }) => {
   );
 };
 
-CreateNewAdmin.propTypes = {
-  func: PropTypes.func,
-};
 
 export default CreateNewAdmin;

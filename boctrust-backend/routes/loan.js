@@ -361,11 +361,14 @@ router.put("/approve-disburse/:loanId", async (req, res) => {
       transferRequestPayload
     );
 
-    // if (transactionResponse?.Status === "Failed") {
-    //   return res
-    //     .status(400)
-    //     .json({ error: transactionResponse.ResponseMessage });
-    // }
+    console.log(transferRequestPayload, "transferRequestPayload")
+    console.log(transactionResponse, "transactionResponse")
+
+    if (transactionResponse?.Status === "Failed" || transactionResponse?.Status === 0 ) {
+      return res
+        .status(400)
+        .json({ error: transactionResponse.ResponseMessage });
+    }
 
     // Find the customer by ID
     const loan = await Loan.findByIdAndUpdate(loanId, {
