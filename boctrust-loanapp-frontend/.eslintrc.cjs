@@ -10,11 +10,13 @@ module.exports = {
     "plugin:react/recommended",
     "plugin:react/jsx-runtime",
     "plugin:react-hooks/recommended",
+     "plugin:emotion/recommended"
   ],
   parserOptions: { ecmaVersion: "latest", sourceType: "module" },
-  settings: { react: { version: "18.2" } },
+  settings: { react: { version: "18.2", "jsx-runtime": "automatic" } },
   plugins: ["react-refresh"],
   rules: {
     "react-refresh/only-export-components": "warn",
+    "react/no-unknown-property": ["error", { ignore: ["css"] }],
   },
 };

@@ -80,7 +80,7 @@ const HomeDashboard = () => {
           <img className="CardIcon" src="/images/eyes.png" alt="icon" />
           <p>Total Customers</p>
         </FigCard>
-        <div className="Spacer"></div>
+        <div  className="Spacer"></div>
         <FigCard>
           {customerAnalytics.completed ? (
             <h4 className="Title">

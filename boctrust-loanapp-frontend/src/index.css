@@ -1,7 +1,10 @@
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap');
+
 :root {
   font-family: open-sans, sans-serif;
   line-height: 1.5;
-  font-weight: 400;
+  
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -13,6 +16,8 @@
 body {
   margin: 0 auto;
   min-height: 100vh;
+  font-weight: 400;
+  font-family: "Open Sans", sans-serif;
 }
 
 h1,
@@ -230,7 +235,7 @@ button:disabled {
   /* loan form mobile */
   .FormContainer {
     padding: 38px 18px !important;
-    margin-top: 68px;
+    /* margin-top: 68px; */
   }
 
   .Step {
@@ -305,9 +310,11 @@ button:disabled {
   }
 
   .DashHeader {
-    height: 66px !important;
-    margin: 2rem 0 -4rem -1.5rem !important;
-    font-size: 1.2rem !important;
+    min-height: 66px;
+    height: fit-content !important;
+    margin: 2rem 0 -4rem -0.5rem !important;
+    font-size: 1.1rem !important;
+    padding: 0.5rem;
   }
 
   .DTable {
@@ -330,10 +337,10 @@ button:disabled {
     margin-bottom: -10rem !important;
   }
 
-  .FieldGroup input,
+  /* .FieldGroup input,
   select {
     width: 300px !important;
-  }
+  } */
   .BtnContainer {
     margin-top: 8rem !important;
   }
@@ -359,15 +366,18 @@ button:disabled {
     /* padding: 18px; */
   }
 
-  .StatCard {
-    margin: 8px !important;
-  }
+
   .StatCard p {
     font-size: 0.7rem !important;
   }
   .ChartBar {
     margin-top: 6rem !important;
-    display: none;
+    /* display: none; */
+    overflow-x: auto;
+    width: fit-content;
+  }
+  .ChartBar  .recharts-wrapper{
+    width: fit-content !important;
   }
 
   .TransContainer {
@@ -388,7 +398,8 @@ button:disabled {
     padding-bottom: 0.7rem !important;
   }
   .ListSec {
-    margin-top: 11rem;
+    margin-top: 5rem;
+    padding: 0 !important;
   }
   .SBox {
     padding-left: 3.4rem;
@@ -542,5 +553,9 @@ button:disabled {
   .mGroup {
     margin-left: -2rem !important;
     margin-bottom: -3.5rem !important;
+  }
+
+ .ListSec tr th{
+    font-size: 14px ;
   }
 }

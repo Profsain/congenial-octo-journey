@@ -151,7 +151,7 @@ const PaddingLoans = () => {
               bgcolor="#145098"
             ></DashboardHeadline>
             <div style={styles.table}>
-              <Table borderless hover responsive="sm">
+              <Table borderless hover responsive="sm" >
                 <thead style={styles.head}>
                   <tr>
                     <th>Loan ID</th>

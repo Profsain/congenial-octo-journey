@@ -284,7 +284,7 @@ const LoanDisbursement = () => {
         {status === "loading" && <PageLoader />}
         <DashboardHeadline
           height="52px"
-          mspacer="2rem 0 -3.2rem -1rem"
+          mspacer="2rem 0 -3.2rem -0.5rem"
           bgcolor="#145098"
         ></DashboardHeadline>
         <div style={styles.table}>
