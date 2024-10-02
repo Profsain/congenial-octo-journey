@@ -117,7 +117,6 @@ const LoanProductsList = ({ count, searchTerm, admin, adminRoles }) => {
                   <th>Code</th>
                   <th>Name</th>
                   <th>Interest Rate</th>
-
                   <th>Term Period</th>
                   <th>Action</th>
                 </tr>
