@@ -156,8 +156,8 @@ const CRCCooporateReport = ({ report, formData }) => {
         <Page size="A4" style={styles.page}>
           <View style={styles.section}>
             <div style={styles.hori}>
-              <Image src="images/crclogo.jpg" alt="logo" style={styles.logo} />
-              <Image src="images/boclogo.jpeg" alt="logo" style={styles.logo} />
+              <Image src="/images/crclogo.jpg" alt="logo" style={styles.logo} />
+              <Image src="/images/boclogo.jpeg" alt="logo" style={styles.logo} />
               <Text> Credit Check Report</Text>
             </div>
           </View>
@@ -167,7 +167,7 @@ const CRCCooporateReport = ({ report, formData }) => {
               <div style={styles.hori}>
                 <Text style={styles.title}>Enquiry Input Details</Text>
                 <Image
-                  src="images/avater.jpg"
+                  src="/images/avater.jpg"
                   alt="logo"
                   style={styles.avatar}
                 />

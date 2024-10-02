@@ -26,7 +26,7 @@ const Footer = ({ settings }) => {
             </li>
             <li>
               <img
-                src="images/ssl.png"
+                src="/images/ssl.png"
                 alt="ssl-cert"
                 style={{ marginLeft: "-25px" }}
               />

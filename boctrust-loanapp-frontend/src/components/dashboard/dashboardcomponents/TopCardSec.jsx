@@ -62,7 +62,7 @@ const TopCardSec = ({ user }) => {
             <img
               width="28px"
               height="28px"
-              src="images/whitenaira.png"
+              src="/images/whitenaira.png"
               alt="naira"
             />
             <h5 className="FigNum">{useBalance.balance}</h5>
@@ -75,7 +75,7 @@ const TopCardSec = ({ user }) => {
             <img
               width="28px"
               height="28px"
-              src="images/whitenaira.png"
+              src="/images/whitenaira.png"
               alt="naira"
             />
             <h5 className="FigNum">{useBalance.totalBalance}</h5>
@@ -88,7 +88,7 @@ const TopCardSec = ({ user }) => {
             <img
               width="28px"
               height="28px"
-              src="images/whitenaira.png"
+              src="/images/whitenaira.png"
               alt="naira"
             />
             <h5 className="FigNum">{upcomingPayments}</h5>
@@ -109,7 +109,7 @@ const TopCardSec = ({ user }) => {
                     <img
                       width="18px"
                       height="18px"
-                      src="images/whitenaira.png"
+                      src="/images/whitenaira.png"
                       alt="naira"
                     />
                   </span>

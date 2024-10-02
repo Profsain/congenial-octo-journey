@@ -351,7 +351,7 @@ const KycCheck = () => {
                       />
                     ) : (
                       <img
-                        src="images/officialid.png"
+                        src="/images/officialid.png"
                         alt="official-id"
                         className="OfficialIdCard"
                       />
@@ -592,7 +592,7 @@ const KycCheck = () => {
                       />
                     ) : (
                       <img
-                        src="images/signature1.png"
+                        src="/images/signature1.png"
                         alt="official signature"
                         className="Signature"
                       />

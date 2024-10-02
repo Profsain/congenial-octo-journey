@@ -4,7 +4,7 @@ const FixedDeposit = () => {
   return (
     <OurProduct
       productTitle="fixed deposit"
-      headerImg="images/fixed-saving.jpg"
+      headerImg="/images/fixed-saving.jpg"
     />
   );
 };

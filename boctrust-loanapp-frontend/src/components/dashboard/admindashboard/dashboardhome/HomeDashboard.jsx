@@ -77,10 +77,10 @@ const HomeDashboard = () => {
           ) : (
             <PageLoader width="28px" />
           )}
-          <img className="CardIcon" src="images/eyes.png" alt="icon" />
+          <img className="CardIcon" src="/images/eyes.png" alt="icon" />
           <p>Total Customers</p>
         </FigCard>
-        <div className="Spacer"></div>
+        <div  className="Spacer"></div>
         <FigCard>
           {customerAnalytics.completed ? (
             <h4 className="Title">
@@ -89,7 +89,7 @@ const HomeDashboard = () => {
           ) : (
             <PageLoader width="28px" />
           )}
-          <img className="CardIcon" src="images/eyes.png" alt="icon" />
+          <img className="CardIcon" src="/images/eyes.png" alt="icon" />
           <p>Total No Disbursed</p>
         </FigCard>
       </div>
@@ -99,33 +99,33 @@ const HomeDashboard = () => {
           <Headline spacer="0 0 0.6rem 0" align="left" text="Loans" />
           <div className="InlineCard">
             <LoansCard
-              img="images/padding.png"
+              img="/images/padding.png"
               title="With Operations"
               stat={customerAnalytics.withOperations?.length}
               bgcolor="#ea5767"
             />
             <LoansCard
-              img="images/star.png"
+              img="/images/star.png"
               title="With Credit"
               stat={customerAnalytics.withCredit?.length}
               bgcolor="#f6ab60"
             />
 
             <LoansCard
-              img="images/thumbup.png"
+              img="/images/thumbup.png"
               title="With COO/Unbooked"
               stat={customerAnalytics.withCoo?.length}
               bgcolor="#32c6c7"
             />
             <LoansCard
-              img="images/star.png"
+              img="/images/star.png"
               title="Booked"
               stat={customerAnalytics.booked?.length}
               bgcolor="#ecaa00"
             />
 
             <LoansCard
-              img="images/active.png"
+              img="/images/active.png"
               title="Completed"
               stat={customerAnalytics.completed?.length}
               bgcolor="#2bb294"

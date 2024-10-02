@@ -1,4 +1,7 @@
+/** @jsxImportSource @emotion/react */
 import PropTypes from "prop-types";
+import { css } from "@emotion/react";
+
 const DashboardHeadline = ({
   height,
   fontSize = "1.6rem",
@@ -7,19 +10,27 @@ const DashboardHeadline = ({
   bgcolor = "#636363",
   children,
 }) => {
-  const style = {
-    fontSize: fontSize,
-    fontWeight: "bold",
-    color: "#fff",
-    textAlign: "center",
-    margin: mspacer,
-    padding: padding,
-    height: height,
-    borderRadius: "2rem",
-    backgroundColor: bgcolor,
-  };
+
+
+  const style = css`
+    font-size: ${fontSize};
+    font-weight: bold;
+    color: #fff;
+    text-align: center;
+    margin: ${mspacer};
+    padding: ${padding};
+    height: ${height};
+    border-radius: 2rem;
+    background-color: ${bgcolor};
+
+      @media (max-width: 600px) {
+        font-size: 18px; 
+      }
+
+  
+  `;
   return (
-    <div style={style} className="DashHeader">
+    <div css={style} className="DashHeader">
       {children}
     </div>
   );

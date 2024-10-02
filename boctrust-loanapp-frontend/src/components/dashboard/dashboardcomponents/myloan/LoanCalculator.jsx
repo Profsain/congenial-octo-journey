@@ -74,7 +74,7 @@ const LoanCalculator = () => {
                 className="Select"
               >
                 <option value="" label="Select a product" />
-                {loanProducts.map((option) => (
+                {loanProducts?.map((option) => (
                   <option
                     key={option._id}
                     value={option._id}

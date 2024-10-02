@@ -114,7 +114,7 @@ const BalanceEnquiry = () => {
                 placeholder="Search by name"
                 onChange={(e) => setSearchTerms(e.target.value)}
               />
-              <img src="images/search.png" alt="search-icon" />
+              <img src="/images/search.png" alt="search-icon" />
             </div>
           </div>
         </DashboardHeadline>
@@ -149,22 +149,19 @@ const BalanceEnquiry = () => {
                   return (
                     <tr key={loan._id}>
                       <td>
-                        {loan?.customer?.banking?.accountDetails?.Message.Id}
+                        {loan.customer?.banking?.accountDetails?.CustomerID}
                       </td>
                       <td>
                         <DisplayLoanProductName loan={loan} />
                       </td>
                       <td>
-                        {
-                          loan?.customer.banking?.accountDetails?.Message
-                            .FullName
-                        }
+                        {loan?.customer?.banking?.accountDetails
+                          ?.CustomerName ||
+                          `${loan?.customer?.firstname} ${loan?.customer?.lastname}`}
                       </td>
                       <td>
-                        {
-                          loan?.customer?.banking?.accountDetails?.Message
-                            ?.AccountNumber
-                        }
+                        {loan?.customer?.banking?.accountDetails
+                          ?.AccountNumber || "N/A"}
                       </td>
                       <td>{getDateOnly(loan.createdAt)}</td>
                       <td>N{loan.loanamount}</td>

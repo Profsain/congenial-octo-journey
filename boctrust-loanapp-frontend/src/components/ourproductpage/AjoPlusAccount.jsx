@@ -4,7 +4,7 @@ const AjoPlusAccount = () => {
   return (
     <OurProduct
       productTitle="ajo plus account"
-      headerImg="images/ajo-plus.jpg"
+      headerImg="/images/ajo-plus.jpg"
     />
   );
 };

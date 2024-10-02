@@ -4,7 +4,7 @@ const InvestmentNote = () => {
   return (
     <OurProduct
       productTitle="investment note"
-      headerImg="images/investment.jpg"
+      headerImg="/images/investment.jpg"
     />
   );
 };

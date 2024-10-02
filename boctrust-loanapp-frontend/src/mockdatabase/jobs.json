@@ -7,7 +7,7 @@
       "deadline": "2023-06-30",
       "dateposted": "2023-06-01",
       "isclosed": false,
-      "image": "images/job2.jpg"
+      "image": "/images/job2.jpg"
     },
     {
       "id": 2,
@@ -16,7 +16,7 @@
       "deadline": "2023-07-15",
       "dateposted": "2023-06-02",
       "isclosed": false,
-      "image": "images/job3.jpg"
+      "image": "/images/job3.jpg"
     },
     {
       "id": 3,
@@ -25,7 +25,7 @@
       "deadline": "2023-06-30",
       "dateposted": "2023-06-05",
       "isclosed": false,
-      "image": "images/job2.jpg"
+      "image": "/images/job2.jpg"
     },
     {
       "id": 4,
@@ -34,7 +34,7 @@
       "deadline": "2023-07-10",
       "dateposted": "2023-06-08",
       "isclosed": false,
-      "image": "images/job3.jpg"
+      "image": "/images/job3.jpg"
     },
     {
       "id": 5,
@@ -52,7 +52,7 @@
       "deadline": "2023-07-05",
       "dateposted": "2023-06-12",
       "isclosed": false,
-      "image": "images/job2.jpg"
+      "image": "/images/job2.jpg"
     },
     {
       "id": 7,
@@ -61,7 +61,7 @@
       "deadline": "2023-07-15",
       "dateposted": "2023-06-15",
       "isclosed": false,
-      "image": "images/job1.jpg"
+      "image": "/images/job1.jpg"
     },
     {
       "id": 8,
@@ -70,7 +70,7 @@
       "deadline": "2023-07-10",
       "dateposted": "2023-06-18",
       "isclosed": false,
-      "image": "images/job3.jpg"
+      "image": "/images/job3.jpg"
     },
     {
       "id": 9,
@@ -79,7 +79,7 @@
       "deadline": "2023-07-05",
       "dateposted": "2023-06-20",
       "isclosed": false,
-      "image": "images/job2.jpg"
+      "image": "/images/job2.jpg"
     }
   ]
 }

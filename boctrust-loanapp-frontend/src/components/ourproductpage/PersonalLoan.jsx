@@ -4,7 +4,7 @@ const PersonalLoan = () => {
   return (
     <OurProduct
       productTitle="personal loan"
-      headerImg="images/personal-loan.jpg"
+      headerImg="/images/personal-loan.jpg"
     />
   );
 };

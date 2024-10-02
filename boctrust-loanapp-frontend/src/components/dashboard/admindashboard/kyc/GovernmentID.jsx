@@ -95,7 +95,7 @@ const GovernmentID = () => {
             <Headline fontSize="24px" text="Valid ID Card View" />
             <div className="ICard">
               <img
-                src="images/officialid.png"
+                src="/images/officialid.png"
                 alt="official-id"
                 className="OfficialIdCard"
               />

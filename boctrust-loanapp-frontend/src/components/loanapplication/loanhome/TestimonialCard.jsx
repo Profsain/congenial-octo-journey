@@ -1,7 +1,7 @@
 import PropTypes from "prop-types"
 import Headline from "../../shared/Headline";
 
-const TestimonialCard = ({ img = "images/avater.jpg", name, text, career }) => {
+const TestimonialCard = ({ img = "/images/avater.jpg", name, text, career }) => {
   const styles = {
     cardStyle: {
       width: "350px",

@@ -26,7 +26,7 @@ const WhoWeAre = ({ textContent, para1, para2, para3 }) => {
         <div className="VisionRight col-md-6 col-sm-12">
           <img
             className="TopImg"
-            src="images/boctrust-staff1.avif"
+            src="/images/boctrust-staff1.avif"
             alt="bocstrust-microfinance-staff"
           />
         </div>

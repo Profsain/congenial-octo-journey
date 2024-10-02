@@ -36,7 +36,7 @@ const AllWebsiteList = () => {
           </thead>
           <tbody>
             <tr>
-              <td><img src="images/headerimg.png" style={styles.img}/></td>
+              <td><img src="/images/headerimg.png" style={styles.img}/></td>
               <td>Home</td>
               <td>Boc_admin</td>
               <td>Generic Page</td>
@@ -49,7 +49,7 @@ const AllWebsiteList = () => {
               </td>
             </tr>
             <tr>
-              <td><img src="images/headerimg.png" style={styles.img}/></td>
+              <td><img src="/images/headerimg.png" style={styles.img}/></td>
               <td>About Us</td>
               <td>Boc_admin</td>
               <td>Generic Page</td>
@@ -62,7 +62,7 @@ const AllWebsiteList = () => {
               </td>
             </tr>
             <tr>
-              <td><img src="images/headerimg.png" style={styles.img}/></td>
+              <td><img src="/images/headerimg.png" style={styles.img}/></td>
               <td>Loans</td>
               <td>Boc_admin</td>
               <td>Generic Page</td>
@@ -75,7 +75,7 @@ const AllWebsiteList = () => {
               </td>
             </tr>
             <tr>
-              <td><img src="images/headerimg.png" style={styles.img}/></td>
+              <td><img src="/images/headerimg.png" style={styles.img}/></td>
               <td>Blog</td>
               <td>Boc_admin</td>
               <td>Blog Page</td>
@@ -88,7 +88,7 @@ const AllWebsiteList = () => {
               </td>
             </tr>
             <tr>
-              <td><img src="images/headerimg.png" style={styles.img}/></td>
+              <td><img src="/images/headerimg.png" style={styles.img}/></td>
               <td>Contact Us</td>
               <td>Boc_admin</td>
               <td>Generic Page</td>

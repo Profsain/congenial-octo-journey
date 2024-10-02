@@ -7,7 +7,7 @@ import validationSchema from "./formvalidation";
 import initialValues from "./formInitialValue";
 // fetch data from api
 import { useDispatch, useSelector } from "react-redux";
-import { fetchProduct } from "../../../redux/reducers/productReducer";
+import { fetchSelectedProduct } from "../../../redux/reducers/productReducer";
 import Headline from "../../shared/Headline";
 import TextInput from "./formcomponents/TextInput";
 // import LoanForm from "./LoanForm";
@@ -34,7 +34,7 @@ const LoanFirstStep = ({ data }) => {
   const [initialLoanProduct, setInitialLoanProduct] = useState();
 
   const [step, setStep] = useState(1);
-  const [stepImg, setStepImg] = useState("images/step1.png");
+  const [stepImg, setStepImg] = useState("/images/step1.png");
 
   // calculate interest rate
   const [loanRepaymentTotal, setLoanRepaymentTotal] = useState(0);
@@ -49,7 +49,7 @@ const LoanFirstStep = ({ data }) => {
   // const navigate = useNavigate();
 
   useEffect(() => {
-    dispatch(fetchProduct());
+    dispatch(fetchSelectedProduct());
   }, [dispatch]);
 
   useEffect(() => {
@@ -119,7 +119,7 @@ const LoanFirstStep = ({ data }) => {
   const handleNext = () => {
     if (step === 1) {
       setStep(2);
-      setStepImg("images/step2.png");
+      setStepImg("/images/step2.png");
     }
   };
 
@@ -235,7 +235,7 @@ const LoanFirstStep = ({ data }) => {
                                   text="This is required to process this application"
                                 />
                                 <img
-                                  src="images/naira.png"
+                                  src="/images/naira.png"
                                   alt=""
                                   className="NairaI"
                                 />
@@ -320,7 +320,7 @@ const LoanFirstStep = ({ data }) => {
                                   />
                                   <h4>
                                     <span className="CalNaira">
-                                      <img src="images/naira.png" alt="" />
+                                      <img src="/images/naira.png" alt="" />
                                     </span>
                                     {isNaN(loanTotal)
                                       ? 0
@@ -341,7 +341,7 @@ const LoanFirstStep = ({ data }) => {
                                   />
                                   <h4>
                                     <span className="CalNaira">
-                                      <img src="images/naira.png" alt="" />
+                                      <img src="/images/naira.png" alt="" />
                                     </span>
 
                                     {isNaN(monthlyPay)
