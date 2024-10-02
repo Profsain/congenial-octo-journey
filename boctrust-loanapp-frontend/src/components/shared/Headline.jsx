@@ -1,22 +1,34 @@
+/** @jsxImportSource @emotion/react */
 import PropTypes from "prop-types";
+import { css } from "@emotion/react";
+
 const Headline = ({
   text = "Pass New Title",
   color = "#145088",
   fontSize = "26px",
-  fontWeight = "600",
+  fontWeight = "700",
   align = "center",
-  spacer = "20px 0"
+  spacer = "20px 0",
 }) => {
-  const style = {
-    color: color,
-    fontSize: fontSize,
-    fontWeight: fontWeight,
-    fontFamily: "Inter, sans-serif",
-    textAlign: align,
-    margin: spacer,
-  };
-  return <h3 style={style}>{text} </h3>;
+  const headlineStyle = css`
+    color: ${color};
+    font-size: ${fontSize};
+    font-weight: ${fontWeight};
+    text-align: ${align};
+    margin: ${spacer};
+
+    @media (max-width: 600px) {
+      font-size: 18px; 
+    }
+
+    @media (max-width: 1024px) {
+      font-size: 22px; 
+    }
+  `;
+
+  return <h3 css={headlineStyle}>{text}</h3>;
 };
+
 
 Headline.propTypes = {
   text: PropTypes.string,

@@ -173,7 +173,7 @@ label {
 .ButtonContainer {
   display: flex;
   flex-direction: row;
-  justify-content: center;
+  justify-content: space-around;
   align-items: center;
   padding: 28px 0;
   margin: 0 auto;
@@ -184,7 +184,6 @@ label {
   font-size: 1.5rem;
   font-weight: 600;
   padding: 8px 38px;
-  margin: 0 76px;
   color: #fff;
   border: none;
   border-radius: 26px;
@@ -264,4 +263,27 @@ label {
 .RecaptchaBadge {
   background-color: #145088;
   /* padding: 8px */
+}
+
+@media screen and (max-width: 600px) {
+  .ButtonContainer {
+    padding: 18px 0;
+  }
+  .BtnAction {
+    min-width: fit-content !important;
+    font-size: 1rem;
+    font-weight: 600;
+    padding: 8px 18px;
+    margin: 0 0px;
+  }
+  .BtnNoAction {
+    font-size: 14px;
+    font-weight: 600;
+    padding: 8px 28px;
+    border-radius: 26px;
+  }
+
+  label {
+    font-size: 1rem;
+  }
 }

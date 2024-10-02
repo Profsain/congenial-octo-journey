@@ -50,4 +50,16 @@
     align-items: center;
     gap: 1rem;
   }
+
+  .InlineCard.collections {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .Stat {
+    padding: 1rem 0;
+  }
+
+  .Spacer {
+    width: 2rem;
+  }
 }

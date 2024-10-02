@@ -105,7 +105,7 @@ const getLoanProduct = async ({
         : 305;
 
     const { data } = await axios.get(
-      `${baseUrl}/BankOneWebAPI/api/Product/GetByCode/2?authToken=${token}&productCode=${401}`
+      `${baseUrl}/BankOneWebAPI/api/Product/GetByCode/2?authToken=${token}&productCode=${  customerAccountProductCode || 401}`
     );
 
     return data;
