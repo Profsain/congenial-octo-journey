@@ -1,10 +1,9 @@
-@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap");
 
 :root {
   font-family: open-sans, sans-serif;
   line-height: 1.5;
-  
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -366,7 +365,6 @@ button:disabled {
     /* padding: 18px; */
   }
 
-
   .StatCard p {
     font-size: 0.7rem !important;
   }
@@ -374,9 +372,8 @@ button:disabled {
     margin-top: 6rem !important;
     /* display: none; */
     overflow-x: auto;
-
   }
-  .ChartBar  .recharts-wrapper{
+  .ChartBar .recharts-wrapper {
     width: fit-content !important;
   }
 
@@ -526,7 +523,6 @@ button:disabled {
     padding: 0 !important;
     padding-bottom: 16px !important;
     padding-right: 14px !important;
-   
   }
   .Hero {
     display: none !important;
@@ -556,7 +552,13 @@ button:disabled {
     margin-bottom: -3.5rem !important;
   }
 
- .ListSec tr th{
-    font-size: 14px ;
+  .ListSec tr th {
+    font-size: 14px;
+  }
+}
+
+@media screen and (max-width: 400px) {
+  .TopCard {
+    margin-right: 0;
   }
 }
