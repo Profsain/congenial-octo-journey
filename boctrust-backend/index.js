@@ -52,6 +52,11 @@ const productsFrontPage = require("./routes/productsFrontPage");
 const productsSeedData = require("./seedData/productsFrontPageData");
 const ProductsFrontPage = require("./models/ProductsFrontPage");
 
+
+// otp
+const termiiOTPRoute = require("./routes/termii");
+
+
 // configure dotenv
 dotenv.config();
 
@@ -169,6 +174,7 @@ mongoose
 
         // front page products
         app.use('/api/products-front-page', productsFrontPage);
+        app.use('/api/otp', termiiOTPRoute);
 
         app.listen(process.env.PORT || 3030, () => console.log("Server running on port 3030"));
     })

@@ -12,6 +12,7 @@ import sendEmail from "../../../../utilities/sendEmail";
 import ReactDOMServer from "react-dom/server";
 import { toast } from "react-toastify";
 import PageLoader from "../../dashboard/shared/PageLoader";
+import { sendOTP, verifyOTP } from "../../../services/termii";
 
 const styles = {
   error: {
@@ -57,7 +58,6 @@ const PhoneOtp = (props) => {
               console.log("reCAPTCHA expired");
               if (recaptchaWidgetId) {
                 window.grecaptcha.reset(recaptchaWidgetId);
-                console.log("Reset");
               }
             },
           }
@@ -67,20 +67,16 @@ const PhoneOtp = (props) => {
         });
       }
 
-      return await signInWithPhoneNumber(
-        auth,
-        number,
-        window.recaptchaVerifier
-      );
+      return await sendOTP(number);
     } catch (error) {
-      toast.error(`Error: ${error}`);
+      toast.error(`Error: ${error?.response?.data?.error || error}`);
     }
   };
 
   // handle otp request
   const requestOtp = async (e) => {
     e.preventDefault();
-    const phone = "+234" + updatePhone.slice(1);
+    const phone = "234" + updatePhone.slice(1);
 
     setErrorMsg("");
 
@@ -89,6 +85,7 @@ const PhoneOtp = (props) => {
     try {
       setLoading(true);
       const response = await setUpRecaptcha(phone);
+
       if (response) {
         setConfirmOtp(response);
         setFlag(true);
@@ -137,7 +134,10 @@ const PhoneOtp = (props) => {
     try {
       setLoading(true);
       setErrorMsg("");
-      await confirmOtp.confirm(otp);
+
+      // verification here
+      await verifyOTP({ pinId: confirmOtp.pin_id, pin: otp });
+
       props.onHide(false);
       // submit customer details
       await handleSubmit();
@@ -213,7 +213,13 @@ const PhoneOtp = (props) => {
               <Form.Text className="text-muted">e.g: 384756</Form.Text>
             </Form.Group>
             <div style={styles.btnBox}>
-              <Button variant="secondary" onClick={() => setFlag(false)}>
+              <Button
+                variant="secondary"
+                onClick={() => {
+                  setFlag(false);
+                  setOtp("");
+                }}
+              >
                 Resend OTP
               </Button>{" "}
               &nbsp; &nbsp; &nbsp; &nbsp;
