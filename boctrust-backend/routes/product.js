@@ -30,7 +30,7 @@ router.get("/products", async (req, res) => {
   }
 });
 
-router.post("/products", (req, res) => {
+router.post("/products", async (req, res) => {
   try {
     // Get post data from request body
     const { productCode } = req.body;
@@ -40,11 +40,17 @@ router.post("/products", (req, res) => {
       return res.status(400).json({ error: "All fields are required" });
     }
 
+    const productFound = await Product.findOne({ productCode })
+
+    if(productFound){
+      return res.status(400).json({ error: "Product Already exist" });
+    }
+
     // Create new product
     const product = new Product(req.body);
 
     // Save product
-    product.save();
+    await product.save();
 
     // Return success response
     return res.status(201).json({ success: "product created successfully" });
