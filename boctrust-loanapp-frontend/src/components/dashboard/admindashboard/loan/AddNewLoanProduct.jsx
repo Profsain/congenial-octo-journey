@@ -8,6 +8,7 @@ import BocButton from "../../shared/BocButton";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchProduct } from "../../../../redux/reducers/productReducer";
 import axios from "axios";
+import { toast } from "react-toastify";
 
 // Define validation schema using Yup
 const validationSchema = Yup.object().shape({
@@ -43,44 +44,34 @@ const AddNewLoanProduct = ({ func }) => {
 
   const dispatch = useDispatch();
 
- 
-
   useEffect(() => {
     dispatch(fetchProduct());
   }, [dispatch]);
 
   const handleSubmit = async (values, { setSubmitting, resetForm }) => {
-    const apiUrl = import.meta.env.VITE_BASE_URL;
-    // Handle form submission logic here
-    // create form data
-    // const formData = new FormData();
-    // formData.append("productName", values.productName);
-    // formData.append("category", values.category);
-    // formData.append("productImage", values.productImage);
-    // formData.append("benefits", values.benefits);
-    // formData.append("features", values.features);
-    // formData.append("interestRate", values.interestRate);
-    // formData.append("interestType", values.interestType);
-    // formData.append("maxTerm", values.maxTerm);
-    // formData.append("termPeriod", values.termPeriod);
-    // formData.append("note", values.note);
+    try {
+      const apiUrl = import.meta.env.VITE_BASE_URL;
 
-    // send form data to server
-    await axios.post(`${apiUrl}/api/product/products`, {
-      productCode: values.productCode,
-    });
+      // send form data to server
+      await axios.post(`${apiUrl}/api/product/products`, {
+        productCode: values.productCode,
+      });
 
-    // set open add branch component to true
-    // func(false);
-    setSubmitting(false);
-    resetForm();
+      // set open add branch component to true
+      // func(false);
+      setSubmitting(false);
+      resetForm();
 
-    setNotification("Product added successfully");
+      setNotification("Product added successfully");
+      toast.success("Product added successfully");
 
-    // set notification to disappear after 5 seconds
-    setTimeout(() => {
-      setNotification("");
-    }, 5000);
+      // set notification to disappear after 5 seconds
+      setTimeout(() => {
+        setNotification("");
+      }, 5000);
+    } catch (errorPayld) {
+      toast.error(errorPayld.response.data.error ?? errorPayld.message);
+    }
   };
 
   const formik = useFormik({
@@ -101,11 +92,15 @@ const AddNewLoanProduct = ({ func }) => {
               onChange={formik.handleChange}
               value={formik.values.productCode}
             >
-              {  loanProducts && loanProducts?.map((product) => (
-                <option key={product?.ProductCode} value={product?.ProductCode}>
-                  {product.ProductName}
-                </option>
-              ))}
+              {loanProducts &&
+                loanProducts?.map((product) => (
+                  <option
+                    key={product?.ProductCode}
+                    value={product?.ProductCode}
+                  >
+                    {product.ProductName}
+                  </option>
+                ))}
             </select>
             {formik.errors.productCode && formik.touched.productCode ? (
               <div className="Error">{formik.errors.productCode}</div>
