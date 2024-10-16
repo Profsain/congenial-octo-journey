@@ -38,6 +38,7 @@ import {
   getFromLocalStorage,
   storeInLocalStorage,
 } from "../../../../utilities/localStorage";
+import { decryptText } from "../../../../utilities/encryptDecrypt";
 
 const apiUrl = import.meta.env.VITE_BASE_URL;
 
@@ -87,10 +88,14 @@ const LoanForm = React.memo(function LoanFormComponent() {
   // fetch all commercial banks
   const [banks, setBanks] = useState([]);
 
-  // (Develpotment) Temporarily Update the firstep Data from the redux store
   useEffect(() => {
     const data = localStorage.getItem("loanFirstInfo");
-    data && setFirstStepData(JSON.parse(data));
+
+    if (data) {
+      let jsonData = JSON.parse(data);
+      jsonData = { ...jsonData, bvn: decryptText(jsonData.bvn) };
+      setFirstStepData(jsonData);
+    }
   }, []);
 
   // Fetch Officers, Products and Employers
@@ -213,15 +218,7 @@ const LoanForm = React.memo(function LoanFormComponent() {
     if (marketerClientPic) {
       ref.current?.setFieldValue("marketerClientPic", marketerClientPic);
     }
-  }, [
-    captureImg,
-    idCard,
-    paySlip,
-    employmentLetter,
-    marketerClientPic,
-    signature,
-    bankStatements,
-  ]);
+  }, [captureImg, idCard, paySlip, employmentLetter, marketerClientPic, signature, bankStatements]);
 
   // get current formik value
   const ref = useRef();
@@ -493,7 +490,6 @@ const LoanForm = React.memo(function LoanFormComponent() {
           ? ref.current?.values.employmentletter
           : true)
       ) {
-
         // checkin the applicaat service duration is >= the madate rule set by the employer and exepting applicats whith no employer madate and bisiness owners
         if (
           careerType !== "business owner" && employer?.mandateRule
@@ -1351,12 +1347,14 @@ const LoanForm = React.memo(function LoanFormComponent() {
                                       {careerType?.toLowerCase() ===
                                       "government employee" ? (
                                         <div>
-                                          {employer?.mandateRule?.allowStacking == "yes" &&
+                                          {employer?.mandateRule
+                                            ?.allowStacking == "yes" &&
                                             calcDaysDiffFromNow(
                                               values.employmentstartdate
                                             ) >=
                                               parseInt(
-                                                employer.mandateRule?.secondaryDuration
+                                                employer.mandateRule
+                                                  ?.secondaryDuration
                                               ) && (
                                               <div>
                                                 <label>
