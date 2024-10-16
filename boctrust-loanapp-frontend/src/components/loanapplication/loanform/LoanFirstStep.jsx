@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 import { useState, useEffect, useRef } from "react";
 // formik and yup for form data management
 import { Formik, Form, Field } from "formik";
-import validationSchema from "./formvalidation";
+import { loanFirstSetpSchema } from "./formvalidation";
 import initialValues from "./formInitialValue";
 // fetch data from api
 import { useDispatch, useSelector } from "react-redux";
@@ -20,8 +20,12 @@ import { ToastContainer, toast } from "react-toastify";
 
 // toast styles
 import "react-toastify/dist/ReactToastify.css";
+import { encryptText } from "../../../../utilities/encryptDecrypt";
 // import { useNavigate } from "react-router-dom";
 // import { updateCustomerStateValues } from "../../../redux/reducers/customerReducer";
+
+
+
 
 // loan form component
 const LoanFirstStep = ({ data }) => {
@@ -54,7 +58,9 @@ const LoanFirstStep = ({ data }) => {
 
   useEffect(() => {
     setInitialLoanProduct(
-      loanProducts?.find((item) => item.ProductCode === "305")
+      loanProducts?.find((item) =>
+        item.productTitle.toLowerCase().includes("term")
+      )
     );
   }, [loanProducts]);
 
@@ -67,7 +73,7 @@ const LoanFirstStep = ({ data }) => {
   }, [step]);
 
   useEffect(() => {
-    if (initialLoanProduct?._id && noofmonth) {
+    if (initialLoanProduct?._id || noofmonth) {
       calculateRepayment();
     }
   }, [noofmonth, currentLoanAmount, initialLoanProduct]);
@@ -86,11 +92,11 @@ const LoanFirstStep = ({ data }) => {
 
     // find product
     const product = loanProducts?.find(
-      (product) => product.ProductCode === productId
+      (product) => product.productCode === productId
     );
 
     // get interest rate
-    const loanRate = product?.InterestRate || 1;
+    const loanRate = product?.interestRate;
 
     // calculator loan amount
     const loanCal = calculatorfunc(
@@ -123,12 +129,17 @@ const LoanFirstStep = ({ data }) => {
     }
   };
 
+  //  Toast Notifications callback
+  const notify = (msg) => {
+    toast.error(msg);
+  };
+
   // send data to redux store
   const productId =
     ref.current?.values.loanproduct || initialLoanProduct?.ProductCode;
 
   const product = loanProducts?.find(
-    (product) => product?.ProductCode === productId
+    (product) => product?.productCode === productId
   );
 
   // handle bvn verification
@@ -141,15 +152,6 @@ const LoanFirstStep = ({ data }) => {
     if (!bvn) {
       return notify("Please Provide a valid bvn number");
     }
-    const raw = JSON.stringify({
-      bvn,
-      loanAmount: loanamount,
-      careerType: careertype,
-      numberOfMonths: noofmonth,
-      loanTotalRepayment: loanRepaymentTotal,
-      monthlyRepayment,
-      loanProduct: product,
-    });
 
     // Store the Information In Redux Store Instead of DB
     // dispatch(
@@ -168,8 +170,28 @@ const LoanFirstStep = ({ data }) => {
     // );
 
     //Store the information in Local Storage
-    localStorage.setItem("loanFirstInfo", raw);
+    localStorage.setItem(
+      "loanFirstInfo",
+      JSON.stringify({
+        bvn: encryptText(bvn),
+        loanAmount: loanamount,
+        careerType: careertype,
+        numberOfMonths: noofmonth,
+        loanTotalRepayment: loanRepaymentTotal,
+        monthlyRepayment,
+        loanProduct: product,
+      })
+    );
 
+    const raw = JSON.stringify({
+      bvn,
+      loanAmount: loanamount,
+      careerType: careertype,
+      numberOfMonths: noofmonth,
+      loanTotalRepayment: loanRepaymentTotal,
+      monthlyRepayment,
+      loanProduct: product,
+    });
     // send data to database and redirect to bvn verification page
     await fetch(`${apiUrl}/api/tempdata/tempdata`, {
       method: "POST",
@@ -194,12 +216,6 @@ const LoanFirstStep = ({ data }) => {
     loanCalRef.current.scrollIntoView({ behavior: "smooth" });
   };
 
-  //  Toast Notifications callback
-  const notify = (msg) => {
-    toast.error(msg, {
-      position: "bottom-right",
-    });
-  };
   return (
     <>
       <div className="container-fluid FormContainer">
@@ -208,12 +224,12 @@ const LoanFirstStep = ({ data }) => {
           <div>
             <Formik
               initialValues={initialValues({ loanamount, careertype })}
-              validationSchema={validationSchema}
+              validationSchema={loanFirstSetpSchema}
               // onSubmit={handleSubmit}
               innerRef={ref}
               encType="multipart/form-data"
             >
-              {({ isSubmitting }) => (
+              {({ isSubmitting, errors }) => (
                 <>
                   <div className="container">
                     <div className="row">
@@ -288,12 +304,13 @@ const LoanFirstStep = ({ data }) => {
                                     name="loanproduct"
                                     className="TextInput"
                                   >
+                                    <option>Select Product</option>
                                     {loanProducts?.map((product) => (
                                       <option
-                                        key={product?.ProductCode}
-                                        value={product?.ProductCode}
+                                        key={product?.productCode}
+                                        value={product?.productCode}
                                       >
-                                        {product.ProductName}
+                                        {product.productTitle}
                                       </option>
                                     ))}
                                   </Field>
@@ -302,6 +319,7 @@ const LoanFirstStep = ({ data }) => {
                                 <div className="ButtonContainer">
                                   <button
                                     type="button"
+                                    disabled={Object.keys(errors).length > 0}
                                     onClick={() => {
                                       calculateRepayment(true);
                                     }}
@@ -355,7 +373,10 @@ const LoanFirstStep = ({ data }) => {
                               <div className="ButtonContainer">
                                 <button
                                   type="button"
-                                  disabled={isSubmitting}
+                                  disabled={
+                                    isSubmitting ||
+                                    Object.keys(errors).length > 0
+                                  }
                                   onClick={handleNext}
                                   className="BtnAction BtnSecondary"
                                 >

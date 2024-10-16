@@ -106,13 +106,13 @@ const BookingModal = ({ selectedLoan, show, handleClose }) => {
     const BaseURL = import.meta.env.VITE_BASE_URL;
     try {
       setIsLoading(true);
-      await axios.post(
-        `${BaseURL}/api/bankone/newCustomerAccount/${selectedLoan?.customer?._id}`
-      );
+      // await axios.post(
+      //   `${BaseURL}/api/bankone/newCustomerAccount/${selectedLoan?.customer?._id}`
+      // );
       await axios.post(
         `${BaseURL}/api/bankone/createLoan/${selectedLoan?._id}`
       );
-      await axios.put(`${BaseURL}/api/loans/approved-book/${selectedLoan._id}`);
+      // await axios.put(`${BaseURL}/api/loans/approved-book/${selectedLoan._id}`);
 
       await dispatch(fetchUnbookedLoans());
       toast.success("Loan Booking Approved")

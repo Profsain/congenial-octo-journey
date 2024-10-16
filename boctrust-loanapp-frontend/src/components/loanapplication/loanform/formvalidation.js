@@ -111,3 +111,13 @@ const validationSchema = Yup.object({
 // end of validationSchema
 
 export default validationSchema;
+
+
+export const loanFirstSetpSchema = Yup.object({
+  loanamount: Yup.string().required("Required"),
+  numberofmonth: Yup.number()
+    .min(1, "Please enter a number from 1 to 24")
+    .max(24, "Please enter a number from 1 to 24")
+    .required("Required"),
+
+});

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import PropTypes from "prop-types";
-import { Field, useFormik } from "formik";
+import { useFormik } from "formik";
 import * as Yup from "yup";
 import DashboardHeadline from "../../shared/DashboardHeadline";
 import "../../dashboardcomponents/transferdashboard/Transfer.css";
@@ -13,7 +13,8 @@ import { toast } from "react-toastify";
 // Define validation schema using Yup
 const validationSchema = Yup.object().shape({
   productCode: Yup.string().required("Product code is required"),
-  // category: Yup.string().required("Category is required"),
+  interestRate: Yup.string().required("Interest Rate is required"),
+  productTitle: Yup.string(),
   // productImage: Yup.string().required("Product image is required"),
   // benefits: Yup.string().required("Benefits is required"),
   // features: Yup.string().required("Features is required"),
@@ -26,6 +27,8 @@ const validationSchema = Yup.object().shape({
 
 const initialValues = {
   productCode: "",
+  productTitle: "",
+  interestRate: "",
   // category: "",
   // productImage: "",
   // benefits: "",
@@ -39,6 +42,7 @@ const initialValues = {
 
 const AddNewLoanProduct = ({ func }) => {
   const [notification, setNotification] = useState("");
+  const [isTitleDisabled, setIsTitleDisabled] = useState(false);
 
   const loanProducts = useSelector((state) => state.productReducer.products);
 
@@ -55,6 +59,8 @@ const AddNewLoanProduct = ({ func }) => {
       // send form data to server
       await axios.post(`${apiUrl}/api/product/products`, {
         productCode: values.productCode,
+        productTitle: values.productTitle,
+        interestRate: values.interestRate,
       });
 
       // set open add branch component to true
@@ -79,6 +85,23 @@ const AddNewLoanProduct = ({ func }) => {
     validationSchema,
     onSubmit: handleSubmit,
   });
+
+  useEffect(() => {
+    if (isTitleDisabled) {
+      const selectedProduct = getSelectLoanProduct();
+      selectedProduct &&
+        formik.setFieldValue("productTitle", selectedProduct?.ProductName);
+    }
+  }, [formik.values.productCode]);
+
+  const getSelectLoanProduct = () => {
+    return (
+      loanProducts &&
+      loanProducts.find((p) => {
+        return p.ProductCode == formik.values.productCode;
+      })
+    );
+  };
 
   return (
     <div className="TransContainer">
@@ -123,37 +146,69 @@ const AddNewLoanProduct = ({ func }) => {
           </div> */}
         </div>
 
-        {/* <div className="FieldRow">
+        <div className="FieldRow">
           <div className="FieldGroup">
-            <label htmlFor="features">Features</label>
+            <label htmlFor="productTitle">Product Title</label>
             <input
               type="text"
-              name="features"
-              id="features"
+              name="productTitle"
+              id="productTitle"
               className="Input"
               onChange={formik.handleChange}
-              value={formik.values.features}
+              value={formik.values.productTitle}
+              disabled={isTitleDisabled}
             />
-            {formik.errors.features && formik.touched.features ? (
-              <div className="Error">{formik.errors.features}</div>
+            {formik.errors.productTitle && formik.touched.productTitle ? (
+              <div className="Error">{formik.errors.productTitle}</div>
             ) : null}
+            <div className="d-flex align-items-center gap-2 text-muted">
+              <input
+                style={{
+                  height: "fit-content",
+                  margin: 0,
+                }}
+                type="checkbox"
+                checked={isTitleDisabled}
+                onChange={(e) => {
+                  if (e.target.checked) {
+                    const selectedProduct = getSelectLoanProduct();
+
+                    if (selectedProduct) {
+                      setIsTitleDisabled(e.target.checked);
+                      formik.setFieldValue(
+                        "productTitle",
+                        selectedProduct?.ProductName
+                      );
+                    } else if (!selectedProduct) {
+                      toast.error("No Product Selected");
+                    }
+                  } else {
+                    setIsTitleDisabled(e.target.checked);
+                  }
+                }}
+              />
+              Use Defualt Name Instead
+            </div>
           </div>
 
           <div className="FieldGroup">
-            <label htmlFor="benefits">Benefits </label>
+            <label htmlFor="interestRate">Interest Rate </label>
             <input
               type="text"
-              name="benefits"
-              id="benefits"
+              name="interestRate"
+              id="interestRate"
               className="Input"
               onChange={formik.handleChange}
-              value={formik.values.benefits}
+              value={formik.values.interestRate}
             />
-            {formik.errors.benefits && formik.touched.benefits ? (
-              <div className="Error">{formik.errors.benefits}</div>
+            {formik.errors.interestRate && formik.touched.interestRate ? (
+              <div className="Error">{formik.errors.interestRate}</div>
             ) : null}
+            <div className="text-success">
+              E.g: Enter '1' for interest rate of 10%
+            </div>
           </div>
-        </div> */}
+        </div>
 
         {/* <div className="FieldRow">
           <div className="FieldGroup">
