@@ -1,3 +1,4 @@
+
 const express = require("express");
 const router = express.Router();
 const Product = require("../models/Product"); // import product model
@@ -5,22 +6,21 @@ const { default: axios } = require("axios");
 
 // get all products endpoint
 router.get("/products", async (req, res) => {
-  const baseUrl = process.env.BANKONE_BASE_URL;
-  const token = process.env.BANKONE_TOKEN;
+  // const baseUrl = process.env.BANKONE_BASE_URL;
+  // const token = process.env.BANKONE_TOKEN;
   try {
     // get all products
     let products = await Product.find();
 
-    products = await Promise.all(
-      products.map(async (product) => {
-        const response = await axios.get(
-          `${baseUrl}/BankOneWebAPI/api/Product/GetByCode/2?authToken=${token}&productCode=${product.productCode}`
-        );
+    // products = await Promise.all(
+    //   products.map(async (product) => {
+    //     const response = await axios.get(
+    //       `${baseUrl}/BankOneWebAPI/api/Product/GetByCode/2?authToken=${token}&productCode=${product.productCode}`
+    //     );
 
-        return response.data;
-      })
-    );
-
+    //     return response.data;
+    //   })
+    // );
 
     // return success response
     return res.status(200).json(products);
@@ -33,19 +33,20 @@ router.get("/products", async (req, res) => {
 router.post("/products", async (req, res) => {
   try {
     // Get post data from request body
-    const { productCode } = req.body;
+    const { productCode, productTitle, interestRate } = req.body;
 
     // Validate required fields
-    if (!productCode) {
+    if (!productCode || !productTitle || !interestRate) {
       return res.status(400).json({ error: "All fields are required" });
     }
 
-    const productFound = await Product.findOne({ productCode })
+
+    const productFound = await Product.findOne({ productCode, productTitle });
 
     if(productFound){
-      return res.status(400).json({ error: "Product Already exist" });
+      return res.status(400).json({ error: "Product Already Exist" });
     }
-
+    
     // Create new product
     const product = new Product(req.body);
 
@@ -66,16 +67,18 @@ router.put("/products/:id", async (req, res) => {
     const { id } = req.params;
 
     // get product update data from request body
-    const { productCode } = req.body;
+    const { productCode, productTitle, interestRate } = req.body;
 
     // validate required fields
-    if (!productCode) {
+    if (!productCode || !productTitle || !interestRate) {
       return res.status(400).json({ error: "All fields are required" });
     }
 
     // find product by id and update
     const product = await Product.findByIdAndUpdate(id, {
       productCode,
+      productTitle,
+      interestRate,
     });
 
     // save updated product

@@ -35,10 +35,7 @@ const LoanProductsList = ({ count, searchTerm, admin, adminRoles }) => {
     dispatch(fetchSelectedProduct());
   }, [dispatch]);
 
-  const products = useSelector(
-    (state) => state.productReducer.products
-  );
-
+  const products = useSelector((state) => state.productReducer.products);
 
   const status = useSelector((state) => state.productReducer.status);
   const [productsList, setProductsList] = useState(products);
@@ -117,7 +114,7 @@ const LoanProductsList = ({ count, searchTerm, admin, adminRoles }) => {
                   <th>Code</th>
                   <th>Name</th>
                   <th>Interest Rate</th>
-                  <th>Term Period</th>
+
                   <th>Action</th>
                 </tr>
               </thead>
@@ -125,10 +122,9 @@ const LoanProductsList = ({ count, searchTerm, admin, adminRoles }) => {
                 {productsList?.length === 0 && <NoResult name="Product" />}
                 {productsList?.map((product) => (
                   <tr key={product._id}>
-                    <td>{product?.ProductCode}</td>
-                    <td>{product?.ProductName}</td>
-                    <td>{product?.InterestRate}</td>
-                    <td>{product?.Tenure}</td>
+                    <td>{product?.productCode}</td>
+                    <td>{product?.productTitle}</td>
+                    <td>{product?.interestRate}</td>
 
                     <td>
                       <div>

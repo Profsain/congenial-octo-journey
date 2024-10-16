@@ -148,8 +148,6 @@ router.post("/createLoan/:loanId", async (req, res) => {
     InterestPaymentFrequency: interestPaymentFrequency,
   };
 
- 
-
   const options = {
     method: "POST",
     headers: {
@@ -158,6 +156,8 @@ router.post("/createLoan/:loanId", async (req, res) => {
     },
     body: JSON.stringify(loanRequestPayload),
   };
+
+  console.log(loanRequestPayload, "loanRequestPayload");
 
   // Construct the URL for loan creation
   const apiUrl = `${baseUrl}/BankOneWebAPI/api/LoanApplication/LoanCreationApplication2/2?authToken=${token}`;
@@ -171,7 +171,8 @@ router.post("/createLoan/:loanId", async (req, res) => {
       );
     }
     const result = await response.json();
-   
+
+    console.log(result, "result");
 
     if (!result.IsSuccessful) {
       return res.status(400).json({ error: result.Message });
@@ -207,24 +208,22 @@ router.post("/createLoan/:loanId", async (req, res) => {
       });
     });
 
-
-     setTimeout(async () => {
+    setTimeout(async () => {
       try {
         // Second API request (same data or different as per requirement)
-        console.log(apiUrl, options)
-        const secondResponse  = await fetch(apiUrl, options);
+        console.log(apiUrl, options);
+        const secondResponse = await fetch(apiUrl, options);
 
-     
-        console.log(secondResponse, "secondLoanResponse")
-        if (!secondResponse || !secondResponse.ok ) {
+        console.log(secondResponse, "secondLoanResponse");
+        if (!secondResponse || !secondResponse.ok) {
           throw new Error(
             `HTTP error! BankOne Loan creation failed. Status: ${secondResponse.status}`
           );
         }
         const result = await secondResponse.json();
-        console.log(result, "result")
+        console.log(result, "result");
       } catch (error) {
-        console.error('Error in second loan request:', error);
+        console.error("Error in second loan request:", error);
       }
     }, 30000);
   } catch (error) {
@@ -299,8 +298,6 @@ router.post("/newCustomerAccount/:customerId", async (req, res) => {
       }),
     };
 
-   
-
     const response = await fetch(
       `${baseUrl}/BankOneWebAPI/api/Account/CreateCustomerAndAccount/2?authToken=${token}`,
       options
@@ -308,15 +305,12 @@ router.post("/newCustomerAccount/:customerId", async (req, res) => {
 
     const newAccSuccessData = await response.json();
 
-
     if (!response.ok) {
       throw new Error("Network response was not ok");
     }
     if (!newAccSuccessData.IsSuccessful) {
       return res.status(400).json({ error: newAccSuccessData.Message });
     }
-
-  
 
     const accountInfo = await getCustomerAccountInfoByTrackingRef(
       newAccSuccessData?.TransactionTrackingRef || customer._id
