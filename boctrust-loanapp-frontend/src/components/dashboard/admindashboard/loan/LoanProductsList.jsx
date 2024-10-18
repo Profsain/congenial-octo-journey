@@ -11,6 +11,9 @@ import ActionNotification from "../../shared/ActionNotification";
 import NoResult from "../../../shared/NoResult";
 // function
 import searchList from "../../../../../utilities/searchListFunc";
+import TableOptionsDropdown from "../../shared/tableOptionsDropdown/TableOptionsDropdown";
+import { IoMdCheckmarkCircleOutline } from "react-icons/io";
+import { FcCancel } from "react-icons/fc";
 
 const LoanProductsList = ({ count, searchTerm, admin, adminRoles }) => {
   // styles
@@ -39,10 +42,9 @@ const LoanProductsList = ({ count, searchTerm, admin, adminRoles }) => {
 
   const status = useSelector((state) => state.productReducer.status);
   const [productsList, setProductsList] = useState(products);
-  const [editLoanProduct, setEditLoanProduct] = useState({});
+  const [selectedProduct, setSelectedProduct] = useState({});
   const [showEditModel, setShowEditModel] = useState(false);
   const [action, setAction] = useState(false);
-  const [productId, setProductId] = useState("");
 
   // update productsList to show 10 products on page load
   // or when count changes
@@ -59,13 +61,9 @@ const LoanProductsList = ({ count, searchTerm, admin, adminRoles }) => {
     handleSearch();
   }, [searchTerm]);
 
-  // action  handler
-  const handleEdit = () => {
-    setShowEditModel(true);
-  };
 
   // handle delete action
-  const handleDelete = async () => {
+  const handleDelete = async (productId) => {
     const apiUrl = import.meta.env.VITE_BASE_URL;
     await fetch(`${apiUrl}/api/product/products/${productId}`, {
       method: "DELETE",
@@ -78,22 +76,31 @@ const LoanProductsList = ({ count, searchTerm, admin, adminRoles }) => {
     setAction(false);
   };
 
-  // handle select action
-  const handleSelect = (e) => {
-    // setOptionVal(e.target.value);
-    const option = e.target.value;
-    const productId = e.target.id;
-    setProductId(productId);
+  const getTableOptions = (product) => {
+    const tableOptions = [
+      {
+        className: "text-primary",
+        icon: <IoMdCheckmarkCircleOutline />,
+        label: "Edit",
+        isDisabled: false,
+        func: () => {
+          setSelectedProduct(product);
+          setShowEditModel(true);
+        },
+      },
+      {
+        className: "text-danger",
+        icon: <FcCancel />,
+        label: "Delete",
+        isDisabled: false,
+        func: async () => {
+          setSelectedProduct(product)
+          setAction(true);
+        },
+      },
+    ];
 
-    // filter product by id
-    const productObj = products?.find((product) => product._id === productId);
-    setEditLoanProduct(productObj);
-
-    if (option === "edit") {
-      handleEdit();
-    } else if (option === "delete") {
-      setAction(true);
-    }
+    return tableOptions;
   };
 
   return (
@@ -112,8 +119,8 @@ const LoanProductsList = ({ count, searchTerm, admin, adminRoles }) => {
               <thead style={styles.head}>
                 <tr>
                   <th>Code</th>
-                  <th>Name</th>
-                  <th>Interest Rate</th>
+                  <th>Product Name</th>
+                  <th>Annual Interest Rate</th>
 
                   <th>Action</th>
                 </tr>
@@ -127,25 +134,9 @@ const LoanProductsList = ({ count, searchTerm, admin, adminRoles }) => {
                     <td>{product?.interestRate}</td>
 
                     <td>
-                      <div>
-                        <select
-                          name="action"
-                          id={product._id}
-                          onChange={(e) => handleSelect(e)}
-                          style={styles.select}
-                        >
-                          <option value="">Action</option>
-                          {admin ||
-                          adminRoles?.includes("update_loan_product") ? (
-                            <option value="edit">Edit</option>
-                          ) : null}
-
-                          {admin ||
-                          adminRoles?.includes("delete_loan_product") ? (
-                            <option value="delete">Delete</option>
-                          ) : null}
-                        </select>
-                      </div>
+                      <TableOptionsDropdown
+                        items={getTableOptions(product)}
+                      />
                     </td>
                   </tr>
                 ))}
@@ -158,13 +149,15 @@ const LoanProductsList = ({ count, searchTerm, admin, adminRoles }) => {
       {/* edit loan product modal */}
       <EditLoanProduct
         show={showEditModel}
-        product={editLoanProduct}
+        product={selectedProduct}
         onHide={() => setShowEditModel(false)}
       />
       <ActionNotification
         show={action}
         handleClose={() => setAction(false)}
-        handleProceed={handleDelete}
+        handleProceed={async () => {
+          await handleDelete(selectedProduct._id);
+        }}
       />
     </>
   );

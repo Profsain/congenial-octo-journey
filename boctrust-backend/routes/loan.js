@@ -335,6 +335,7 @@ router.put("/disburse/:loanId", async (req, res) => {
 // Endpoint for Operations to disburse loans
 router.put("/approve-disburse/:loanId", async (req, res) => {
   const { loanId } = req.params;
+  console.log(loanId, "loanId")
   const token = process.env.BANKONE_TOKEN;
   try {
     const loanAndCustomer = await Loan.findById(loanId).populate("customer");
@@ -367,14 +368,14 @@ router.put("/approve-disburse/:loanId", async (req, res) => {
     if (transactionResponse?.Status === "Failed" || transactionResponse?.Status === 0 ) {
       return res
         .status(400)
-        .json({ error: transactionResponse.ResponseMessage });
+        .json({ error: transactionResponse.ResponseMessage  });
     }
 
     // Find the customer by ID
-    const loan = await Loan.findByIdAndUpdate(loanId, {
-      disbursementstatus: "approved",
-      loanstatus: "completed",
-    });
+    // const loan = await Loan.findByIdAndUpdate(loanId, {
+    //   disbursementstatus: "approved",
+    //   loanstatus: "completed",
+    // });
 
     if (!loan) {
       return res.status(404).json({ error: "Loan not found" });

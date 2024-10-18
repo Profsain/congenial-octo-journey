@@ -1,54 +1,38 @@
 /* eslint-disable react/prop-types */
 import { useState, useEffect } from "react";
 import { useDispatch } from "react-redux";
-import { fetchProduct } from "../../../../redux/reducers/productReducer";
+import { fetchSelectedProduct } from "../../../../redux/reducers/productReducer";
 import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
+import axios from "axios";
+import PageLoader from "../../shared/PageLoader";
+import { toast } from "react-toastify";
 
 const EditLoanProduct = (props) => {
   const dispatch = useDispatch();
   const product = props.product;
 
-  // form state
-  const [editProductName, setEditProductName] = useState("");
-  const [editCategory, setEditCategory] = useState("");
-  const [editFeatures, setEditFeatures] = useState("");
-  const [editBenefits, setEditBenefits] = useState("");
-  const [editInterestRate, setEditInterestRate] = useState("");
-  const [editInterestType, setEditInterestType] = useState("");
-  const [editMaxTerm, setEditMaxTerm] = useState("");
-  const [editTermPeriod, setEditTermPeriod] = useState("");
-  const [editNote, setEditNote] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
-  // pass object data to form
-  const updateFormObject = () => {
-    setEditProductName(product.productName);
-    setEditCategory(product.category);
-    setEditFeatures(product.features);
-    setEditBenefits(product.benefits);
-    setEditInterestRate(product.interestRate);
-    setEditInterestType(product.interestType);
-    setEditMaxTerm(product.maxTerm);
-    setEditTermPeriod(product.termPeriod);
-    setEditNote(product.note);
-  };
+  // form state
+  const [updateValue, setUpdateValue] = useState(null);
 
   useEffect(() => {
-    updateFormObject();
+    if (product) {
+      axios
+        .get(`${import.meta.env.VITE_BASE_URL}/api/product/${product._id}`)
+        .then(({ data }) => {
+          setUpdateValue({
+            interestRate: data.product.interestRate,
+            productTitle: data.product.productTitle,
+            bankoneProductName: data.bankoneDetails.ProductName,
+          });
+        });
+    }
   }, [product]);
 
-  // clear form fields
   const clearForm = () => {
-    setEditProductName("");
-    setEditCategory("");
-    setEditFeatures("");
-    setEditBenefits("");
-    setEditInterestRate("");
-    setEditInterestType("");
-    setEditMaxTerm("");
-    setEditTermPeriod("");
-    setEditNote("");
-    dispatch(fetchProduct());
+    setUpdateValue(null);
   };
 
   // close model box
@@ -57,34 +41,38 @@ const EditLoanProduct = (props) => {
     clearForm();
   };
 
+  const handleChange = (e) => {
+    const value = e.target.value;
+    const name = e.target.name;
+    setUpdateValue({ ...updateValue, [name]: value });
+  };
+
   // submit update to api endpoint
   const handleSubmit = async (e) => {
     e.preventDefault();
+    try {
+      setIsLoading(true);
 
-    const apiUrl = import.meta.env.VITE_BASE_URL;
-    
-    const updatedProduct = {
-      productName: editProductName,
-      category: editCategory,
-      features: editFeatures,
-      benefits: editBenefits,
-      interestRate: editInterestRate,
-      interestType: editInterestType,
-      maxTerm: editMaxTerm,
-      termPeriod: editTermPeriod,
-      note: editNote,
-    };
+      const apiUrl = import.meta.env.VITE_BASE_URL;
 
-    await fetch(`${apiUrl}/api/product/products/${product._id}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(updatedProduct),
-    });
+      const updatedProduct = {
+        productCode: product.productCode,
+        productTitle: updateValue.productTitle,
+        interestRate: updateValue.interestRate,
+      };
 
-    clearForm();
-    handleClose();
+      await axios.put(
+        `${apiUrl}/api/product/products/${product._id}`,
+        updatedProduct
+      );
+      await dispatch(fetchSelectedProduct());
+      clearForm();
+      handleClose();
+    } catch (error) {
+      toast.error(error.response.data.error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -101,135 +89,67 @@ const EditLoanProduct = (props) => {
           Edit Loan Product
         </Modal.Title>
       </Modal.Header>
-      <Modal.Body>
-        {/* edit form */}
-        <form onSubmit={handleSubmit}>
-          <div className="FieldGroup">
-            <label htmlFor="productName" style={{ marginTop: "-1rem" }}>
-              Product Name
-            </label>
-            <input
-              type="text"
-              style={{ width: "100%" }}
-              className="Input"
-              value={editProductName}
-              onChange={(e) => setEditProductName(e.target.value)}
-            />
-          </div>
+      {updateValue ? (
+        <>
+          <Modal.Body>
+            {/* edit form */}
+            <form>
+              <div className="FieldRow">
+                <div className="FieldGroup">
+                  <label htmlFor="productName">Product</label>
+                  <input
+                    type="text"
+                    name="bankoneProductName"
+                    id="bankoneProductName"
+                    className="Input"
+                    value={updateValue.bankoneProductName}
+                    onChange={handleChange}
+                    disabled
+                  />
+                </div>
+              </div>
+              <div className="FieldRow">
+                <div className="FieldGroup">
+                  <label htmlFor="productTitle">Product Title</label>
+                  <input
+                    type="text"
+                    name="productTitle"
+                    id="productTitle"
+                    className="Input"
+                    value={updateValue.productTitle}
+                    onChange={handleChange}
+                  />
+                </div>
 
-          <div className="FieldGroup">
-            <label htmlFor="category" style={{ marginTop: "-1rem" }}>
-              Product Category
-            </label>
-            <input
-              type="text"
-              style={{ width: "100%" }}
-              className="Input"
-              value={editCategory}
-              onChange={(e) => setEditCategory(e.target.value)}
-            />
-          </div>
-
-          <div className="FieldGroup">
-            <label htmlFor="features" style={{ marginTop: "-1rem" }}>
-              Features
-            </label>
-            <input
-              type="text"
-              style={{ width: "100%" }}
-              className="Input"
-              value={editFeatures}
-              onChange={(e) => setEditFeatures(e.target.value)}
-            />
-          </div>
-
-          <div className="FieldGroup">
-            <label htmlFor="benefits" style={{ marginTop: "-1rem" }}>
-              Benefits
-            </label>
-            <input
-              type="text"
-              style={{ width: "100%" }}
-              className="Input"
-              value={editBenefits}
-              onChange={(e) => setEditBenefits(e.target.value)}
-            />
-          </div>
-
-          <div className="FieldGroup">
-            <label htmlFor="interestRate" style={{ marginTop: "-1rem" }}>
-              Interest Rate
-            </label>
-            <input
-              type="text"
-              style={{ width: "100%" }}
-              className="Input"
-              value={editInterestRate}
-              onChange={(e) => setEditInterestRate(e.target.value)}
-            />
-          </div>
-
-          <div className="FieldGroup">
-            <label htmlFor="interestType" style={{ marginTop: "-1rem" }}>
-              Interest Type
-            </label>
-            <input
-              type="text"
-              style={{ width: "100%" }}
-              className="Input"
-              value={editInterestType}
-              onChange={(e) => setEditInterestType(e.target.value)}
-            />
-          </div>
-          
-          <div className="FieldGroup">
-            <label htmlFor="maxTerm" style={{ marginTop: "-1rem" }}>
-              Max Term
-            </label>
-            <input
-              type="text"
-              style={{ width: "100%" }}
-              className="Input"
-              value={editMaxTerm}
-              onChange={(e) => setEditMaxTerm(e.target.value)}
-            />
-          </div>
-
-          <div className="FieldGroup">
-            <label htmlFor="termPeriod" style={{ marginTop: "-1rem" }}>
-              Term Period
-            </label>
-            <input
-              type="text"
-              style={{ width: "100%" }}
-              className="Input"
-              value={editTermPeriod}
-              onChange={(e) => setEditTermPeriod(e.target.value)}
-            />
-          </div>
-
-          <div className="FieldGroup">
-            <label htmlFor="note" style={{ marginTop: "-1rem" }}>
-              Note
-            </label>
-            <input
-              type="text"
-              style={{ width: "100%" }}
-              className="Input"
-              value={editNote}
-              onChange={(e) => setEditNote(e.target.value)}
-            />
-          </div>
-        </form>
-      </Modal.Body>
-      <Modal.Footer>
-        <Button variant="secondary" onClick={handleClose}>
-          Close
-        </Button>
-        <Button variant="primary" type="button" onClick={handleSubmit}>
-          Update
-        </Button>
-      </Modal.Footer>
+                <div className="FieldGroup">
+                  <label htmlFor="interestRate">Interest Rate </label>
+                  <input
+                    type="text"
+                    name="interestRate"
+                    id="interestRate"
+                    className="Input"
+                    value={updateValue.interestRate}
+                    onChange={handleChange}
+                  />
+                </div>
+              </div>
+            </form>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button variant="secondary" onClick={handleClose}>
+              Close
+            </Button>
+            <Button variant="primary d-flex" type="button" onClick={handleSubmit}>
+              {isLoading ? <PageLoader width="20px" /> : null}
+              Update
+            </Button>
+          </Modal.Footer>
+        </>
+      ) : (
+        <div className="p-5">
+          <PageLoader width="30px" />
+        </div>
+      )}
     </Modal>
   );
 };

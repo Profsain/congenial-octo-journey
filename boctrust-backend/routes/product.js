@@ -1,4 +1,3 @@
-
 const express = require("express");
 const router = express.Router();
 const Product = require("../models/Product"); // import product model
@@ -30,6 +29,31 @@ router.get("/products", async (req, res) => {
   }
 });
 
+// get all products endpoint
+router.get("/:productId", async (req, res) => {
+  const { productId } = req.params;
+
+  const baseUrl = process.env.BANKONE_BASE_URL;
+  const token = process.env.BANKONE_TOKEN;
+
+  try {
+    // get all products
+    let product = await Product.findOne({ _id: productId });
+
+    const response = await axios.get(
+      `${baseUrl}/BankOneWebAPI/api/Product/GetByCode/2?authToken=${token}&productCode=${product.productCode}`
+    );
+
+    
+
+    // return success response
+    return res.status(200).json({product, bankoneDetails: response.data});
+  } catch (error) {
+    // console.log(error, "error");
+    return res.status(500).json({ error: error.message });
+  }
+});
+
 router.post("/products", async (req, res) => {
   try {
     // Get post data from request body
@@ -40,13 +64,12 @@ router.post("/products", async (req, res) => {
       return res.status(400).json({ error: "All fields are required" });
     }
 
-
     const productFound = await Product.findOne({ productCode, productTitle });
 
-    if(productFound){
+    if (productFound) {
       return res.status(400).json({ error: "Product Already Exist" });
     }
-    
+
     // Create new product
     const product = new Product(req.body);
 

@@ -192,7 +192,7 @@ const AddNewLoanProduct = ({ func }) => {
           </div>
 
           <div className="FieldGroup">
-            <label htmlFor="interestRate">Interest Rate </label>
+            <label htmlFor="interestRate">Annual Interest Rate </label>
             <input
               type="text"
               name="interestRate"
@@ -205,7 +205,7 @@ const AddNewLoanProduct = ({ func }) => {
               <div className="Error">{formik.errors.interestRate}</div>
             ) : null}
             <div className="text-success">
-              E.g: Enter '1' for interest rate of 10%
+              E.g: Enter '10' for interest rate of 10%
             </div>
           </div>
         </div>
