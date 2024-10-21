@@ -12,7 +12,7 @@ import Headline from "../../shared/Headline";
 import TextInput from "./formcomponents/TextInput";
 // import LoanForm from "./LoanForm";
 import "./Form.css";
-import calculatorfunc from "../../shared/calculatorfunc";
+import calculatorfunc, { calculateSimpleInterest } from "../../shared/calculatorfunc";
 
 // bvn verification function
 import { bvnVerification } from "./bvnVerification";
@@ -23,9 +23,6 @@ import "react-toastify/dist/ReactToastify.css";
 import { encryptText } from "../../../../utilities/encryptDecrypt";
 // import { useNavigate } from "react-router-dom";
 // import { updateCustomerStateValues } from "../../../redux/reducers/customerReducer";
-
-
-
 
 // loan form component
 const LoanFirstStep = ({ data }) => {
@@ -99,27 +96,30 @@ const LoanFirstStep = ({ data }) => {
     const loanRate = product?.interestRate;
 
     // calculator loan amount
-    const loanCal = calculatorfunc(
+    // const loanCal = calculatorfunc(
+    //   parseInt(currentLoanAmount.replace(/,/g, "")),
+    //   noofmonth * 30,
+    //   loanRate
+    // );
+
+    const {
+      interest,
+      totalPayment: loanTotal,
+      monthlyPayment: monthlyPay,
+    } = calculateSimpleInterest(
       parseInt(currentLoanAmount.replace(/,/g, "")),
-      noofmonth * 30,
-      loanRate
+      loanRate,
+      noofmonth
     );
-    setInterestResult(loanCal);
+    setInterestResult(interest);
+    setLoanRepaymentTotal(loanTotal);
+    setMonthlyRepayment(monthlyPay);
 
     if (userClicked) {
       scrollToLoanCal();
     }
   };
 
-  const loanTotal =
-    parseInt(currentLoanAmount.replace(/,/g, "")) + interestResult;
-  const monthlyPay = (loanTotal / parseInt(noofmonth)).toFixed();
-
-  // update repayment
-  useEffect(() => {
-    setLoanRepaymentTotal(loanTotal);
-    setMonthlyRepayment(monthlyPay);
-  }, [loanTotal, monthlyPay]);
 
   // handle next step, check validation schema and move to next step
   const handleNext = () => {
@@ -340,9 +340,9 @@ const LoanFirstStep = ({ data }) => {
                                     <span className="CalNaira">
                                       <img src="/images/naira.png" alt="" />
                                     </span>
-                                    {isNaN(loanTotal)
+                                    {isNaN(loanRepaymentTotal)
                                       ? 0
-                                      : loanTotal.toLocaleString() ||
+                                      : loanRepaymentTotal.toLocaleString() ||
                                         loanamount}{" "}
                                     <span> for </span>
                                     {noofmonth}
@@ -362,9 +362,9 @@ const LoanFirstStep = ({ data }) => {
                                       <img src="/images/naira.png" alt="" />
                                     </span>
 
-                                    {isNaN(monthlyPay)
+                                    {isNaN(monthlyRepayment)
                                       ? 0
-                                      : Number(monthlyPay).toLocaleString()}
+                                      : Number(monthlyRepayment).toLocaleString()}
                                   </h4>
                                 </div>
                               </div>

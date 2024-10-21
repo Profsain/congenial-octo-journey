@@ -10,6 +10,7 @@ const {
   handleInterBankTransfer,
   getAccountProduct,
   getLoanProduct,
+  getLoanByCustomerId,
 } = require("../services/bankoneOperationsServices");
 
 // add token to environment variable
@@ -91,78 +92,76 @@ router.post("/createLoan/:loanId", async (req, res) => {
   if (!loanId)
     return res.status(400).json({ error: "Bad Request! No LoanId " });
 
-  const loanAndCustomer = await Loan.findById(loanId).populate("customer");
-
-  if (!loanAndCustomer)
-    return res.status(404).json({ error: "Loan Does not Exist" });
-
-  const loanProduct = await getLoanProduct({
-    careertype: loanAndCustomer.customer.careertype,
-    deductions: loanAndCustomer.deductions,
-    otheremployername: loanAndCustomer.customer.otheremployername,
-    loanproduct: 305,
-  });
-
-  // get the loan creation request payload from the request body
-  const {
-    _id,
-    customer: { banking },
-    numberofmonth,
-    loanamount,
-    collateralDetails,
-    collateralType,
-    computationMode,
-    interestAccrualCommencementDate,
-    principalPaymentFrequency,
-    interestPaymentFrequency,
-    moratorium,
-  } = loanAndCustomer;
-
-  // console.log(loanProductDetails, "loanProductDetails")
-
-  const customerId = banking?.accountDetails?.CustomerID;
-
-  const accountNumber = banking?.accountDetails?.AccountNumber;
-
-  // convert number of month to number of days
-  const tenure = Number(numberofmonth) * 30;
-
-  // Define the loan creation request payload here
-  const loanRequestPayload = {
-    TransactionTrackingRef: _id,
-    // LoanProductCode: loanProductDetails.ProductCode,
-    LoanProductCode: loanProduct.ProductCode,
-    CustomerID: customerId,
-    LinkedAccountNumber: accountNumber,
-    CollateralDetails: collateralDetails,
-    CollateralType: collateralType,
-    ComputationMode: computationMode,
-    Tenure: tenure,
-    Moratorium: moratorium,
-    InterestAccrualCommencementDate: new Date(
-      interestAccrualCommencementDate
-    ).toISOString(),
-    Amount: loanamount,
-    InterestRate: loanProduct.InterestRate,
-    PrincipalPaymentFrequency: principalPaymentFrequency,
-    InterestPaymentFrequency: interestPaymentFrequency,
-  };
-
-  const options = {
-    method: "POST",
-    headers: {
-      accept: "application/json",
-      "content-type": "application/json",
-    },
-    body: JSON.stringify(loanRequestPayload),
-  };
-
-  console.log(loanRequestPayload, "loanRequestPayload");
-
-  // Construct the URL for loan creation
-  const apiUrl = `${baseUrl}/BankOneWebAPI/api/LoanApplication/LoanCreationApplication2/2?authToken=${token}`;
-
   try {
+    const loanAndCustomer = await Loan.findById(loanId).populate("customer");
+
+    if (!loanAndCustomer)
+      return res.status(404).json({ error: "Loan Does not Exist" });
+
+    const loanProduct = await getLoanProduct({
+      careertype: loanAndCustomer.customer.careertype,
+      deductions: loanAndCustomer.deductions,
+      otheremployername: loanAndCustomer.customer.otheremployername,
+      loanproduct: 305,
+    });
+
+    // get the loan creation request payload from the request body
+    const {
+      _id,
+      customer: { banking },
+      numberofmonth,
+      loanamount,
+      collateralDetails,
+      collateralType,
+      computationMode,
+      interestAccrualCommencementDate,
+      principalPaymentFrequency,
+      interestPaymentFrequency,
+      moratorium,
+    } = loanAndCustomer;
+
+    // console.log(loanProductDetails, "loanProductDetails")
+
+    const customerId = banking?.accountDetails?.CustomerID;
+
+    const accountNumber = banking?.accountDetails?.AccountNumber;
+
+    // convert number of month to number of days
+    const tenure = Number(numberofmonth) * 30;
+
+    // Define the loan creation request payload here
+    const loanRequestPayload = {
+      TransactionTrackingRef: _id,
+      // LoanProductCode: loanProductDetails.ProductCode,
+      LoanProductCode: loanProduct.ProductCode,
+      CustomerID: customerId,
+      LinkedAccountNumber: accountNumber,
+      CollateralDetails: collateralDetails,
+      CollateralType: collateralType,
+      ComputationMode: computationMode,
+      Tenure: tenure,
+      Moratorium: moratorium,
+      InterestAccrualCommencementDate: new Date(
+        interestAccrualCommencementDate
+      ).toISOString(),
+      Amount: loanamount,
+      InterestRate: loanProduct.InterestRate,
+      PrincipalPaymentFrequency: principalPaymentFrequency,
+      InterestPaymentFrequency: interestPaymentFrequency,
+    };
+
+    const options = {
+      method: "POST",
+      headers: {
+        accept: "application/json",
+        "content-type": "application/json",
+      },
+      body: JSON.stringify(loanRequestPayload),
+    };
+
+    // Construct the URL for loan creation
+    const apiUrl = `${baseUrl}/BankOneWebAPI/api/LoanApplication/LoanCreationApplication2/2?authToken=${token}`;
+
     const response = await fetch(apiUrl, options);
 
     if (!response) {
@@ -172,11 +171,16 @@ router.post("/createLoan/:loanId", async (req, res) => {
     }
     const result = await response.json();
 
-    console.log(result, "result");
-
     if (!result.IsSuccessful) {
       return res.status(400).json({ error: result.Message });
     }
+
+    await Loan.findOneAndUpdate(
+      { _id: loanId },
+      {
+        loanAccountNumber: result.Message.AccountNumber,
+      }
+    );
 
     // Send an email with the password reset link
     const transporter = nodemailer.createTransport({
@@ -207,30 +211,14 @@ router.post("/createLoan/:loanId", async (req, res) => {
         data: result,
       });
     });
-
-    setTimeout(async () => {
-      try {
-        // Second API request (same data or different as per requirement)
-        console.log(apiUrl, options);
-        const secondResponse = await fetch(apiUrl, options);
-
-        console.log(secondResponse, "secondLoanResponse");
-        if (!secondResponse || !secondResponse.ok) {
-          throw new Error(
-            `HTTP error! BankOne Loan creation failed. Status: ${secondResponse.status}`
-          );
-        }
-        const result = await secondResponse.json();
-        console.log(result, "result");
-      } catch (error) {
-        console.error("Error in second loan request:", error);
-      }
-    }, 30000);
   } catch (error) {
     console.log(error);
-    res
-      .status(500)
-      .json({ error: "Internal Server Error BankOne Loan creation" });
+    res.status(500).json({
+      error:
+        error?.message ||
+        error ||
+        "Internal Server Error BankOne Loan creation",
+    });
   }
 });
 
@@ -390,6 +378,37 @@ router.get("/getCustomerById/:customerId", (req, res) => {
   // Construct the URL with the provided customer ID
   const apiUrl = `${baseUrl}/BankOneWebAPI/api/Customer/GetByCustomerID/2?authToken=${token}&CustomerID=${customerId}`;
 
+  fetch(apiUrl, options)
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+      return response.json();
+    })
+    .then((data) => {
+      // Handle the data as needed
+      res.json(data); // Send the response to the client
+    })
+    .catch((err) => {
+      console.error(err);
+      res.status(500).json({ error: err.message }); // Handle errors and send a response to the client
+    });
+});
+
+// get customer by id endpoint (Done)
+router.get("/getLoansById/:customerId", (req, res) => {
+  const { customerId } = req.params; // Get the customer ID from the URL parameters
+
+  const options = {
+    method: "GET",
+    headers: {
+      accept: "application/json",
+    },
+  };
+
+  // Construct the URL with the provided customer ID
+  const apiUrl = `${baseUrl}/BankOneWebAPI/api/Loan/GetLoansByCustomerId/2?authToken=${token}&institutionCode=${mfbcode}&CustomerID=${customerId}`;
+ 
   fetch(apiUrl, options)
     .then((response) => {
       if (!response.ok) {

@@ -40,7 +40,7 @@ const handleInterBankTransfer = async (transferRequestPayload) => {
       "There was a problem with the fetch operation:",
       error?.message
     );
-    throw error?.message || "Error"; // Optionally, rethrow the error if you want to handle it further up
+    throw error?.response?.statusText || error?.message || "Error"; // Optionally, rethrow the error if you want to handle it further up
   }
 };
 
@@ -49,20 +49,18 @@ const getAccountProduct = async ({
   deductions,
   otheremployername,
 }) => {
-  // Construct the URL for interbank transfer
-
   const baseUrl = process.env.BANKONE_BASE_URL;
   const token = process.env.BANKONE_TOKEN;
 
   try {
-    const customerAccountProductCode =
-      careertype == "government employee" &&
-      deductions == "ippis" &&
-      !otheremployername
-        ? 107
-        : careertype !== "business owner" && otheremployername
-        ? 200
-        : 201;
+    const customerAccountProductCode = 401
+      // careertype == "government employee" &&
+      // deductions == "ippis" &&
+      // !otheremployername
+      //   ? 107
+      //   : careertype !== "business owner" && otheremployername
+      //   ? 200
+      //   : 201;
     const response = await axios.get(
       `${baseUrl}/BankOneWebAPI/api/Product/GetByCode/2?authToken=${token}&productCode=${customerAccountProductCode}`
     );
@@ -74,7 +72,7 @@ const getAccountProduct = async ({
       "There was a problem with the fetch operation:",
       error?.message
     );
-    throw error?.message || "Error"; // Optionally, rethrow the error if you want to handle it further up
+    throw error?.response?.statusText || error?.message || "Error"; // Optionally, rethrow the error if you want to handle it further up
   }
 };
 
@@ -84,8 +82,6 @@ const getLoanProduct = async ({
   otheremployername,
   loanproduct,
 }) => {
-  // Construct the URL for interbank transfer
-
   const baseUrl = process.env.BANKONE_BASE_URL;
   const token = process.env.BANKONE_TOKEN;
 
@@ -95,17 +91,39 @@ const getLoanProduct = async ({
   // * Term Loan: 305
 
   try {
-    const customerAccountProductCode =
-      careertype == "government employee" &&
-      deductions == "ippis" &&
-      !otheremployername
-        ? 306
-        : careertype !== "business owner" && otheremployername
-        ? loanproduct
-        : 305;
+    const customerAccountProductCode = 401;
+    // careertype == "government employee" &&
+    // deductions == "ippis" &&
+    // !otheremployername
+    //   ? 306
+    //   : loanproduct;
 
     const { data } = await axios.get(
-      `${baseUrl}/BankOneWebAPI/api/Product/GetByCode/2?authToken=${token}&productCode=${  customerAccountProductCode || 401}`
+      `${baseUrl}/BankOneWebAPI/api/Product/GetByCode/2?authToken=${token}&productCode=${customerAccountProductCode}`
+    );
+
+    return data;
+  } catch (error) {
+    console.log(
+      "There was a problem with the fetch operation:",
+      error.response.statusText
+    );
+
+    throw error?.response?.statusText || error?.message || "Error"; // Optionally, rethrow the error if you want to handle it further up
+  }
+};
+
+const getLoanByCustomerId = async (customerId) => {
+  // Construct the URL for interbank transfer
+
+  const baseUrl = process.env.BANKONE_BASE_URL;
+  const token = process.env.BANKONE_TOKEN;
+
+  try {
+    const { data } = await axios.get(
+      `${baseUrl}/BankOneWebAPI/api/Loan/GetLoansByCustomerId/2?authToken=${token}&institutionCode=${
+        process.env.BANKONE_MFB_CODE
+      }&CustomerId=${customerId}&addStartAndEndDate=${true}`
     );
 
     return data;
@@ -114,7 +132,7 @@ const getLoanProduct = async ({
       "There was a problem with the fetch operation:",
       error?.message
     );
-    throw error?.message || "Error"; // Optionally, rethrow the error if you want to handle it further up
+    throw error?.response?.statusText || error?.message || "Error"; // Optionally, rethrow the error if you want to handle it further up
   }
 };
 
@@ -123,4 +141,5 @@ module.exports = {
   handleInterBankTransfer,
   getAccountProduct,
   getLoanProduct,
+  getLoanByCustomerId,
 };

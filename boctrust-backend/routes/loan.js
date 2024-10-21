@@ -335,6 +335,7 @@ router.put("/disburse/:loanId", async (req, res) => {
 // Endpoint for Operations to disburse loans
 router.put("/approve-disburse/:loanId", async (req, res) => {
   const { loanId } = req.params;
+
   const token = process.env.BANKONE_TOKEN;
   try {
     const loanAndCustomer = await Loan.findById(loanId).populate("customer");
@@ -361,13 +362,11 @@ router.put("/approve-disburse/:loanId", async (req, res) => {
       transferRequestPayload
     );
 
-    console.log(transferRequestPayload, "transferRequestPayload")
-    console.log(transactionResponse, "transactionResponse")
 
     if (transactionResponse?.Status === "Failed" || transactionResponse?.Status === 0 ) {
       return res
         .status(400)
-        .json({ error: transactionResponse.ResponseMessage });
+        .json({ error: transactionResponse.ResponseMessage  });
     }
 
     // Find the customer by ID

@@ -40,6 +40,8 @@ const TransferMoney = ({
           }
         );
 
+        console.log(response, "response")
+
         setCreditAccountName(response.data?.Name);
       } catch (error) {
         console.log(error);
