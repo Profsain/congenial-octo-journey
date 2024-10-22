@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import PageLoader from "./PageLoader";
 import PropTypes from "prop-types";
-import { fetchProduct } from "../../../redux/reducers/productReducer";
+import {  fetchSelectedProduct } from "../../../redux/reducers/productReducer";
 
 const DisplayLoanProductName = ({ loan }) => {
   const dispatch = useDispatch();
@@ -10,7 +10,7 @@ const DisplayLoanProductName = ({ loan }) => {
   useEffect(() => {
     const getData = async () => {
       try {
-        await dispatch(fetchProduct());
+        await dispatch(fetchSelectedProduct());
       } catch (error) {
         console.log(error);
       }
@@ -22,9 +22,9 @@ const DisplayLoanProductName = ({ loan }) => {
       {loanProducts ? (
         loanProducts?.find(
           (item) =>
-            item.ProductCode === loan?.customer?.loanproduct ||
+            item._id === loan?.customer?.loanproduct ||
             loan?.loanproduct
-        )?.ProductName || "General Loan"
+        )?.productTitle || "General Loan"
       ) : (
         <PageLoader width="20px" />
       )}

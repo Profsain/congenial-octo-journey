@@ -279,6 +279,7 @@ const LoanForm = React.memo(function LoanFormComponent() {
         const employer = employers.find(
           (employer) => employer._id === formValues.employerId
         );
+
         // generate customer id
         const customerId = generateCustomerId();
         const formData = new FormData();
@@ -291,7 +292,7 @@ const LoanForm = React.memo(function LoanFormComponent() {
         formData.append("loantotalrepayment", loanRepaymentTotal);
         formData.append("monthlyrepayment", monthlyRepayment);
         formData.append("careertype", formValues.careertype);
-        formData.append("loanproduct", product?.ProductCode);
+        formData.append("loanproduct", product?._id);
         formData.append("loanpurpose", formValues.loanpurpose);
         formData.append("otherpurpose", formValues.otherpurpose);
         formData.append("bvnnumber", formValues.bvnnumber);
@@ -325,7 +326,7 @@ const LoanForm = React.memo(function LoanFormComponent() {
           "nkinresidentialaddress",
           formValues.nkinresidentialaddress
         );
-        formData.append("employer", employer._id);
+        formData.append("employer", employer?._id);
         formData.append("otheremployername", formValues.otheremployername);
         formData.append("employeraddress", formValues.employeraddress);
         formData.append("employmentstartdate", formValues.employmentstartdate);
@@ -401,7 +402,8 @@ const LoanForm = React.memo(function LoanFormComponent() {
         const responsePayload = await res.json();
 
         if (!res.ok) {
-          return toast.error(responsePayload.response.data.error);
+          console.log(responsePayload);
+          throw  new Error(responsePayload.error)
         }
         toast.success("Customer Account Created!!!");
         deleteFromLocalStorage("onbaordData");
@@ -410,8 +412,7 @@ const LoanForm = React.memo(function LoanFormComponent() {
       }
     } catch (error) {
       console.log(error);
-      toast.error(error.message || "Something Went Wrong");
-      throw new Error(error.message);
+      throw new Error(error);
     }
 
     // setSubmitting(false);

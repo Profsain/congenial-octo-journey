@@ -23,6 +23,7 @@ const sendSMS = async (phoneNumber, smsMessage) => {
       console.log(`SMS sent successfully! Status: ${data.status}`);
     })
     .catch((error) => {
+ 
       // Handle errors
       throw new Error(`Error: ${error}`);
     });
