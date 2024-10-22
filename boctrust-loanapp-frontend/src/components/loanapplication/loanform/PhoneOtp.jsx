@@ -139,6 +139,7 @@ const PhoneOtp = (props) => {
       await verifyOTP({ pinId: confirmOtp.pin_id, pin: otp });
 
       props.onHide(false);
+
       // submit customer details
       await handleSubmit();
 
@@ -147,12 +148,14 @@ const PhoneOtp = (props) => {
         number,
         "Your loan application has been received. We will get back to you shortly."
       );
+
       await handleSendEmail();
 
       navigate("/login");
     } catch (error) {
       console.error("Error verifying OTP:", error);
-      setErrorMsg(`Error verifying OTP: ${error.message}`);
+      setErrorMsg(`Error verifying OTP: ${error?.message}`);
+      toast.error(error?.message || "Something Went Wrong");
     } finally {
       setLoading(false);
     }

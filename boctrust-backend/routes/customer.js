@@ -10,6 +10,7 @@ const path = require("path");
 const CustomerModel = require("../models/Customer"); // Import customer model
 const Customer = require("../models/Customer");
 const Loan = require("../models/Loan");
+const Employer = require("../models/EmployersManager");
 
 // configure dotenv
 dotenv.config();
@@ -64,24 +65,39 @@ router.post("/customer", multipleUpload, async (req, res) => {
   // hash password
   // check if user already exist
   // Validate if user exist in our database
-  const { email, username } = req.body;
-  const oldUser = await CustomerModel.findOne({
-    $or: [{ email: email }, { username: username }],
-  });
-
-  if (oldUser) {
-    return res.status(409).json({ error: "User Already Exist. Please Login" });
-  }
-
-  // Encrypt user password
-  req.body.password = await bcrypt.hash(req.body.password, 10);
-  req.body.confirmpassword = await bcrypt.hash(req.body.confirmpassword, 10);
 
   try {
-    const customer = await CustomerModel.create(req.body);
+    const { email, username, employer } = req.body;
+    const oldUser = await CustomerModel.findOne({
+      $or: [{ email: email }, { username: username }],
+    });
+
+    if (oldUser) {
+      return res
+        .status(409)
+        .json({ error: "User Already Exist. Please Login" });
+    }
+
+    // Encrypt user password
+    req.body.password = await bcrypt.hash(req.body.password, 10);
+    req.body.confirmpassword = await bcrypt.hash(req.body.confirmpassword, 10);
+
+    console.log(
+      {
+        ...req.body,
+        employer: employer && employer != "undefined" ? employer : null,
+      },
+      "Print payload"
+    );
+
+    const customer = await CustomerModel.create({
+      ...req.body,
+      employer: employer && employer != "undefined" ? employer : null,
+    });
 
     await Loan.create({
       customer: customer._id,
+      loanproduct: req.body.loanproduct,
       loanamount: req.body.loanamount,
       monthlyrepayment: req.body.monthlyrepayment,
       buyoverloan: req.body.buyoverloan,
@@ -175,6 +191,16 @@ router.get("/customers", async (req, res) => {
     customer.forEach((customer) => {
       customer.password = undefined;
       customer.confirmpassword = undefined;
+
+      if (!customer.employer) {
+        const psuedoEmployer = new Employer({
+          employersId: `E00${Math.floor(Math.random() * 100) + 1} `,
+          employersName: customer?.otheremployername,
+          employersAddress: customer?.employeraddress,
+        });
+
+        customer.employer = psuedoEmployer;
+      }
     });
 
     // Map users to include image URLs

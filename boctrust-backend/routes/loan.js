@@ -6,13 +6,33 @@ const {
   handleInterBankTransfer,
 } = require("../services/bankoneOperationsServices");
 const { generateTransactionRef } = require("../utils/generateTransactionRef");
+const Employer = require("../models/EmployersManager");
 
 // Get all loan
 router.get("/", async (req, res) => {
   try {
     const loans = await Loan.find({
       loanstatus: { $ne: "with operations" },
-    }).populate("customer");
+    }).populate({
+      path: "customer",
+      populate: {
+        path: "employer", // Populating employer within customer
+        model: "Employer",
+      },
+    }).populate("loanproduct");
+
+    loans.forEach((loan) => {
+      if (!loan.customer.employer) {
+    
+        const psuedoEmployer = new Employer({
+          employersId: `E00${Math.floor(Math.random() * 100) + 1} `,
+          employersName: loan.customer?.otheremployername,
+          employersAddress: loan.customer?.employeraddress,
+        });
+
+        loan.customer.employer = psuedoEmployer;
+      }
+    });
 
     return res.status(200).json(loans);
   } catch (error) {
@@ -47,7 +67,7 @@ router.get("/unbooked", async (req, res) => {
   try {
     const loans = await Loan.find({
       loanstatus: "unbooked",
-      deductions:  { $ne: "remita" },
+      deductions: { $ne: "remita" },
     }).populate("customer");
 
     return res.status(200).json(loans);
@@ -61,7 +81,7 @@ router.get("/booked", async (req, res) => {
   try {
     const loans = await Loan.find({
       loanstatus: "booked",
-      deductions:  { $ne: "remita" },
+      deductions: { $ne: "remita" },
     }).populate("customer");
 
     return res.status(200).json(loans);
@@ -362,11 +382,13 @@ router.put("/approve-disburse/:loanId", async (req, res) => {
       transferRequestPayload
     );
 
-
-    if (transactionResponse?.Status === "Failed" || transactionResponse?.Status === 0 ) {
+    if (
+      transactionResponse?.Status === "Failed" ||
+      transactionResponse?.Status === 0
+    ) {
       return res
         .status(400)
-        .json({ error: transactionResponse.ResponseMessage  });
+        .json({ error: transactionResponse.ResponseMessage });
     }
 
     // Find the customer by ID

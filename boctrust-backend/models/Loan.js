@@ -52,6 +52,10 @@ const loanSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    loanproduct: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Product",
+    },
     numberofmonth: {
       type: Number,
       default: 0,
