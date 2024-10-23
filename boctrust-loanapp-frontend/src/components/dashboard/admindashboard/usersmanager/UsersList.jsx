@@ -28,6 +28,9 @@ const UsersList = ({ count, searchTerms }) => {
     completed: {
       color: "#5cc51c",
     },
+    table: {
+      overflow: "auto",
+    },
   };
 
   const dispatch = useDispatch();
@@ -105,9 +108,9 @@ const UsersList = ({ count, searchTerms }) => {
     <>
       {status === "loading" && <PageLoader />}
 
-      <div className="ListSec">
+      <div className="">
         <div style={styles.table}>
-          <Table hover responsive="sm">
+          <Table hover responsive="sm ">
             <thead style={styles.head}>
               <tr>
                 <th>Photo</th>
@@ -115,7 +118,7 @@ const UsersList = ({ count, searchTerms }) => {
                 <th>Email</th>
                 <th>Phone</th>
                 <th>Username</th>
-                <th>User Type</th>
+
                 <th>Role</th>
                 <th>Status</th>
                 <th>Action</th>
@@ -136,9 +139,9 @@ const UsersList = ({ count, searchTerms }) => {
                   <td>{user.email}</td>
                   <td>{user.phone}</td>
                   <td>{user.username}</td>
-                  <td>{user.userType}</td>
+
                   <td>{user?.userRole?.label || "All"}</td>
-                  <td >
+                  <td>
                     <span className="badge bg-success">
                       {user.status.toUpperCase()}
                     </span>

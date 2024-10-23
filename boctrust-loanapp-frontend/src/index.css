@@ -264,13 +264,7 @@ button:disabled {
   }
 
   /* dashboar section */
-  .MobileNav {
-    display: block;
-  }
 
-  .DesktopNav {
-    display: none;
-  }
 
   .DashboardContainer {
     padding: 0 !important;
@@ -334,6 +328,7 @@ button:disabled {
     flex-direction: column;
     padding: 4rem !important;
     margin-bottom: -10rem !important;
+    
   }
 
   /* .FieldGroup input,

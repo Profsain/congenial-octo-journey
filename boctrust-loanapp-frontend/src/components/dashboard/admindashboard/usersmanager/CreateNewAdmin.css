@@ -58,7 +58,38 @@
   z-index: 100;
 }
 
-
-select:disabled{
+select:disabled {
   opacity: 0.5;
+}
+.TransContainer .FormCon form {
+  display: grid;
+  gap: 2rem;
+}
+
+.TransContainer .FormCon .FieldRow {
+  padding: 0 !important;
+  margin-bottom: 0 !important;
+  display: flex;
+  gap: 2rem;
+}
+
+.TransContainer .FormCon .FieldRow label {
+  margin-top: 0 !important;
+}
+
+.TransContainer .FormCon .IUpload {
+  padding: 0 !important;
+}
+
+@media screen and (max-width: 768px) {
+  .TransContainer .FormCon .FieldRow {
+    flex-direction: column;
+  }
+}
+
+@media screen and (max-width: 600px) {
+  .TransContainer .DashHeader {
+    margin: 2rem 0 1rem 0 !important;
+    font-size: 1.6rem !important; 
+  }
 }
