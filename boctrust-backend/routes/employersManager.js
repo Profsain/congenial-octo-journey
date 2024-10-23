@@ -43,8 +43,8 @@ router.post("/employers", (req, res) => {
       employersName,
       employersAddress,
       mandateRule,
-      statementRule,
-      employerLetterRule,
+      statementRule: !!statementRule ?  statementRule : null ,
+      employerLetterRule: !!employerLetterRule ?  employerLetterRule : null,
     });
 
     // Save Employer

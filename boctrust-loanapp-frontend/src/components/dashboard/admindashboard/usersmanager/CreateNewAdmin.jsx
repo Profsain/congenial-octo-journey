@@ -1,5 +1,5 @@
 /* eslint-disable no-undef */
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useFormik } from "formik";
 import BocButton from "../../shared/BocButton";
 import DashboardHeadline from "../../shared/DashboardHeadline";
@@ -7,10 +7,11 @@ import "../customers/Customer.css";
 import "./CreateNewAdmin.css";
 import validationSchema from "./validationSchema";
 import { userTypes } from "../../../../lib/userRelated";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import PageLoader from "../../shared/PageLoader";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
+import { fetchRolesAndPermisions } from "../../../../redux/reducers/adminUserReducer";
 
 const initialValues = {
   fullName: "",
@@ -28,8 +29,21 @@ const CreateNewAdmin = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const { rolesAndPermission } = useSelector((state) => state.adminUserReducer);
+
+  useEffect(() => {
+    const getData = async () => {
+      try {
+        await dispatch(fetchRolesAndPermisions());
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    getData();
+  });
 
   const handleSubmit = async (values, { resetForm }) => {
     const apiUrl = import.meta.env.VITE_BASE_URL;
@@ -88,7 +102,6 @@ const CreateNewAdmin = () => {
       setIsLoading(false);
     }
   };
-
 
   const formik = useFormik({
     initialValues,
@@ -200,8 +213,6 @@ const CreateNewAdmin = () => {
             </div>
           </div>
 
-          {console.log(formik.errors)}
-
           <div className="FieldRow">
             <div className="FieldGroup">
               <label htmlFor="userType">User Type</label>
@@ -310,6 +321,5 @@ const CreateNewAdmin = () => {
     </div>
   );
 };
-
 
 export default CreateNewAdmin;

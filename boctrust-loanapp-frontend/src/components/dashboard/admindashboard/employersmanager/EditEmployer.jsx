@@ -229,6 +229,7 @@ const EditEmployer = (props) => {
                 setEditStatementRule(rule);
               }}
             >
+              <option>-None Selected-</option>
               {statementRules?.map((item, index) => (
                 <option key={index} value={item._id}>
                   {item.ruleTitle}
@@ -282,6 +283,7 @@ const EditEmployer = (props) => {
                 setEditStatementRule(rule);
               }}
             >
+              <option>-None Selected-</option>
               {employerLetterRules?.map((item, index) => (
                 <option key={index} value={item._id}>
                   {item.ruleTitle}
