@@ -688,7 +688,7 @@ const SideNavMain = ({ onMenuItemClick }) => {
                   <Link
                     id="userrole"
                     onClick={onMenuItemClick}
-                    to="/dashboard/roles"
+                    to="/dashboard/users/roles"
                   >
                     User Roles
                   </Link>
@@ -697,7 +697,7 @@ const SideNavMain = ({ onMenuItemClick }) => {
                   <Link
                     id="accesscontrol"
                     onClick={onMenuItemClick}
-                    to="/dashboard/accesscontrol"
+                    to="/dashboard/users/accesscontrol"
                   >
                     Access Control
                   </Link>

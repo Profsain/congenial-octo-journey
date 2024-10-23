@@ -403,7 +403,7 @@ const LoanForm = React.memo(function LoanFormComponent() {
 
         if (!res.ok) {
           console.log(responsePayload);
-          throw  new Error(responsePayload.error)
+          throw new Error(responsePayload.error);
         }
         toast.success("Customer Account Created!!!");
         deleteFromLocalStorage("onbaordData");
@@ -1369,26 +1369,18 @@ const LoanForm = React.memo(function LoanFormComponent() {
                                                 (Government employee)
                                               </div>
                                             )}
-                                          {calcDaysDiffFromNow(
-                                            values.employmentstartdate
-                                          ) >=
-                                            parseInt(
-                                              employer?.mandateRule?.mandateDuration.split(
-                                                " "
-                                              )[0]
-                                            ) && (
-                                            <div>
-                                              <label>
-                                                <Field
-                                                  type="radio"
-                                                  name="deductions"
-                                                  value="ippis"
-                                                />
-                                              </label>
-                                              Deduction from source via IPPIS
-                                              (Government employee)
-                                            </div>
-                                          )}
+
+                                          <div>
+                                            <label>
+                                              <Field
+                                                type="radio"
+                                                name="deductions"
+                                                value="ippis"
+                                              />
+                                            </label>
+                                            Deduction from source via IPPIS
+                                            (Government employee)
+                                          </div>
                                         </div>
                                       ) : (
                                         <>
