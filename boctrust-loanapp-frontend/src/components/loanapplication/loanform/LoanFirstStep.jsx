@@ -92,6 +92,8 @@ const LoanFirstStep = ({ data }) => {
       (product) => product._id === productId
     );
 
+  
+
     // get interest rate
     const loanRate = product?.interestRate;
 

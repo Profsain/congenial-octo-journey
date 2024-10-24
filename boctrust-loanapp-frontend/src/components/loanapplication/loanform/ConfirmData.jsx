@@ -22,10 +22,11 @@ const ConfirmData = ({ career }) => {
 
   const calculateRepayment = () => {
     // get product id from formik values
-   
+ 
     const productId = values.loanproduct;
-
+ 
     const noOfMonths = values.numberofmonth;
+
 
     if (!productId || !noOfMonths) {
       return toast.error("Please Enter All Fields ");
@@ -37,6 +38,8 @@ const ConfirmData = ({ career }) => {
     // get interest rate
     const loanRate = product?.interestRate;
 
+    if(!values.loanamount || !loanRate || !noOfMonths) return 
+
     const { monthlyPayment: monthlyPay } = calculateSimpleInterest(
       parseInt(values.loanamount.replace(/,/g, "")),
       loanRate,
@@ -46,12 +49,14 @@ const ConfirmData = ({ career }) => {
     setFieldValue("monthlyRepayment", monthlyPay);
   };
 
-  const handleInputChange = (fieldName, event) => {
-    if (fieldName === "loanamount") {
-      calculateRepayment();
-    }
+  useEffect(() => {
+    calculateRepayment();
+  }, [values.loanamount ])
 
-    // Update the field value as the user types
+
+  const handleInputChange = (fieldName, event) => {
+   
+   // Update the field value as the user types
     setFieldValue(fieldName, event.target.value);
   };
 
