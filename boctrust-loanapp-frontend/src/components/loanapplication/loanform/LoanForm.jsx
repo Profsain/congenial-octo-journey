@@ -39,6 +39,7 @@ import {
   storeInLocalStorage,
 } from "../../../../utilities/localStorage";
 import { decryptText } from "../../../../utilities/encryptDecrypt";
+import axios from "axios";
 
 const apiUrl = import.meta.env.VITE_BASE_URL;
 
@@ -49,23 +50,10 @@ const LoanForm = React.memo(function LoanFormComponent() {
   const handleOpenCapture = () => {
     setOpenCapture(true);
   };
-  // capture fix code end
 
-  // Function to initialize the bvn details extraction after redirect to clallback url
-  const initializeApp = () => {
-    const urlSearchParams = new URLSearchParams(window.location.search);
-    const code = urlSearchParams.get("code");
-
-    if (code) {
-      getBvnDetails(); // Call this function if there's an authorization code in the URL
-    } else {
-      // Optionally, handle other initialization tasks here
-      console.log("No authorization code found. Proceed with the normal flow.");
-    }
-  };
 
   // Call the initializeApp function when the window loads
-  window.onload = initializeApp;
+  // window.onload = initializeApp;
 
   // fetch loan product
   const dispatch = useDispatch();
@@ -88,22 +76,31 @@ const LoanForm = React.memo(function LoanFormComponent() {
   // fetch all commercial banks
   const [banks, setBanks] = useState([]);
 
-  useEffect(() => {
-    const data = localStorage.getItem("loanFirstInfo");
+  // Function to initialize the bvn details extraction after redirect to clallback url
+  const initializeApp = async () => {
+    const urlSearchParams = new URLSearchParams(window.location.search);
+    const code = urlSearchParams.get("code");
 
-    if (data) {
-      let jsonData = JSON.parse(data);
-      jsonData = { ...jsonData, bvn: decryptText(jsonData.bvn) };
-      setFirstStepData(jsonData);
+    if (code) {
+      const { bvn } = await getBvnDetails(code); // Call this function if there's an authorization code in the URL
+    
+    const firstDataResponse = await axios.get(`${import.meta.env.VITE_BASE_URL}/api/tempdata/tempdata/${bvn}`)
+     
+    setFirstStepData(firstDataResponse.data.data);
+    
+    } else {
+      // Optionally, handle other initialization tasks here
+      console.log("No authorization code found. Proceed with the normal flow.");
     }
-  }, []);
+  };
+
+
 
   // Fetch Officers, Products and Employers
   useEffect(() => {
     const getData = async () => {
       try {
-        //
-        // const res = await axios()
+        await initializeApp();
 
         await dispatch(fetchAllLoanOfficers());
         await dispatch(fetchProduct());
@@ -407,7 +404,7 @@ const LoanForm = React.memo(function LoanFormComponent() {
         }
         toast.success("Customer Account Created!!!");
         deleteFromLocalStorage("onbaordData");
-        deleteFromLocalStorage("loanFirstInfo");
+        
         fileValues.map((item) => deleteFromLocalStorage(item));
       }
     } catch (error) {
@@ -505,7 +502,7 @@ const LoanForm = React.memo(function LoanFormComponent() {
         ) {
           storeInLocalStorage({
             key: "onbaordData",
-            value: ref.current?.values,
+            value:  ref.current?.values,
           });
           setStep(3);
 
@@ -520,7 +517,7 @@ const LoanForm = React.memo(function LoanFormComponent() {
         isFieldValid("salaryaccountname", ref) &&
         isFieldValid("salaryaccountnumber", ref)
       ) {
-        storeInLocalStorage({ key: "onbaordData", value: ref.current?.values });
+        storeInLocalStorage({ key: "onbaordData", value:  ref.current?.values });
         setStep(4);
         setStepImg("https://i.imgur.com/DPMDjLy.png");
       } else if (
@@ -535,7 +532,7 @@ const LoanForm = React.memo(function LoanFormComponent() {
         setStep(5);
         setStepImg("https://i.imgur.com/DPMDjLy.png");
       } else {
-        console.log(ref.current?.values, " ref.current?.values");
+       
         notify("Please Enter Valid Details for all Fields");
       }
     } else {

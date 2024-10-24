@@ -89,7 +89,7 @@ const LoanFirstStep = ({ data }) => {
 
     // find product
     const product = loanProducts?.find(
-      (product) => product.productCode === productId
+      (product) => product._id === productId
     );
 
     // get interest rate
@@ -139,7 +139,7 @@ const LoanFirstStep = ({ data }) => {
     ref.current?.values.loanproduct || initialLoanProduct?.ProductCode;
 
   const product = loanProducts?.find(
-    (product) => product?.productCode === productId
+    (product) => product?._id === productId
   );
 
   // handle bvn verification
@@ -170,7 +170,7 @@ const LoanFirstStep = ({ data }) => {
     // );
 
     //Store the information in Local Storage
-    localStorage.setItem(
+    sessionStorage.setItem(
       "loanFirstInfo",
       JSON.stringify({
         bvn: encryptText(bvn),
@@ -308,7 +308,7 @@ const LoanFirstStep = ({ data }) => {
                                     {loanProducts?.map((product) => (
                                       <option
                                         key={product?.productCode}
-                                        value={product?.productCode}
+                                        value={product?._id}
                                       >
                                         {product.productTitle}
                                       </option>
