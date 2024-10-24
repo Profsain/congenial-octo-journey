@@ -88,6 +88,7 @@ const LoanForm = React.memo(function LoanFormComponent() {
       );
 
       setFirstStepData(firstDataResponse.data.data);
+      await axios.delete(`${import.meta.env.VITE_BASE_URL}/api/tempdata/tempdata/${bvn}`)
     } else {
       // Optionally, handle other initialization tasks here
       console.log("No authorization code found. Proceed with the normal flow.");
@@ -142,6 +143,7 @@ const LoanForm = React.memo(function LoanFormComponent() {
         "monthlyRepayment",
         firstStepData.monthlyRepayment
       );
+      ref.current?.setFieldValue("loanproduct", firstStepData.loanProduct?._id);
       setProduct(firstStepData.loanProduct || {});
     }
   }, [firstStepData]);
@@ -401,9 +403,9 @@ const LoanForm = React.memo(function LoanFormComponent() {
           throw new Error(responsePayload.error);
         }
         toast.success("Customer Account Created!!!");
-        deleteFromLocalStorage("onbaordData");
-
+        deleteFromLocalStorage("onbaordData");  
         fileValues.map((item) => deleteFromLocalStorage(item));
+       
       }
     } catch (error) {
       console.log(error);
