@@ -3,11 +3,54 @@ import { useFormikContext } from "formik";
 import ConfirmField from "./ConfirmField";
 import Headline from "../../shared/Headline";
 import "./Form.css";
+import { toast } from "react-toastify";
+import { useDispatch, useSelector } from "react-redux";
+import { useEffect } from "react";
+import { fetchSelectedProduct } from "../../../redux/reducers/productReducer";
+import { calculateSimpleInterest } from "../../shared/calculatorfunc";
 
 const ConfirmData = ({ career }) => {
   const { values, setFieldValue } = useFormikContext();
 
+  const loanProducts = useSelector((state) => state.productReducer.products);
+
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(fetchSelectedProduct());
+  }, [dispatch]);
+
+  const calculateRepayment = () => {
+    // get product id from formik values
+   
+    const productId = values.loanproduct;
+
+    const noOfMonths = values.numberofmonth;
+
+    if (!productId || !noOfMonths) {
+      return toast.error("Please Enter All Fields ");
+    }
+
+    // find product
+    const product = loanProducts?.find((product) => product._id === productId);
+
+    // get interest rate
+    const loanRate = product?.interestRate;
+
+    const { monthlyPayment: monthlyPay } = calculateSimpleInterest(
+      parseInt(values.loanamount.replace(/,/g, "")),
+      loanRate,
+      noOfMonths
+    );
+
+    setFieldValue("monthlyRepayment", monthlyPay);
+  };
+
   const handleInputChange = (fieldName, event) => {
+    if (fieldName === "loanamount") {
+      calculateRepayment();
+    }
+
     // Update the field value as the user types
     setFieldValue(fieldName, event.target.value);
   };

@@ -51,7 +51,6 @@ const LoanForm = React.memo(function LoanFormComponent() {
     setOpenCapture(true);
   };
 
-
   // Call the initializeApp function when the window loads
   // window.onload = initializeApp;
 
@@ -83,18 +82,17 @@ const LoanForm = React.memo(function LoanFormComponent() {
 
     if (code) {
       const { bvn } = await getBvnDetails(code); // Call this function if there's an authorization code in the URL
-    
-    const firstDataResponse = await axios.get(`${import.meta.env.VITE_BASE_URL}/api/tempdata/tempdata/${bvn}`)
-     
-    setFirstStepData(firstDataResponse.data.data);
-    
+
+      const firstDataResponse = await axios.get(
+        `${import.meta.env.VITE_BASE_URL}/api/tempdata/tempdata/${bvn}`
+      );
+
+      setFirstStepData(firstDataResponse.data.data);
     } else {
       // Optionally, handle other initialization tasks here
       console.log("No authorization code found. Proceed with the normal flow.");
     }
   };
-
-
 
   // Fetch Officers, Products and Employers
   useEffect(() => {
@@ -404,7 +402,7 @@ const LoanForm = React.memo(function LoanFormComponent() {
         }
         toast.success("Customer Account Created!!!");
         deleteFromLocalStorage("onbaordData");
-        
+
         fileValues.map((item) => deleteFromLocalStorage(item));
       }
     } catch (error) {
@@ -502,7 +500,7 @@ const LoanForm = React.memo(function LoanFormComponent() {
         ) {
           storeInLocalStorage({
             key: "onbaordData",
-            value:  ref.current?.values,
+            value: ref.current?.values,
           });
           setStep(3);
 
@@ -517,7 +515,7 @@ const LoanForm = React.memo(function LoanFormComponent() {
         isFieldValid("salaryaccountname", ref) &&
         isFieldValid("salaryaccountnumber", ref)
       ) {
-        storeInLocalStorage({ key: "onbaordData", value:  ref.current?.values });
+        storeInLocalStorage({ key: "onbaordData", value: ref.current?.values });
         setStep(4);
         setStepImg("https://i.imgur.com/DPMDjLy.png");
       } else if (
@@ -532,7 +530,6 @@ const LoanForm = React.memo(function LoanFormComponent() {
         setStep(5);
         setStepImg("https://i.imgur.com/DPMDjLy.png");
       } else {
-       
         notify("Please Enter Valid Details for all Fields");
       }
     } else {
@@ -666,7 +663,7 @@ const LoanForm = React.memo(function LoanFormComponent() {
                                         <option value="widowed">Widowed</option>
                                       </SelectField>
                                       <div className="Space"></div>
-                                      <SelectField
+                                      {/* <SelectField
                                         label="No of Dependents"
                                         name="noofdependent"
                                       >
@@ -678,10 +675,16 @@ const LoanForm = React.memo(function LoanFormComponent() {
                                         <option value="5">5</option>
                                         <option value="6">6</option>
                                         <option value="7">7</option>
-                                        <option value="more than 7">
+                                        <option value="more_than_7">
                                           More than 7
                                         </option>
-                                      </SelectField>
+                                      </SelectField> */}
+                                      <TextInput
+                                        label="No of Dependents"
+                                        name="noofdependent"
+                                        type="text"
+                                        placeholder="1"
+                                      />
                                     </div>
 
                                     {/* Input row sectioin */}
@@ -969,7 +972,7 @@ const LoanForm = React.memo(function LoanFormComponent() {
                                             </option>
                                           );
                                         })}
-                                        <option value="other">Other</option>
+                                        {/* <option value="other">Other</option> */}
                                       </SelectField>
                                     )}
 
@@ -1367,17 +1370,26 @@ const LoanForm = React.memo(function LoanFormComponent() {
                                               </div>
                                             )}
 
-                                          <div>
-                                            <label>
-                                              <Field
-                                                type="radio"
-                                                name="deductions"
-                                                value="ippis"
-                                              />
-                                            </label>
-                                            Deduction from source via IPPIS
-                                            (Government employee)
-                                          </div>
+                                          {calcDaysDiffFromNow(
+                                            values.employmentstartdate
+                                          ) >=
+                                            parseInt(
+                                              employer.mandateRule.mandateDuration.split(
+                                                " "
+                                              )[0]
+                                            ) && (
+                                            <div>
+                                              <label>
+                                                <Field
+                                                  type="radio"
+                                                  name="deductions"
+                                                  value="ippis"
+                                                />
+                                              </label>
+                                              Deduction from source via IPPIS
+                                              (Government employee)
+                                            </div>
+                                          )}
                                         </div>
                                       ) : (
                                         <>
