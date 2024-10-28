@@ -108,6 +108,10 @@ button:disabled {
   height: 13px;
 }
 
+.ListSec tr th, .ListSec tr td {
+  font-size: 14px;
+}
+
 @media screen and (max-width: 600px) {
   .Welcome {
     display: none;

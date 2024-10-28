@@ -106,13 +106,13 @@ const AccountList = ({ showCount, searchTerms }) => {
           <tbody>
             {customerList?.length === 0 && <NoResult name="customer" />}
 
-            {sortByCreatedAt(customerList)?.map((customer) => (
+            {  customerList  ? sortByCreatedAt(customerList)?.map((customer) => (
               <tr key={customer._id}>
                 <td>
-                  {customer.banking?.accountDetails?.Message?.AccountNumber}
+                  {customer.banking?.accountDetails?.AccountNumber}
                 </td>
-                <td>{customer.banking?.accountDetails?.Message?.FullName}</td>
-                <td>{customer.banking?.accountDetails?.Message?.Id}</td>
+                <td>{customer.banking?.accountDetails?.CustomerName}</td>
+                <td>{customer.banking?.accountDetails?.CustomerID}</td>
                 <td>{handleGetAgent(customer?.agentcode) || "Boctrust"}</td>
                 <td style={styles?.completed}>Active</td>
                 {/* <td>
@@ -124,7 +124,9 @@ const AccountList = ({ showCount, searchTerms }) => {
                   </select>
                 </td> */}
               </tr>
-            ))}
+            )) : (
+              <PageLoader width="100px" />
+            )}
           </tbody>
         </Table>
       </div>
