@@ -79,7 +79,7 @@ const TopCardSec = ({ user }) => {
               alt="naira"
             />
             <h5 className="FigNum">{useBalance.totalBalance}</h5>
-            <p>Total Balance</p>
+            <p>Total Paid</p>
           </FigCard>
         </Col>
 
