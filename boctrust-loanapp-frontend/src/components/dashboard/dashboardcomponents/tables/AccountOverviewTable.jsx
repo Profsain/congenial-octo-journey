@@ -78,7 +78,7 @@ const AccountOverviewTable = ({ user }) => {
                   {nigerianCurrencyFormat.format(loan.TotalOutstandingAmount)}
                 </td>
                 <td>
-                  {nigerianCurrencyFormat.format(loan.TotalAmountPaidTillDate)}
+                  {nigerianCurrencyFormat.format(loan?.TotalAmountPaidTillDate)}
                 </td>
               </tr>
             ))
