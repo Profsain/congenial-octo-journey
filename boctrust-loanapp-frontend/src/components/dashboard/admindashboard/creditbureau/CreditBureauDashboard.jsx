@@ -251,10 +251,10 @@ const CreditBureauDashboard = () => {
               <Table borderless hover responsive="sm">
                 <thead style={styles.head}>
                   <tr>
-                    <th>Customer ID</th>
+                    <th> ID</th>
                     <th>Name</th>
-                    <th>Employer Name</th>
-                    <th>Loan Requested</th>
+                    <th>Employer</th>
+                    <th>Loan Amt</th>
                     <th>Review</th>
                     <th>Assigned</th>
                     <th>Analyst Check</th>

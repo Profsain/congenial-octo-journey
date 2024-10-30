@@ -56,7 +56,7 @@ const LoanBalanceDetails = ({ loanObj, show, handleClose, fullName }) => {
             title="Total Amount Paid Till Date:"
             text={
               loanObj && loanObj.Message && loanObj.Message[0]
-                ? loanObj.Message[0].TotalAmountPaidTillDate
+                ? loanObj.Message[0]?.TotalAmountPaidTillDate
                 : ""
             }
           />
@@ -64,7 +64,7 @@ const LoanBalanceDetails = ({ loanObj, show, handleClose, fullName }) => {
             title="Total Outstanding:"
             text={
               loanObj && loanObj.Message && loanObj.Message[0]
-                ? loanObj.Message[0].TotalOutstandingAmount
+                ? loanObj.Message[0]?.TotalOutstandingAmount
                 : ""
             }
           />
