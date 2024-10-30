@@ -130,9 +130,32 @@
   font-size: 14px;
 }
 
+
+.YellowCard #CardText{
+  display: grid;
+  gap: 1rem;
+}
+
 #CardText p {
   margin: 0;
   padding: 0;
+}
+
+#CardText .recentTrscAmt.credit {
+  color: #08519a;
+}
+
+#CardText .recentTrscAmt.debit {
+  color: #dc2626;
+}
+
+#CardText > div:first-of-type > p{
+  color: #e2e8f0;
+  text-align: center;
+}
+
+#CardText  b{
+  text-transform: uppercase;
 }
 
 .CustomeThead {
@@ -186,9 +209,7 @@
   object-fit: contain;
 }
 
-
-
-@media screen  and (max-width: 1024px) {
+@media screen and (max-width: 1024px) {
   .MobileNav {
     display: block;
   }

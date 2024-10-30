@@ -11,6 +11,7 @@ const {
   getAccountProduct,
   getLoanProduct,
   getLoanByCustomerId,
+  generateTrackingId,
 } = require("../services/bankoneOperationsServices");
 
 // add token to environment variable
@@ -85,6 +86,17 @@ router.post("/createCustomerAccount", async (req, res) => {
   }
 });
 
+const createLoanRequest = async (apiUrl, options) => {
+  const response = await fetch(apiUrl, options);
+
+  if (!response) {
+    throw new Error(
+      `HTTP error! BankOne Loan creation failed. Status: ${response.status}`
+    );
+  }
+  return response;
+};
+
 // loan creation endpoint (verify)
 router.post("/createLoan/:loanId", async (req, res) => {
   const { loanId } = req.params;
@@ -93,7 +105,9 @@ router.post("/createLoan/:loanId", async (req, res) => {
     return res.status(400).json({ error: "Bad Request! No LoanId " });
 
   try {
-    const loanAndCustomer = await Loan.findById(loanId).populate("customer");
+    const loanAndCustomer = await Loan.findById(loanId)
+      .populate("customer")
+      .populate("loanproduct");
 
     if (!loanAndCustomer)
       return res.status(404).json({ error: "Loan Does not Exist" });
@@ -129,11 +143,14 @@ router.post("/createLoan/:loanId", async (req, res) => {
     // convert number of month to number of days
     const tenure = Number(numberofmonth) * 30;
 
+    const trackingRef = generateTrackingId();
+
     // Define the loan creation request payload here
     const loanRequestPayload = {
-      TransactionTrackingRef: _id,
+      TransactionTrackingRef: trackingRef,
       // LoanProductCode: loanProductDetails.ProductCode,
-      LoanProductCode: loanProduct.ProductCode,
+      LoanProductCode:
+        loanAndCustomer.loanproduct.productCode || loanProduct.productCode,
       CustomerID: customerId,
       LinkedAccountNumber: accountNumber,
       CollateralDetails: collateralDetails,
@@ -145,7 +162,7 @@ router.post("/createLoan/:loanId", async (req, res) => {
         interestAccrualCommencementDate
       ).toISOString(),
       Amount: loanamount,
-      InterestRate: loanProduct.InterestRate,
+      InterestRate: loanProduct.interestRate,
       PrincipalPaymentFrequency: principalPaymentFrequency,
       InterestPaymentFrequency: interestPaymentFrequency,
     };
@@ -162,23 +179,26 @@ router.post("/createLoan/:loanId", async (req, res) => {
     // Construct the URL for loan creation
     const apiUrl = `${baseUrl}/BankOneWebAPI/api/LoanApplication/LoanCreationApplication2/2?authToken=${token}`;
 
-    const response = await fetch(apiUrl, options);
+    const response = await createLoanRequest(apiUrl, options);
 
-    if (!response) {
-      throw new Error(
-        `HTTP error! BankOne Loan creation failed. Status: ${response.status}`
-      );
-    }
     const result = await response.json();
 
     if (!result.IsSuccessful) {
       return res.status(400).json({ error: result.Message });
     }
 
+    await new Promise((resolve) => setTimeout(resolve, 30000));
+    const secondResponse = await createLoanRequest(apiUrl, options);
+    const secondResult = await secondResponse.json();
+
+    if (!secondResult.IsSuccessful) {
+      return res.status(400).json({ error: secondResult.Message });
+    }
+
     await Loan.findOneAndUpdate(
       { _id: loanId },
       {
-        loanAccountNumber: result.Message.AccountNumber,
+        loanAccountNumber: secondResult.Message.AccountNumber,
       }
     );
 
@@ -239,6 +259,9 @@ router.post("/newCustomerAccount/:customerId", async (req, res) => {
       otheremployername: customer.otheremployername,
     });
 
+    const accountOfficerCodeDev = "1001";
+    const accountOfficerCodeProd = "52";
+
     const options = {
       method: "POST",
       headers: {
@@ -276,7 +299,7 @@ router.post("/newCustomerAccount/:customerId", async (req, res) => {
 
         Gender: customer.gender || "male",
 
-        AccountOfficerCode: "52",
+        AccountOfficerCode: accountOfficerCodeDev,
 
         NotificationPreference: "3",
 
@@ -408,7 +431,7 @@ router.get("/getLoansById/:customerId", (req, res) => {
 
   // Construct the URL with the provided customer ID
   const apiUrl = `${baseUrl}/BankOneWebAPI/api/Loan/GetLoansByCustomerId/2?authToken=${token}&institutionCode=${mfbcode}&CustomerID=${customerId}`;
- 
+
   fetch(apiUrl, options)
     .then((response) => {
       if (!response.ok) {
@@ -554,10 +577,12 @@ router.get("/getLoanByAccount/:accountNumber", (req, res) => {
     });
 });
 
+// https://staging.mybankone.com/BankOneWebAPI/api/Loan/GetLoanRepaymentSchedule/2?authToken=0552974c-0abe-4ff9-a9ef-5ee363b52b53&loanAccountNumber=00960014010003932
+
 // get loan repayment schedule (Verify)
 router.get("/getLoanRepaymentSchedule/:loanAccountNumber", async (req, res) => {
   const { loanAccountNumber } = req.params; // Get the loan account number from the URL parameters
-  console.log("repayment schedule", loanAccountNumber);
+
   try {
     // Construct the URL with the provided loan account number
     const apiUrl = `${baseUrl}/BankOneWebAPI/api/loan/GetLoanRepaymentSchedule/2?authToken=${token}&loanAccountNumber=${loanAccountNumber}`;
@@ -607,15 +632,19 @@ router.get("/loanAccountBalance/:customerId", async (req, res) => {
     const response = await fetch(apiUrl, options);
 
     if (!response.ok) {
+      const res = await response.json();
+
       throw new Error(
-        `HTTP error! BankOne Loan account Balance failed. Status: ${response.status}`
+        `HTTP error! BankOne Loan account Balance failed. Status: ${
+          res?.Message || response.status
+        }`
       );
     }
 
     const data = await response.json();
 
     // Handle the data as needed
-    console.log("Loan Account Balance", data);
+
     res.json(data); // Send the response to the client
   } catch (err) {
     console.error(err);
@@ -689,7 +718,6 @@ router.get("/commercialbanks", async (req, res) => {
     const response = await fetch(apiUrl, options);
 
     if (!response) {
-      console.log("server error");
       throw new Error(response);
     }
 
@@ -700,6 +728,26 @@ router.get("/commercialbanks", async (req, res) => {
     }
 
     const data = await response.json();
+
+    res.json(data); // Send the response to the client
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: err }); // Handle errors and send a response to the client
+  }
+});
+
+router.post("/transactionStatusQuery", async (req, res) => {
+  try {
+    // Construct the URL with the provided parameters
+    const apiUrl = `${baseUrl}/thirdpartyapiservice/apiservice/CoreTransactions/TransactionStatusQuery`;
+    const { ref, date, amount } = req.body;
+
+    const { data } = await axios.post(apiUrl, {
+      RetrievalReference: ref,
+      TransactionDate: date,
+      Amount: amount,
+      Token: token,
+    });
 
     res.json(data); // Send the response to the client
   } catch (err) {

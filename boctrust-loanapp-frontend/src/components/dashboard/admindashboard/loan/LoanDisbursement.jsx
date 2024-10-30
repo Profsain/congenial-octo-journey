@@ -196,15 +196,7 @@ const LoanDisbursement = () => {
       {
         className: "text-primary",
         icon: <IoMdCheckmarkCircleOutline />,
-        label:
-          canUserDisburse && (!canUserApprove || !loan.debursementDetails)
-            ? "Disburse Loan"
-            : canUserApprove &&
-              canUserDisburse &&
-              canUserApprove &&
-              loan.debursementDetails
-            ? "Approve"
-            : "",
+        label: !loan.debursementDetails ? "Disburse Loan" : "Approve",
         isDisabled:
           (canUserDisburse && !canUserApprove && loan.debursementDetails) ||
           (canUserApprove &&
@@ -242,7 +234,6 @@ const LoanDisbursement = () => {
           (canUserApprove && loan.disbursementstatus === "approved"),
         isLoading: rejectLoading,
         func: () => {
-       
           setLoanObj(loan);
           setAction(true);
         },
@@ -291,7 +282,7 @@ const LoanDisbursement = () => {
           <Table borderless hover responsive="sm">
             <thead style={styles.head}>
               <tr>
-                <th>Loan ID</th>
+                <th>Customer ID</th>
                 <th>Loan Product</th>
                 <th>Borrower</th>
                 <th>A/C Number</th>

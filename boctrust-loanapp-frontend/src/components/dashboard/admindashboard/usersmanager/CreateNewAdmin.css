@@ -1,3 +1,7 @@
+.edit__user .FieldGroup {
+  margin: 0 !important;
+}
+
 .CheckboxContainer {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
@@ -90,6 +94,6 @@ select:disabled {
 @media screen and (max-width: 600px) {
   .TransContainer .DashHeader {
     margin: 2rem 0 1rem 0 !important;
-    font-size: 1.6rem !important; 
+    font-size: 1.6rem !important;
   }
 }

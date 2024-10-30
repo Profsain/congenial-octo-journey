@@ -11,6 +11,9 @@ import ActionNotification from "../../shared/ActionNotification";
 
 // function
 import searchList from "../../../../../utilities/searchListFunc";
+import TableOptionsDropdown from "../../shared/tableOptionsDropdown/TableOptionsDropdown";
+import { IoMdCheckmarkCircleOutline } from "react-icons/io";
+import { FcCancel } from "react-icons/fc";
 
 const RoleList = ({ count, searchTerms, setIsEditMode }) => {
   const styles = {
@@ -33,11 +36,11 @@ const RoleList = ({ count, searchTerms, setIsEditMode }) => {
 
   // local state
   const [rolesList, setRoleList] = useState(rolesAndPermission);
-
   const [action, setAction] = useState(false);
   const [roleId, setRoleId] = useState("");
 
   const dispatch = useDispatch();
+
   useEffect(() => {
     dispatch(fetchRolesAndPermisions());
   }, [dispatch]);
@@ -57,20 +60,10 @@ const RoleList = ({ count, searchTerms, setIsEditMode }) => {
     handleSearch();
   }, [searchTerms]);
 
-  // handle action select
-  const handleAction = (e) => {
-    const id = e.target.id;
-
-    // // find selected role by id
-    // const role = rolesAndPermission.find((role) => role._id === id);
-    // setRoleObj(role);
-    setRoleId(id);
-  };
-
   // handle delete
   const handleDelete = async () => {
     const apiUrl = import.meta.env.VITE_BASE_URL;
-    await fetch(`${apiUrl}/api/admin/rolesAndPermission/${roleId}`, {
+    await fetch(`${apiUrl}/api/role/${roleId}`, {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
@@ -80,6 +73,33 @@ const RoleList = ({ count, searchTerms, setIsEditMode }) => {
     // remove role from rolesList
     dispatch(fetchRolesAndPermisions());
     setAction(false);
+  };
+
+  const getTableOptions = (role) => {
+    const tableOptions = [
+      {
+        className: "text-primary",
+        icon: <IoMdCheckmarkCircleOutline />,
+        label: "Edit",
+        isDisabled: false,
+        func: () => {
+          setIsEditMode(role);
+        },
+      },
+      {
+        className: "text-danger",
+        icon: <FcCancel />,
+        label: "Delete",
+        isDisabled: false,
+
+        func: () => {
+          setRoleId(role._id);
+          setAction(true);
+        },
+      },
+    ];
+
+    return tableOptions;
   };
 
   return (
@@ -112,22 +132,7 @@ const RoleList = ({ count, searchTerms, setIsEditMode }) => {
                     <td>{role.description}</td>
 
                     <td>
-                      <select
-                        name="action"
-                        className="action"
-                        id={role._id}
-                        onChange={handleAction}
-                      >
-                        <option value="">Action</option>
-                        <option
-                          onClick={() => setIsEditMode(role)}
-                          value="edit"
-                        >
-                          Edit
-                        </option>
-                        <option value="view">View</option>
-                        <option value="delete">Delete</option>
-                      </select>
+                      <TableOptionsDropdown items={getTableOptions(role)} />
                     </td>
                   </tr>
                 ))}

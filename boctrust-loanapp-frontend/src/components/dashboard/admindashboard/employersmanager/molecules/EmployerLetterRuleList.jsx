@@ -66,7 +66,6 @@ const EmployerLetterRuleList = () => {
 
   const handleDeleteMandateRule = async (rule) => {
     try {
-    
       const apiUrl = import.meta.env.VITE_BASE_URL;
       // Handle form submission logic here
       await fetch(`${apiUrl}/api/employer-letter-rule/${rule._id}`, {
@@ -144,11 +143,10 @@ const EmployerLetterRuleList = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {ruleList &&
-                    sortByCreatedAt(ruleList)?.length === 0 && (
-                      <NoResult name="Employment Letter Rule" />
-                    )}
-                  
+                  {ruleList && sortByCreatedAt(ruleList)?.length === 0 && (
+                    <NoResult name="Employment Letter Rule" />
+                  )}
+
                   {ruleList &&
                     ruleList?.map((employmentLetterRule, index) => {
                       return (

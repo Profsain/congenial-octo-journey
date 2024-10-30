@@ -8,7 +8,7 @@ import "./DashboardHome.css";
 const DashboardHome = () => {
   // get current login user
   const user = useSelector((state) => state.adminAuth.user);
-  console.log(user, "user")
+
   const isAccountCreated = user?.banking?.isAccountCreated;
 
   return (

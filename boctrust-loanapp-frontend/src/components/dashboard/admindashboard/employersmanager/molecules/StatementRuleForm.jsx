@@ -68,10 +68,10 @@ const StatementRuleForm = ({
                     name="maximumTenure"
                     id="maximumTenure"
                     className="Select"
-                    disabled={values.noMaxTenure}
+                    disabled={values?.noMaxTenure}
                     onChange={(e) => {
                       setFieldValue("maximumTenure", e.target.value);
-                      if (values.noMaxTenure) {
+                      if (values?.noMaxTenure) {
                         setFieldValue("maximumTenure", 0);
                       }
                     }}
@@ -113,11 +113,11 @@ const StatementRuleForm = ({
                     type="text"
                     name="maximumAmount"
                     id="maximumAmount"
-                    disabled={values.noMaxAmount}
+                    disabled={values?.noMaxAmount}
                     className="Input"
                     onChange={(e) => {
                       setFieldValue("maximumAmount", e.target.value);
-                      if (values.noMaxAmount) {
+                      if (values?.noMaxAmount) {
                         setFieldValue("maximumAmount", 0);
                       }
                     }}

@@ -1,93 +1,45 @@
 /* eslint-disable react/prop-types */
-import { useState, useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { fetchAdmins } from "../../../../redux/reducers/adminUserReducer";
+import { useState } from "react";
 import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
 import "./CreateNewAdmin.css";
 import { userTypes } from "../../../../lib/userRelated";
 import PageLoader from "../../shared/PageLoader";
 import { toast } from "react-toastify";
+import { updateUserValidationSchema } from "../../../loanapplication/loanform/formvalidation";
+import { useFormik } from "formik";
+import { useDispatch } from "react-redux";
+import { fetchAdmins } from "../../../../redux/reducers/adminUserReducer";
 
 const EditUser = (props) => {
-  const dispatch = useDispatch();
   const user = props.userobj;
-
-  console.log(user, "user")
 
   const viewEdit = props.viewEdit;
 
-  // form state
-  const [editFullName, setEditFullName] = useState("");
-  const [editEmail, setEditEmail] = useState("");
-  const [editPhone, setEditPhone] = useState("");
-  const [editUsername, setEditUsername] = useState("");
-  const [editPassword, setEditPassword] = useState("");
-  const [editUserType, setEditUserType] = useState("");
-  const [editAdminRoles, setEditAdminRoles] = useState([]);
-
   const [isLoading, setIsLoading] = useState(false);
 
-  const { rolesAndPermission } = useSelector((state) => state.adminUserReducer);
-
-  // pass object data to form
-  const updateFormObject = () => {
-    setEditFullName(user.fullName);
-    setEditEmail(user.email);
-    setEditPhone(user.phone);
-    setEditUsername(user.username);
-    setEditUserType(user.userType);
-    setEditAdminRoles(user?.userRole);
-  };
-
-  useEffect(() => {
-    updateFormObject();
-  }, [user]);
-
-  // clear form fields
-  const clearForm = () => {
-    setEditFullName("");
-    setEditEmail("");
-    setEditPhone("");
-    setEditUsername("");
-    setEditPassword("");
-    setEditUserType("");
-
-    setEditAdminRoles("");
-    dispatch(fetchAdmins());
-  };
-
-  useEffect(() => {
-    if (editUserType && editUserType === "super_admin") {
-      const adminRole = rolesAndPermission?.find(
-        (item) => item.value === "super_admin"
-      );
-      setEditAdminRoles(adminRole?._id);
-    }
-  }, [editUserType, rolesAndPermission]);
+  const dispatch = useDispatch();
 
   // close model box
-  const handleClose = () => {
+  const handleClose = (clearForm) => {
     props.onHide();
     clearForm();
   };
 
   // submit update to api endpoint
-  const handleSubmit = async (e) => {
+  const handleSubmitForm = async (values, resetForm) => {
     try {
       setIsLoading(true);
 
-      e.preventDefault();
-
       const apiUrl = import.meta.env.VITE_BASE_URL;
       const updatedUser = {
-        fullName: editFullName,
-        email: editEmail,
-        phone: editPhone,
-        username: editUsername,
-        password: editPassword,
-        userType: editUserType,
-        userRole: editAdminRoles,
+        fullName: values["editFullName"],
+        email: values["editEmail"],
+        phone: values["editPhone"],
+        username: values["editUsername"],
+        password: values["editPassword"],
+        userType: values["editUserType"],
+        userRole: values["editAdminRoles"],
       };
 
       const res = await fetch(`${apiUrl}/api/admin/update/${user._id}`, {
@@ -99,8 +51,8 @@ const EditUser = (props) => {
       });
 
       if (res.ok) {
-        clearForm();
-        handleClose();
+        dispatch(fetchAdmins());
+        handleClose(resetForm);
         toast.success("User has been updated");
       } else {
         const errorResponse = await res.json();
@@ -113,6 +65,29 @@ const EditUser = (props) => {
     }
   };
 
+  const {
+    values,
+    resetForm,
+    handleChange,
+    handleBlur,
+    handleSubmit,
+    errors,
+    touched,
+  } = useFormik({
+    initialValues: {
+      editFullName: user.fullName,
+      editEmail: user.email,
+      editPhone: user.phone,
+      editUsername: user.username,
+      editUserType: user.userType,
+    },
+    validationSchema: updateUserValidationSchema,
+
+    onSubmit(values) {
+      handleSubmitForm(values, resetForm);
+    },
+  });
+
   return (
     <Modal
       {...props}
@@ -120,7 +95,7 @@ const EditUser = (props) => {
       aria-labelledby="contained-modal-title-vcenter "
       centered
       backdrop="static"
-      className="modal__container"
+      className="modal__container edit__user"
       keyboard={false}
     >
       <Modal.Header>
@@ -139,9 +114,12 @@ const EditUser = (props) => {
               type="text"
               style={{ width: "100%" }}
               className="Input"
-              value={editFullName}
-              onChange={(e) => setEditFullName(e.target.value)}
+              value={values["editFullName"]}
+              name="editFullName"
+              onChange={handleChange}
+              handleblur={handleBlur}
             />
+            <span className="error__msg">{errors["editFullName"]}</span>
           </div>
 
           <div className="FieldGroup">
@@ -152,9 +130,12 @@ const EditUser = (props) => {
               type="text"
               style={{ width: "100%" }}
               className="Input"
-              value={editEmail}
-              onChange={(e) => setEditEmail(e.target.value)}
+              value={values["editEmail"]}
+              name="editEmail"
+              onChange={handleChange}
+              handleblur={handleBlur}
             />
+            <span className="error__msg">{errors["editEmail"]}</span>
           </div>
 
           <div className="FieldGroup">
@@ -165,9 +146,12 @@ const EditUser = (props) => {
               type="text"
               style={{ width: "100%" }}
               className="Input"
-              value={editPhone}
-              onChange={(e) => setEditPhone(e.target.value)}
+              value={values["editPhone"]}
+              name="editPhone"
+              onChange={handleChange}
+              handleblur={handleBlur}
             />
+            <span className="error__msg">{errors["editPhone"]}</span>
           </div>
 
           <div className="FieldGroup">
@@ -178,20 +162,24 @@ const EditUser = (props) => {
               type="text"
               style={{ width: "100%" }}
               className="Input"
-              value={editUsername}
-              onChange={(e) => setEditUsername(e.target.value)}
+              value={values["editUsername"]}
+              name="editUsername"
+              onChange={handleChange}
+              handleblur={handleBlur}
             />
+            <span className="error__msg">{errors["editUsername"]}</span>
           </div>
 
           <div className="FieldGroup">
             <label htmlFor="userType">User Type</label>
             <select
-              name="userType"
               id="userType"
               className="Input w-100"
               disabled={viewEdit !== "edit"}
-              value={editUserType}
-              onChange={(e) => setEditUserType(e.target.value)}
+              value={values["editUserType"]}
+              name="editUserType"
+              onChange={handleChange}
+              handleblur={handleBlur}
             >
               {userTypes.map((option) => (
                 <option key={option.value} value={option.value}>
@@ -199,35 +187,8 @@ const EditUser = (props) => {
                 </option>
               ))}
             </select>
+            <span className="error__msg">{errors["editUserType"]}</span>
           </div>
-
-          {rolesAndPermission && (
-            <div className="FieldGroup">
-              <label htmlFor="userRole">User Roles</label>
-              <select
-                name="userRole"
-                value={editAdminRoles?._id}
-                disabled={
-                  viewEdit !== "edit" ||
-                  !editUserType ||
-                  editUserType === "super_admin"
-                }
-                id="userRole"
-                className="Input  w-100"
-              >
-                <option value="">Select Role</option>
-                {rolesAndPermission.map((option) => (
-                  <option
-                    onClick={() => setEditAdminRoles(option._id)}
-                    key={option._id}
-                    value={option._id}
-                  >
-                    {option.label}
-                  </option>
-                ))}
-              </select>
-            </div>
-          )}
 
           {/* adminRoles checkbox options section */}
 
@@ -264,7 +225,12 @@ const EditUser = (props) => {
         </form>
       </Modal.Body>
       <Modal.Footer>
-        <Button variant="secondary" onClick={handleClose}>
+        <Button
+          variant="secondary"
+          onClick={() => {
+            handleClose(resetForm);
+          }}
+        >
           Close
         </Button>
 

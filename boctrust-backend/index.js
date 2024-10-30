@@ -60,6 +60,7 @@ const termiiOTPRoute = require("./routes/termii");
 // configure dotenv
 dotenv.config();
 
+
 // connect to database
 mongoose
     .connect(process.env.MONGODB_URL, {

@@ -12,7 +12,7 @@ import Headline from "../../shared/Headline";
 import TextInput from "./formcomponents/TextInput";
 // import LoanForm from "./LoanForm";
 import "./Form.css";
-import calculatorfunc, { calculateSimpleInterest } from "../../shared/calculatorfunc";
+import  { calculateSimpleInterest } from "../../shared/calculatorfunc";
 
 // bvn verification function
 import { bvnVerification } from "./bvnVerification";
@@ -20,8 +20,7 @@ import { ToastContainer, toast } from "react-toastify";
 
 // toast styles
 import "react-toastify/dist/ReactToastify.css";
-import { encryptText } from "../../../../utilities/encryptDecrypt";
-// import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 // import { updateCustomerStateValues } from "../../../redux/reducers/customerReducer";
 
 // loan form component
@@ -47,7 +46,7 @@ const LoanFirstStep = ({ data }) => {
 
   const loanProducts = useSelector((state) => state.productReducer.products);
 
-  // const navigate = useNavigate();
+  const navigate = useNavigate();
 
   useEffect(() => {
     dispatch(fetchSelectedProduct());
@@ -175,7 +174,7 @@ const LoanFirstStep = ({ data }) => {
     sessionStorage.setItem(
       "loanFirstInfo",
       JSON.stringify({
-        bvn: encryptText(bvn),
+        bvn: bvn,
         loanAmount: loanamount,
         careerType: careertype,
         numberOfMonths: noofmonth,
@@ -205,8 +204,8 @@ const LoanFirstStep = ({ data }) => {
       .then((response) => response.json())
       .then(() => {
         // search for bvn details and verify
-        bvnVerification();
-        // navigate("/app/nibbs-login")
+        // bvnVerification();
+        navigate("/app/nibbs-login")
         // set show loan form to true
         // setShowLoanForm(true);
       });

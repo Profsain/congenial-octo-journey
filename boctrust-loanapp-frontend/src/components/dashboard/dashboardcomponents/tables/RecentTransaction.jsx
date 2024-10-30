@@ -1,9 +1,14 @@
-import PropTypes from "prop-types"
+import PropTypes from "prop-types";
 import BocButton from "../../shared/BocButton";
 import DashboardHeadline from "../../shared/DashboardHeadline";
 import Table from "react-bootstrap/Table";
+import { useDispatch, useSelector } from "react-redux";
+import { useEffect } from "react";
+import { fetchUserTransactions } from "../../../../redux/reducers/transactionReducer";
+import PageLoader from "../../shared/PageLoader";
+import { nigerianCurrencyFormat } from "../../../../../utilities/formatToNiaraCurrency";
 
-const RecentTransaction = ({user}) => {
+const RecentTransaction = ({ user }) => {
   const styles = {
     table: {
       marginLeft: "2rem",
@@ -12,14 +17,33 @@ const RecentTransaction = ({user}) => {
       color: "#145098",
       fontWeight: "bold",
       fontSize: "1.2rem",
-      },
-      completed: {
-        color: "#5cc51c",
-      }
+    },
+    completed: {
+      color: "#5cc51c",
+    },
   };
 
-  console.log("Recent Transaction", user);
-  const recentTransaction = user?.recentTransaction || [];
+  const { userTransactions, status } = useSelector(
+    (state) => state.transactionReducer
+  );
+
+  const dispatch = useDispatch(0);
+
+  useEffect(() => {
+    const getData = async () => {
+      if (!user) return;
+
+      try {
+        await dispatch(
+          fetchUserTransactions(user.banking?.accountDetails?.AccountNumber)
+        );
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    getData();
+  }, [user]);
 
   return (
     <div>
@@ -42,70 +66,45 @@ const RecentTransaction = ({user}) => {
             <th>Details</th>
           </tr>
         </thead>
-        {/* <tbody>
-          <tr>
-            <td>2023-25-03</td>
-            <td>1234567891</td>
-            <td>N2134</td>
-            <td>Dr</td>
-            <td>Loan Repayment</td>
-            <td style={styles.completed}>Completed</td>
-            <td>
-              <BocButton cursor="pointer" bgcolor="#145098" bradius="18px">
-                View
-              </BocButton>
-            </td>
-          </tr>
-          <tr>
-            <td>2023-25-03</td>
-            <td>1234567891</td>
-            <td>N2134</td>
-            <td>Dr</td>
-            <td>Loan Repayment</td>
-            <td style={styles.completed}>Completed</td>
-            <td>
-              <BocButton cursor="pointer" bgcolor="#145098" bradius="18px">
-                View
-              </BocButton>
-            </td>
-          </tr>
-          <tr>
-            <td>2023-25-05</td>
-            <td>1234567891</td>
-            <td>N1134</td>
-            <td>Cr</td>
-            <td>Loan Repayment</td>
-            <td style={styles.completed}>Completed</td>
-            <td>
-              <BocButton cursor="pointer" bgcolor="#145098" bradius="18px">
-                View
-              </BocButton>
-            </td>
-          </tr>
-        </tbody> */}
+
         <tbody>
-          {recentTransaction.length === 0 ? (
+          {!userTransactions || status === "loading" ? (
+            <tr>
+              <td colSpan="5">
+                <PageLoader width="70px" />
+              </td>
+            </tr>
+          ) : userTransactions.length === 0 ? (
             <tr>
               <td colSpan="7" style={{ textAlign: "center" }}>
                 No recent transactions
               </td>
             </tr>
           ) : (
-            recentTransaction.map((transaction, index) => (
-              <tr key={index}>
-                <td>{transaction.date}</td>
-                <td>{transaction.accountNumber}</td>
-                <td>{transaction.amount}</td>
-                <td>{transaction.drCr}</td>
-                <td>{transaction.type}</td>
-                <td style={styles.completed}>{transaction.status}</td>
-                <td>
-                  <BocButton cursor="pointer" bgcolor="#145098" bradius="18px">
-                    View
-                  </BocButton>
-                </td>
-              </tr>
-            ))
+            userTransactions &&
+            userTransactions.slice(0, 5).map((transaction, index) => {
+              return (
+                <tr key={index}>
+                  <td>{transaction?.CurrentDate}</td>
+                  <td>{transaction?.AccountNumber || "NIL"}</td>
+                  <td>
+                    {nigerianCurrencyFormat.format(transaction?.Amount / 100)}
+                  </td>
+                  <td>{transaction?.RecordType}</td>
+                  <td> - </td>
+                  <td style={styles.completed}>{transaction?.status}</td>
+                  <td>
+                    <BocButton
+                      cursor="pointer"
+                      bgcolor="#145098"
+                      bradius="18px"
+                    >
+                      View
+                    </BocButton>
+                  </td>
+                </tr>
+              );
+            })
           )}
         </tbody>
       </Table>
@@ -114,7 +113,7 @@ const RecentTransaction = ({user}) => {
 };
 
 RecentTransaction.propTypes = {
-  user: PropTypes.any
-}
+  user: PropTypes.any,
+};
 
 export default RecentTransaction;
