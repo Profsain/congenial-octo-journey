@@ -54,15 +54,15 @@ const getAccountProduct = async ({
   const token = process.env.BANKONE_TOKEN;
 
   try {
-    const customerAccountProductCode = 102;
-    // const customerAccountProductCode =
-    //   careertype == "government employee" &&
-    //   deductions == "ippis" &&
-    //   !otheremployername
-    //     ? 107
-    //     : careertype !== "business owner" && otheremployername
-    //     ? 200
-    //     : 201;
+    // const customerAccountProductCode = 102;
+    const customerAccountProductCode =
+      careertype == "government employee" &&
+      deductions == "ippis" &&
+      !otheremployername
+        ? 107
+        : careertype !== "business owner" && otheremployername
+        ? 200
+        : 201;
     const response = await axios.get(
       `${baseUrl}/BankOneWebAPI/api/Product/GetByCode/2?authToken=${token}&productCode=${customerAccountProductCode}`
     );
@@ -93,12 +93,12 @@ const getLoanProduct = async ({
   // * Term Loan: 305
 
   try {
-    const customerAccountProductCode = 401;
-    // const customerAccountProductCode = careertype == "government employee" &&
-    // deductions == "ippis" &&
-    // !otheremployername
-    //   ? 306
-    //   : loanproduct;
+    // const customerAccountProductCode = 401;
+    const customerAccountProductCode = careertype == "government employee" &&
+    deductions == "ippis" &&
+    !otheremployername
+      ? 306
+      : loanproduct;
 
     // const { data } = await axios.get(
     //   `${baseUrl}/BankOneWebAPI/api/Product/GetByCode/2?authToken=${token}&productCode=${customerAccountProductCode}`
