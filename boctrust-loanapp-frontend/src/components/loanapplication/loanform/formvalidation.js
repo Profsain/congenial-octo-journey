@@ -1,5 +1,8 @@
 import * as Yup from "yup";
 // validation Yup.Schema
+
+const MAX_FILE_SIZE = 1 * 1024 * 1024; // 1MB
+
 const validationSchema = Yup.object({
   loanamount: Yup.string().required("Required"),
   numberofmonth: Yup.number()
@@ -18,7 +21,10 @@ const validationSchema = Yup.object({
   lastname: Yup.string().required("Required"),
   phonenumber: Yup.string()
     .required("Required")
-    .matches(/^[0-9]+$/, "Must be only digits")
+    .matches(
+      /^0[789][01]\d{8}$/,
+      "Phone number must be a valid Nigerian number, e.g., 09023653676"
+    )
     .min(11, "Must be exactly 11 digits")
     .max(11, "Must be exactly 11 digits"),
   dob: Yup.date().required("Required"),
@@ -33,14 +39,21 @@ const validationSchema = Yup.object({
   stateoforigin: Yup.string().required("Required"),
   ippis: Yup.string().required("Required"),
   servicenumber: Yup.string().required("Required"),
-  valididcard: Yup.mixed().required("File is Required"),
+  valididcard: Yup.mixed()
+    .required("File is Required")
+    .test("fileSizeValididcard", "File size exceeds 1MB", (value) => {
+      return value && value.size <= MAX_FILE_SIZE;
+    }),
 
   // next of kin
   nkinfirstname: Yup.string().required("Required"),
   nkinlastname: Yup.string().required("Required"),
   nkinphonenumber: Yup.string()
     .required("Required")
-    .matches(/^[0-9]+$/, "Must be only digits")
+    .matches(
+      /^0[789][01]\d{8}$/,
+      "Phone number must be a valid Nigerian number, e.g., 09023653676"
+    )
     .min(11, "Must be exactly 11 digits")
     .max(11, "Must be exactly 11 digits"),
   nkinrelationship: Yup.string().required("Required"),
@@ -55,7 +68,39 @@ const validationSchema = Yup.object({
   officialemail: Yup.string()
     .email("Invalid email format")
     .required("Required"),
-  uploadpayslip: Yup.mixed().required("Required"),
+  uploadpayslip: Yup.mixed()
+    .required("Payslip Required")
+    .test("fileSize", "File size exceeds 1MB", (value) => {
+      return value && value.size <= MAX_FILE_SIZE;
+    }),
+  uploadbankstatement: Yup.mixed().test(
+    "fileSizePayslip",
+    "File size exceeds 1MB",
+    (value) => {
+      return value && value.size <= MAX_FILE_SIZE;
+    }
+  ),
+  employmentletter: Yup.mixed().test(
+    "fileSizeEmploymentletter",
+    "File size exceeds 1MB",
+    (value) => {
+      return value && value.size <= MAX_FILE_SIZE;
+    }
+  ),
+  marketerClientPic: Yup.mixed().test(
+    "fileSizeMarketerClientPic",
+    "File size exceeds 1MB",
+    (value) => {
+      return value && value.size <= MAX_FILE_SIZE;
+    }
+  ),
+  signature: Yup.mixed().test(
+    "fileSizeSignature",
+    "File size exceeds 1MB",
+    (value) => {
+      return value && value.size <= MAX_FILE_SIZE;
+    }
+  ),
 
   // bank details and disbursement
   salaryaccountname: Yup.string().required("Required"),
@@ -112,12 +157,28 @@ const validationSchema = Yup.object({
 
 export default validationSchema;
 
-
 export const loanFirstSetpSchema = Yup.object({
   loanamount: Yup.string().required("Required"),
   numberofmonth: Yup.number()
     .min(1, "Please enter a number from 1 to 24")
     .max(24, "Please enter a number from 1 to 24")
     .required("Required"),
+});
 
+export const updateUserValidationSchema = Yup.object({
+  editFullName: Yup.string().required("Required"),
+  editEmail: Yup.string().email("Invalid email format").required("Required"),
+  editPhone: Yup.string()
+    .required("Required")
+    .matches(/^[0-9]+$/, "Must be only digits")
+    .min(11, "Must be exactly 11 digits")
+    .max(11, "Must be exactly 11 digits"),
+  editUsername: Yup.string().required("Required"),
+  // editPassword: Yup.string()
+  //   .required("Password is required")
+  //   .matches(
+  //     /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/,
+  //     "Password must be at least 8 characters, contain one uppercase letter, one lowercase letter, and one digit"
+  //   ),
+  editUserType: Yup.string().required("Required"),
 });

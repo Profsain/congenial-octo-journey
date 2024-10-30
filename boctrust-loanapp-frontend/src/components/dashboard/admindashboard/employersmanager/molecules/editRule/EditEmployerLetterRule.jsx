@@ -5,10 +5,10 @@ import { toast } from "react-toastify";
 import { IoClose } from "react-icons/io5";
 import "./EditeRule.css";
 import { useDispatch } from "react-redux";
-import StatementRuleForm from "../StatementRuleForm";
 import { fetchEmployerLetterRules } from "../../../../../../redux/reducers/employerLetterRuleReducer";
+import EmployerLetterRuleForm from "../EmployerLetterRuleForm";
 
-const EditEmployerLetterRule = ({ show, handleClose, selectedMandateRule }) => {
+const EditEmployerLetterRule = ({ show, handleClose, selectedRule }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState("");
 
@@ -19,13 +19,16 @@ const EditEmployerLetterRule = ({ show, handleClose, selectedMandateRule }) => {
       setIsLoading(true);
       const apiUrl = import.meta.env.VITE_BASE_URL;
       // Handle form submission logic here
-      await fetch(`${apiUrl}/api/employer-letter-rule/${selectedMandateRule._id}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(values),
-      });
+      await fetch(
+        `${apiUrl}/api/employer-letter-rule/${selectedRule._id}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(values),
+        }
+      );
 
       await dispatch(fetchEmployerLetterRules());
 
@@ -51,13 +54,13 @@ const EditEmployerLetterRule = ({ show, handleClose, selectedMandateRule }) => {
           <button onClick={handleClose} className="btn btn-light close-btn">
             <IoClose size={20} color="rgb(244 63 94)" />
           </button>
-          <StatementRuleForm
+          <EmployerLetterRuleForm
             formTitle={"Edit Employer Letter Rule"}
             handleSubmit={handleUpdate}
             message={message}
             isLoading={isLoading}
             isUpdate
-            initialValues={selectedMandateRule}
+            initialValues={selectedRule}
           />
         </div>
       </Modal.Body>
@@ -68,7 +71,7 @@ const EditEmployerLetterRule = ({ show, handleClose, selectedMandateRule }) => {
 EditEmployerLetterRule.propTypes = {
   handleClose: PropTypes.func,
   show: PropTypes.bool,
-  selectedMandateRule: PropTypes.object,
+  selectedRule: PropTypes.object,
 };
 
 export default EditEmployerLetterRule;

@@ -46,7 +46,7 @@ import StatementRules from "../employersmanager/StatementRules";
 // import AllWebsitePages from "../website/AllWebsitePages";
 import ContactForm from "../website/ContactForm";
 import LoanDisbursement from "../loan/LoanDisbursement";
-import BalanceEnquiry from "../loan/BalanceEnquiry";
+// import BalanceEnquiry from "../loan/BalanceEnquiry";
 import LoanStatement from "../loan/LoanStatement";
 import PostJobs from "../website/PostJobs";
 import JobApplicationsList from "../website/JobApplicationsList";
@@ -472,7 +472,7 @@ const AdminDashboard = () => {
           <Route path="overdue" element={<OverdueLoans />} />
           <Route path="products" element={<LoanProducts />} />
           <Route path="calculator" element={<LoanCalculator />} />
-          <Route path="balanceenquiry" element={<BalanceEnquiry />} />
+          {/* <Route path="balanceenquiry" element={<BalanceEnquiry />} /> */}
           <Route path="loanstatement" element={<LoanStatement />} />
         </Route>
         <Route path="repayment" element={<RepaymentDashboard />} />

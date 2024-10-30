@@ -212,7 +212,7 @@ const SideNavMain = ({ onMenuItemClick }) => {
                   Loan Calculator
                 </Link>
               </li>
-              <li>
+              {/* <li>
                 <Link
                   id="balanceenquiry"
                   onClick={onMenuItemClick}
@@ -220,7 +220,7 @@ const SideNavMain = ({ onMenuItemClick }) => {
                 >
                   Balance Enquiry
                 </Link>
-              </li>
+              </li> */}
 
               <li>
                 <Link

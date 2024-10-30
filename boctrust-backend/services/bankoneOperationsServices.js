@@ -1,4 +1,5 @@
 const { default: axios } = require("axios");
+const Product = require("../models/Product");
 
 const getCustomerAccountInfoByTrackingRef = async (trackinRef) => {
   const baseUrl = process.env.BANKONE_BASE_URL;
@@ -53,7 +54,7 @@ const getAccountProduct = async ({
   const token = process.env.BANKONE_TOKEN;
 
   try {
-    // const customerAccountProductCode = 401
+    // const customerAccountProductCode = 102;
     const customerAccountProductCode =
       careertype == "government employee" &&
       deductions == "ippis" &&
@@ -83,8 +84,8 @@ const getLoanProduct = async ({
   otheremployername,
   loanproduct,
 }) => {
-  const baseUrl = process.env.BANKONE_BASE_URL;
-  const token = process.env.BANKONE_TOKEN;
+  // const baseUrl = process.env.BANKONE_BASE_URL;
+  // const token = process.env.BANKONE_TOKEN;
 
   // * IPPIS Loan: 306
   // * ROSCA Loan: 303
@@ -99,11 +100,16 @@ const getLoanProduct = async ({
       ? 306
       : loanproduct;
 
-    const { data } = await axios.get(
-      `${baseUrl}/BankOneWebAPI/api/Product/GetByCode/2?authToken=${token}&productCode=${customerAccountProductCode}`
-    );
+    // const { data } = await axios.get(
+    //   `${baseUrl}/BankOneWebAPI/api/Product/GetByCode/2?authToken=${token}&productCode=${customerAccountProductCode}`
+    // );
 
-    return data;
+    // get product
+    let product = await Product.findOne({
+      productCode: customerAccountProductCode,
+    });
+
+    return product;
   } catch (error) {
     console.log(
       "There was a problem with the fetch operation:",
@@ -127,7 +133,7 @@ const getLoanByCustomerId = async (customerId) => {
       }&CustomerId=${customerId}&addStartAndEndDate=${true}`
     );
 
-    return data;
+    return data.Message;
   } catch (error) {
     console.error(
       "There was a problem with the fetch operation:",
@@ -137,10 +143,24 @@ const getLoanByCustomerId = async (customerId) => {
   }
 };
 
+function generateTrackingId() {
+  // Get the current timestamp in milliseconds
+  const timestamp = Date.now().toString();
+
+  // Generate a random number and convert it to a string
+  const randomValue = Math.random().toString(36).substring(2, 15);
+
+  // Combine timestamp and random value to create a unique traceId
+  const traceId = timestamp + randomValue;
+
+  return traceId;
+}
+
 module.exports = {
   getCustomerAccountInfoByTrackingRef,
   handleInterBankTransfer,
   getAccountProduct,
   getLoanProduct,
   getLoanByCustomerId,
+  generateTrackingId,
 };

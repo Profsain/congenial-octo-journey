@@ -11,6 +11,9 @@ const CustomerModel = require("../models/Customer"); // Import customer model
 const Customer = require("../models/Customer");
 const Loan = require("../models/Loan");
 const Employer = require("../models/EmployersManager");
+const {
+  getLoanByCustomerId,
+} = require("../services/bankoneOperationsServices");
 
 // configure dotenv
 dotenv.config();
@@ -82,14 +85,6 @@ router.post("/customer", multipleUpload, async (req, res) => {
     req.body.password = await bcrypt.hash(req.body.password, 10);
     req.body.confirmpassword = await bcrypt.hash(req.body.confirmpassword, 10);
 
-    console.log(
-      {
-        ...req.body,
-        employer: employer && employer != "undefined" ? employer : null,
-      },
-      "Print payload"
-    );
-
     const customer = await CustomerModel.create({
       ...req.body,
       employer: employer && employer != "undefined" ? employer : null,
@@ -148,6 +143,20 @@ router.post("/login", async (req, res) => {
         ...customer.toJSON(),
         photocaptureImg: `${baseUrl}/public/filesUpload/${customer.photocapture}`,
       };
+
+      // Add customer active loan to payload
+      if (customer.banking?.isAccountCreated) {
+        const customerLoanAccounts = await getLoanByCustomerId(
+          customer.banking?.accountDetails.CustomerID
+        );
+        const activeLoanAccount = customerLoanAccounts.find(
+          (account) =>
+            account.RealLoanStatus === "Active" && !account.IsLoanWrittenOff
+        );
+        
+        customerWithImages.activeLoan = activeLoanAccount;
+      }
+
       return res
         .status(200)
         .json({ success: "Login successful", customer: customerWithImages });

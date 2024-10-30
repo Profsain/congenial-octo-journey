@@ -7,8 +7,28 @@ const apiUrl = import.meta.env.VITE_BASE_URL;
 const API_ENDPOINT = `${apiUrl}/api`;
 
 // Thunk to fetch Loans from the API
+export const fetchMyLoans = createAsyncThunk(
+  "account/fetchMyLoans",
+  async (customerId) => {
+    const response = await axios.get(`${API_ENDPOINT}/loans/my/${customerId}`);
+
+    return response.data;
+  }
+);
+
+// Thunk to fetch Loans from the API
 export const fetchLoans = createAsyncThunk("account/fetchLoans", async () => {
-  const response = await axios.get(`${API_ENDPOINT}/loans`);
+  const { data: allLoans } = await axios.get(`${API_ENDPOINT}/loans`);
+
+  const loanFullPayload = await Promise.all(
+    allLoans.Message.map(async (loan) => {
+      const { data: loanBalance } =  await axios.get(
+        `${API_ENDPOINT}/bankone/loanAccountBalance/${customerId}`
+      );
+
+      return { ...loan, balance: loanBalance };
+    })
+  );
 
   return response.data;
 });
@@ -66,9 +86,36 @@ export const fetchCompletedLoan = createAsyncThunk(
 export const fetchCustomerLoans = createAsyncThunk(
   "account/fetchCustomerLoans",
   async (customerId) => {
-    const response = await axios.get(`${API_ENDPOINT}/loans/${customerId}`);
+    const response = await axios.get(
+      `${API_ENDPOINT}/bankone/getLoansById/${customerId}`
+    );
+
+    return response.data.Message;
+  }
+);
+
+// Thunk to get loan repayent schedule
+export const fetchLoanRepaymentSchedule = createAsyncThunk(
+  "account/fetchLoanRepaymentSchedule",
+  async (loanAccountNumber) => {
+    const response = await axios.get(
+      `${API_ENDPOINT}/bankone/getLoanRepaymentSchedule/${loanAccountNumber}`
+    );
 
     return response.data;
+  }
+);
+
+// Thunk to get loan repayent schedule
+export const fetchLoanAccountBal = createAsyncThunk(
+  "account/fetchLoanAccountBal",
+  async (customerId) => {
+    
+    const response = await axios.get(
+      `${API_ENDPOINT}/bankone/loanAccountBalance/${customerId}`
+    );
+
+    return response.data.Message;
   }
 );
 
@@ -82,6 +129,8 @@ const loanSlice = createSlice({
     bookedLoans: null,
     completedLoans: null,
     selectedCustomerLoan: null,
+    activeLoanRepaymentSchedule: null,
+    loansAccountBalance: null,
     loanFirstInfo: null,
     status: "idle",
     error: null,
@@ -104,6 +153,20 @@ const loanSlice = createSlice({
         state.status = "failed";
         state.error = action.error.message;
       })
+
+      .addCase(fetchMyLoans.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(fetchMyLoans.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        state.allLoans = action.payload;
+      })
+      .addCase(fetchMyLoans.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.error.message;
+      })
+
+
       .addCase(fetchAllLoans.pending, (state) => {
         state.status = "loading";
       })
@@ -167,6 +230,30 @@ const loanSlice = createSlice({
         state.selectedCustomerLoan = action.payload;
       })
       .addCase(fetchCustomerLoans.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.error.message;
+      })
+
+      .addCase(fetchLoanRepaymentSchedule.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(fetchLoanRepaymentSchedule.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        state.activeLoanRepaymentSchedule = action.payload;
+      })
+      .addCase(fetchLoanRepaymentSchedule.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.error.message;
+      })
+
+      .addCase(fetchLoanAccountBal.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(fetchLoanAccountBal.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        state.loansAccountBalance = action.payload;
+      })
+      .addCase(fetchLoanAccountBal.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.error.message;
       });

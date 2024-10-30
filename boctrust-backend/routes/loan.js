@@ -13,17 +13,18 @@ router.get("/", async (req, res) => {
   try {
     const loans = await Loan.find({
       loanstatus: { $ne: "with operations" },
-    }).populate({
-      path: "customer",
-      populate: {
-        path: "employer", // Populating employer within customer
-        model: "Employer",
-      },
-    }).populate("loanproduct");
+    })
+      .populate({
+        path: "customer",
+        populate: {
+          path: "employer", // Populating employer within customer
+          model: "Employer",
+        },
+      })
+      .populate("loanproduct");
 
     loans.forEach((loan) => {
       if (!loan.customer.employer) {
-    
         const psuedoEmployer = new Employer({
           employersId: `E00${Math.floor(Math.random() * 100) + 1} `,
           employersName: loan.customer?.otheremployername,
@@ -44,6 +45,19 @@ router.get("/", async (req, res) => {
 router.get("/all", async (req, res) => {
   try {
     const loans = await Loan.find().populate("customer");
+    return res.status(200).json(loans);
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+});
+
+// Get all loan
+router.get("/my/:customerId", async (req, res) => {
+  const { customerId } = req.params;
+  try {
+    const loans = await Loan.find({
+      customer: customerId,
+    }).populate("customer");
     return res.status(200).json(loans);
   } catch (error) {
     return res.status(500).json({ error: error.message });

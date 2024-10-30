@@ -50,8 +50,15 @@ const KycViewDetails = ({ customer, setShowInfo }) => {
             />
           </div>
 
-          <KycInput name="Email" type="text" value={customer?.email || ""} />
-
+          <div className="InputRow">
+            <KycInput name="Email" type="text" value={customer?.email || ""} />
+            <div className="Space"></div>
+            <KycInput
+              name="BVN"
+              type="text"
+              value={customer?.bvnnumber || ""}
+            />
+          </div>
           <div className="InputRow">
             <KycInput
               name="Marital Status"
@@ -229,7 +236,6 @@ const KycViewDetails = ({ customer, setShowInfo }) => {
                 value={customer?.totalannualincome || ""}
               />
             </div>
-
             <KycInput
               name="Offical Email"
               type="text"

@@ -21,6 +21,8 @@ router.get("/products", async (req, res) => {
     //   })
     // );
 
+   
+
     // return success response
     return res.status(200).json(products);
   } catch (error) {
@@ -44,10 +46,25 @@ router.get("/:productId", async (req, res) => {
       `${baseUrl}/BankOneWebAPI/api/Product/GetByCode/2?authToken=${token}&productCode=${product.productCode}`
     );
 
-    
+    // return success response
+    return res.status(200).json({ product, bankoneDetails: response.data });
+  } catch (error) {
+    // console.log(error, "error");
+    return res.status(500).json({ error: error.message });
+  }
+});
+
+// get all products endpoint
+router.get("/productCode/:code", async (req, res) => {
+  const { productCode } = req.params;
+
+
+  try {
+    // get all products
+    let product = await Product.findOne({ productCode: productCode });
 
     // return success response
-    return res.status(200).json({product, bankoneDetails: response.data});
+    return res.status(200).json({ product });
   } catch (error) {
     // console.log(error, "error");
     return res.status(500).json({ error: error.message });

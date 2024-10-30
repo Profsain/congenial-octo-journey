@@ -32,6 +32,7 @@ const EmployerLetterRuleForm = ({
   handleSubmit,
   message,
 }) => {
+  
   return (
     <div className="add__statementContainer">
       <div className="TransContainer ">
@@ -68,10 +69,10 @@ const EmployerLetterRuleForm = ({
                     name="maximumTenure"
                     id="maximumTenure"
                     className="Select"
-                    disabled={values.noMaxTenure}
+                    disabled={values?.noMaxTenure}
                     onChange={(e) => {
                       setFieldValue("maximumTenure", e.target.value);
-                      if (values.noMaxTenure) {
+                      if (values?.noMaxTenure) {
                         setFieldValue("maximumTenure", 0);
                       }
                     }}
@@ -113,11 +114,11 @@ const EmployerLetterRuleForm = ({
                     type="text"
                     name="maximumAmount"
                     id="maximumAmount"
-                    disabled={values.noMaxAmount}
+                    disabled={values?.noMaxAmount}
                     className="Input"
                     onChange={(e) => {
                       setFieldValue("maximumAmount", e.target.value);
-                      if (values.noMaxAmount) {
+                      if (values?.noMaxAmount) {
                         setFieldValue("maximumAmount", 0);
                       }
                     }}

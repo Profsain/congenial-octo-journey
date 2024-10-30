@@ -10,11 +10,26 @@ const API_ENDPOINT = `${apiUrl}/api`;
 export const fetchUserTransactions = createAsyncThunk(
   "transaction/fetchUserTransactions",
   async (accountNumber) => {
-    const response = await axios.get(
+    const { data: transactionsData } = await axios.get(
       `${API_ENDPOINT}/bankone/getUserTransactions/${accountNumber}`
     );
 
-    return response.data;
+    const transactionWithStatus = await Promise.all(
+      transactionsData.Message.map(async (transaction) => {
+        const { data: statusData } = await axios.post(
+          `${import.meta.env.VITE_BASE_URL}/api/bankone/transactionStatusQuery`,
+          {
+            ref: transaction.InstrumentNo,
+            date: transaction.CurrentDate,
+            amount: transaction.Amount,
+          }
+        );
+
+        return { ...transaction, status: statusData.ResponseMessage };
+      })
+    );
+
+    return transactionWithStatus;
   }
 );
 

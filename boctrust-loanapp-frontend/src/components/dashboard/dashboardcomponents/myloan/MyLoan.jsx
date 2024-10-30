@@ -1,24 +1,38 @@
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import Table from "react-bootstrap/Table";
 import BocButton from "../../shared/BocButton";
 import "../../Dashboard.css";
 import DashboardHeadline from "../../shared/DashboardHeadline";
+import { useEffect } from "react";
+import { fetchMyLoans } from "../../../../redux/reducers/loanReducer";
+import PageLoader from "../../shared/PageLoader";
+
+const styles = {
+  head: {
+    color: "#fff",
+    fontSize: "1rem",
+  },
+  table: {
+    marginLeft: "-1rem",
+  },
+};
 
 const MyLoan = () => {
   const user = useSelector((state) => state.adminAuth.user);
-  const allLoans = user?.allLoans || [];
+  const { allLoans, status } = useSelector((state) => state.loanReducer);
 
-  // console.log("user my loan", allLoans)
+  const dispatch = useDispatch();
+  useEffect(() => {
+    const getData = async () => {
+      try {
+        await dispatch(fetchMyLoans(user?._id));
+      } catch (error) {
+        console.log(error);
+      }
+    };
 
-  const styles = {
-    head: {
-      color: "#fff",
-      fontSize: "1rem",
-    },
-    table: {
-      marginLeft: "-1rem",
-    },
-  };
+    getData();
+  }, [user]);
 
   return (
     <div className="MLoan">
@@ -47,142 +61,25 @@ const MyLoan = () => {
           </tr>
         </thead>
         <tbody>
-          {allLoans.length === 0 ? (
+          {!allLoans || status === "loading" ? (
+            <tr>
+              <td colSpan="8">
+                <PageLoader width="70px" />
+              </td>
+            </tr>
+          ) : allLoans && allLoans.length === 0 ? (
             <tr>
               <td colSpan="8" style={{ textAlign: "center" }}>
                 No loan record
               </td>
             </tr>
-          ) : (
-            <div>
-              <tr>
-                <td>{user?.banking.accountDetails.Message.CustomerID || ""}</td>
-                <td>{user.loanpurpose[0] || ""}</td>
-                <td>N{user.loanamount || ""}</td>
-                <td>N280000</td>
-                <td>N0.00</td>
-                <td>N22300</td>
-                <td>22-04-2023</td>
-                <td>
-                  <BocButton width="120px" cursor="pointer" bgcolor="#ecaa00">
-                    Booked
-                  </BocButton>
-                </td>
-              </tr>
-              <tr>
-                <td>1012</td>
-                <td>Car Loan</td>
-                <td>N2,200000</td>
-                <td>N280000</td>
-                <td>N0.00</td>
-                <td>N223000</td>
-                <td>18-05-2023</td>
-                <td>
-                  <BocButton width="120px" cursor="pointer" bgcolor="#ecaa66">
-                    With Credit
-                  </BocButton>
-                </td>
-              </tr>
-              <tr>
-                <td>1013</td>
-                <td>SME Loan</td>
-                <td>N2000000</td>
-                <td>N290000</td>
-                <td>N0.00</td>
-                <td>N90300</td>
-                <td>20-03-2023</td>
-                <td>
-                  <BocButton width="120px" cursor="pointer" bgcolor="#7dd50e">
-                    Completed
-                  </BocButton>
-                </td>
-              </tr>
-              <tr>
-                <td>1023</td>
-                <td>Salary Advance</td>
-                <td>N50000</td>
-                <td>N28000</td>
-                <td>N0.00</td>
-                <td>N23000</td>
-                <td>05-02-2023</td>
-                <td>
-                  <BocButton width="120px" cursor="pointer" bgcolor="#7dd50e">
-                    Completed
-                  </BocButton>
-                </td>
-              </tr>
-              <tr>
-                <td>1010</td>
-                <td>Personal Loan</td>
-                <td>N220000</td>
-                <td>N280000</td>
-                <td>N0.00</td>
-                <td>N22300</td>
-                <td>22-04-2023</td>
-                <td>
-                  <BocButton width="120px" cursor="pointer" bgcolor="#145098">
-                    With COO
-                  </BocButton>
-                </td>
-              </tr>
-              <tr>
-                <td>1010</td>
-                <td>Car Loan</td>
-                <td>N220000</td>
-                <td>N280000</td>
-                <td>N0.00</td>
-                <td>N22300</td>
-                <td>22-04-2023</td>
-                <td>
-                  <BocButton width="120px" cursor="pointer" bgcolor="#f64f4f">
-                    With Operation
-                  </BocButton>
-                </td>
-              </tr>
-              <tr>
-                <td>1010</td>
-                <td>Personal Loan</td>
-                <td>N230000</td>
-                <td>N280000</td>
-                <td>N0.00</td>
-                <td>N22300</td>
-                <td>22-07-2023</td>
-                <td>
-                  <BocButton width="120px" cursor="pointer" bgcolor="#ecaa00">
-                    Booked
-                  </BocButton>
-                </td>
-              </tr>
-              <tr>
-                <td>1010</td>
-                <td>Car Loan</td>
-                <td>N220000</td>
-                <td>N280000</td>
-                <td>N0.00</td>
-                <td>N22300</td>
-                <td>22-04-2023</td>
-                <td>
-                  <BocButton width="120px" cursor="pointer" bgcolor="#7dd50e">
-                    Completed
-                  </BocButton>
-                </td>
-              </tr>
-              <tr>
-                <td>1010</td>
-                <td>Personal Loan</td>
-                <td>N220000</td>
-                <td>N280000</td>
-                <td>N0.00</td>
-                <td>N22300</td>
-                <td>22-04-2023</td>
-                <td>
-                  <BocButton width="120px" cursor="pointer" bgcolor="#ecaa00">
-                    Booked
-                  </BocButton>
-                </td>
-              </tr>
-            </div>
-          )}
+          ) : allLoans.map((loan) =>(
+            <tr key={loan._id}>
+<td>
+  
+</td>
+            </tr>
+          ) )   }
         </tbody>
       </Table>
     </div>

@@ -12,7 +12,7 @@ import Headline from "../../shared/Headline";
 import TextInput from "./formcomponents/TextInput";
 // import LoanForm from "./LoanForm";
 import "./Form.css";
-import calculatorfunc, { calculateSimpleInterest } from "../../shared/calculatorfunc";
+import  { calculateSimpleInterest } from "../../shared/calculatorfunc";
 
 // bvn verification function
 import { bvnVerification } from "./bvnVerification";
@@ -20,8 +20,7 @@ import { ToastContainer, toast } from "react-toastify";
 
 // toast styles
 import "react-toastify/dist/ReactToastify.css";
-import { encryptText } from "../../../../utilities/encryptDecrypt";
-// import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 // import { updateCustomerStateValues } from "../../../redux/reducers/customerReducer";
 
 // loan form component
@@ -47,7 +46,7 @@ const LoanFirstStep = ({ data }) => {
 
   const loanProducts = useSelector((state) => state.productReducer.products);
 
-  // const navigate = useNavigate();
+  const navigate = useNavigate();
 
   useEffect(() => {
     dispatch(fetchSelectedProduct());
@@ -172,18 +171,18 @@ const LoanFirstStep = ({ data }) => {
     // );
 
     //Store the information in Local Storage
-    sessionStorage.setItem(
-      "loanFirstInfo",
-      JSON.stringify({
-        bvn: encryptText(bvn),
-        loanAmount: loanamount,
-        careerType: careertype,
-        numberOfMonths: noofmonth,
-        loanTotalRepayment: loanRepaymentTotal,
-        monthlyRepayment,
-        loanProduct: product,
-      })
-    );
+    // sessionStorage.setItem(
+    //   "loanFirstInfo",
+    //   JSON.stringify({
+    //     bvn: bvn,
+    //     loanAmount: loanamount,
+    //     careerType: careertype,
+    //     numberOfMonths: noofmonth,
+    //     loanTotalRepayment: loanRepaymentTotal,
+    //     monthlyRepayment,
+    //     loanProduct: product,
+    //   })
+    // );
 
     const raw = JSON.stringify({
       bvn,

@@ -104,6 +104,7 @@ const CustomersList = ({ showCount, searchTerms }) => {
                 <th>First Name</th>
                 <th>Last Name</th>
                 <th>Email</th>
+                <th>Username</th>
                 <th>Branch</th>
                 <th>Action</th>
               </tr>
@@ -130,6 +131,7 @@ const CustomersList = ({ showCount, searchTerms }) => {
                   <td>{customer.firstname}</td>
                   <td>{customer.lastname}</td>
                   <td>{customer.email}</td>
+                  <td>{customer.username}</td>
                   <td>{capitalizeEachWord(customer.branch)}</td>
                   <td>
                     <BocButton
@@ -148,9 +150,9 @@ const CustomersList = ({ showCount, searchTerms }) => {
       </div>
 
       {/* show loan details model */}
-      {show && (
+      {/* {show && (
         <LoanDetails show={show} handleClose={handleClose} loanObj={loanObj} />
-      )}
+      )} */}
     </>
   );
 };
