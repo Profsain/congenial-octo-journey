@@ -70,8 +70,8 @@ const TopCardSec = ({ user }) => {
         (loan) => loan.LoanAccountNo == user?.activeLoan?.Number
       );
       setUserBalance({
-        totalPaid: currLoan.TotalAmountPaidTillDate,
-        balance: currLoan.TotalOutstandingAmount,
+        totalPaid: currLoan?.TotalAmountPaidTillDate || "0.00",
+        balance: currLoan.TotalOutstandingAmount|| 0,
       });
     }
   }, [activeLoanRepaymentSchedule, loansAccountBalance]);
