@@ -437,6 +437,8 @@ const CreditCheckhtmlForm = ({
     const { name, value } = e.target;
     setBureauData({ ...bureauData, [name]: value });
   };
+
+  // report upload change
   const handleBureauReportUploadChange = (e, uploadCategory) => {
     const { name, value } = e.target;
     if (uploadCategory === "first") {
@@ -471,40 +473,60 @@ const CreditCheckhtmlForm = ({
   const [successMsg, setSuccessMsg] = useState("");
 
   // update report type options
+  // useEffect(() => {
+  //   if (
+  //     bureauData.bureauName === "first_central" ||
+  //     bureauReportUpload.firstUpload.bureauName === "first_central" ||
+  //     bureauReportUpload.secondUpload.bureauName === "first_central"
+  //   ) {
+  //     setReportOptions([
+  //       { value: "consumer_report", label: "Consumer Report" },
+  //       { value: "commercial_report", label: "Commercial Report" },
+  //     ]);
+  //   } else if (
+  //     bureauData.bureauName === "crc_bureau" ||
+  //     bureauReportUpload.firstUpload.bureauName === "crc_bureau" ||
+  //     bureauReportUpload.secondUpload.bureauName === "crc_bureau"
+  //   ) {
+  //     setReportOptions([
+  //       { value: "consumer_basic", label: "Consumer Basic Report" },
+  //       { value: "consumer_classic", label: "Consumer Classic Report" },
+  //       { value: "corporate_classic", label: "Corporate Classic Report" },
+  //     ]);
+  //   } else if (
+  //     bureauData.bureauName === "credit_register" ||
+  //     bureauReportUpload.firstUpload.bureauName === "credit_register" ||
+  //     bureauReportUpload.secondUpload.bureauName === "credit_register"
+  //   ) {
+  //     setReportOptions([
+  //       { value: "consumer_report", label: "Consumer Report" },
+  //     ]);
+  //   }
+  // }, [
+  //   bureauData.bureauName,
+  //   bureauReportUpload.firstUpload.bureauName,
+  //   bureauReportUpload.secondUpload.bureauName,
+  // ]);
+
+  // fix update report type options
   useEffect(() => {
-    if (
-      bureauData.bureauName === "first_central" ||
-      bureauReportUpload.firstUpload.bureauName === "first_central" ||
-      bureauReportUpload.secondUpload.bureauName === "first_central"
-    ) {
+    if (bureauData.bureauName === "first_central") {
       setReportOptions([
         { value: "consumer_report", label: "Consumer Report" },
         { value: "commercial_report", label: "Commercial Report" },
       ]);
-    } else if (
-      bureauData.bureauName === "crc_bureau" ||
-      bureauReportUpload.firstUpload.bureauName === "crc_bureau" ||
-      bureauReportUpload.secondUpload.bureauName === "crc_bureau"
-    ) {
+    } else if (bureauData.bureauName === "crc_bureau") {
       setReportOptions([
         { value: "consumer_basic", label: "Consumer Basic Report" },
         { value: "consumer_classic", label: "Consumer Classic Report" },
         { value: "corporate_classic", label: "Corporate Classic Report" },
       ]);
-    } else if (
-      bureauData.bureauName === "credit_register" ||
-      bureauReportUpload.firstUpload.bureauName === "credit_register" ||
-      bureauReportUpload.secondUpload.bureauName === "credit_register"
-    ) {
+    } else if (bureauData.bureauName === "credit_register") {
       setReportOptions([
         { value: "consumer_report", label: "Consumer Report" },
       ]);
     }
-  }, [
-    bureauData.bureauName,
-    bureauReportUpload.firstUpload.bureauName,
-    bureauReportUpload.secondUpload.bureauName,
-  ]);
+  }, [bureauData.bureauName]);
 
   const handleBureauCheck = async (e) => {
     e.preventDefault();
@@ -636,7 +658,7 @@ const CreditCheckhtmlForm = ({
         `${apiUrl}/api/updatecustomer/creditBureauSearch/${customerId}`,
         bureauData
       );
-      console.log(res);
+     
     } catch (error) {
       toast.error(error?.response?.data?.error || "Something Went Wrong");
     }
@@ -1066,12 +1088,12 @@ const CreditCheckhtmlForm = ({
             ) : (
               <h4
                 style={{
-                  color: "red",
+                  color: "gray",
                   paddingBottom: "3rem",
                   textAlign: "center",
                 }}
               >
-                No Credit Registry Report
+                ""
               </h4>
             )}
           </div>
