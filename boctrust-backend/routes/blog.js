@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const multer = require('multer');
 const Post = require('../models/Post'); // import post model
+const { authenticateStaffToken } = require('../middleware/auth');
 
 // Set up Multer storage to define where to save the uploaded images
 const storage = multer.diskStorage({
@@ -41,7 +42,7 @@ router.get('/posts', async (req, res) => {
 });
 
 // create new blog post endpoint
-router.post('/posts', upload.single('postImg'), async (req, res) => {
+router.post('/posts', authenticateStaffToken, upload.single('postImg'), async (req, res) => {
   try {
     // Get post data from request body
     const { title, postSummary, body, category, tags } = req.body;
@@ -68,7 +69,7 @@ router.post('/posts', upload.single('postImg'), async (req, res) => {
 });
 
 // update single blog post endpoint
-router.put('/posts/:id', async (req, res) => {
+router.put('/posts/:id', authenticateStaffToken, async (req, res) => {
     try {
         // get post id from request params
       const { id } = req.params;
@@ -90,7 +91,7 @@ router.put('/posts/:id', async (req, res) => {
 });
 
 // delete single blog post endpoint
-router.delete('/posts/:id', async (req, res) => {
+router.delete('/posts/:id', authenticateStaffToken, async (req, res) => {
     try {
         // get post id from request params
       const { id } = req.params;

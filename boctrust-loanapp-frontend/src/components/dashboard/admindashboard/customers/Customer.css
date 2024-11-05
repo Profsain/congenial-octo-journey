@@ -57,16 +57,17 @@ input:active {
 }
 
 .SubItem {
-  position: relative;
-  top: -0.5rem;
-  background-color: #103e75;
-  padding: 4px;
+  display: flex;
+  justify-content: end;
+}
+.SubItem ul {
+  padding: .5rem  !important;
+  width: 80%;
+  font-size: 0.7rem;
+
 }
 
-.SubItem ul > li:hover {
-  padding-left: 18px;
-  border-left: 1px solid #fff;
-}
+
 
 .BtnRow {
   display: flex;

@@ -14,6 +14,7 @@ import useSearch from "../../../../../utilities/useSearchName.js";
 import useSearchByDate from "../../../../../utilities/useSearchByDate.js";
 import useSearchByDateRange from "../../../../../utilities/useSearchByDateRange.js";
 import getNextMonthDate from "../../../../../utilities/getNextMonthDate";
+import apiClient from "../../../../lib/axios.js";
 
 const MandateHistory = () => {
   const styles = {
@@ -58,25 +59,14 @@ const MandateHistory = () => {
   const [mandateObj, setMandateObj] = useState({});
 
   const handleMandateView = async (id) => {
-    const apiUrl = import.meta.env.VITE_BASE_URL;
-
     setViewLoader(true);
     // find customer by id
     const customer = customers.find((customer) => customer._id === id);
 
     // call mandate history api
-    const response = await fetch(`${apiUrl}/api/remita/mandate-history`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-
-      // send customer details to remita
-      body: JSON.stringify({
-        customer: customer,
-      }),
+    const { data } = await apiClient.post(`/remita/mandate-history`, {
+      customer: customer,
     });
-    const data = await response.json();
 
     // update model object
     if (data.data.status === "success") {

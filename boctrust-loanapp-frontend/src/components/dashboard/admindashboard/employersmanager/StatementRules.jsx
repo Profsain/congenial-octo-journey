@@ -5,6 +5,7 @@ import { toast } from "react-toastify";
 import { fetchStatementRules } from "../../../../redux/reducers/statementRuleReducer";
 import StatementRuleForm from "./molecules/StatementRuleForm";
 import StatementRuleList from "./molecules/StatementRuleList";
+import apiClient from "../../../../lib/axios";
 
 const initialValues = {
   ruleTitle: "",
@@ -21,15 +22,10 @@ const StatementRules = () => {
   const addStatementRule = async ({ values }) => {
     try {
       setIsLoading(true);
-      const apiUrl = import.meta.env.VITE_BASE_URL;
+      
       // Handle form submission logic here
-      await fetch(`${apiUrl}/api/statement-rule`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(values),
-      });
+      await apiClient.post(`/statement-rule`, values);
+      
       await dispatch(fetchStatementRules());
     } catch (error) {
       console.log(error);

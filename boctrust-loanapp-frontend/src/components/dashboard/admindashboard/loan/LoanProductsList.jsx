@@ -14,6 +14,7 @@ import searchList from "../../../../../utilities/searchListFunc";
 import TableOptionsDropdown from "../../shared/tableOptionsDropdown/TableOptionsDropdown";
 import { IoMdCheckmarkCircleOutline } from "react-icons/io";
 import { FcCancel } from "react-icons/fc";
+import apiClient from "../../../../lib/axios";
 
 const LoanProductsList = ({ count, searchTerm, admin, adminRoles }) => {
   // styles
@@ -64,13 +65,8 @@ const LoanProductsList = ({ count, searchTerm, admin, adminRoles }) => {
 
   // handle delete action
   const handleDelete = async (productId) => {
-    const apiUrl = import.meta.env.VITE_BASE_URL;
-    await fetch(`${apiUrl}/api/product/products/${productId}`, {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+   
+    await apiClient.delete(`/product/products/${productId}`);
 
     dispatch(fetchSelectedProduct());
     setAction(false);

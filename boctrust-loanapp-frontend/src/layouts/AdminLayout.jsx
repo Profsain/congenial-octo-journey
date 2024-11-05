@@ -4,12 +4,20 @@ import SideNavMain from "../components/dashboard/admindashboard/dashboardhome/Si
 import TopNavber from "../components/dashboard/topnavbar/TopNavber";
 import { useSelector } from "react-redux";
 import PropTypes from "prop-types";
+import { useOnClickOutside } from "../hooks/useOnClickOutside.";
+import { useRef } from "react";
 
-const AdminLayout = ({ onMenuItemClick, showSidebar, setShowSidebar, currentTitle }) => {
- 
-    // current login admin user
-    const currentUser = useSelector((state) => state.adminAuth.user);
-    const adminName = currentUser.fullName;
+const AdminLayout = ({
+  onMenuItemClick,
+  showSidebar,
+  setShowSidebar,
+  currentTitle,
+}) => {
+  // current login admin user
+  const currentUser = useSelector((state) => state.adminAuth.user);
+  const adminName = currentUser.fullName;
+
+  const ref = useRef(null);
 
   const handleMouseOver = () => {
     setShowSidebar(true);
@@ -18,7 +26,8 @@ const AdminLayout = ({ onMenuItemClick, showSidebar, setShowSidebar, currentTitl
   const handleMouseOut = () => {
     setShowSidebar(false);
   };
-  
+
+  useOnClickOutside(ref, () => setShowSidebar(false));
 
   return (
     <div className="DashboardContainer">
@@ -36,7 +45,11 @@ const AdminLayout = ({ onMenuItemClick, showSidebar, setShowSidebar, currentTitl
                   <SideNavIcons />
                 </div>
               ) : (
-                <div className="SideNavMain" onMouseLeave={handleMouseOut}>
+                <div
+                  ref={ref}
+                  className="SideNavMain"
+                  onMouseLeave={handleMouseOut}
+                >
                   <SideNavMain onMenuItemClick={onMenuItemClick} />
                 </div>
               )}
@@ -54,12 +67,11 @@ const AdminLayout = ({ onMenuItemClick, showSidebar, setShowSidebar, currentTitl
   );
 };
 
-
 AdminLayout.propTypes = {
-    onMenuItemClick: PropTypes.func,
-    showSidebar: PropTypes.bool,
-    setShowSidebar: PropTypes.func,
-    currentTitle: PropTypes.string,
-  };
+  onMenuItemClick: PropTypes.func,
+  showSidebar: PropTypes.bool,
+  setShowSidebar: PropTypes.func,
+  currentTitle: PropTypes.string,
+};
 
 export default AdminLayout;

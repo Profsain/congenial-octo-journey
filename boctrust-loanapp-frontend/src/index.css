@@ -335,6 +335,11 @@ button:disabled {
     
   }
 
+  .loan_calculator .FieldRow{
+    padding: 0rem !important;
+    margin-bottom: 0rem !important;
+  }
+
   /* .FieldGroup input,
   select {
     width: 300px !important;
@@ -379,6 +384,7 @@ button:disabled {
   .TransContainer {
     width: 100% !important;
     background-color: #fff !important;
+    padding: 0.2rem;
   }
   .ReportCon {
     margin-right: 0 !important;
@@ -428,7 +434,7 @@ button:disabled {
 
   .VBox {
     flex-direction: column !important;
-    margin-bottom: -4rem !important;
+    /* margin-bottom: -4rem !important; */
   }
   /* .RBox {
     margin-top: 6rem !important;
@@ -539,7 +545,10 @@ button:disabled {
   }
 
   .bSection {
-    margin-top: 12rem !important;
+    margin-top: 6rem !important;
+  }
+ .loan__statement .bSection {
+    margin-top: 6rem !important;
   }
 
   .appForm {
@@ -552,7 +561,7 @@ button:disabled {
   }
 
   .ListSec tr th {
-    font-size: 14px;
+    font-size: 12px;
   }
 }
 

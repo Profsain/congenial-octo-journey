@@ -7,6 +7,7 @@ import "../customers/Customer.css";
 import NextPreBtn from "../../shared/NextPreBtn";
 import "../../dashboardcomponents/transferdashboard/Transfer.css";
 import CareerList from "./CareerList";
+import apiClient from "../../../../lib/axios";
 
 // Define validation schema using Yup
 const validationSchema = Yup.object().shape({
@@ -36,13 +37,8 @@ const PostJobs = () => {
     const apiUrl = import.meta.env.VITE_BASE_URL;
     // Handle form submission logic here
     try {
-      await fetch(`${apiUrl}/api/wiki/wikis`, {
-        method: "POST",
-        body: JSON.stringify(values),
-        headers: {
-          "Content-type": "application/json; charset=UTF-8",
-        },
-      });
+      await apiClient.post(`/wiki/wikis`, values);
+      
       setSubmitting(false);
       resetForm(initialValues);
       setShowAddNew(false);

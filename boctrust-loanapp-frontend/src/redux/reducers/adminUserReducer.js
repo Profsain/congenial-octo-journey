@@ -1,19 +1,27 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
+import apiClient from "../../lib/axios";
 
 //fetch admin
-const apiUrl = import.meta.env.VITE_BASE_URL;
 
 // Thunk to fetch admin from the API
-export const fetchAdmins = createAsyncThunk("admin/fetchAdmins", async () => {
-  const response = await axios.get(`${apiUrl}/api/admin/users`);
-  return response.data;
-});
+export const fetchAdmins = createAsyncThunk(
+  "admin/fetchAdmins",
+  async (searchTerm) => {
+   
+    let pathUrl = `/admin/users`;
+    if (searchTerm) {
+      pathUrl = pathUrl + `?search=${searchTerm}`;
+    }
+    const response = await apiClient.get(pathUrl);
+    return response.data;
+  }
+);
 // Thunk to fetch admin with role Type
 export const fetchAdminsByRole = createAsyncThunk(
   "admin/fetchAdminsByRole",
   async (roleId) => {
-    const response = await axios.get(`${apiUrl}/api/admin/users/${roleId}`);
+    const response = await apiClient.get(`/admin/users/${roleId}`);
     return response.data;
   }
 );
@@ -22,7 +30,7 @@ export const fetchRolesAndPermisions = createAsyncThunk(
   "admin/fetchRolesAndPermisions",
   async (_, thunkAPI) => {
     try {
-      const response = await axios.get(`${apiUrl}/api/role`);
+      const response = await apiClient.get(`/role`);
 
       return response.data;
     } catch (error) {
@@ -37,7 +45,7 @@ export const fetchPermissions = createAsyncThunk(
   "admin/fetchPermissions",
   async (_, thunkAPI) => {
     try {
-      const response = await axios.get(`${apiUrl}/api/role/permission`);
+      const response = await apiClient.get(`/role/permission`);
       return response.data;
     } catch (error) {
       return thunkAPI.rejectWithValue(
@@ -51,7 +59,7 @@ export const addNewRole = createAsyncThunk(
   "admin/addNewRole",
   async (payload, thunkAPI) => {
     try {
-      await axios.post(`${apiUrl}/api/role`, payload);
+      await apiClient.post(`/api/role`, payload);
     } catch (error) {
       return thunkAPI.rejectWithValue(
         error.response?.data?.error || "Something went wrong"
@@ -63,7 +71,7 @@ export const updateRole = createAsyncThunk(
   "admin/updateRole",
   async ({ payload, roleId }, thunkAPI) => {
     try {
-      await axios.put(`${apiUrl}/api/role/${roleId}`, payload);
+      await apiClient.put(`/role/${roleId}`, payload);
     } catch (error) {
       return thunkAPI.rejectWithValue(
         error.response?.data?.message || "Something went wrong"

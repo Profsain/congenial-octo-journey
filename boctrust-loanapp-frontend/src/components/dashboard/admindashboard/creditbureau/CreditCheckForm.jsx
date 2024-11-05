@@ -27,6 +27,7 @@ import CreditBureauSelect from "./atoms/CreditBureauSelect";
 import ReportReasonSelect from "./atoms/ReportReasonSelect";
 import CheckFileUploadsNotice from "./molecules/CheckFileUploadsNotice";
 import { customerApprovalEnum } from "../../../../lib/userRelated";
+import apiClient from "../../../../lib/axios";
 
 const creditBureauOptions = [
   { value: "first_central", label: "First Central" },
@@ -225,38 +226,32 @@ const CreditCheckhtmlForm = ({
 
     if (isCreditDbCheck) {
       formData.append("dbSearchReport", dbSearchReport);
-      const res = await fetch(
-        `${apiUrl}/api/updatecustomer/creditDbSearch/${customerId}`,
+      await apiClient.put(
+        `/updatecustomer/creditDbSearch/${customerId}`,
+        formData,
         {
-          method: "PUT",
-          enctype: "multipart/form-data",
-          body: formData,
+          headers: {
+            "Content-Type": "multipart/form-data", // Override Content-Type for this request
+          },
         }
       );
 
-      if (!res.ok) {
-        const resObj = await res.json();
-        throw new Error(resObj?.error);
-      }
       setDidUploadAny(true);
       setDbSearchReport("");
       setIsCreditDbCheck(false);
     }
     if (isDeductCheck) {
       formData.append("deductSearchReport", deductSearchReport);
-      const res = await fetch(
-        `${apiUrl}/api/updatecustomer/deductcheck/${customerId}`,
+      await apiClient.put(
+        `/updatecustomer/deductcheck/${customerId}`,
+        formData,
         {
-          method: "PUT",
-          enctype: "multipart/form-data",
-          body: formData,
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
         }
       );
 
-      if (!res.ok) {
-        const resObj = await res.json();
-        throw new Error(resObj?.error);
-      }
       setDidUploadAny(true);
       setDeductSearchReport("");
       setIsDeductCheck(false);
@@ -270,19 +265,16 @@ const CreditCheckhtmlForm = ({
         formData.append(key, value);
       });
 
-      const res = await fetch(
-        `${apiUrl}/api/updatecustomer/creditBureauSearch/${customerId}/fileupload`,
+      await apiClient.put(
+        `/updatecustomer/creditBureauSearch/${customerId}/fileupload`,
+        formData,
         {
-          method: "PUT",
-          enctype: "multipart/form-data",
-          body: formData,
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
         }
       );
 
-      if (!res.ok) {
-        const resObj = await res.json();
-        throw new Error(resObj?.error);
-      }
       setDidUploadAny(true);
     }
     if (
@@ -294,19 +286,16 @@ const CreditCheckhtmlForm = ({
         secondUploadFormData.append(key, value);
       });
 
-      const res = await fetch(
-        `${apiUrl}/api/updatecustomer/creditBureauSearch/${customerId}/fileupload`,
+      await apiClient.put(
+        `/updatecustomer/creditBureauSearch/${customerId}/fileupload`,
+        formData,
         {
-          method: "PUT",
-          enctype: "multipart/form-data",
-          body: formData,
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
         }
       );
 
-      if (!res.ok) {
-        const resObj = await res.json();
-        throw new Error(resObj?.error);
-      }
       setDidUploadAny(true);
     }
     if (
@@ -368,11 +357,10 @@ const CreditCheckhtmlForm = ({
       setReportObj(pdfReport);
 
       // send update to backend
-      await fetch(`${apiUrl}/api/updatecustomer/creditDbSearch/${customerId}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(searchReport),
-      });
+      await apiClient.put(
+        `/updatecustomer/creditDbSearch/${customerId}`,
+        searchReport
+      );
 
       clearForm();
     } catch (error) {
@@ -407,11 +395,10 @@ const CreditCheckhtmlForm = ({
       setReportObj(pdfReport);
 
       // send update to backend
-      await fetch(`${apiUrl}/api/updatecustomer/deductcheck/${customerId}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(searchReport),
-      });
+      await apiClient.put(
+        `/updatecustomer/deductcheck/${customerId}`,
+        searchReport
+      );
 
       // clear form fields
       setSearchByDeduct("");
@@ -537,22 +524,11 @@ const CreditCheckhtmlForm = ({
       const reportType = bureauData.reportType;
       const apiEndpoint =
         reportType === "consumer_report"
-          ? `${apiUrl}/api/firstcentral/firstcentralreport`
-          : `${apiUrl}/api/firstcentral/firstcentralCommercialReport`;
+          ? `/firstcentral/firstcentralreport`
+          : `/firstcentral/firstcentralCommercialReport`;
       try {
         const bvn = bureauData.bvnNo;
-        const response = await fetch(`${apiEndpoint}`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ bvn }),
-        });
-
-        const data = await response.json();
-        if (!response.ok) {
-          setBureauLoading(false);
-          setNoReport(true);
-          throw new Error(data.message);
-        }
+        const { data } = await apiClient.post(`${apiEndpoint}`, { bvn });
 
         setBureauLoading(false);
         // set first central report
@@ -579,22 +555,14 @@ const CreditCheckhtmlForm = ({
       const reportType = bureauData.reportType;
       const apiEndpoint =
         reportType === "consumer_basic"
-          ? `${apiUrl}/api/crc/getcrc`
+          ? `/crc/getcrc`
           : reportType === "consumer_classic"
-          ? `${apiUrl}/api/crc/getcrcclassic`
-          : `${apiUrl}/api/crc/getcrccooporate`;
+          ? `/crc/getcrcclassic`
+          : `/crc/getcrccooporate`;
 
       try {
         const bvn = bureauData.bvnNo;
-        const response = await fetch(apiEndpoint, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ bvn }),
-        });
-        const data = await response.json();
-        if (!response.ok) {
-          throw new Error(data.message);
-        }
+        const { data } = await apiClient.post(apiEndpoint, { bvn });
 
         // set  report
         if (reportType === "consumer_basic") {
@@ -625,15 +593,9 @@ const CreditCheckhtmlForm = ({
       clearReport();
       try {
         const bvn = bureauData.bvnNo;
-        const response = await fetch(`${apiUrl}/api/creditregistry/getreport`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ bvn }),
+        const { data } = await apiClient.post(`/creditregistry/getreport`, {
+          bvn,
         });
-        const data = await response.json();
-        if (!response.ok) {
-          throw new Error(data.message);
-        }
 
         // set  report
         setPDFContent(data.data.Reports[0].PDFContent);
@@ -654,11 +616,11 @@ const CreditCheckhtmlForm = ({
     }
 
     try {
-      const res = await axios.put(
-        `${apiUrl}/api/updatecustomer/creditBureauSearch/${customerId}`,
+      await apiClient.put(
+        `/updatecustomer/creditBureauSearch/${customerId}`,
         bureauData
       );
-     
+
     } catch (error) {
       toast.error(error?.response?.data?.error || "Something Went Wrong");
     }
@@ -717,12 +679,13 @@ const CreditCheckhtmlForm = ({
     );
 
     // send formData object to backend
-    const res = await fetch(
-      `${apiUrl}/api/updatecustomer/paySlipAnalysis/${customerId}`,
+    const res = await apiClient.put(
+      `/updatecustomer/paySlipAnalysis/${customerId}`,
+      formData,
       {
-        method: "PUT",
-        enctype: "multipart/form-data",
-        body: formData,
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
       }
     );
 
@@ -760,7 +723,7 @@ const CreditCheckhtmlForm = ({
         didUploadAny && toast.success("File(s) Upload Success");
         setFormStep(2);
       } catch (error) {
-        toast.error(error?.message);
+        toast.error(error?.response?.data?.error || error?.message);
       } finally {
         setIsUpdateLoading(false);
       }
@@ -1175,7 +1138,7 @@ const CreditCheckhtmlForm = ({
                       className="form-check-label w-100 text-center mb-3"
                       htmlFor="flexSwitchCheckChecked"
                     >
-                      Please Provide at leat one Credit Bureau Report
+                      Upload at Least 2 Credit Bureau reports
                     </label>
                   </div>
                   <div className=" d-flex flex-column gap-2">

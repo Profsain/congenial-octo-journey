@@ -7,6 +7,7 @@ import Modal from "react-bootstrap/Modal";
 import "./EmployerManager.css";
 import { fetchMandateRules } from "../../../../redux/reducers/mandateRuleReducer";
 import { fetchStatementRules } from "../../../../redux/reducers/statementRuleReducer";
+import apiClient from "../../../../lib/axios";
 
 const EditEmployer = (props) => {
   const dispatch = useDispatch();
@@ -85,13 +86,7 @@ const EditEmployer = (props) => {
       statementRule: editStatementRule?._id,
       employerLetterRule: editEmploymentLetterRule?._id,
     };
-    await fetch(`${apiUrl}/api/agency/employers/${employers._id}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(updatedEmployer),
-    });
+    await apiClient.put(`/agency/employers/${employers._id}`, updatedEmployer);
 
     await dispatch(fetchEmployers());
 

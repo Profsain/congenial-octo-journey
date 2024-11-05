@@ -6,6 +6,7 @@ import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
+import apiClient from "../../../../lib/axios";
 
 const EditBlogPage = (props) => {
   const dispatch = useDispatch();
@@ -49,8 +50,8 @@ const EditBlogPage = (props) => {
   // submit update to api endpoint
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const apiUrl = import.meta.env.VITE_BASE_URL;
     
+
     const updatedPost = {
       title: editTitle,
       postSummary: editPostSummary,
@@ -58,15 +59,8 @@ const EditBlogPage = (props) => {
       category: editCategory,
       tags: editTags,
     };
-    
 
-    await fetch(`${apiUrl}/api/blog/posts/${post._id}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(updatedPost),
-    });
+    await apiClient.put(`/blog/posts/${post._id}`, updatedPost);
 
     clearForm();
     handleClose();

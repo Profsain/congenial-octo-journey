@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
+import apiClient from "../../../../lib/axios";
 
 const EditInquiry = (props) => {
   const inquiry = props.inquiry;
@@ -44,13 +45,7 @@ const EditInquiry = (props) => {
       category: editCategory,
     };
 
-    await fetch(`${apiUrl}/api/wiki/wikis`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(updateInquiry),
-    });
+    await apiClient.post(`${apiUrl}/api/wiki/wikis`, updateInquiry);
 
     clearForm();
     handleClose();

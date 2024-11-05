@@ -14,6 +14,7 @@ import searchList from "../../../../../utilities/searchListFunc";
 import ActionNotification from "../../shared/ActionNotification";
 import EditAccount from "./EditAccount";
 import handleAdminRoles from "../../../../../utilities/getAdminRoles";
+import apiClient from "../../../../lib/axios";
 
 const AccountTypes = () => {
   const [openAddAccountType, setOpenAddAccountType] = useState(false);
@@ -61,14 +62,9 @@ const AccountTypes = () => {
   }, [searchTerm]);
 
   // handle account delete action
-  const apiUrl = import.meta.env.VITE_BASE_URL;
+ 
   const handleDelete = async () => {
-    await fetch(`${apiUrl}/api/account/accounts/${accountId}`, {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+    await apiClient.delete(`/account/accounts/${accountId}`);
     dispatch(fetchAccount());
     setAction(false);
   };

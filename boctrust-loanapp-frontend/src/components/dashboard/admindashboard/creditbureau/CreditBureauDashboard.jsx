@@ -18,6 +18,7 @@ import KycViewDetails from "../kyc/KycViewDetails";
 import { toast } from "react-toastify";
 import { customerApprovalEnum } from "../../../../lib/userRelated";
 import { fetchAllCustomersLoans } from "../../../../redux/reducers/customersLoansReducer";
+import apiClient from "../../../../lib/axios";
 
 const styles = {
   btnBox: {
@@ -75,7 +76,7 @@ const CreditBureauDashboard = () => {
 
   useEffect(() => {
     const getData = async () => {
-      await dispatch(fetchAllCustomersLoans());
+      await dispatch(fetchAllCustomersLoans({}));
     };
     getData();
   }, [dispatch]);
@@ -111,7 +112,7 @@ const CreditBureauDashboard = () => {
       fromDate: "",
       toDate: "",
     });
-    dispatch(fetchAllCustomersLoans());
+    dispatch(fetchAllCustomersLoans({}));
     setSearchCustomer(customers);
   };
 
@@ -133,7 +134,6 @@ const CreditBureauDashboard = () => {
 
   const filterCustomers = () => {
     if (admin.role === "credit analyst") {
-      console.log(searchCustomer, "searchCustomer");
       const filteredCustomers = searchCustomer?.filter((customer) => {
         return (
           customer.creditCheck.assignment.isCreditAnalystAssigned === false ||
@@ -170,7 +170,7 @@ const CreditBureauDashboard = () => {
   const handleCancelCheck = () => {
     setShowCreditCheckForm(false);
     setSelectedCustomer("");
-    dispatch(fetchAllCustomersLoans());
+    dispatch(fetchAllCustomersLoans({}));
   };
 
   useEffect(() => {
@@ -179,23 +179,12 @@ const CreditBureauDashboard = () => {
 
   // handle assignment and start credit check
   const assignCustomer = async () => {
-    const apiUrl = import.meta.env.VITE_BASE_URL;
+    await apiClient.put(`/updatecustomer/assignto/${selectedCustomer._id}`, {
+      creditAnalyst: adminName,
+      isCreditAnalystAssigned: true,
+    });
 
-    await fetch(
-      `${apiUrl}/api/updatecustomer/assignto/${selectedCustomer._id}`,
-      {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          creditAnalyst: adminName,
-          isCreditAnalystAssigned: true,
-        }),
-      }
-    );
-
-    await dispatch(fetchAllCustomersLoans());
+    await dispatch(fetchAllCustomersLoans({}));
   };
 
   const handleProceed = async () => {

@@ -7,6 +7,7 @@ import { IoClose } from "react-icons/io5";
 import "./EditeRule.css";
 import { fetchMandateRules } from "../../../../../../redux/reducers/mandateRuleReducer";
 import { useDispatch } from "react-redux";
+import apiClient from "../../../../../../lib/axios";
 
 const EditMandateRule = ({ show, handleClose, selectedMandateRule }) => {
   const [isLoading, setIsLoading] = useState(false);
@@ -17,15 +18,9 @@ const EditMandateRule = ({ show, handleClose, selectedMandateRule }) => {
   const handleUpdateMandate = async (values) => {
     try {
       setIsLoading(true);
-      const apiUrl = import.meta.env.VITE_BASE_URL;
+
       // Handle form submission logic here
-      await fetch(`${apiUrl}/api/mandate-rule/${selectedMandateRule._id}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(values),
-      });
+      await apiClient.put(`/mandate-rule/${selectedMandateRule._id}`, values);
 
       await dispatch(fetchMandateRules());
 

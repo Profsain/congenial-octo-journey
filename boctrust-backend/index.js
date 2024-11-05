@@ -41,7 +41,7 @@ const bvnVerificationRoutes = require("./routes/bvnVerification");
 const career = require("./routes/career");
 const settings = require("./routes/settings");
 const siteContent = require("./routes/siteContentRoute");
-const boardMemberRoutes = require("./routes/boardMember")
+const boardMemberRoutes = require("./routes/boardMember");
 // board members seeds
 const BoardMember = require("./models/BoardOfDirectors");
 const boardMembers = require("./seedData/boardMembers");
@@ -52,132 +52,150 @@ const productsFrontPage = require("./routes/productsFrontPage");
 const productsSeedData = require("./seedData/productsFrontPageData");
 const ProductsFrontPage = require("./models/ProductsFrontPage");
 
-
 // otp
 const termiiOTPRoute = require("./routes/termii");
 
+// refresh token
+const refreshTokenRoutes = require("./routes/refreshToken");
+
+const {
+  authenticateToken,
+  authenticateStaffToken,
+} = require("./middleware/auth");
 
 // configure dotenv
 dotenv.config();
 
-
 // connect to database
 mongoose
-    .connect(process.env.MONGODB_URL, {
+  .connect(process.env.MONGODB_URL, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
-    })
-    .then(() => { 
-        console.log("Connected to database successfully");
-        
-        // seed board members data
-        BoardMember.find()
-            .then((boardMembersData) => {
-                if (boardMembersData.length === 0) {
-                    BoardMember.insertMany(boardMembers)
-                        .then(() => console.log("Board members data seeded successfully"))
-                        .catch((err) => console.log(err));
-                }
-            })
-            .catch((err) => console.log(err));
-        
-        // seed product page data
-        ProductsFrontPage.find()
-            .then((productsData) => {
-                if (productsData.length === 0) {
-                    ProductsFrontPage.insertMany(productsSeedData)
-                        .then(() => console.log("Product page data seeded successfully"))
-                        .catch((err) => console.log(err));
-                }
-            })
-            .catch((err) => console.log(err));
-        
-        // create new instance of express
-        const app = express();
+  })
+  .then(() => {
+    console.log("Connected to database successfully");
 
-        // use cors
-        const corsOptions = {
-            origin: "*",
-            methods: 'GET, PUT, POST, DELETE',
-            allowedHeaders: ['Content-Type'],
+    // seed board members data
+    BoardMember.find()
+      .then((boardMembersData) => {
+        if (boardMembersData.length === 0) {
+          BoardMember.insertMany(boardMembers)
+            .then(() => console.log("Board members data seeded successfully"))
+            .catch((err) => console.log(err));
         }
+      })
+      .catch((err) => console.log(err));
 
-        app.use(cors(corsOptions));
+    // seed product page data
+    ProductsFrontPage.find()
+      .then((productsData) => {
+        if (productsData.length === 0) {
+          ProductsFrontPage.insertMany(productsSeedData)
+            .then(() => console.log("Product page data seeded successfully"))
+            .catch((err) => console.log(err));
+        }
+      })
+      .catch((err) => console.log(err));
 
-        app.use(cookieParser());
+    // create new instance of express
+    const app = express();
 
-        // use express json
-        app.use(express.json());
+    // use cors
+    const corsOptions = {
+      origin: [
+        "http://localhost:5173",
+        "https://www.boctrustmfb.com",
+      ],
+      methods: "GET, PUT, POST, DELETE",
+      credentials: true,
+    };
 
-        // Serve static files from the "uploads" directory
-        app.use('/uploads', express.static('uploads'));
+    app.use(cors(corsOptions));
 
-        // Serve static files from the "public/filesUpload" directory
-        app.use('/public/filesUpload', express.static('public/filesUpload'));
-        
-        // Middleware
-        app.use(bodyParser.json());
-        app.use(bodyParser.urlencoded({ extended: true }));
+    app.use(cookieParser());
 
-        // use routes
-        app.use('/api/blog', blogRoutes);
-        app.use('/api/wiki', wikiRoutes);
-        app.use('/api/product', productRoutes);
-        app.use('/api/inquiry', inquiryRoutes);
-        app.use('/api/contact', contactRoutes);
-        app.use('/api/branch', branchRoutes);
-        app.use('/api/customer', customerRoutes);
-        app.use('/api/customers-loans', customersLoansRoute);
-        app.use('/api/role', roleRoute);
-        app.use('/api/loans', loanRoute);
-        app.use('/api/updatecustomer', updateCustomerRoutes);
-        app.use('/api/account', accountRoutes);
-        app.use('/api/disbursement', disbursementRoutes);
-        app.use('/api/agency', employersManagerRoutes);
-        app.use('/api/mandate-rule', mandateRuleRoutes);
-        app.use('/api/statement-rule', statementRuleRoutes);
-        app.use('/api/employer-letter-rule', employerLetterRuleRoutes);
-        // admin routes
-        app.use('/api/admin', adminRoutes);
-        app.use('/api/account-officers', bankoneAccountOfficers);
-        // bankone operation routes
-        app.use('/api/bankone', bankOneOperationRoutes);
-        app.use('/api/bankone-products', bankOneProductsRoutes);
-        // remita operation routes
-        app.use('/api/remita', remitaOperationRoutes);
-        // email sender routes
-        app.use('/api/email', sendEmail);
-        // crc register routes
-        app.use('/api/crc', crcRegisterRoutes);
-        // credit registry routes
-        app.use('/api/creditregistry', creditRegistryRoutes);
-        // first central routes
-        app.use('/api/firstcentral', firstCentralRoutes);
+    // use express json
+    app.use(express.json());
 
-        // temp data routes
-        app.use('/api/tempdata', tempDataRoutes);
+    // Serve static files from the "uploads" directory
+    app.use("/uploads", express.static("uploads"));
 
-        // bvn verification routes
-        app.use('/api/bvn', bvnVerificationRoutes);
+    // Serve static files from the "public/filesUpload" directory
+    app.use("/public/filesUpload", express.static("public/filesUpload"));
 
-        // career routes
-        app.use('/api/career', career);
-        app.use('/api/job-application', jobApplicationRoutes);
+    // Middleware
+    app.use(bodyParser.json());
+    app.use(bodyParser.urlencoded({ extended: true }));
 
-        // settings routes
-        app.use('/api/settings', settings);
+    // use routes
+    app.use("/api/blog", blogRoutes);
+    app.use("/api/wiki", wikiRoutes);
+    app.use("/api/product", productRoutes);
+    app.use("/api/inquiry", inquiryRoutes);
+    app.use("/api/contact", contactRoutes);
+    app.use("/api/branch", branchRoutes);
+    app.use("/api/customer", customerRoutes);
+    app.use("/api/customers-loans", customersLoansRoute);
+    app.use("/api/role", authenticateStaffToken, roleRoute);
+    app.use("/api/loans", authenticateToken, loanRoute);
+    app.use("/api/updatecustomer", updateCustomerRoutes);
+    app.use("/api/account", accountRoutes);
+    app.use("/api/disbursement", authenticateStaffToken, disbursementRoutes);
+    app.use("/api/agency", authenticateStaffToken, employersManagerRoutes);
+    app.use("/api/mandate-rule", authenticateStaffToken, mandateRuleRoutes);
+    app.use("/api/statement-rule", authenticateStaffToken, statementRuleRoutes);
+    app.use(
+      "/api/employer-letter-rule",
+      authenticateStaffToken,
+      employerLetterRuleRoutes
+    );
+    // admin routes
+    app.use("/api/admin", adminRoutes);
+    app.use("/api/account-officers", bankoneAccountOfficers);
+    // bankone operation routes
+    app.use("/api/bankone", bankOneOperationRoutes);
+    app.use("/api/bankone-products", bankOneProductsRoutes);
+    // remita operation routes
+    app.use("/api/remita", authenticateToken, remitaOperationRoutes);
+    // email sender routes
+    app.use("/api/email", sendEmail);
+    // crc register routes
+    app.use("/api/crc", authenticateStaffToken, crcRegisterRoutes);
+    // credit registry routes
+    app.use(
+      "/api/creditregistry",
+      authenticateStaffToken,
+      creditRegistryRoutes
+    );
+    // first central routes
+    app.use("/api/firstcentral", authenticateStaffToken, firstCentralRoutes);
 
-        // site content routes
-        app.use('/api/site-content', siteContent);
+    // temp data routes
+    app.use("/api/tempdata", tempDataRoutes);
 
-        // board member routes
-        app.use('/api/board-member', boardMemberRoutes);
+    // bvn verification routes
+    app.use("/api/bvn", bvnVerificationRoutes);
 
-        // front page products
-        app.use('/api/products-front-page', productsFrontPage);
-        app.use('/api/otp', termiiOTPRoute);
+    // career routes
+    app.use("/api/career", career);
+    app.use("/api/job-application", jobApplicationRoutes);
 
-        app.listen(process.env.PORT || 3030, () => console.log("Server running on port 3030"));
-    })
-    .catch((err) => console.log(err));
+    // settings routes
+    app.use("/api/settings", settings);
 
+    // site content routes
+    app.use("/api/site-content", siteContent);
+
+    // board member routes
+    app.use("/api/board-member", boardMemberRoutes);
+
+    // front page products
+    app.use("/api/products-front-page", productsFrontPage);
+    app.use("/api/otp", termiiOTPRoute);
+    app.use("/api/sharedAuth", refreshTokenRoutes);
+
+    app.listen(process.env.PORT || 3030, () =>
+      console.log("Server running on port 3030")
+    );
+  })
+  .catch((err) => console.log(err));

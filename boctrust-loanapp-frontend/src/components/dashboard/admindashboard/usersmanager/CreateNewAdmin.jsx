@@ -11,7 +11,11 @@ import { useDispatch, useSelector } from "react-redux";
 import PageLoader from "../../shared/PageLoader";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
-import { fetchRolesAndPermisions } from "../../../../redux/reducers/adminUserReducer";
+import {
+  fetchAdmins,
+  fetchRolesAndPermisions,
+} from "../../../../redux/reducers/adminUserReducer";
+import apiClient from "../../../../lib/axios";
 
 const initialValues = {
   fullName: "",
@@ -43,11 +47,9 @@ const CreateNewAdmin = () => {
     };
 
     getData();
-  });
+  }, []);
 
   const handleSubmit = async (values, { resetForm }) => {
-    const apiUrl = import.meta.env.VITE_BASE_URL;
-
     try {
       setIsLoading(true);
 
@@ -76,13 +78,13 @@ const CreateNewAdmin = () => {
         formData.append("userRole", values.userRole);
       }
 
-      const res = await fetch(`${apiUrl}/api/admin/register`, {
-        method: "POST",
-        enctype: "multipart/form-data",
-        body: formData,
+      const res = await apiClient.post(`/admin/register`, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
       });
 
-      if (res.ok) {
+      if (res.status == 201) {
         // clear fields
         resetForm();
 
@@ -91,6 +93,9 @@ const CreateNewAdmin = () => {
         setTimeout(() => {
           setNotification("");
         }, 3000);
+
+        await dispatch(fetchAdmins());
+
         toast.success("New admin user added successfully");
       } else {
         const errorResponse = await res.json();
@@ -124,6 +129,7 @@ const CreateNewAdmin = () => {
                 id="fullName"
                 className="Input"
                 onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
                 value={formik.values.fullName}
               />
               {formik.errors.fullName && formik.touched.fullName ? (
@@ -136,6 +142,7 @@ const CreateNewAdmin = () => {
                 type="file"
                 name="photo"
                 accept=".jpg, .jpeg, .png"
+                onBlur={formik.handleBlur}
                 id="photo"
                 className="Input"
                 onChange={(event) => {
@@ -157,6 +164,7 @@ const CreateNewAdmin = () => {
                 name="email"
                 placeholder="Enter office email"
                 id="email"
+                onBlur={formik.handleBlur}
                 className="Input"
                 onChange={formik.handleChange}
                 value={formik.values.email}
@@ -172,6 +180,7 @@ const CreateNewAdmin = () => {
                 name="phone"
                 placeholder="e.g. 09082312333"
                 id="phone"
+                onBlur={formik.handleBlur}
                 className="Input"
                 onChange={formik.handleChange}
               />
@@ -189,6 +198,7 @@ const CreateNewAdmin = () => {
                 name="username"
                 placeholder="Enter username"
                 id="username"
+                onBlur={formik.handleBlur}
                 className="Input"
                 onChange={formik.handleChange}
                 value={formik.values.username}
@@ -202,6 +212,7 @@ const CreateNewAdmin = () => {
               <input
                 type="password"
                 name="password"
+                onBlur={formik.handleBlur}
                 placeholder="Enter password"
                 id="password"
                 className="Input"
@@ -218,6 +229,7 @@ const CreateNewAdmin = () => {
               <label htmlFor="userType">User Type</label>
               <select
                 name="userType"
+                onBlur={formik.handleBlur}
                 id="userType"
                 className="Input"
                 onChange={formik.handleChange}
@@ -239,6 +251,7 @@ const CreateNewAdmin = () => {
                 <label htmlFor="userRole">User Roles</label>
                 <select
                   name="userRole"
+                  onBlur={formik.handleBlur}
                   disabled={
                     !formik.values.userType ||
                     formik.values.userType === "super_admin"

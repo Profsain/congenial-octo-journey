@@ -2,13 +2,14 @@ import PropTypes from "prop-types";
 import { useState } from "react";
 import Headline from "../../../shared/Headline";
 import BocButton from "../../shared/BocButton";
+import { toast } from "react-toastify";
 
 const ViewBySection = ({
   firstBtn = "Applications Today",
   setSearch,
   setDateRange,
   dateRange,
-  searchDateFunc,
+  setSearchTodayEntries,
   handleReload,
   printBtn,
 }) => {
@@ -64,10 +65,37 @@ const ViewBySection = ({
   // handle search by date range input change
   const handleChange = (e) => {
     // update object state
-    setDateRange({
-      ...dateRange,
-      [e.target.name]: e.target.value,
-    });
+
+    const { name, value } = e.target;
+
+    if (name === "fromDate") {
+      setDateRange({
+        ...dateRange,
+        [name]: value,
+      });
+
+      // Ensure "toDate" is not earlier than "fromDate"
+      if (dateRange.toDate && new Date(value) > new Date(dateRange.toDate)) {
+        setDateRange({
+          ...dateRange,
+          toDate: value,
+        });
+      }
+    } else if (name === "toDate") {
+      // Ensure "fromDate" is not later than "toDate"
+      if (
+        dateRange.fromDate &&
+        new Date(value) < new Date(dateRange.fromDate)
+      ) {
+        return toast.error(
+          "The 'to' date cannot be earlier than the 'from' date."
+        );
+      }
+      setDateRange({
+        ...dateRange,
+        toDate: value,
+      });
+    }
   };
 
   return (
@@ -78,7 +106,7 @@ const ViewBySection = ({
           margin="8px 18px"
           bgcolor="#ecaa00"
           bradius="25px"
-          func={searchDateFunc}
+          func={() => setSearchTodayEntries(true)}
         >
           {firstBtn}
         </BocButton>
@@ -128,6 +156,7 @@ const ViewBySection = ({
             <input
               type="date"
               name="fromDate"
+              value={dateRange.fromDate}
               style={styles.inputBox}
               onChange={handleChange}
             />
@@ -135,6 +164,7 @@ const ViewBySection = ({
             <label htmlFor="to">To</label>
             <input
               type="date"
+              value={dateRange.toDate}
               name="toDate"
               style={styles.inputBox}
               onChange={handleChange}
@@ -151,7 +181,7 @@ ViewBySection.propTypes = {
   setSearch: PropTypes.func,
   setDateRange: PropTypes.func,
   dateRange: PropTypes.object,
-  searchDateFunc: PropTypes.func,
+  setSearchTodayEntries: PropTypes.func,
   handleReload: PropTypes.func,
   printBtn: PropTypes.element,
 };

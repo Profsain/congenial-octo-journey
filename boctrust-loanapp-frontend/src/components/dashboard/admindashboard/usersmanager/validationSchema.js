@@ -7,8 +7,13 @@ const validationSchema = Yup.object().shape({
     .email("Invalid email format")
     .required("Email is required"),
   phone: Yup.string()
-    .matches(/^\d{11}$/, "Invalid phone number format")
-    .required("Phone number is required"),
+    .required("Required")
+    .matches(
+      /^0[789][01]\d{8}$/,
+      "Phone number must be a valid Nigerian number, e.g., 09023653676"
+    )
+    .min(11, "Must be exactly 11 digits")
+    .max(11, "Must be exactly 11 digits"),
   username: Yup.string().required("Username is required"),
   password: Yup.string()
     .required("Password is required")
@@ -19,6 +24,5 @@ const validationSchema = Yup.object().shape({
   userType: Yup.string().required("User type is required"),
   userRole: Yup.string().required("Admin role is required"),
 });
-
 
 export default validationSchema;
