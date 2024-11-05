@@ -104,8 +104,7 @@ mongoose
     const corsOptions = {
       origin: [
         "http://localhost:5173",
-        // "http://192.168.1.187:5173",
-        // "https://www.boctrustmfb.com",
+        "https://www.boctrustmfb.com",
       ],
       methods: "GET, PUT, POST, DELETE",
       credentials: true,
