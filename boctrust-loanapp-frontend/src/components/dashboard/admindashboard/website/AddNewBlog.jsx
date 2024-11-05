@@ -7,6 +7,7 @@ import "react-quill/dist/quill.snow.css";
 import DashboardHeadline from "../../shared/DashboardHeadline";
 import "../../dashboardcomponents/transferdashboard/Transfer.css";
 import BocButton from "../../shared/BocButton";
+import apiClient from "../../../../lib/axios";
 // import BocEditor from "../../shared/BocEditor";
 
 // Define validation schema using Yup
@@ -78,7 +79,7 @@ const AddNewBlog = ({ func }) => {
   const [notification, setNotification] = useState("");
   // handle new form submit
   const handleSubmit = async (values, { setSubmitting, resetForm }) => {
-    const apiUrl = import.meta.env.VITE_BASE_URL;
+
     // convert tags to array
     const tags = values.tags.split(",");
 
@@ -91,10 +92,10 @@ const AddNewBlog = ({ func }) => {
     formData.append("tags", tags);
     formData.append("postImg", values.postImg);
 
-    await fetch(`${apiUrl}/api/blog/posts`, {
-      method: "POST",
-      enctype: "multipart/form-data",
-      body: formData,
+    await apiClient.post(`/blog/posts`, formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
     });
 
     setNotification("Blog post added successfully");

@@ -8,12 +8,12 @@ const jwt = require("jsonwebtoken");
 const multer = require("multer");
 const path = require("path");
 const CustomerModel = require("../models/Customer"); // Import customer model
-const Customer = require("../models/Customer");
 const Loan = require("../models/Loan");
 const Employer = require("../models/EmployersManager");
 const {
   getLoanByCustomerId,
 } = require("../services/bankoneOperationsServices");
+const { authenticateCustomerToken, authenticateToken } = require("../middleware/auth");
 
 // configure dotenv
 dotenv.config();
@@ -153,9 +153,23 @@ router.post("/login", async (req, res) => {
           (account) =>
             account.RealLoanStatus === "Active" && !account.IsLoanWrittenOff
         );
-        
+
         customerWithImages.activeLoan = activeLoanAccount;
       }
+
+      const refreshToken = jwt.sign(
+        { user_id: user._id, username },
+        process.env.REFRESH_TOKEN_KEY,
+        { expiresIn: "7d" }
+      );
+
+      // Create secure cookie with refresh token
+      res.cookie("jwt", refreshToken, {
+        httpOnly: true, //accessible only by web server
+        secure: true, //https
+        sameSite: "None", //cross-site cookie
+        maxAge: 7 * 24 * 60 * 60 * 1000, //cookie expiry: set to match rT
+      });
 
       return res
         .status(200)
@@ -166,6 +180,8 @@ router.post("/login", async (req, res) => {
     return res.status(500).json({ error: error.message });
   }
 });
+
+
 
 router.post("/checkValidEmail", async (req, res) => {
   try {
@@ -190,7 +206,7 @@ router.post("/checkValidEmail", async (req, res) => {
 // Read all customer
 const baseUrl = process.env.BASE_URL;
 
-router.get("/customers", async (req, res) => {
+router.get("/customers", authenticateToken, async (req, res) => {
   try {
     const customer = await CustomerModel.find()
       .populate("employer")
@@ -234,7 +250,7 @@ router.get("/customers", async (req, res) => {
 });
 
 // Read a customer by ID
-router.get("/customer/:customerId", async (req, res) => {
+router.get("/customer/:customerId", authenticateToken, async (req, res) => {
   try {
     let customer = await CustomerModel.findById(req.params.customerId);
     if (!customer) {
@@ -257,7 +273,7 @@ router.get("/customer/:customerId", async (req, res) => {
 });
 
 // Update a customer by ID
-router.put("/customer/:customerId", async (req, res) => {
+router.put("/customer/:customerId", authenticateCustomerToken, async (req, res) => {
   try {
     const customer = await CustomerModel.findByIdAndUpdate(
       req.params.customerId,
@@ -276,26 +292,30 @@ router.put("/customer/:customerId", async (req, res) => {
 });
 
 // update customer loan status
-router.put("/customer/disbursestatus/:customerId", async (req, res) => {
-  try {
-    const customer = await CustomerModel.findByIdAndUpdate(
-      req.params.customerId,
-      { disbursementstatus: req.body.disbursementstatus },
-      {
-        new: true,
+router.put(
+  "/customer/disbursestatus/:customerId",
+  authenticateCustomerToken,
+  async (req, res) => {
+    try {
+      const customer = await CustomerModel.findByIdAndUpdate(
+        req.params.customerId,
+        { disbursementstatus: req.body.disbursementstatus },
+        {
+          new: true,
+        }
+      );
+      if (!customer) {
+        return res.status(404).json({ error: "Customer not found" });
       }
-    );
-    if (!customer) {
-      return res.status(404).json({ error: "Customer not found" });
+      res.json(customer);
+    } catch (error) {
+      res.status(500).json({ error: "Unable to update customer" });
     }
-    res.json(customer);
-  } catch (error) {
-    res.status(500).json({ error: "Unable to update customer" });
   }
-});
+);
 
 // Delete a customer by ID
-router.delete("/customer/:customerId", async (req, res) => {
+router.delete("/customer/:customerId", authenticateToken, async (req, res) => {
   try {
     const customer = await CustomerModel.findByIdAndRemove(
       req.params.customerId
@@ -315,7 +335,7 @@ router.post("/forgot-password", async (req, res) => {
     const { email } = req.body;
 
     // Check if the email exists in the database
-    const user = await Customer.findOne({ email });
+    const user = await CustomerModel.findOne({ email });
 
     if (!user) {
       return res.status(404).json({ message: "Email not found" });
@@ -363,7 +383,7 @@ router.post("/reset-password", async (req, res) => {
     const { token, newPassword } = req.body;
 
     // Find the user with the provided token
-    const customer = await Customer.findOne({ token });
+    const customer = await CustomerModel.findOne({ token });
 
     if (!customer) {
       return res.status(400).json({ message: "Invalid or expired token" });

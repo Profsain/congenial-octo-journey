@@ -7,6 +7,7 @@ import PageLoader from "../../shared/PageLoader";
 import ActionNotification from "../../shared/ActionNotification";
 import "../../Dashboard.css";
 import ViewContact from "./ViewContact";
+import apiClient from "../../../../lib/axios";
 
 const ContactForm = () => {
   const [openModel, setOpenModel] = useState(false);
@@ -45,13 +46,7 @@ const ContactForm = () => {
 
   // handle delete action
   const handleDelete = async () => {
-    const apiUrl = import.meta.env.VITE_BASE_URL;
-    await fetch(`${apiUrl}/api/contact/contacts/${contactId}`, {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+    await apiClient.delete(`/contact/contacts/${contactId}`);
 
     dispatch(fetchContact());
     setAction(false);

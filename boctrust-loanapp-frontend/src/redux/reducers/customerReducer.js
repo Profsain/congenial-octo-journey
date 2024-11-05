@@ -1,16 +1,15 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import axios, { AxiosError } from "axios";
+import  { AxiosError } from "axios";
+import apiClient from "../../lib/axios";
 
-//fetch accounts
-const apiUrl = import.meta.env.VITE_BASE_URL;
 
-const API_ENDPOINT = `${apiUrl}/api/customer`;
+const API_ENDPOINT = `/customer`;
 
 // Thunk to fetch account from the API
 export const fetchAllCustomer = createAsyncThunk(
   "account/fetchAllCustomer",
   async () => {
-    const response = await axios.get(`${API_ENDPOINT}/customers`);
+    const response = await apiClient.get(`${API_ENDPOINT}/customers`);
     return response.data;
   }
 );
@@ -18,7 +17,7 @@ export const fetchAllCustomer = createAsyncThunk(
 export const fetchSingleCustomer = createAsyncThunk(
   "account/fetchSingleCustomer",
   async (customerId) => {
-    const response = await axios.get(`${API_ENDPOINT}/customer/${customerId}`);
+    const response = await apiClient.get(`${API_ENDPOINT}/customer/${customerId}`);
 
     return response.data;
   }
@@ -29,8 +28,8 @@ export const createBankoneCustomer = createAsyncThunk(
   "account/createBankoneCustomer",
   async (customerId, thunkAPI) => {
     try {
-      await axios.post(
-        `${apiUrl}/api/bankone/newCustomerAccount/${customerId}`
+      await apiClient.post(
+        `/bankone/newCustomerAccount/${customerId}`
       );
     } catch (error) {
       if (error instanceof AxiosError) {

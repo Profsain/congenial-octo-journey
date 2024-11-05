@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { fetchContent } from "../../../../redux/reducers/siteContentReducer";
 import PageLoader from "../../shared/PageLoader";
 import "./Editor.css";
+import apiClient from "../../../../lib/axios";
 
 const AboutEditor = () => {
   const dispatch = useDispatch();
@@ -40,21 +41,20 @@ const AboutEditor = () => {
     setLoading(true);
 
     e.preventDefault();
-    const apiUrl = import.meta.env.VITE_BASE_URL;
+
     try {
       // console.log("formData", formData);
       // Update the content in the database
-      const response = await fetch(
-        `${apiUrl}/api/site-content/update-content`,
+      const { data } = await apiClient.put(
+        `/site-content/update-content`,
+        formData,
         {
-          method: "PUT",
           headers: {
-            "Content-Type": "application/json",
+            "Content-Type": "multipart/form-data",
           },
-          body: JSON.stringify(formData),
         }
       );
-      const data = await response.json();
+     
       if (data) {
         setMessage("Content updated successfully");
         setLoading(false);

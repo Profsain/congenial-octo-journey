@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchDirectors } from "../../../../redux/reducers/boardDirectorReducer";
 import PageLoader from "../../shared/PageLoader";
+import apiClient from "../../../../lib/axios";
 
 const BoardOfDirectorEditor = () => {
   const apiUrl = import.meta.env.VITE_BASE_URL;
@@ -69,20 +70,7 @@ const BoardOfDirectorEditor = () => {
         const { _id, ...updatedData } = director; // Assuming each director has a unique identifier (_id)
 
         // Send update request to the backend
-        const response = await fetch(
-          `${apiUrl}/api/board-member/edit-member/${_id}`,
-          {
-            method: "PUT",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(updatedData),
-          }
-        );
-
-        if (!response.ok) {
-          throw new Error(`Failed to update director with ID ${_id}`);
-        }
+        await apiClient.put(`/board-member/edit-member/${_id}`, updatedData);
       }
       setLoading(false);
       dispatch(fetchDirectors()); // Refresh list of directors
@@ -104,20 +92,8 @@ const BoardOfDirectorEditor = () => {
     setLoading(true);
     e.preventDefault();
     try {
-      console.log("newDirector", newDirector);
-
       // Send add request to the backend
-      const response = await fetch(`${apiUrl}/api/board-member/add-member`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(newDirector),
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to add new director");
-      }
+      await apiClient.post(`/board-member/add-member`, newDirector);
 
       // Refresh list of directors
       dispatch(fetchDirectors());
@@ -165,23 +141,15 @@ const BoardOfDirectorEditor = () => {
   // Handle deleting a director
   const handleDeleteDirector = async (directorId) => {
     try {
-      const response = await fetch(
-        `${apiUrl}/api/board-member/delete/${directorId}`,
-        {
-          method: "DELETE",
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error(`Failed to delete director with ID ${directorId}`);
-      }
+      await apiClient.delete(`/board-member/delete/${directorId}`);
 
       dispatch(fetchDirectors());
-      // set director to the previous one if the current director is the last one 
+      
+      // set director to the previous one if the current director is the last one
       if (currentDirectorIndex === formData.length - 1) {
         setCurrentDirectorIndex(currentDirectorIndex - 1);
       }
-      
+
       setMessage("Director deleted successfully!");
       resetMessage();
     } catch (error) {

@@ -95,7 +95,7 @@ const LoanStatement = () => {
   }, [searchTerms]);
 
   return (
-    <>
+    <div className="loan__statement">
       {/* top search bar */}
       <div className="Search">
         <DashboardHeadline padding="0" height="70px" bgcolor="#d9d9d9">
@@ -128,7 +128,7 @@ const LoanStatement = () => {
         {status === "loading" && <PageLoader />}
         <DashboardHeadline
           height="52px"
-          mspacer="2rem 0 -2.5rem -1rem"
+          mspacer="2rem 0 -3.3rem -1rem"
           bgcolor="#145098"
         ></DashboardHeadline>
         <div style={styles.table}>
@@ -218,7 +218,7 @@ const LoanStatement = () => {
           />
         )}
       </div>
-    </>
+    </div>
   );
 };
 

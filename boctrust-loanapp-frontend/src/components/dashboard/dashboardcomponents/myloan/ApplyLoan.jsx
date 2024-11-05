@@ -8,6 +8,7 @@ import DashboardHeadline from "../../shared/DashboardHeadline";
 import "../transferdashboard/Transfer.css";
 import BocButton from "../../shared/BocButton";
 import interestRate from "../../../shared/calculatorfunc";
+import apiClient from "../../../../lib/axios";
 
 // Define validation schema using Yup
 const validationSchema = Yup.object().shape({
@@ -18,7 +19,6 @@ const validationSchema = Yup.object().shape({
     .required("Amount is required"),
   note: Yup.string().required("Note is required"),
 });
-
 
 const initialValues = {
   loanProduct: "",
@@ -41,17 +41,13 @@ const ApplyLoan = () => {
     (state) => state?.productReducer?.products?.products
   );
 
-  const baseUrl = import.meta.env.VITE_BASE_URL;
-
-   // get current login user
+  // get current login user
   const user = useSelector((state) => state.adminAuth.user);
   const isAccountCreated = user?.banking.isAccountCreated;
 
   // update message
-  const updateMessage = (message) => { 
-    setMessage(
-      message
-    );
+  const updateMessage = (message) => {
+    setMessage(message);
     setTimeout(() => {
       setMessage("");
     }, 3000);
@@ -76,7 +72,7 @@ const ApplyLoan = () => {
     const loanProductName = selectedProduct.productName;
     const principal = parseInt(values.amount);
     const time = parseInt(values.duration) * 30;
-    
+
     // calculate total repayment
     const totalRepayment = interestRate(principal, time, rate);
 
@@ -96,17 +92,10 @@ const ApplyLoan = () => {
     };
     // send the object to the backend
     try {
-      const response = await fetch(
-        `${baseUrl}/api/loan/${customerId}`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(loanApplication),
-        }
+      const { data } = await apiClient.post(
+        `/loan/${customerId}`,
+        loanApplication
       );
-      const data = await response.json();
 
       // reset form
       resetForm();
@@ -129,7 +118,7 @@ const ApplyLoan = () => {
       >
         <Form>
           <div className="FieldRow">
-            <div className="FieldGroup" style={{marginBottom: "18px"}}>
+            <div className="FieldGroup" style={{ marginBottom: "18px" }}>
               <label htmlFor="loanProduct">Loan Product</label>
               <Field
                 as="select"
@@ -174,7 +163,11 @@ const ApplyLoan = () => {
             </div>
           </div>
 
-          {message && <div style={{color: "orange", textAlign: "center"}}>{message}</div>}
+          {message && (
+            <div style={{ color: "orange", textAlign: "center" }}>
+              {message}
+            </div>
+          )}
           <div className="BtnContainer">
             <BocButton
               fontSize="1.6rem"

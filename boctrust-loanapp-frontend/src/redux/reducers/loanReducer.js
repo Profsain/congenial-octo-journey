@@ -1,16 +1,11 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
-
-//fetch accounts
-const apiUrl = import.meta.env.VITE_BASE_URL;
-
-const API_ENDPOINT = `${apiUrl}/api`;
+import apiClient from "../../lib/axios";
 
 // Thunk to fetch Loans from the API
 export const fetchMyLoans = createAsyncThunk(
   "account/fetchMyLoans",
   async (customerId) => {
-    const response = await axios.get(`${API_ENDPOINT}/loans/my/${customerId}`);
+    const response = await apiClient.get(`/loans/my/${customerId}`);
 
     return response.data;
   }
@@ -18,26 +13,26 @@ export const fetchMyLoans = createAsyncThunk(
 
 // Thunk to fetch Loans from the API
 export const fetchLoans = createAsyncThunk("account/fetchLoans", async () => {
-  const { data: allLoans } = await axios.get(`${API_ENDPOINT}/loans`);
+  const { data: allLoans } = await apiClient.get(`/loans`);
 
   const loanFullPayload = await Promise.all(
-    allLoans.Message.map(async (loan) => {
-      const { data: loanBalance } =  await axios.get(
-        `${API_ENDPOINT}/bankone/loanAccountBalance/${customerId}`
+    allLoans.map(async (loan) => {
+      const { data: loanBalance } = await apiClient.get(
+        `/bankone/loanAccountBalance/${loan?.customer?.banking?.accountDetails?.CustomerID}`
       );
 
       return { ...loan, balance: loanBalance };
     })
   );
 
-  return response.data;
+  return loanFullPayload;
 });
 
 // Thunk to fetch All Loans from the API
 export const fetchAllLoans = createAsyncThunk(
   "account/fetchAllLoans",
   async () => {
-    const response = await axios.get(`${API_ENDPOINT}/loans/all`);
+    const response = await apiClient.get(`/loans/all`);
 
     return response.data;
   }
@@ -47,7 +42,7 @@ export const fetchAllLoans = createAsyncThunk(
 export const fetchPendingLoans = createAsyncThunk(
   "account/fetchPendingLoans",
   async () => {
-    const response = await axios.get(`${API_ENDPOINT}/loans/pending`);
+    const response = await apiClient.get(`/loans/pending`);
 
     return response.data;
   }
@@ -57,7 +52,7 @@ export const fetchPendingLoans = createAsyncThunk(
 export const fetchUnbookedLoans = createAsyncThunk(
   "account/fetchUnbookedLoans",
   async () => {
-    const response = await axios.get(`${API_ENDPOINT}/loans/unbooked`);
+    const response = await apiClient.get(`/loans/unbooked`);
 
     return response.data;
   }
@@ -67,7 +62,7 @@ export const fetchUnbookedLoans = createAsyncThunk(
 export const fetchBookedLoans = createAsyncThunk(
   "account/fetchBookedLoans",
   async () => {
-    const res = await axios.get(`${API_ENDPOINT}/loans/booked`);
+    const res = await apiClient.get(`/loans/booked`);
 
     return res.data;
   }
@@ -76,7 +71,7 @@ export const fetchBookedLoans = createAsyncThunk(
 export const fetchCompletedLoan = createAsyncThunk(
   "account/fetchCompletedLoan",
   async () => {
-    const res = await axios.get(`${API_ENDPOINT}/loans/disbursed`);
+    const res = await apiClient.get(`/loans/disbursed`);
 
     return res.data;
   }
@@ -86,9 +81,7 @@ export const fetchCompletedLoan = createAsyncThunk(
 export const fetchCustomerLoans = createAsyncThunk(
   "account/fetchCustomerLoans",
   async (customerId) => {
-    const response = await axios.get(
-      `${API_ENDPOINT}/bankone/getLoansById/${customerId}`
-    );
+    const response = await apiClient.get(`/bankone/getLoansById/${customerId}`);
 
     return response.data.Message;
   }
@@ -98,8 +91,8 @@ export const fetchCustomerLoans = createAsyncThunk(
 export const fetchLoanRepaymentSchedule = createAsyncThunk(
   "account/fetchLoanRepaymentSchedule",
   async (loanAccountNumber) => {
-    const response = await axios.get(
-      `${API_ENDPOINT}/bankone/getLoanRepaymentSchedule/${loanAccountNumber}`
+    const response = await apiClient.get(
+      `/bankone/getLoanRepaymentSchedule/${loanAccountNumber}`
     );
 
     return response.data;
@@ -110,9 +103,8 @@ export const fetchLoanRepaymentSchedule = createAsyncThunk(
 export const fetchLoanAccountBal = createAsyncThunk(
   "account/fetchLoanAccountBal",
   async (customerId) => {
-    
-    const response = await axios.get(
-      `${API_ENDPOINT}/bankone/loanAccountBalance/${customerId}`
+    const response = await apiClient.get(
+      `/bankone/loanAccountBalance/${customerId}`
     );
 
     return response.data.Message;
@@ -165,7 +157,6 @@ const loanSlice = createSlice({
         state.status = "failed";
         state.error = action.error.message;
       })
-
 
       .addCase(fetchAllLoans.pending, (state) => {
         state.status = "loading";

@@ -5,6 +5,7 @@ import * as Yup from "yup";
 import DashboardHeadline from "../../shared/DashboardHeadline";
 import "../../dashboardcomponents/transferdashboard/Transfer.css";
 import BocButton from "../../shared/BocButton";
+import apiClient from "../../../../lib/axios";
 
 // Define validation schema using Yup
 const validationSchema = Yup.object().shape({
@@ -25,17 +26,11 @@ const initialValues = {
 };
 
 const AddBranch = ({ func }) => {
-  const apiUrl = import.meta.env.VITE_BASE_URL;
+
   const [message, setMessage] = useState("");
   const handleSubmit = async (values, { resetForm }) => {
     // Handle form submission logic here
-    await fetch(`${apiUrl}/api/branch/branches`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(values),
-    });
+    await apiClient.post(`/branch/branches`, values);
 
     // reset form
     resetForm();
@@ -45,7 +40,6 @@ const AddBranch = ({ func }) => {
     setTimeout(() => {
       setMessage("");
     }, 3000);
-
   };
 
   return (

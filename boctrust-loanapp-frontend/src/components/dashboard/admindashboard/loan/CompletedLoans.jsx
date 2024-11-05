@@ -134,7 +134,7 @@ const OverdueLoans = () => {
             </div>
           </DashboardHeadline>
         </div>
-        <div >
+        <div>
           {/* data loader */}
           {status === "loading" && <PageLoader />}
 
@@ -161,12 +161,16 @@ const OverdueLoans = () => {
                 </thead>
                 <tbody>
                   {loanList && sortByCreatedAt(loanList)?.length === 0 && (
-                    <NoResult name="loan" />
+                    <tr>
+                      <td colSpan={8}>
+                        <NoResult name="loan" />
+                      </td>
+                    </tr>
                   )}
                   {loanList &&
                     loanList?.map((loan) => {
                       return (
-                        <tr key={loan._id} >
+                        <tr key={loan._id}>
                           <td>
                             {loan.customer?.banking?.accountDetails
                               ?.CustomerID || "N/A"}

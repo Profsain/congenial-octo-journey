@@ -4,6 +4,7 @@ import { useDispatch } from "react-redux";
 import { fetchWikis } from "../../../../redux/reducers/wikiReducer";
 import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
+import apiClient from "../../../../lib/axios";
 
 const EditWiki = (props) => {
   const dispatch = useDispatch();
@@ -42,21 +43,14 @@ const EditWiki = (props) => {
   // submit update to api endpoint
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const apiUrl = import.meta.env.VITE_BASE_URL;
-    
+
     const updatedWikis = {
-        question: editQuestion,
-        answer: editAnswer,
-        category: editCategory,
+      question: editQuestion,
+      answer: editAnswer,
+      category: editCategory,
     };
 
-    await fetch(`${apiUrl}/api/wiki/wikis/${wikis._id}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(updatedWikis),
-    });
+    await apiClient(`/wiki/wikis/${wikis._id}`, updatedWikis);
 
     clearForm();
     handleClose();
@@ -117,7 +111,6 @@ const EditWiki = (props) => {
               onChange={(e) => setEditCategory(e.target.value)}
             />
           </div>
-
         </form>
       </Modal.Body>
       <Modal.Footer>

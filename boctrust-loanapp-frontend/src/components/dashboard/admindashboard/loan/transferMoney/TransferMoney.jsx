@@ -8,9 +8,9 @@ import { IoClose } from "react-icons/io5";
 import { Modal } from "react-bootstrap";
 import "./TransferMoney.css";
 import PageLoader from "../../../shared/PageLoader";
-import axios from "axios";
 
-const apiUrl = import.meta.env.VITE_BASE_URL;
+import apiClient from "../../../../../lib/axios";
+
 
 const TransferMoney = ({
   show,
@@ -32,8 +32,8 @@ const TransferMoney = ({
   useEffect(() => {
     const getData = async () => {
       try {
-        const response = await axios.post(
-          `${apiUrl}/api/bankone/accountNameEnquiry`,
+        const response = await apiClient.post(
+          `/bankone/accountNameEnquiry`,
           {
             bankCode: loanObj?.customer?.bankcode,
             accountNumber: loanObj?.customer?.salaryaccountnumber,

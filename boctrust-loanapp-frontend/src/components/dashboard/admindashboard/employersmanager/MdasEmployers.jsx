@@ -9,6 +9,7 @@ import PageLoader from "../../shared/PageLoader";
 import EditEmployer from "./EditEmployer";
 import ActionNotification from "../../shared/ActionNotification";
 import getDateOnly from "../../../../../utilities/getDate";
+import apiClient from "../../../../lib/axios";
 
 const MdasEmployers = () => {
   const styles = {
@@ -68,13 +69,8 @@ const MdasEmployers = () => {
 
   // handle delete action
   const handleDelete = async () => {
-    const apiUrl = import.meta.env.VITE_BASE_URL;
-    await fetch(`${apiUrl}/api/agency/employers/${deleteId}`, {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+    
+    await apiClient.delete(`/agency/employers/${deleteId}`);
     // close modal
     setAction(false);
     // fetch employers

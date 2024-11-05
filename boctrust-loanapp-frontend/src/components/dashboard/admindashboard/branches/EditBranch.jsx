@@ -4,6 +4,7 @@ import { useDispatch } from "react-redux";
 import { fetchBranches } from "../../../../redux/reducers/branchReducer";
 import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
+import apiClient from "../../../../lib/axios";
 
 const EditBranch = (props) => {
   const dispatch = useDispatch();
@@ -60,15 +61,9 @@ const EditBranch = (props) => {
       phoneNumber: editBranchPhone,
       address: editBranchAddress,
       note: editNote,
-      };
-      
-    await fetch(`${apiUrl}/api/branch/branches/${branch._id}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(updatedBranch),
-    });
+    };
+
+    await apiClient.put(`/branch/branches/${branch._id}`, updatedBranch);
 
     clearForm();
     handleClose();

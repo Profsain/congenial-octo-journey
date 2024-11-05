@@ -14,6 +14,7 @@ import { FcCancel } from "react-icons/fc";
 import { fetchMandateRules } from "../../../../../redux/reducers/mandateRuleReducer";
 import EditMandateRule from "./editRule/EditMandateRule";
 import { toast } from "react-toastify";
+import apiClient from "../../../../../lib/axios";
 
 const MandateRuleList = () => {
   const styles = {
@@ -44,7 +45,7 @@ const MandateRuleList = () => {
   const [selectedMandateRule, setSelectedMandateRule] = useState(null);
   const [show, setShow] = useState(false);
 
-  // fetch all Loans
+  // fetch all Rules
   const dispatch = useDispatch();
   const { mandateRules, status } = useSelector(
     (state) => state.mandateRuleReducer
@@ -70,12 +71,7 @@ const MandateRuleList = () => {
       
       const apiUrl = import.meta.env.VITE_BASE_URL;
       // Handle form submission logic here
-      await fetch(`${apiUrl}/api/mandate-rule/${rule._id}`, {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+      await apiClient.delete(`/mandate-rule/${rule._id}`);
 
       await dispatch(fetchMandateRules());
       toast.success("Mandate Deleted successfully");

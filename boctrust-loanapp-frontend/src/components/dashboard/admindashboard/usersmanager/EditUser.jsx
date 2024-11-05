@@ -10,6 +10,7 @@ import { updateUserValidationSchema } from "../../../loanapplication/loanform/fo
 import { useFormik } from "formik";
 import { useDispatch } from "react-redux";
 import { fetchAdmins } from "../../../../redux/reducers/adminUserReducer";
+import apiClient from "../../../../lib/axios";
 
 const EditUser = (props) => {
   const user = props.userobj;
@@ -31,7 +32,7 @@ const EditUser = (props) => {
     try {
       setIsLoading(true);
 
-      const apiUrl = import.meta.env.VITE_BASE_URL;
+     
       const updatedUser = {
         fullName: values["editFullName"],
         email: values["editEmail"],
@@ -42,15 +43,9 @@ const EditUser = (props) => {
         userRole: values["editAdminRoles"],
       };
 
-      const res = await fetch(`${apiUrl}/api/admin/update/${user._id}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(updatedUser),
-      });
+      const res = await apiClient.put(`/admin/update/${user._id}`, updatedUser);
 
-      if (res.ok) {
+      if (res.status == 200) {
         dispatch(fetchAdmins());
         handleClose(resetForm);
         toast.success("User has been updated");

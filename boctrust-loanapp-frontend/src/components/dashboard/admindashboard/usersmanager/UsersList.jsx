@@ -13,6 +13,7 @@ import EditUser from "./EditUser";
 // function
 import searchList from "../../../../../utilities/searchListFunc";
 import handleAdminRoles from "../../../../../utilities/getAdminRoles";
+import apiClient from "../../../../lib/axios";
 
 const UsersList = ({ count, searchTerms }) => {
   const styles = {
@@ -55,14 +56,10 @@ const UsersList = ({ count, searchTerms }) => {
     setUsersList(users?.slice(0, count));
   }, [users, count]);
 
-  // update usersList on search
-  const handleSearch = () => {
-    const currSearch = searchList(users, searchTerms, "fullName");
-    setUsersList(currSearch);
-  };
-
   useEffect(() => {
-    handleSearch();
+    if (searchTerms.length >= 3 || searchTerms.length == 0) {
+      dispatch(fetchAdmins(searchTerms));
+    }
   }, [searchTerms]);
 
   // handle action select
@@ -91,13 +88,7 @@ const UsersList = ({ count, searchTerms }) => {
 
   // handle delete
   const handleDelete = async () => {
-    const apiUrl = import.meta.env.VITE_BASE_URL;
-    await fetch(`${apiUrl}/api/admin/users/${userId}`, {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+    await apiClient.delete(`/admin/users/${userId}`);
 
     // remove user from usersList
     dispatch(fetchAdmins());
@@ -106,8 +97,6 @@ const UsersList = ({ count, searchTerms }) => {
 
   return (
     <>
-      {status === "loading" && <PageLoader />}
-
       <div className="">
         <div style={styles.table}>
           <Table hover responsive="sm ">
@@ -124,44 +113,52 @@ const UsersList = ({ count, searchTerms }) => {
                 <th>Action</th>
               </tr>
             </thead>
-            <tbody>
-              {usersList?.length === 0 && <NoResult name="user" />}
-              {usersList?.map((user) => (
-                <tr key={user._id} className="">
-                  <td>
-                    <img
-                      src={user.imageUrl}
-                      alt="method-logo"
-                      style={styles.img}
-                    />
-                  </td>
-                  <td>{user.fullName}</td>
-                  <td>{user.email}</td>
-                  <td>{user.phone}</td>
-                  <td>{user.username}</td>
+            {status === "loading" ? (
+              <tr>
+                <td colSpan="8">
+                  <PageLoader />
+                </td>
+              </tr>
+            ) : (
+              <tbody>
+                {usersList?.length === 0 && <NoResult name="user" />}
+                {usersList?.map((user) => (
+                  <tr key={user._id} className="">
+                    <td>
+                      <img
+                        src={user.imageUrl}
+                        alt="method-logo"
+                        style={styles.img}
+                      />
+                    </td>
+                    <td>{user.fullName}</td>
+                    <td>{user.email}</td>
+                    <td>{user.phone}</td>
+                    <td>{user.username}</td>
 
-                  <td>{user?.userRole?.label || "All"}</td>
-                  <td>
-                    <span className="badge bg-success">
-                      {user.status.toUpperCase()}
-                    </span>
-                  </td>
-                  <td>
-                    <select
-                      name="action"
-                      className="action"
-                      id={user._id}
-                      onChange={handleAction}
-                    >
-                      <option value="">Action</option>
-                      <option value="edit">Edit</option>
-                      <option value="view">View</option>
-                      <option value="delete">Delete</option>
-                    </select>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
+                    <td>{user?.userRole?.label || "All"}</td>
+                    <td>
+                      <span className="badge bg-success">
+                        {user.status.toUpperCase()}
+                      </span>
+                    </td>
+                    <td>
+                      <select
+                        name="action"
+                        className="action"
+                        id={user._id}
+                        onChange={handleAction}
+                      >
+                        <option value="">Action</option>
+                        <option value="edit">Edit</option>
+                        <option value="view">View</option>
+                        <option value="delete">Delete</option>
+                      </select>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            )}
           </Table>
         </div>
       </div>

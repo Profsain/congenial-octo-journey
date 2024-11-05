@@ -6,10 +6,10 @@ import { useEffect, useState } from "react";
 import LabeledSelect from "../../../shared/labeledInput/LabeledSelect";
 import "./BookModal.css";
 import { toast } from "react-toastify";
-import axios from "axios";
 import { useDispatch } from "react-redux";
 import PageLoader from "../../shared/PageLoader";
 import { fetchUnbookedLoans } from "../../../../redux/reducers/loanReducer";
+import apiClient from "../../../../lib/axios";
 
 const computationModeList = [
   {
@@ -21,7 +21,6 @@ const computationModeList = [
     label: "EMI Loan",
   },
 ];
-
 
 const frequencyList = [
   {
@@ -85,37 +84,31 @@ const BookingModal = ({ selectedLoan, show, handleClose }) => {
   };
 
   const handleIniateBooking = async () => {
-    const BaseURL = import.meta.env.VITE_BASE_URL;
     try {
       setIsLoading(true);
-      await axios.put(
-        `${BaseURL}/api/loans/book/${selectedLoan._id}`,
-        bookingDetails
-      );
+      await apiClient.put(`/loans/book/${selectedLoan._id}`, bookingDetails);
 
       await dispatch(fetchUnbookedLoans());
-      toast.success("Booking Initiated and Pending Approval")
-      handleClose()
+      toast.success("Booking Initiated and Pending Approval");
+      handleClose();
     } catch (error) {
       toast.error(error?.response?.data?.error || "Something went Wrong");
     } finally {
       setIsLoading(false);
     }
   };
+
   const handleApproveBooking = async () => {
-    const BaseURL = import.meta.env.VITE_BASE_URL;
     try {
       setIsLoading(true);
-      await axios.post(
-        `${BaseURL}/api/bankone/newCustomerAccount/${selectedLoan?.customer?._id}`
+      await apiClient.post(
+        `/bankone/newCustomerAccount/${selectedLoan?.customer?._id}`
       );
-      await axios.post(
-        `${BaseURL}/api/bankone/createLoan/${selectedLoan?._id}`
-      );
-      await axios.put(`${BaseURL}/api/loans/approved-book/${selectedLoan._id}`);
+      await apiClient.post(`/bankone/createLoan/${selectedLoan?._id}`);
+      await apiClient.put(`/loans/approved-book/${selectedLoan._id}`);
 
       await dispatch(fetchUnbookedLoans());
-      toast.success("Loan Booking Approved")
+      toast.success("Loan Booking Approved");
       handleClose();
     } catch (error) {
       console.log(error);

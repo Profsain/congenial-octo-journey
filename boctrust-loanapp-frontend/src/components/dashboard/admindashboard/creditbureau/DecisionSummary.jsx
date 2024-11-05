@@ -5,11 +5,11 @@ import PropTypes from "prop-types";
 import { fetchSingleCustomer } from "../../../../redux/reducers/customerReducer";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
-import { format } from "date-fns";
-import axios from "axios";
+import { format, formatDistance } from "date-fns";
 import PageLoader from "../../shared/PageLoader";
 import { nigerianCurrencyFormat } from "../../../../../utilities/formatToNiaraCurrency";
 import { customerApprovalEnum } from "../../../../lib/userRelated";
+import apiClient from "../../../../lib/axios";
 
 const percentageIndex = 0.45;
 
@@ -125,8 +125,6 @@ const DecisionSummary = ({ customerId }) => {
     }
   }, [decisionSummaryInfo, selectedCustomer]);
 
-  const apiUrl = import.meta.env.VITE_BASE_URL;
-
   const handleApproveCustomer = async () => {
     const requestObj = {
       customerHasGoodCreditHistory: validateInfo.isGoodCreditHistory,
@@ -148,23 +146,19 @@ const DecisionSummary = ({ customerId }) => {
         approvalStatus.creditOfficerApprovalStatus ==
         customerApprovalEnum.pending
       ) {
-        await axios.put(
-          `${apiUrl}/api/updatecustomer/approve/co/${customerId}`,
+        await apiClient.put(
+          `/updatecustomer/approve/co/${customerId}`,
           requestObj
         );
       } else if (
         approvalStatus.headOfCreditApprovalStatus ==
         customerApprovalEnum.pending
       ) {
-        await axios.put(
-          `${apiUrl}/api/updatecustomer/approve/hoc/${customerId}`
-        );
+        await apiClient.put(`/updatecustomer/approve/hoc/${customerId}`);
       } else if (
         approvalStatus.cooApprovalStatus == customerApprovalEnum.pending
       ) {
-        await axios.put(
-          `${apiUrl}/api/updatecustomer/approve/coo/${customerId}`
-        );
+        await apiClient.put(`/updatecustomer/approve/coo/${customerId}`);
       }
       await dispatch(fetchSingleCustomer(customerId));
       toast.success("Customer Approval Success");
@@ -218,32 +212,33 @@ const DecisionSummary = ({ customerId }) => {
     return true;
   };
 
+
   return (
     <div className="TransContainer RBox">
-      <div className=" d-flex justify-content-center p-5">
+      <div className=" d-flex justify-content-center mt-3 mb-4">
         <h4>Decision Summary</h4>
       </div>
 
-      <div className="mx-5">
+      <div className="mx-1">
         <p className="row">
-          <span className="col-5"> Customer&apos;s Net pay is </span>
-          <span className="figure col-7">
+          <span className="col-7"> Customer&apos;s Net pay is </span>
+          <span className="figure col-5">
             {nigerianCurrencyFormat.format(
               selectedCustomer?.creditCheck?.paySlipAnalysis?.netPay
             )}
           </span>
         </p>
         <p className="row">
-          <span className="col-5"> 45% of Customer&apos;s Net pay is </span>
-          <span className="figure col-7">
+          <span className="col-7"> 45% of Customer&apos;s Net pay is </span>
+          <span className="figure col-5">
             {nigerianCurrencyFormat.format(
               decisionSummaryInfo?.maxAmountLendable
             )}
           </span>
         </p>
         <p className="row">
-          <span className="col-5"> Monthy Repayment</span>{" "}
-          <span className="figure col-7">
+          <span className="col-7"> Monthy Repayment</span>{" "}
+          <span className="figure col-5">
             {nigerianCurrencyFormat.format(
               selectedCustomer?.creditCheck?.paySlipAnalysis
                 ?.monthlyLoanRepayment
@@ -251,16 +246,16 @@ const DecisionSummary = ({ customerId }) => {
           </span>
         </p>
         <p className="row">
-          <span className="col-5"> Total Monthy Deductions</span>{" "}
-          <span className="figure col-7">
+          <span className="col-7"> Total Monthy Deductions</span>{" "}
+          <span className="figure col-5">
             {decisionSummaryInfo?.totalMonthlyDeductions}
           </span>
         </p>
         <p className="row">
-          <span className="col-5">
+          <span className="col-7">
             If Loan is approved, customer&apos;s Take Home is{" "}
           </span>
-          <div className="col-7">
+          <div className="col-5">
             <span className="figure">
               {nigerianCurrencyFormat.format(
                 decisionSummaryInfo?.maxAmountLendable -
@@ -290,7 +285,7 @@ const DecisionSummary = ({ customerId }) => {
             <span className="">
               Customer Name/Number is on the Soft suite document{" "}
             </span>
-            <div className="form-check form-switch col-sm-4 col-md-4 mt-4">
+            <div className="form-check d-flex form-switch col-sm-4 mt-4">
               <input
                 className="form-check-input"
                 type="checkbox"
@@ -311,7 +306,7 @@ const DecisionSummary = ({ customerId }) => {
 
           <p className="decision-row  ">
             <span className=""> Customer Next of Kin is okay </span>
-            <div className="form-check form-switch col-sm-4 col-md-4 mt-4">
+            <div className="form-check d-flex form-switch col-sm-4 col-md-4 mt-4">
               <input
                 className="form-check-input"
                 type="checkbox"
@@ -324,7 +319,7 @@ const DecisionSummary = ({ customerId }) => {
                   })
                 }
               />
-              <label className="form-check-label mx-3 checked">
+              <label className="form-check-label  mx-3 checked">
                 {validateInfo.isCustomerNextOfKinOk ? "Yes" : "No"}
               </label>
             </div>
@@ -332,7 +327,7 @@ const DecisionSummary = ({ customerId }) => {
 
           <p className="decision-row  ">
             <span className="">Credit Bureau Check</span>{" "}
-            <div className="form-check form-switch col-sm-4 col-md-4 mt-4">
+            <div className="form-check form-switch d-flex col-sm-4 col-md-4 mt-4">
               <input
                 className="form-check-input"
                 type="checkbox"
@@ -345,7 +340,7 @@ const DecisionSummary = ({ customerId }) => {
                   })
                 }
               />
-              <label className="form-check-label mx-3 checked">
+              <label className="form-check-label  mx-3 checked">
                 {validateInfo.isCreditCheckOk ? "Yes" : "No"}
               </label>
             </div>
@@ -353,7 +348,7 @@ const DecisionSummary = ({ customerId }) => {
 
           <p className="decision-row  ">
             <span className=""> BVN Check</span>
-            <div className="form-check form-switch col-sm-4 col-md-4 mt-4">
+            <div className="form-check form-switch d-flex col-sm-4 col-md-4 mt-4">
               <input
                 className="form-check-input"
                 type="checkbox"
@@ -366,7 +361,7 @@ const DecisionSummary = ({ customerId }) => {
                   })
                 }
               />
-              <label className="form-check-label mx-3 checked">
+              <label className="form-check-label  mx-3 checked">
                 {validateInfo.isBvnCheckOk ? "Yes" : "No"}
               </label>
             </div>
@@ -399,7 +394,7 @@ const DecisionSummary = ({ customerId }) => {
               )}
             </div>
 
-            <div className="col-sm-12 col-md-3">
+            <div className="col-sm-12 col-md-6">
               <button className="viewBtn">
                 <a
                   target="_blank"
@@ -429,7 +424,7 @@ const DecisionSummary = ({ customerId }) => {
               )}
             </div>
 
-            <div className="col-sm-12 col-md-3">
+            <div className="col-sm-12 col-md-6">
               <button className="viewBtn">
                 <a
                   target="_blank"
@@ -455,10 +450,10 @@ const DecisionSummary = ({ customerId }) => {
                   <div className="d-flex gap-2 mt-3 align-items-center">
                     <h6>{item?.bureauName}</h6>
                     <span className="validBtn">
-                      {format(item?.bureauDate, "MMM dd, HH:mm")}
+                      {format(item?.bureauDate, "MMM dd")}
                     </span>
                   </div>
-                  <div className="col-sm-12 col-md-3">
+                  <div className="col-sm-12 col-md-6">
                     <button className="viewBtn">
                       <a
                         target="_blank"
@@ -487,7 +482,7 @@ const DecisionSummary = ({ customerId }) => {
               )}
             </div>
 
-            <div className="col-sm-12 col-md-3">
+            <div className="col-sm-12 col-md-6">
               <button className="viewBtn">
                 <a
                   target="_blank"
@@ -582,6 +577,21 @@ const DecisionSummary = ({ customerId }) => {
           ) : (
             <div className="already__approved">
               Customer has been approved by Credit Officer
+              <p className="d-flex gap-2 justify-content-center">
+                <b>Duration:</b>
+
+                {selectedCustomer?.creditCheck.assignment.updatedAt &&
+                  selectedCustomer?.creditCheck?.decisionSummary
+                    .creditOfficerApprovedAt &&
+                  formatDistance(
+                    new Date(
+                      selectedCustomer?.creditCheck.assignment.updatedAt
+                    ),
+                    new Date(
+                      selectedCustomer?.creditCheck?.decisionSummary.creditOfficerApprovedAt
+                    )
+                  )}
+              </p>
             </div>
           )}
         </div>

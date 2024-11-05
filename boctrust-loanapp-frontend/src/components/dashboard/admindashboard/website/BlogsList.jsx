@@ -12,6 +12,7 @@ import NoResult from "../../../shared/NoResult";
 // function
 import getDateOnly from "../../../../../utilities/getDate";
 import searchList from "../../../../../utilities/searchListFunc";
+import apiClient from "../../../../lib/axios";
 
 const BlogsList = ({ count, searchTerms }) => {
   const [modalShow, setModalShow] = useState(false);
@@ -76,13 +77,8 @@ const BlogsList = ({ count, searchTerms }) => {
   const handleDelete = async (e) => {
     e.preventDefault();
 
-    const apiUrl = import.meta.env.VITE_BASE_URL;
-    await fetch(`${apiUrl}/api/blog/posts/${actionId}`, {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+    await apiClient.delete(`/blog/posts/${actionId}`);
+
     setAction(false);
     dispatch(fetchBlogPosts());
   };

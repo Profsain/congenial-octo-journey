@@ -1,10 +1,11 @@
-import {useState} from "react";
+import { useState } from "react";
 import PropTypes from "prop-types";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import BocButton from "../../shared/BocButton";
 import DashboardHeadline from "../../shared/DashboardHeadline";
 import "../customers/Customer.css";
+import apiClient from "../../../../lib/axios";
 
 // Define validation schema using Yup
 const validationSchema = Yup.object().shape({
@@ -20,26 +21,25 @@ const initialValues = {
 const AddNewWithdrawerMethod = ({ func }) => {
   const [notification, setNotification] = useState("");
 
-  const handleSubmit = async (values, { resetForm }) => {
-    const apiUrl = import.meta.env.VITE_BASE_URL;
+  const handleSubmit = async (values, { resetForm }
     
+  ) => {
     // Handle form submission logic here
     const formData = new FormData();
     formData.append("methodName", values.methodName);
     formData.append("logo", values.logo);
 
-    await fetch(`${apiUrl}/api/disbursement/disbursements`, {
-      method: "POST",
-      enctype: "multipart/form-data",
-      body: formData,
+    await apiClient.post(`/disbursement/disbursements`, formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
     });
     resetForm();
     setNotification("Method added successfully");
 
     setTimeout(() => {
       setNotification("");
-    }
-    , 3000);
+    }, 3000);
   };
 
   const handleClose = () => {

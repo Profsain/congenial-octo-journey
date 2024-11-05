@@ -4,9 +4,9 @@ import { useDispatch } from "react-redux";
 import { fetchSelectedProduct } from "../../../../redux/reducers/productReducer";
 import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
-import axios from "axios";
 import PageLoader from "../../shared/PageLoader";
 import { toast } from "react-toastify";
+import apiClient from "../../../../lib/axios";
 
 const EditLoanProduct = (props) => {
   const dispatch = useDispatch();
@@ -19,15 +19,13 @@ const EditLoanProduct = (props) => {
 
   useEffect(() => {
     if (product) {
-      axios
-        .get(`${import.meta.env.VITE_BASE_URL}/api/product/${product._id}`)
-        .then(({ data }) => {
-          setUpdateValue({
-            interestRate: data.product.interestRate,
-            productTitle: data.product.productTitle,
-            bankoneProductName: data.bankoneDetails.ProductName,
-          });
+      apiClient.get(`/product/${product._id}`).then(({ data }) => {
+        setUpdateValue({
+          interestRate: data.product.interestRate,
+          productTitle: data.product.productTitle,
+          bankoneProductName: data.bankoneDetails.ProductName,
         });
+      });
     }
   }, [product]);
 
@@ -53,18 +51,13 @@ const EditLoanProduct = (props) => {
     try {
       setIsLoading(true);
 
-      const apiUrl = import.meta.env.VITE_BASE_URL;
-
       const updatedProduct = {
         productCode: product.productCode,
         productTitle: updateValue.productTitle,
         interestRate: updateValue.interestRate,
       };
 
-      await axios.put(
-        `${apiUrl}/api/product/products/${product._id}`,
-        updatedProduct
-      );
+      await apiClient.put(`/product/products/${product._id}`, updatedProduct);
       await dispatch(fetchSelectedProduct());
       clearForm();
       handleClose();
@@ -139,7 +132,11 @@ const EditLoanProduct = (props) => {
             <Button variant="secondary" onClick={handleClose}>
               Close
             </Button>
-            <Button variant="primary d-flex" type="button" onClick={handleSubmit}>
+            <Button
+              variant="primary d-flex"
+              type="button"
+              onClick={handleSubmit}
+            >
               {isLoading ? <PageLoader width="20px" /> : null}
               Update
             </Button>

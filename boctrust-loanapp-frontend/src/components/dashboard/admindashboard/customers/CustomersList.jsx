@@ -110,7 +110,14 @@ const CustomersList = ({ showCount, searchTerms }) => {
               </tr>
             </thead>
             <tbody>
-              {customerList?.length === 0 && <NoResult name="customer" />}
+              {customerList?.length === 0 && (
+                <tr >
+                  <td colSpan="8">
+                  <NoResult name="customer" />
+
+                  </td>
+                </tr>
+              )}
               {sortByCreatedAt(customerList)?.map((customer) => (
                 <tr key={customer._id}>
                   <td>

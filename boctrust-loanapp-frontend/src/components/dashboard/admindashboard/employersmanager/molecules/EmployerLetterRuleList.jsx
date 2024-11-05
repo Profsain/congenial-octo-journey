@@ -13,6 +13,7 @@ import { FcCancel } from "react-icons/fc";
 import { toast } from "react-toastify";
 import EditEmployerLetterRule from "./editRule/EditEmployerLetterRule";
 import { fetchEmployerLetterRules } from "../../../../../redux/reducers/employerLetterRuleReducer";
+import apiClient from "../../../../../lib/axios";
 
 const EmployerLetterRuleList = () => {
   const styles = {
@@ -68,12 +69,7 @@ const EmployerLetterRuleList = () => {
     try {
       const apiUrl = import.meta.env.VITE_BASE_URL;
       // Handle form submission logic here
-      await fetch(`${apiUrl}/api/employer-letter-rule/${rule._id}`, {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+      await apiClient.delete(`/employer-letter-rule/${rule._id}`);
 
       await dispatch(fetchEmployerLetterRules());
       toast.success("Employer Letter Rule Deleted successfully");

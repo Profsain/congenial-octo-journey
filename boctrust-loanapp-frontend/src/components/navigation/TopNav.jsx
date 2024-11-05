@@ -6,12 +6,19 @@ import { logoutUser } from "../../redux/reducers/adminAuthReducer";
 import { Navbar, Container, Nav, NavDropdown } from "react-bootstrap";
 import "./Navigation.css";
 import { Link } from "react-router-dom";
+import { handleLogout } from "../../services/logout";
 
 const TopNav = ({ settings }) => {
   // handle logout
   const dispatch = useDispatch();
-  const handleLogout = () => {
-    dispatch(logoutUser());
+  const logoutUser = async () => {
+    try {
+      await handleLogout();
+      dispatch(logoutUser());
+      navigate("/login");
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   // get current admin
@@ -197,7 +204,7 @@ const TopNav = ({ settings }) => {
                 {currentUser ? (
                   <Nav.Link
                     href="/login"
-                    onClick={handleLogout}
+                    onClick={logoutUser}
                     className="mx-4"
                   >
                     Logout

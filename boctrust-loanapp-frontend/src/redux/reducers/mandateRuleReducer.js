@@ -1,15 +1,14 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
+import apiClient from "../../lib/axios";
 
 //fetch employer
-const apiUrl = import.meta.env.VITE_BASE_URL;
-const API_ENDPOINT = `${apiUrl}/api/mandate-rule`;
+const API_ENDPOINT = `/mandate-rule`;
 
 // Thunk to fetch employer from the API
 export const fetchMandateRules = createAsyncThunk(
   "mandateRule/fetchMandateRules",
   async () => {
-    const response = await axios.get(API_ENDPOINT);
+    const response = await apiClient.get(API_ENDPOINT);
     console.log(response.data.mandateRules)
     return response.data.mandateRules;
   }

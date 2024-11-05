@@ -15,6 +15,7 @@ import useSearchByDateRange from "../../../../../utilities/useSearchByDateRange.
 
 import stopLoanFunc from "./stopLoanFunc";
 import sendSMS from "../../../../../utilities/sendSms.js";
+import apiClient from "../../../../lib/axios.js";
 
 const StopCollections = () => {
   const styles = {
@@ -86,18 +87,9 @@ const StopCollections = () => {
     };
 
     // call stop collection api
-    const response = await fetch(`${apiUrl}/api/remita/stop-loan-collection`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-
-      // send customer details to remita
-      body: JSON.stringify({
-        ...raw,
-      }),
+    const { data } = await apiClient.post(`/remita/stop-loan-collection`, {
+      ...raw,
     });
-    const data = await response.json();
 
     // check if response is success
     if (data.data.status === "success") {
@@ -108,7 +100,7 @@ const StopCollections = () => {
       // send sms notification to customer
       const message = `Dear customer, your loan collection has been stopped. Please contact us for more information.`;
       await sendSMS(customer.phone, message);
-      
+
       // call dispatch
       dispatch(fetchAllCustomer());
     }

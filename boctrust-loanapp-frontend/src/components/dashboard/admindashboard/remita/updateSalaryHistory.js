@@ -1,23 +1,24 @@
-const updateSalaryHistory = async (customerId, data, remitaStatus="pending", loanStatus="pending", disbursementDetails={}) => {
+import apiClient from "../../../../lib/axios";
+
+const updateSalaryHistory = async (
+  customerId,
+  data,
+  remitaStatus = "pending",
+  loanStatus = "pending",
+  disbursementDetails = {}
+) => {
   const apiUrl = import.meta.env.VITE_BASE_URL;
-  
-     // update customer data with remita details
+
+  // update customer data with remita details
   const remitaData = {
     isRemitaCheck: true,
     remitaStatus: remitaStatus,
     loanStatus: loanStatus,
-    remitaDetails: data,  
-    disbursementDetails: disbursementDetails
+    remitaDetails: data,
+    disbursementDetails: disbursementDetails,
   };
-  
-  await fetch(
-    `${apiUrl}/api/updatecustomer/remita/${customerId}`,
-    {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(remitaData),
-    }
-  );
-}
 
-export  default updateSalaryHistory;
+  await apiClient.put(`/updatecustomer/remita/${customerId}`, remitaData);
+};
+
+export default updateSalaryHistory;
