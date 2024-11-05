@@ -1,4 +1,4 @@
-import {useState} from "react"
+import { useState } from "react";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import BocButton from "../../../shared/BocButton";
@@ -8,6 +8,7 @@ import "../Report.css";
 import AccountBalanceList from "./AccountBalanceList";
 import NextPreBtn from "../../../shared/NextPreBtn";
 import PageLoader from "../../../shared/PageLoader";
+import apiClient from "../../../../../lib/axios";
 
 // Define validation schema using Yup
 const validationSchema = Yup.object().shape({
@@ -23,19 +24,18 @@ const initialValues = {
 };
 
 const AccountBalance = () => {
-  const apiUrl = import.meta.env.VITE_BASE_URL;
+  
   const [accountBalance, setAccountBalance] = useState([]);
   const [processing, setProcessing] = useState(false);
 
-  const handleSubmit = async(values) => {
+  const handleSubmit = async (values) => {
     // Handle form submission logic here
     setProcessing(true);
     try {
-       const loanBalance = await fetch(
-         `${apiUrl}/api/bankone/balanceEnquiry/${values.customerId}`
+      const { data: loanBalanceData } = await apiClient.get(
+        `/bankone/balanceEnquiry/${values.customerId}`
       );
-      
-      const loanBalanceData = await loanBalance.json();
+
       if (loanBalanceData) {
         setAccountBalance(loanBalanceData);
         setProcessing(false);
@@ -91,16 +91,19 @@ const AccountBalance = () => {
             </div>
             <div className="BtnRow">
               <div className="BtnContainer">
-                {processing ? (<PageLoader />) : (<BocButton
-                  margin="0"
-                  fontSize="1.6rem"
-                  type="submit"
-                  bgcolor="#ecaa00"
-                  bradius="18px"
-                >
-                  Submit
-                </BocButton>)}
-                
+                {processing ? (
+                  <PageLoader />
+                ) : (
+                  <BocButton
+                    margin="0"
+                    fontSize="1.6rem"
+                    type="submit"
+                    bgcolor="#ecaa00"
+                    bradius="18px"
+                  >
+                    Submit
+                  </BocButton>
+                )}
               </div>
             </div>
           </Form>

@@ -5,6 +5,8 @@ const nodemailer = require("nodemailer");
 const multer = require("multer");
 const User = require("../models/AdminUser");
 const express = require("express");
+const { authenticateStaffToken } = require("../middleware/auth");
+const errorHandlerMiddleware = require("../utils/errorHandler");
 const router = express.Router();
 // const adminUserVerification = require('../middleware/AuthMiddleware');
 
@@ -25,9 +27,31 @@ const upload = multer({
 });
 
 // Get all users
-router.get("/users", async (req, res) => {
+router.get("/users", authenticateStaffToken, async (req, res) => {
   try {
-    const users = await User.find().populate("userRole");
+    const { search } = req.query;
+   
+    let queryObject = {};
+
+    if (search) {
+      const stringSearchFields = [
+        "fullName",
+        "username",
+        "email",
+       
+      ];
+
+      const query = {
+        $or: [
+          ...stringSearchFields.map((field) => ({
+            [field]: new RegExp("^" + search, "i"),
+          })),
+        ],
+      };
+      queryObject = { ...queryObject, ...query };
+    }
+
+    const users = await User.find(queryObject).populate("userRole");
 
     // Map users to include image URLs
     const usersWithImages = users.map((user) => {
@@ -46,7 +70,7 @@ router.get("/users", async (req, res) => {
 }); // get all users logic ends here
 
 // Get Users for specific Role
-router.get("/users/:roleId", async (req, res) => {
+router.get("/users/:roleId", authenticateStaffToken, async (req, res) => {
   const { roleId } = req.params;
   try {
     const users = await User.find({ userRole: roleId });
@@ -112,33 +136,16 @@ router.post("/register", type, async (req, res, next) => {
       photo,
     });
 
-    // Create token
-    const token = jwt.sign(
-      { user_id: user._id, username },
-      process.env.TOKEN_KEY,
-      {
-        expiresIn: "2h",
-      }
-    );
-    // save user token
-    user.token = token;
     user.save();
-
-    // return token
-    res.cookie("token", token, {
-      withCredentials: true,
-      httpOnly: false,
-    });
 
     // return new user
     return res.status(201).json({ success: "User created successfully" });
-    next();
   } catch (error) {
-    return res.status(500).json({ error: error.message });
+    return errorHandlerMiddleware(error, 500, res);
   }
 }); // registration logic ends here
 
-router.post("/registerTest", async (req, res, next) => {
+router.post("/registerTest", async (req, res) => {
   try {
     // Get user input
     const { fullName, email, phone, username, password, userType, userRole } =
@@ -193,7 +200,6 @@ router.post("/registerTest", async (req, res, next) => {
 
     // return new user
     return res.status(201).json({ success: "User created successfully" });
-    next();
   } catch (error) {
     return res.status(500).json({ error: error.message });
   }
@@ -217,7 +223,7 @@ router.post("/verify", (req, res) => {
 });
 
 // Login user using username and password
-router.post("/login", async (req, res, next) => {
+router.post("/login", async (req, res) => {
   try {
     // get user input
     const { username, password } = req.body;
@@ -237,16 +243,25 @@ router.post("/login", async (req, res, next) => {
         { user_id: user._id, username },
         process.env.TOKEN_KEY,
         {
-          expiresIn: "2h",
+          expiresIn: "2m",
         }
       );
 
       // save user token
       user.token = token;
 
-      res.cookie("token", token, {
-        withCredentials: true,
-        httpOnly: false,
+      const refreshToken = jwt.sign(
+        { user_id: user._id, username },
+        process.env.REFRESH_TOKEN_KEY,
+        { expiresIn: "7d" }
+      );
+
+      // Create secure cookie with refresh token
+      res.cookie("jwt", refreshToken, {
+        httpOnly: true, //accessible only by web server
+        secure: false, //https
+        sameSite: "lax", //cross-site cookie
+        maxAge: 7 * 24 * 60 * 60 * 1000, //cookie expiry: set to match rT
       });
 
       // user
@@ -254,7 +269,6 @@ router.post("/login", async (req, res, next) => {
     }
 
     return res.status(400).json({ error: "Invalid Credentials" });
-    next();
   } catch (error) {
     return res.status(500).json({ error: error.message });
   }
@@ -337,7 +351,7 @@ router.post("/reset-password", async (req, res) => {
 });
 
 // Delete a user
-router.delete("/users/:id", async (req, res) => {
+router.delete("/users/:id", authenticateStaffToken, async (req, res) => {
   try {
     // get user id from request params
     const { id } = req.params;
@@ -355,7 +369,7 @@ router.delete("/users/:id", async (req, res) => {
 }); // delete user logic ends here
 
 // Update a user
-router.put("/update/:id", async (req, res) => {
+router.put("/update/:id", authenticateStaffToken, async (req, res) => {
   try {
     const { id } = req.params;
     const { fullName, email, phone, username, userType, userRole } = req.body;
@@ -384,7 +398,7 @@ router.put("/update/:id", async (req, res) => {
     }
     throw new Error("User not found");
   } catch (error) {
-    return res.status(500).json({ error: error.message });
+    return errorHandlerMiddleware(error, 500, res);
   }
 }); // update user logic ends here
 

@@ -8,6 +8,7 @@ import "../Report.css";
 import AccountStatementList from "./AccountStatementList";
 import NextPreBtn from "../../../shared/NextPreBtn";
 import PageLoader from "../../../shared/PageLoader";
+import apiClient from "../../../../../lib/axios";
 
 // Define validation schema using Yup
 const validationSchema = Yup.object().shape({
@@ -23,7 +24,7 @@ const initialValues = {
 };
 
 const AccountStatement = () => {
-  const apiUrl = import.meta.env.VITE_BASE_URL;
+ 
   const [accountBalance, setAccountBalance] = useState([]);
   const [processing, setProcessing] = useState(false);
 
@@ -31,11 +32,10 @@ const AccountStatement = () => {
     // Handle form submission logic here
     setProcessing(true);
     try {
-      const loanBalance = await fetch(
-        `${apiUrl}/api/bankone/loanAccountStatement/${values.customerId}/${values.startDate}/${values.endDate}`
+      const { data: loanBalanceData } = await apiClient.get(
+        `/bankone/loanAccountStatement/${values.customerId}/${values.startDate}/${values.endDate}`
       );
 
-      const loanBalanceData = await loanBalance.json();
       if (loanBalanceData) {
         setAccountBalance(loanBalanceData);
         setProcessing(false);

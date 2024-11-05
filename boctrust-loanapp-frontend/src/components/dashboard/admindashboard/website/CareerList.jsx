@@ -1,4 +1,4 @@
-import PropTypes from "prop-types"
+import PropTypes from "prop-types";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchCareer } from "../../../../redux/reducers/careerReducer";
@@ -10,12 +10,13 @@ import EditCareer from "./EditCareer";
 import NoResult from "../../../shared/NoResult";
 // functions
 import getDateOnly from "../../../../../utilities/getDate";
+import apiClient from "../../../../lib/axios";
 // import searchList from "../../../../../utilities/searchListFunc";
 
-const CareerList = ({count, searchTerms}) => {
+const CareerList = ({ count, searchTerms }) => {
   const [openModel, setOpenModel] = useState(false);
   const [action, setAction] = useState(false);
-  const [actionOption, setActionOption] = useState("")
+  const [actionOption, setActionOption] = useState("");
   const [careerId, setCareerId] = useState("");
   const [careerObj, setCareerObj] = useState({});
 
@@ -52,7 +53,7 @@ const CareerList = ({count, searchTerms}) => {
   const handleSelect = (e) => {
     const option = e.target.value;
     const id = e.target.id;
-    setCareerId(id); 
+    setCareerId(id);
 
     // filter jobs object by id
     const career = careers.find((jobs) => jobs._id === id);
@@ -64,22 +65,14 @@ const CareerList = ({count, searchTerms}) => {
     } else if (option === "delete") {
       setAction(true);
     } else if (option === "view") {
-      setActionOption("view")
+      setActionOption("view");
       handleEdit();
     }
-
-  }
+  };
 
   // handle delete action
-  const handleDelete = async () => { 
-    const apiUrl = import.meta.env.VITE_BASE_URL;
-    
-    await fetch(`${apiUrl}/api/career/careers/${careerId}`, {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+  const handleDelete = async () => {
+    await apiClient.delete(`/career/careers/${careerId}`);
 
     dispatch(fetchCareer());
     setAction(false);
@@ -164,7 +157,7 @@ const CareerList = ({count, searchTerms}) => {
 
 CareerList.propTypes = {
   count: PropTypes.number,
-  searchTerms: PropTypes.string
-}
+  searchTerms: PropTypes.string,
+};
 
 export default CareerList;

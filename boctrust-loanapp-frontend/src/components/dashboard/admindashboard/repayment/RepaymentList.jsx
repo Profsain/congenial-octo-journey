@@ -3,10 +3,9 @@ import { useSelector } from "react-redux";
 import Table from "react-bootstrap/Table";
 import "../../Dashboard.css";
 import DashboardHeadline from "../../shared/DashboardHeadline";
-import BocButton from "../../shared/BocButton";
 import NextPreBtn from "../../shared/NextPreBtn";
 import handleAdminRoles from "../../../../../utilities/getAdminRoles";
-import sortByCreatedAt from "../../shared/sortedByDate";
+
 
 const RepaymentList = () => {
   const styles = {
@@ -47,7 +46,7 @@ const RepaymentList = () => {
     <div>
       <DashboardHeadline
         height="52px"
-        mspacer="2rem 0 -2.55rem -1rem"
+        mspacer="2rem 0 -3.33rem -1rem"
         bgcolor="#145098"
       ></DashboardHeadline>
       <div style={styles.table}>

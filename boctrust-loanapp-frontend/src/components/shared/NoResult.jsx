@@ -9,7 +9,8 @@ const NoResult = ({ name }) => {
     color: #145098;
     font-size: 1.5rem;
     padding-top: 2rem;
-    width: 200px;
+    width: 100%;
+   
 
     @media (max-width: 600px) {
       font-size: 1rem;

@@ -3,53 +3,10 @@ import { useSelector } from "react-redux";
 import PropTypes from "prop-types";
 import "../../Dashboard.css";
 import handleAdminRoles from "../../../../../utilities/getAdminRoles";
-import { Link } from "react-router-dom";
+import { NavLink, useLocation } from "react-router-dom";
 
 const SideNavMain = ({ onMenuItemClick }) => {
-  const [isCustomerOpen, setIsCustomerOpen] = useState(false);
-  const [isOpen, setIsOpen] = useState(false);
-  const [isLoanOpen, setIsLoanOpen] = useState(false);
-  const [isAccountOpen, setIsAccountOpen] = useState(false);
-  const [isRemitaOpen, setIsRemitaOpen] = useState(false);
-  const [isEmployerOpen, setIsEmployerOpen] = useState(false);
-  const [isWebManagerOpen, setIsWebManagerOpen] = useState(false);
-  const [isKycOpen, setIsKycOpen] = useState(false);
-  const [isReportsOpen, setIsReportsOpen] = useState(false);
-  const [isUserManagerOpen, setIsUserManagerOpen] = useState(false);
-  const [isSettingOpen, setIsSettingOpen] = useState(false);
-
-  const openSubCustomer = () => setIsCustomerOpen(true);
-  const closeSubCustomer = () => setIsCustomerOpen(false);
-
-  const openSubItem = () => setIsOpen(true);
-  const closeSubItem = () => setIsOpen(false);
-
-  const openSubLoan = () => setIsLoanOpen(true);
-  const closeSubLoan = () => setIsLoanOpen(false);
-
-  const openSubAccount = () => setIsAccountOpen(true);
-  const closeSubAccount = () => setIsAccountOpen(false);
-
-  const openSubRemita = () => setIsRemitaOpen(true);
-  const closeSubRemita = () => setIsRemitaOpen(false);
-
-  const openSubEmployer = () => setIsEmployerOpen(true);
-  const closeSubEmployer = () => setIsEmployerOpen(false);
-
-  const openSubWebManager = () => setIsWebManagerOpen(true);
-  const closeSubWebManager = () => setIsWebManagerOpen(false);
-
-  const openSubKyc = () => setIsKycOpen(true);
-  const closeSubKyc = () => setIsKycOpen(false);
-
-  const openSubUserManager = () => setIsUserManagerOpen(true);
-  const closeSubUserManager = () => setIsUserManagerOpen(false);
-
-  const openSubReports = () => setIsReportsOpen(true);
-  const closeSubReports = () => setIsReportsOpen(false);
-
-  const openSubSetting = () => setIsSettingOpen(true);
-  const closeSubSetting = () => setIsSettingOpen(false);
+  const [activeSection, setActiveSection] = useState("dashboard");
 
   // current login superAdmin user
   const currentUser = useSelector((state) => state.adminAuth.user);
@@ -58,6 +15,8 @@ const SideNavMain = ({ onMenuItemClick }) => {
   const [superAdmin, setSuperAdmin] = useState("");
   const [adminRoles, setAdminRoles] = useState([]);
   const [shouldNotSee, setShouldNotSee] = useState([]);
+
+  const location = useLocation();
 
   useEffect(() => {
     if (currentUser) {
@@ -71,6 +30,15 @@ const SideNavMain = ({ onMenuItemClick }) => {
     }
   }, [currentUser]);
 
+  useEffect(() => {
+    const pathList = location.pathname.split("/");
+    setActiveSection(pathList.length > 2 ? pathList[2] : pathList[1]);
+  }, []);
+
+  const checkSectionActive = (key) => {
+    return activeSection === key;
+  };
+
   return (
     <div className="NavIcons SideMain FixSideNav">
       <div className="BrandCon">
@@ -80,43 +48,79 @@ const SideNavMain = ({ onMenuItemClick }) => {
         <p className="text-capitalize">{currentUser?.userRole?.label}</p>
       </div>
 
-      <Link
-        id="dashboard"
-        to="/dashboard"
-        onClick={onMenuItemClick}
-        className="IconBox"
+      <div
+        className={`link__wrap  ${
+          checkSectionActive("dashboard") ? "section__active" : ""
+        }`}
+        onClick={(e) => {
+          onMenuItemClick(e);
+          setActiveSection("dashboard");
+        }}
       >
-        <img src="/images/ddashboard.png" alt="dashboard" />
-        <p>Dashboard</p>
-      </Link>
+        <NavLink
+          id="dashboard"
+          to="/dashboard"
+          onClick={onMenuItemClick}
+          className={({ isActive }) =>
+            `IconBox ${isActive ? "link_active " : ""}`
+          }
+          end
+        >
+          <img
+            onClick={onMenuItemClick}
+            src="/images/ddashboard.png"
+            alt="dashboard"
+          />
+          <p>Dashboard</p>
+        </NavLink>
+      </div>
 
-      <Link
-        id="branches"
-        to="/dashboard/branches"
-        onClick={onMenuItemClick}
-        className="IconBox"
+      <div
+        className={`link__wrap  ${
+          checkSectionActive("branches") ? "section__active" : ""
+        }`}
+        onClick={(e) => {
+          onMenuItemClick(e);
+          setActiveSection("branches");
+        }}
       >
-        <img src="/images/dmda.png" alt="branches" />
-        <p>Branches</p>
-      </Link>
+        <NavLink
+          id="branches"
+          to="/dashboard/branches"
+          className={({ isActive }) =>
+            `IconBox ${isActive ? "link_active " : ""}`
+          }
+        >
+          <img src="/images/dmda.png" alt="branches" />
+          <p  id="branches" >Branches</p>
+        </NavLink>
+      </div>
 
       {/* Menu with sub item */}
-      <div onMouseOver={openSubCustomer} onMouseLeave={closeSubCustomer}>
+      <div
+        className={`link__wrap ${
+          checkSectionActive("customers") ? "section__active" : ""
+        }`}
+        onClick={() => {
+          setActiveSection("customers");
+        }}
+      >
         <div className="IconBox">
-          <img src="/images/dprofile.png" alt="customer" />
+          <img src="/images/dprofile.png" alt="customers" />
           <p>Customers</p>
         </div>
-        {isCustomerOpen ? (
+        {checkSectionActive("customers") ? (
           <div className="SubItem">
             <ul>
               <li>
-                <Link
+                <NavLink
                   id="customer"
                   onClick={onMenuItemClick}
                   to={"/dashboard/customers"}
+                  className={({ isActive }) => (isActive ? "link_active" : "")}
                 >
                   All Customers
-                </Link>
+                </NavLink>
               </li>
               {/* {superAdmin || adminRoles?.includes("customer_request") ? (
                 <li id="customerrequest" onClick={onMenuItemClick}>
@@ -130,87 +134,103 @@ const SideNavMain = ({ onMenuItemClick }) => {
 
       {/* loans menu */}
 
-      <div onMouseOver={openSubLoan} onMouseLeave={closeSubLoan}>
+      <div
+        className={`link__wrap ${
+          checkSectionActive("loans") ? "section__active" : ""
+        }`}
+        onClick={() => {
+          setActiveSection("loans");
+        }}
+      >
         <div className="IconBox">
           <img src="/images/dmyloan.png" alt="loan" />
           <p>Loans</p>
         </div>
-        {isLoanOpen ? (
+        {checkSectionActive("loans") ? (
           <div className="SubItem">
             <ul>
               <li>
-                <Link
+                <NavLink
                   id="myloan"
                   onClick={onMenuItemClick}
                   to="/dashboard/loans"
+                  className={({ isActive }) => (isActive ? "link_active" : "")}
+                  end
                 >
                   All Loans
-                </Link>
+                </NavLink>
               </li>
               <li>
-                <Link
+                <NavLink
                   id="pendingloans"
                   onClick={onMenuItemClick}
                   to="/dashboard/loans/pending"
+                  className={({ isActive }) => (isActive ? "link_active" : "")}
                 >
                   Pending Loan
-                </Link>
+                </NavLink>
               </li>
               <li>
-                <Link
+                <NavLink
                   id="bookloans"
                   onClick={onMenuItemClick}
                   to="/dashboard/loans/book"
+                  className={({ isActive }) => (isActive ? "link_active" : "")}
                 >
                   Book Loans
-                </Link>
+                </NavLink>
               </li>
 
               {/* updated */}
               <li>
-                <Link
+                <NavLink
                   id="loandisbursement"
                   onClick={onMenuItemClick}
                   to="/dashboard/loans/disburse"
+                  className={({ isActive }) => (isActive ? "link_active" : "")}
                 >
                   Disburse Loans
-                </Link>
+                </NavLink>
               </li>
               <li>
-                <Link
+                <NavLink
                   id="completedloans"
                   onClick={onMenuItemClick}
                   to="/dashboard/loans/completed"
+                  className={({ isActive }) => (isActive ? "link_active" : "")}
                 >
                   Completed Loans
-                </Link>
+                </NavLink>
               </li>
               <li>
-                <Link
+                <NavLink
                   id="overdueloans"
                   onClick={onMenuItemClick}
                   to="/dashboard/loans/overdue"
+                  className={({ isActive }) => (isActive ? "link_active" : "")}
                 >
                   Overdue Loans
-                </Link>
+                </NavLink>
               </li>
               <li>
-                <Link
+                <NavLink
                   id="loanproducts"
                   onClick={onMenuItemClick}
                   to="/dashboard/loans/products"
+                  className={({ isActive }) => (isActive ? "link_active" : "")}
                 >
                   Loan Products
-                </Link>
+                </NavLink>
               </li>
               <li>
-                <Link
+                <NavLink
                   id="loancalculator"
                   onClick={onMenuItemClick}
                   to="/dashboard/loans/calculator"
+                  className={({ isActive }) => (isActive ? "link_active" : "")}
                 >
                   Loan Calculator
-                </Link>
+                </NavLink>
               </li>
               {/* <li>
                 <Link
@@ -223,13 +243,14 @@ const SideNavMain = ({ onMenuItemClick }) => {
               </li> */}
 
               <li>
-                <Link
+                <NavLink
                   id="loanstatement"
                   onClick={onMenuItemClick}
                   to="/dashboard/loans/loanstatement"
+                  className={({ isActive }) => (isActive ? "link_active" : "")}
                 >
                   Loan A/C Statement
-                </Link>
+                </NavLink>
               </li>
             </ul>
           </div>
@@ -237,47 +258,64 @@ const SideNavMain = ({ onMenuItemClick }) => {
       </div>
 
       {/* repayment menu */}
-      <Link
-        to="/dashboard/repayment"
-        id="repayment"
-        className="IconBox"
-        onClick={onMenuItemClick}
+      <div
+        className={`link__wrap  ${
+          checkSectionActive("repayment") ? "section__active" : ""
+        }`}
+        onClick={(e) => {
+          onMenuItemClick(e);
+          setActiveSection("repayment");
+        }}
       >
-        <img
+        <NavLink
+          to="/dashboard/repayment"
           id="repayment"
-          onClick={onMenuItemClick}
-          src="/images/dtransfer.png"
-          alt="repayment"
-        />
-        <p>Repayments</p>
-      </Link>
+         
+          className={({ isActive }) =>
+            `IconBox ${isActive ? "link_active " : ""}`
+          }
+        >
+          <img id="repayment" src="/images/dtransfer.png" alt="repayment" />
+          <p id="repayment">Repayments</p>
+        </NavLink>
+      </div>
 
       {/* account menu */}
-      <div onMouseOver={openSubAccount} onMouseLeave={closeSubAccount}>
+      <div
+        className={`link__wrap ${
+          checkSectionActive("accounts") ? "section__active" : ""
+        }`}
+        onClick={() => {
+          setActiveSection("accounts");
+        }}
+      >
         <div className="IconBox">
           <img src="/images/daccount.png" alt="accounts" />
           <p>Accounts</p>
         </div>
-        {isAccountOpen ? (
+        {checkSectionActive("accounts") ? (
           <div className="SubItem">
             <ul>
               <li>
-                <Link
+                <NavLink
                   id="accounts"
                   onClick={onMenuItemClick}
                   to="/dashboard/accounts"
+                  className={({ isActive }) => (isActive ? "link_active" : "")}
+                  end
                 >
                   All Accounts
-                </Link>
+                </NavLink>
               </li>
               <li>
-                <Link
+                <NavLink
                   id="accounttypes"
                   onClick={onMenuItemClick}
                   to="/dashboard/accounts/types"
+                  className={({ isActive }) => (isActive ? "link_active" : "")}
                 >
                   Account Types
-                </Link>
+                </NavLink>
               </li>
             </ul>
           </div>
@@ -297,63 +335,91 @@ const SideNavMain = ({ onMenuItemClick }) => {
         </p>
       </div> */}
 
-      <Link
-        id="transaction"
-        onClick={onMenuItemClick}
-        to="/dashboard/transactions"
-        className="IconBox"
+      <div
+        className={`link__wrap  ${
+          checkSectionActive("transactions") ? "section__active" : ""
+        }`}
+        onClick={(e) => {
+          onMenuItemClick(e);
+          setActiveSection("transactions");
+        }}
       >
-        <img id="transaction" src="/images/daccount.png" alt="transaction" />
-        <p>Transactions</p>
-      </Link>
+        <NavLink
+          id="transaction"
+          
+          to="/dashboard/transactions"
+          className={({ isActive }) =>
+            `IconBox ${isActive ? "link_active " : ""}`
+          }
+        >
+          <img id="transaction" src="/images/daccount.png" alt="transaction" />
+          <p id="repayment">Transactions</p>
+        </NavLink>
+      </div>
 
       {/* NIBSS Menu with sub item */}
-      <div onMouseOver={openSubItem} onMouseLeave={closeSubItem}>
+      <div
+        className={`link__wrap ${
+          checkSectionActive("nibss") ? "section__active" : ""
+        }`}
+        onClick={() => {
+          setActiveSection("nibss");
+        }}
+      >
         <div className="IconBox">
           <img src="/images/dwithdraw.png" alt="nibss" />
           <p>NIBSS Direct Debit</p>
         </div>
-        {isOpen ? (
+        {checkSectionActive("nibss") ? (
           <div className="SubItem">
             <ul>
               <li>
-                <Link
+                <NavLink
                   id="debitTransactions"
                   onClick={onMenuItemClick}
                   to="/dashboard/nibbs"
+                  className={({ isActive }) => (isActive ? "link_active" : "")}
+                  end
                 >
                   Debit Transactions
-                </Link>
+                </NavLink>
               </li>
               {superAdmin || adminRoles?.includes("manage_nibss") ? (
                 <li>
-                  <Link
+                  <NavLink
                     id="collectionsSummary"
                     onClick={onMenuItemClick}
+                    className={({ isActive }) =>
+                      isActive ? "link_active" : ""
+                    }
                     to="/dashboard/nibbs/collectionsSummary"
                   >
                     Collections Summary
-                  </Link>
+                  </NavLink>
                 </li>
               ) : null}
               <li>
-                <Link
+                <NavLink
                   id="debitMandates"
                   onClick={onMenuItemClick}
+                  className={({ isActive }) => (isActive ? "link_active" : "")}
                   to="/dashboard/nibbs/debitMandates"
                 >
                   Debit Mandates
-                </Link>
+                </NavLink>
               </li>
               {superAdmin || adminRoles?.includes("manage_nibss") ? (
                 <li>
-                  <Link
+                  <NavLink
                     id="stopRestartCollections"
                     onClick={onMenuItemClick}
+                    className={({ isActive }) =>
+                      isActive ? "link_active" : ""
+                    }
                     to="/dashboard/nibbs/stopRestartCollections"
                   >
                     Stop/Restart Collections
-                  </Link>
+                  </NavLink>
                 </li>
               ) : null}
             </ul>
@@ -361,63 +427,80 @@ const SideNavMain = ({ onMenuItemClick }) => {
         ) : null}
       </div>
 
-      <div onMouseOver={openSubRemita} onMouseLeave={closeSubRemita}>
+      <div
+        className={`link__wrap ${
+          checkSectionActive("remita") ? "section__active" : ""
+        }`}
+        onClick={() => {
+          setActiveSection("remita");
+        }}
+      >
         <div className="IconBox">
           <img src="/images/dremita.png" alt="remita" />
           <p>Remita Collections</p>
         </div>
-        {isRemitaOpen ? (
+        {checkSectionActive("remita") ? (
           <div className="SubItem">
             <ul>
               {superAdmin || adminRoles?.includes("get_salary_history") ? (
                 <li>
-                  <Link
+                  <NavLink
                     id="checksalaryhistory"
                     onClick={onMenuItemClick}
+                    className={({ isActive }) =>
+                      isActive ? "link_active" : ""
+                    }
                     to="/dashboard/remita"
+                    end
                   >
                     Check Salary History
-                  </Link>
+                  </NavLink>
                 </li>
               ) : null}
 
               <li>
-                <Link
+                <NavLink
                   id="remita"
                   onClick={onMenuItemClick}
                   to="/dashboard/remita/disbursement"
+                  className={({ isActive }) => (isActive ? "link_active" : "")}
                 >
                   Loan Disbursements
-                </Link>
+                </NavLink>
               </li>
 
               <li>
-                <Link
+                <NavLink
                   id="collectionnotifications"
                   onClick={onMenuItemClick}
                   to="/dashboard/remita/notification"
+                  className={({ isActive }) => (isActive ? "link_active" : "")}
                 >
                   Collection Notification
-                </Link>
+                </NavLink>
               </li>
               <li>
-                <Link
+                <NavLink
                   id="mandatehistory"
                   onClick={onMenuItemClick}
+                  className={({ isActive }) => (isActive ? "link_active" : "")}
                   to="/dashboard/remita/mandatehistory"
                 >
                   Mandate History
-                </Link>
+                </NavLink>
               </li>
               {superAdmin || adminRoles?.includes("stop_remita_loan") ? (
                 <li>
-                  <Link
+                  <NavLink
                     id="stopcollections"
+                    className={({ isActive }) =>
+                      isActive ? "link_active" : ""
+                    }
                     onClick={onMenuItemClick}
                     to="/dashboard/remita/stopcollections"
                   >
                     Stop Collections
-                  </Link>
+                  </NavLink>
                 </li>
               ) : null}
             </ul>
@@ -426,70 +509,109 @@ const SideNavMain = ({ onMenuItemClick }) => {
       </div>
 
       {(superAdmin || !shouldNotSee?.includes("creditAssessment")) && (
-        <Link
-          to="/dashboard/creditbureau"
-          id="creditbureau"
-          className="IconBox"
-          onClick={onMenuItemClick}
+        <div
+          className={`link__wrap  ${
+            checkSectionActive("creditbureau") ? "section__active" : ""
+          }`}
+          onClick={(e) => {
+            onMenuItemClick(e);
+            setActiveSection("creditbureau");
+          }}
         >
-          <img id="creditbureau" src="/images/dreport.png" alt="creditbureau" />
-          <p id="creditbureau">Credit Assessment</p>
-        </Link>
+          <NavLink
+            to="/dashboard/creditbureau"
+            id="creditbureau"
+            
+            className={({ isActive }) =>
+              `IconBox ${isActive ? "link_active " : ""}`
+            }
+          >
+            <img
+              id="creditbureau"
+              src="/images/dreport.png"
+              alt="creditbureau"
+            />
+            <p id="creditbureau">Credit Assessment</p>
+          </NavLink>
+        </div>
       )}
 
       {superAdmin || !shouldNotSee?.includes("employerManager") ? (
-        <div onMouseOver={openSubEmployer} onMouseLeave={closeSubEmployer}>
+        <div
+          className={`link__wrap ${
+            checkSectionActive("mdas") ? "section__active" : ""
+          }`}
+          onClick={() => {
+            setActiveSection("mdas");
+          }}
+        >
           <div className="IconBox">
             <img src="/images/dmda.png" alt="mdas" />
             <p>Employer Manager</p>
           </div>
-          {isEmployerOpen ? (
+          {checkSectionActive("mdas") ? (
             <div className="SubItem">
               <ul>
                 <li>
-                  <Link
+                  <NavLink
                     id="mdas"
                     onClick={onMenuItemClick}
                     to="/dashboard/mdas"
+                    className={({ isActive }) =>
+                      isActive ? "link_active" : ""
+                    }
+                    end
                   >
                     All Employers
-                  </Link>
+                  </NavLink>
                 </li>
                 <li>
-                  <Link
+                  <NavLink
                     id="addemployer"
                     onClick={onMenuItemClick}
                     to="/dashboard/mdas/addemployer"
+                    className={({ isActive }) =>
+                      isActive ? "link_active" : ""
+                    }
                   >
                     Add Employer
-                  </Link>
+                  </NavLink>
                 </li>
                 <li>
-                  <Link
+                  <NavLink
                     id="mandaterules"
                     onClick={onMenuItemClick}
                     to="/dashboard/mdas/mandaterules"
+                    className={({ isActive }) =>
+                      isActive ? "link_active" : ""
+                    }
                   >
                     Mandate Rules
-                  </Link>
+                  </NavLink>
                 </li>
                 <li>
-                  <Link
+                  <NavLink
                     id="statementrules"
                     onClick={onMenuItemClick}
+                    className={({ isActive }) =>
+                      isActive ? "link_active" : ""
+                    }
                     to="/dashboard/mdas/statementrules"
                   >
                     Statement Rules
-                  </Link>
+                  </NavLink>
                 </li>
                 <li>
-                  <Link
+                  <NavLink
                     id="employmentletter"
                     onClick={onMenuItemClick}
+                    className={({ isActive }) =>
+                      isActive ? "link_active" : ""
+                    }
                     to="/dashboard/mdas/employmentletter"
                   >
                     Employment Letter
-                  </Link>
+                  </NavLink>
                 </li>
               </ul>
             </div>
@@ -498,153 +620,195 @@ const SideNavMain = ({ onMenuItemClick }) => {
       ) : null}
 
       {superAdmin || !shouldNotSee?.includes("kycReview") ? (
-        <div onMouseOver={openSubKyc} onMouseLeave={closeSubKyc}>
+        <div
+          className={`link__wrap ${
+            checkSectionActive("kyc") ? "section__active" : ""
+          }`}
+          onClick={() => {
+            setActiveSection("kyc");
+          }}
+        >
           <div className="IconBox">
             <img src="/images/dkyc.png" alt="kyc" />
             <p>KYC Review</p>
           </div>
 
-          {isKycOpen ? (
+          {checkSectionActive("kyc") ? (
             <div className="SubItem">
               <ul>
                 <li>
-                  <Link id="kyc" onClick={onMenuItemClick} to="/dashboard/kyc">
+                  <NavLink
+                    id="kyc"
+                    onClick={onMenuItemClick}
+                    to="/dashboard/kyc"
+                    className={({ isActive }) =>
+                      isActive ? "link_active" : ""
+                    }
+                    end
+                  >
                     Do KYC Review
-                  </Link>
+                  </NavLink>
                 </li>
                 <li>
-                  <Link
+                  <NavLink
                     id="report"
                     onClick={onMenuItemClick}
                     to="/dashboard/kyc/report"
+                    className={({ isActive }) =>
+                      isActive ? "link_active" : ""
+                    }
                   >
                     Review Report
-                  </Link>
+                  </NavLink>
                 </li>
                 <li>
-                  <Link
+                  <NavLink
                     id="employmentLetters"
                     onClick={onMenuItemClick}
+                    className={({ isActive }) =>
+                      isActive ? "link_active" : ""
+                    }
                     to="/dashboard/kyc/employmentLetters"
                   >
                     Employment Letters
-                  </Link>
+                  </NavLink>
                 </li>
                 <li>
-                  <Link
+                  <NavLink
                     id="bankStatements"
                     onClick={onMenuItemClick}
+                    className={({ isActive }) =>
+                      isActive ? "link_active" : ""
+                    }
                     to="/dashboard/kyc/bankStatements"
                   >
                     Bank Statement
-                  </Link>
+                  </NavLink>
                 </li>
               </ul>
             </div>
           ) : null}
         </div>
       ) : null}
-      <div onMouseOver={openSubWebManager} onMouseLeave={closeSubWebManager}>
+      <div
+        className={`link__wrap ${
+          checkSectionActive("webmanager") ? "section__active" : ""
+        }`}
+        onClick={() => {
+          setActiveSection("webmanager");
+        }}
+      >
         <div className="IconBox">
           <img src="/images/dwebsite.png" alt="webmanager" />
           <p>Website Manager</p>
         </div>
 
-        {isWebManagerOpen && (
+        {checkSectionActive("webmanager") && (
           <div className="SubItem">
             <ul>
               {/* <li id="website" onClick={onMenuItemClick}>
                 All Pages
               </li> */}
               <li>
-                <Link
+                <NavLink
                   id="webmanager"
                   onClick={onMenuItemClick}
                   to="/dashboard/webmanager"
+                  className={({ isActive }) => (isActive ? "link_active" : "")}
+                  end
                 >
                   Blogs
-                </Link>
+                </NavLink>
               </li>
               <li>
-                <Link
+                <NavLink
                   id="contactForm"
                   onClick={onMenuItemClick}
+                  className={({ isActive }) => (isActive ? "link_active" : "")}
                   to="/dashboard/webmanager/contactForm"
                 >
                   Contact Form
-                </Link>
+                </NavLink>
               </li>
               <li>
-                <Link
+                <NavLink
                   id="addwiki"
                   onClick={onMenuItemClick}
+                  className={({ isActive }) => (isActive ? "link_active" : "")}
                   to="/dashboard/webmanager/addwiki"
                 >
                   Wikis/FAQs
-                </Link>
+                </NavLink>
               </li>
               <li>
-                <Link
+                <NavLink
                   id="customerAsk"
                   onClick={onMenuItemClick}
+                  className={({ isActive }) => (isActive ? "link_active" : "")}
                   to="/dashboard/webmanager/customerAsk"
                 >
                   Customer Enquiry
-                </Link>
+                </NavLink>
               </li>
               <li>
-                <Link
+                <NavLink
                   id="career"
                   onClick={onMenuItemClick}
+                  className={({ isActive }) => (isActive ? "link_active" : "")}
                   to="/dashboard/webmanager/career"
                 >
                   Career
-                </Link>
+                </NavLink>
               </li>
               <li>
-                <Link
+                <NavLink
                   id="job-applicants"
                   onClick={onMenuItemClick}
+                  className={({ isActive }) => (isActive ? "link_active" : "")}
                   to="/dashboard/webmanager/job-applicants"
                 >
                   Job Applications
-                </Link>
+                </NavLink>
               </li>
               <li>
-                <Link
+                <NavLink
                   id="homeEditor"
                   onClick={onMenuItemClick}
+                  className={({ isActive }) => (isActive ? "link_active" : "")}
                   to="/dashboard/webmanager/homeEditor"
                 >
                   Home Page
-                </Link>
+                </NavLink>
               </li>
               <li>
-                <Link
+                <NavLink
+                  className={({ isActive }) => (isActive ? "link_active" : "")}
                   id="aboutEditor"
                   onClick={onMenuItemClick}
                   to="/dashboard/webmanager/aboutEditor"
                 >
                   About Page
-                </Link>
+                </NavLink>
               </li>
               <li>
-                <Link
+                <NavLink
+                  className={({ isActive }) => (isActive ? "link_active" : "")}
                   id="boardEditor"
                   onClick={onMenuItemClick}
                   to="/dashboard/webmanager/boardEditor"
                 >
                   Directors
-                </Link>
+                </NavLink>
               </li>
               <li>
-                <Link
+                <NavLink
+                  className={({ isActive }) => (isActive ? "link_active" : "")}
                   id="productEditor"
                   onClick={onMenuItemClick}
                   to="/dashboard/webmanager/productEditor"
                 >
                   Products Page
-                </Link>
+                </NavLink>
               </li>
             </ul>
           </div>
@@ -665,42 +829,56 @@ const SideNavMain = ({ onMenuItemClick }) => {
 
       {(superAdmin || !shouldNotSee?.includes("userManager")) && (
         <div
-          onMouseOver={openSubUserManager}
-          onMouseLeave={closeSubUserManager}
+          className={`link__wrap ${
+            checkSectionActive("users") ? "section__active" : ""
+          }`}
+          onClick={() => {
+            setActiveSection("users");
+          }}
         >
           <div className="IconBox">
             <img src="/images/dusermanage.png" alt="usermanager" />
             <p>User Manager</p>
           </div>
-          {isUserManagerOpen ? (
+          {checkSectionActive("users") ? (
             <div className="SubItem">
               <ul>
                 <li>
-                  <Link
+                  <NavLink
                     id="allusers"
                     onClick={onMenuItemClick}
                     to="/dashboard/users"
+                    className={({ isActive }) =>
+                      isActive ? "link_active" : ""
+                    }
+                    end
                   >
                     All Users
-                  </Link>
+                  </NavLink>
                 </li>
                 <li>
-                  <Link
+                  <NavLink
                     id="userrole"
                     onClick={onMenuItemClick}
+                    className={({ isActive }) =>
+                      isActive ? "link_active" : ""
+                    }
                     to="/dashboard/users/roles"
                   >
                     User Roles
-                  </Link>
+                  </NavLink>
                 </li>
                 <li>
-                  <Link
+                  <NavLink
+                    className={({ isActive }) =>
+                      isActive ? "link_active" : ""
+                    }
                     id="accesscontrol"
                     onClick={onMenuItemClick}
                     to="/dashboard/users/accesscontrol"
                   >
                     Access Control
-                  </Link>
+                  </NavLink>
                 </li>
               </ul>
             </div>
@@ -708,41 +886,52 @@ const SideNavMain = ({ onMenuItemClick }) => {
         </div>
       )}
 
-      <div onMouseOver={openSubReports} onMouseLeave={closeSubReports}>
+      <div
+        className={`link__wrap ${
+          checkSectionActive("report") ? "section__active" : ""
+        }`}
+        onClick={() => {
+          setActiveSection("report");
+        }}
+      >
         <div className="IconBox">
           <img src="/images/dreport.png" alt="report" />
           <p>Reports</p>
         </div>
 
-        {isReportsOpen ? (
+        {checkSectionActive("report") ? (
           <div className="SubItem">
             <ul>
               <li>
-                <Link
+                <NavLink
                   id="report"
+                  className={({ isActive }) => (isActive ? "link_active" : "")}
                   onClick={onMenuItemClick}
                   to="/dashboard/report/account-statement"
+                  end
                 >
                   Account Statement
-                </Link>
+                </NavLink>
               </li>
               <li>
-                <Link
+                <NavLink
+                  className={({ isActive }) => (isActive ? "link_active" : "")}
                   id="accountbalance"
                   onClick={onMenuItemClick}
                   to="/dashboard/report/accountbalance"
                 >
                   Account Balance
-                </Link>
+                </NavLink>
               </li>
               <li>
-                <Link
+                <NavLink
+                  className={({ isActive }) => (isActive ? "link_active" : "")}
                   id="loanreporting"
                   onClick={onMenuItemClick}
                   to="/dashboard/report/loan"
                 >
                   Loan Report
-                </Link>
+                </NavLink>
               </li>
             </ul>
           </div>
@@ -750,41 +939,58 @@ const SideNavMain = ({ onMenuItemClick }) => {
       </div>
 
       {(superAdmin || !shouldNotSee?.includes("userManager")) && (
-        <div onMouseOver={openSubSetting} onMouseLeave={closeSubSetting}>
+        <div
+          className={`link__wrap ${
+            checkSectionActive("settings") ? "section__active" : ""
+          }`}
+          onClick={() => {
+            setActiveSection("settings");
+          }}
+        >
           <div className="IconBox">
-            <img src="/images/dreport.png" alt="report" />
+            <img src="/images/dreport.png" alt="settings" />
             <p>Settings</p>
           </div>
 
-          {isSettingOpen ? (
+          {checkSectionActive("settings") ? (
             <div className="SubItem">
               <ul>
                 <li>
-                  <Link
+                  <NavLink
                     id="general"
                     onClick={onMenuItemClick}
                     to="/dashboard/settings"
+                    className={({ isActive }) =>
+                      isActive ? "link_active" : ""
+                    }
+                    end
                   >
                     General
-                  </Link>
+                  </NavLink>
                 </li>
                 <li>
-                  <Link
+                  <NavLink
+                    className={({ isActive }) =>
+                      isActive ? "link_active" : ""
+                    }
                     id="email"
                     onClick={onMenuItemClick}
                     to="/dashboard/settings/email"
                   >
                     Email
-                  </Link>
+                  </NavLink>
                 </li>
                 <li>
-                  <Link
+                  <NavLink
+                    className={({ isActive }) =>
+                      isActive ? "link_active" : ""
+                    }
                     id="googleanalytics"
                     onClick={onMenuItemClick}
                     to="/dashboard/settings/googleanalytics"
                   >
                     Google Analytics
-                  </Link>
+                  </NavLink>
                 </li>
               </ul>
             </div>

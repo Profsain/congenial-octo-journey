@@ -13,12 +13,12 @@ import getDateOnly from "../../../../../utilities/getDate";
 import getTime from "../../../../../utilities/getTime";
 import OtherDocuments from "./OtherDocuments";
 import ViewBySection from "../remita/ViewBySection";
-import useSearch from "../../../../../utilities/useSearchName";
 import useSearchByDate from "../../../../../utilities/useSearchByDate";
 import useSearchByDateRange from "../../../../../utilities/useSearchByDateRange";
 import sortByCreatedAt from "../../shared/sortedByDate";
 import KycViewDetails from "./KycViewDetails";
 import { fetchAllCustomersLoans } from "../../../../redux/reducers/customersLoansReducer";
+import apiClient from "../../../../lib/axios";
 
 const KycCheck = () => {
   const styles = {
@@ -32,7 +32,7 @@ const KycCheck = () => {
     },
     head: {
       color: "#fff",
-      fontSize: "1rem",
+     
     },
     approved: {
       color: "#5cc51c",
@@ -45,8 +45,6 @@ const KycCheck = () => {
     },
   };
 
-  const apiUrl = import.meta.env.VITE_BASE_URL;
-
   // fetch all customer
   const dispatch = useDispatch();
   const customers = useSelector(
@@ -54,6 +52,7 @@ const KycCheck = () => {
   );
   const status = useSelector((state) => state.customerReducer.status);
   // component state
+  const [searchTerm, setSearchTerm] = useState("");
   const [searchCustomer, setSearchCustomer] = useState([]);
   const [customerId, setCustomerId] = useState("");
   const [currentCustomer, setCurrentCustomer] = useState({});
@@ -67,6 +66,7 @@ const KycCheck = () => {
   const [isKycApproved, setIsKycApproved] = useState(null);
   const [showOtherDocs, setShowOtherDocs] = useState(false);
   const [showInfo, setShowInfo] = useState(false);
+  const [searchTodayEntries, setSearchTodayEntries] = useState(false);
   // processing bar state
   const [progress, setProgress] = useState(false);
 
@@ -86,6 +86,22 @@ const KycCheck = () => {
       setSearchCustomer([]);
     }
   }, [customers]);
+
+  useEffect(() => {
+    if (
+      searchTerm.length >= 3 ||
+      searchTerm.length == 0 ||
+      searchTodayEntries
+    ) {
+      console.log(searchTodayEntries, "searchTodayEntries");
+      dispatch(
+        fetchAllCustomersLoans({
+          searchTerm,
+          dateFilter: searchTodayEntries,
+        })
+      );
+    }
+  }, [searchTerm, searchTodayEntries]);
 
   // scroll to top
   useEffect(() => {
@@ -160,47 +176,23 @@ const KycCheck = () => {
     };
 
     // send update to backend
-    await fetch(`${apiUrl}/api/updatecustomer/kyc/${customerId}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data),
-    });
+    await apiClient.put(`/updatecustomer/kyc/${customerId}`, data);
 
     if (isKycApproved === true) {
-      await fetch(`${apiUrl}/api/loans/status/${currentCustomer.loan._id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          loanstatus: "with credit",
-        }),
+      await apiClient.put(`/loans/status/${currentCustomer.loan._id}`, {
+        loanstatus: "with credit",
       });
     }
 
-    await dispatch(fetchAllCustomersLoans());
+    await dispatch(fetchAllCustomersLoans({}));
     setShowKycDetails(false);
     setProgress(false);
   };
-
-  // handle search by
-  const { searchTerm, setSearchTerm, filteredData } = useSearch(
-    customers,
-    "firstname"
-  );
 
   const [dateRange, setDateRange] = useState({
     fromDate: "",
     toDate: "",
   });
-
-  useEffect(() => {
-    setSearchCustomer(filteredData);
-  }, [searchTerm, filteredData]);
-
-  // handle search by date
-  const { filteredDateData } = useSearchByDate(customers, "createdAt");
-  const searchByDate = () => {
-    setSearchCustomer(filteredDateData);
-  };
 
   // handle list reload
   const handleReload = () => {
@@ -208,7 +200,8 @@ const KycCheck = () => {
       fromDate: "",
       toDate: "",
     });
-    dispatch(fetchAllCustomersLoans());
+    dispatch(fetchAllCustomersLoans({}));
+    setSearchTodayEntries(false);
 
     setSearchCustomer(customers);
   };
@@ -234,7 +227,7 @@ const KycCheck = () => {
               setSearch={setSearchTerm}
               setDateRange={setDateRange}
               dateRange={dateRange}
-              searchDateFunc={searchByDate}
+              setSearchTodayEntries={setSearchTodayEntries}
               handleReload={handleReload}
             />
           </div>

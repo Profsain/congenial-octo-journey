@@ -8,6 +8,7 @@ import PageLoader from "../../shared/PageLoader";
 import ActionNotification from "../../shared/ActionNotification";
 // functions
 import getDateOnly from "../../../../../utilities/getDate";
+import apiClient from "../../../../lib/axios";
 
 const WithdrawerMethodList = () => {
   const styles = {
@@ -42,40 +43,34 @@ const WithdrawerMethodList = () => {
   const [actionId, setActionId] = useState("");
   const [disbursementObj, setDisbursementObj] = useState({});
 
-
   const handleSelect = (e) => {
     const option = e.target.value;
     const id = e.target.id;
     setActionId(id);
     // find single disbursement by id
-    const disbursement = disbursements.find((disbursement) => disbursement._id === id);
+    const disbursement = disbursements.find(
+      (disbursement) => disbursement._id === id
+    );
     setDisbursementObj(disbursement);
-    
+
     if (option === "edit") {
       // edit disbursement
     } else if (option === "delete") {
       setAction(true);
     }
-
   };
 
   // handle delete action
   const handleDelete = async (e) => {
     e.preventDefault();
 
-    const apiUrl = import.meta.env.VITE_BASE_URL;
-    
-    await fetch(`${apiUrl}/api/disbursement/disbursements/${actionId}`, {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(disbursementObj),
-    })
+    await apiClient
+      .delete(`/disbursement/disbursements/${actionId}`, disbursementObj)
+
       .then((res) => res.json());
     setAction(false);
     dispatch(fetchDisbursements());
-  }
+  };
 
   return (
     <>
@@ -113,7 +108,12 @@ const WithdrawerMethodList = () => {
                     <td>{getDateOnly(disbursement.createdAt)}</td>
                     <td style={styles.completed}>Active</td>
                     <td>
-                      <select name="action" className="action" id={disbursement._id} onChange={(e) => handleSelect(e)}>
+                      <select
+                        name="action"
+                        className="action"
+                        id={disbursement._id}
+                        onChange={(e) => handleSelect(e)}
+                      >
                         <option value="">Action</option>
                         <option value="edit">Edit</option>
                         <option value="delete">Delete</option>
@@ -126,7 +126,11 @@ const WithdrawerMethodList = () => {
           </div>
         </div>
       )}
-      <ActionNotification handleClose={() => setAction(false)} handleProceed={handleDelete} show={ action} />
+      <ActionNotification
+        handleClose={() => setAction(false)}
+        handleProceed={handleDelete}
+        show={action}
+      />
     </>
   );
 };

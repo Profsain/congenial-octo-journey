@@ -84,7 +84,7 @@ const AdminDashboard = () => {
   const handleMenuItemClick = (e) => {
     // e.preventDefault();
     const id = e.target.id;
-    console.log(id, "id")
+
     setCurrentComponent(id);
     switch (id) {
       case "dashboard":

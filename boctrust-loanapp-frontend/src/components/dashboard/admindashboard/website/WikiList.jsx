@@ -1,4 +1,4 @@
-import PropTypes from "prop-types"
+import PropTypes from "prop-types";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchWikis } from "../../../../redux/reducers/wikiReducer";
@@ -11,8 +11,9 @@ import NoResult from "../../../shared/NoResult";
 // functions
 import getDateOnly from "../../../../../utilities/getDate";
 import searchList from "../../../../../utilities/searchListFunc";
+import apiClient from "../../../../lib/axios";
 
-const WikiList = ({count, searchTerms}) => {
+const WikiList = ({ count, searchTerms }) => {
   const [openModel, setOpenModel] = useState(false);
   const [action, setAction] = useState(false);
   const [wikiId, setWikiId] = useState("");
@@ -51,7 +52,7 @@ const WikiList = ({count, searchTerms}) => {
   const handleSelect = (e) => {
     const option = e.target.value;
     const id = e.target.id;
-    setWikiId(id); 
+    setWikiId(id);
 
     // filter wiki object by id
     const wiki = wikis.find((wiki) => wiki._id === id);
@@ -59,23 +60,14 @@ const WikiList = ({count, searchTerms}) => {
 
     if (option === "edit") {
       handleEdit();
-
     } else if (option === "delete") {
       setAction(true);
     }
-
-  }
+  };
 
   // handle delete action
-  const handleDelete = async () => { 
-    const apiUrl = import.meta.env.VITE_BASE_URL;
-    
-    await fetch(`${apiUrl}/api/wiki/wikis/${wikiId}`, {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+  const handleDelete = async () => {
+    await apiClient.delete(`/wiki/wikis/${wikiId}`);
 
     dispatch(fetchWikis());
     setAction(false);
@@ -114,8 +106,8 @@ const WikiList = ({count, searchTerms}) => {
                   <th>Action</th>
                 </tr>
               </thead>
-                <tbody>
-                  {wikisList?.length === 0 && <NoResult name="wikis" />}
+              <tbody>
+                {wikisList?.length === 0 && <NoResult name="wikis" />}
                 {wikisList?.map((wiki) => (
                   <tr key={wiki._id}>
                     <td>{wiki.question}</td>
@@ -160,7 +152,7 @@ const WikiList = ({count, searchTerms}) => {
 
 WikiList.propTypes = {
   count: PropTypes.number,
-  searchTerms: PropTypes.string
-}
+  searchTerms: PropTypes.string,
+};
 
 export default WikiList;

@@ -4,6 +4,7 @@ import Table from "react-bootstrap/Table";
 import ActionNotification from "../../shared/ActionNotification";
 import "../../Dashboard.css";
 import EditInquiry from "./EditInquiry";
+import apiClient from "../../../../lib/axios";
 
 const CustomerAsk = () => {
   const [inquiries, setInquiries] = useState([]);
@@ -12,11 +13,9 @@ const CustomerAsk = () => {
   const [inquiryId, setInquiryId] = useState("");
   const [inquiryObj, setInquiryObj] = useState({});
 
-  const apiUrl = import.meta.env.VITE_BASE_URL;
-
   const fetchInquiry = async () => {
-    const response = await fetch(`${apiUrl}/api/inquiry/inquiries`);
-    const data = await response.json();
+    const { data } = await apiClient.get(`/inquiry/inquiries`);
+
     setInquiries(data.inquiries);
   };
 
@@ -48,12 +47,7 @@ const CustomerAsk = () => {
 
   // handle delete action
   const handleDelete = async () => {
-    await fetch(`${apiUrl}/api/inquiry/inquiries/${inquiryId}`, {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+    await apiClient.delete(`/inquiry/inquiries/${inquiryId}`);
     fetchInquiry();
     setAction(false);
   };

@@ -1,23 +1,18 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
-
-//fetch accounts
-const apiUrl = import.meta.env.VITE_BASE_URL;
-
-const API_ENDPOINT = `${apiUrl}/api`;
+import apiClient from "../../lib/axios";
 
 // Thunk to fetch account from the API
 export const fetchUserTransactions = createAsyncThunk(
   "transaction/fetchUserTransactions",
   async (accountNumber) => {
-    const { data: transactionsData } = await axios.get(
-      `${API_ENDPOINT}/bankone/getUserTransactions/${accountNumber}`
+    const { data: transactionsData } = await apiClient.get(
+      `/bankone/getUserTransactions/${accountNumber}`
     );
 
     const transactionWithStatus = await Promise.all(
       transactionsData.Message.map(async (transaction) => {
-        const { data: statusData } = await axios.post(
-          `${import.meta.env.VITE_BASE_URL}/api/bankone/transactionStatusQuery`,
+        const { data: statusData } = await apiClient.post(
+          `/bankone/transactionStatusQuery`,
           {
             ref: transaction.InstrumentNo,
             date: transaction.CurrentDate,

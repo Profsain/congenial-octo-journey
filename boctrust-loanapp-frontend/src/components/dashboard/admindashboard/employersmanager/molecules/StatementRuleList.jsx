@@ -13,6 +13,7 @@ import { FcCancel } from "react-icons/fc";
 import { toast } from "react-toastify";
 import { fetchStatementRules } from "../../../../../redux/reducers/statementRuleReducer";
 import EditStatementRule from "./editRule/EditStatementRule";
+import apiClient from "../../../../../lib/axios";
 
 const StatementRuleList = () => {
   const styles = {
@@ -66,15 +67,9 @@ const StatementRuleList = () => {
 
   const handleDeleteMandateRule = async (rule) => {
     try {
-    
       const apiUrl = import.meta.env.VITE_BASE_URL;
       // Handle form submission logic here
-      await fetch(`${apiUrl}/api/statement-rule/${rule._id}`, {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+      await apiClient.delete(`/statement-rule/${rule._id}`);
 
       await dispatch(fetchStatementRules());
       toast.success("Statement Rule Deleted successfully");
@@ -148,7 +143,7 @@ const StatementRuleList = () => {
                     sortByCreatedAt(mandateRuleList)?.length === 0 && (
                       <NoResult name="Statement Rule" />
                     )}
-                  
+
                   {mandateRuleList &&
                     mandateRuleList?.map((statementRule, index) => {
                       return (

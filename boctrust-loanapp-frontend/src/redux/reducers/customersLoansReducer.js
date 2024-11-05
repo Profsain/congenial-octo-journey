@@ -1,16 +1,26 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
+import apiClient from "../../lib/axios";
 
-//fetch accounts
-const apiUrl = import.meta.env.VITE_BASE_URL;
-
-const API_ENDPOINT = `${apiUrl}/api/customers-loans`;
+const API_ENDPOINT = `/customers-loans`;
 
 // Thunk to fetch All Customers and their Loan from the API
 export const fetchAllCustomersLoans = createAsyncThunk(
   "customersLoans/fetchAllCustomersLoans",
-  async () => {
-    const response = await axios.get(`${API_ENDPOINT}/`);
+  async ({ searchTerm, dateFilter , sort }) => {
+    
+    let pathurl = API_ENDPOINT;
+    if (searchTerm) {
+      pathurl = pathurl + `?search=${searchTerm}`;
+      if (dateFilter) {
+        pathurl = pathurl + `&dateFilter=${dateFilter}`;
+      }
+    }
+    if (dateFilter) {
+      pathurl = pathurl + `?dateFilter=${dateFilter}`;
+    }
+
+    const response = await apiClient.get(`${pathurl}`);
+    
     return response.data;
   }
 );
@@ -19,7 +29,7 @@ export const fetchAllCustomersLoans = createAsyncThunk(
 export const fetchSingleCustomerLoans = createAsyncThunk(
   "customersLoans/fetchSingleCustomerLoans",
   async (customerId) => {
-    const response = await axios.get(`${API_ENDPOINT}/${customerId}`);
+    const response = await apiClient.get(`${API_ENDPOINT}/${customerId}`);
 
     return response.data;
   }

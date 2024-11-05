@@ -7,6 +7,7 @@ import "./EditeRule.css";
 import { useDispatch } from "react-redux";
 import { fetchEmployerLetterRules } from "../../../../../../redux/reducers/employerLetterRuleReducer";
 import EmployerLetterRuleForm from "../EmployerLetterRuleForm";
+import apiClient from "../../../../../../lib/axios";
 
 const EditEmployerLetterRule = ({ show, handleClose, selectedRule }) => {
   const [isLoading, setIsLoading] = useState(false);
@@ -17,18 +18,9 @@ const EditEmployerLetterRule = ({ show, handleClose, selectedRule }) => {
   const handleUpdate = async (values) => {
     try {
       setIsLoading(true);
-      const apiUrl = import.meta.env.VITE_BASE_URL;
+     
       // Handle form submission logic here
-      await fetch(
-        `${apiUrl}/api/employer-letter-rule/${selectedRule._id}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(values),
-        }
-      );
+      await apiClient.put(`/employer-letter-rule/${selectedRule._id}`, values);
 
       await dispatch(fetchEmployerLetterRules());
 

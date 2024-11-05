@@ -3,7 +3,6 @@ import { Row, Col } from "react-bootstrap";
 import FigCard from "../shared/FigCard";
 import "../Dashboard.css";
 import { useEffect, useState } from "react";
-import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchUserTransactions } from "../../../redux/reducers/transactionReducer";
 import {

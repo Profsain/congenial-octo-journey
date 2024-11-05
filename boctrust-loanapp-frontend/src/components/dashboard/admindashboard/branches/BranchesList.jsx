@@ -12,6 +12,7 @@ import NextPreBtn from "../../shared/NextPreBtn";
 // function
 import searchList from "../../../../../utilities/searchListFunc";
 import sortByCreatedAt from "../../shared/sortedByDate";
+import apiClient from "../../../../lib/axios";
 
 const BranchesList = ({ showCount, searchTerms, admin, adminRoles }) => {
   // styles
@@ -95,12 +96,7 @@ const BranchesList = ({ showCount, searchTerms, admin, adminRoles }) => {
   // handle delete action
   const handleDelete = async () => {
     const apiUrl = import.meta.env.VITE_BASE_URL;
-    await fetch(`${apiUrl}/api/branch/branches/${branchId}`, {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+    await apiClient.delete(`/branch/branches/${branchId}`);
 
     dispatch(fetchBranches());
     setAction(false);
@@ -124,7 +120,13 @@ const BranchesList = ({ showCount, searchTerms, admin, adminRoles }) => {
               </tr>
             </thead>
             <tbody>
-              {branchesList?.length === 0 && <NoResult name="branches" />}
+              {branchesList?.length === 0 && (
+                <tr>
+                  <td colSpan={6}>
+                    <NoResult name="branches" />
+                  </td>
+                </tr>
+              )}
               {branchesList?.map((branch) => (
                 <tr key={branch._id}>
                   <td>{branch.branchId}</td>
@@ -142,12 +144,11 @@ const BranchesList = ({ showCount, searchTerms, admin, adminRoles }) => {
                       <option value="">Action</option>
                       <option value="view">View</option>
                       {admin || adminRoles?.includes("manage_branch") ? (
-                            <>
-                              <option value="edit">Edit</option>
-                              <option value="delete">Delete</option>
-                            </>
-                          ) : null
-                        }
+                        <>
+                          <option value="edit">Edit</option>
+                          <option value="delete">Delete</option>
+                        </>
+                      ) : null}
                     </select>
                   </td>
                 </tr>
@@ -185,7 +186,7 @@ BranchesList.propTypes = {
   searchTerms: PropTypes.string,
   showCount: PropTypes.number,
   admin: PropTypes.string,
-  adminRoles: PropTypes.array
+  adminRoles: PropTypes.array,
 };
 
 export default BranchesList;

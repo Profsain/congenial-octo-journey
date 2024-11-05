@@ -54,7 +54,6 @@ router.put("/creditDbSearch/:customerId", multipleUpload, async (req, res) => {
       { new: true }
     );
 
-    console.log(customer, "creditDbSearch");
     res.json(customer);
   } catch (err) {
     console.error(err);
@@ -87,8 +86,6 @@ router.put("/deductcheck/:customerId", multipleUpload, async (req, res) => {
       },
       { new: true }
     );
-
-    console.log(customer, "customer deductCheck");
 
     res.json(customer);
   } catch (err) {
@@ -162,7 +159,7 @@ router.put(
       if (!element) {
         return res.status(400).json({
           error:
-            "No Bureau Search History. Plese Provide Report for Search Carried Out",
+            "No Bureau Search History. Please Provide Report for Search Carried Out",
         });
       }
 
@@ -260,9 +257,6 @@ router.put("/assignto/:customerId", async (req, res) => {
   try {
     const customerId = req.params.customerId;
     const updates = req.body;
-
-    console.log(customerId, "customerId");
-    console.log(updates, "updates");
 
     const updateObject = Object.keys(updates).reduce((acc, key) => {
       acc[`creditCheck.assignment.${key}`] = updates[key];

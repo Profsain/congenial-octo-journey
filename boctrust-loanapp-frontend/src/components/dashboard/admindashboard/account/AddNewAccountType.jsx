@@ -6,14 +6,14 @@ import { fetchAccount } from "../../../../redux/reducers/accountReducer";
 import DashboardHeadline from "../../shared/DashboardHeadline";
 import "../../dashboardcomponents/transferdashboard/Transfer.css";
 import BocButton from "../../shared/BocButton";
+import apiClient from "../../../../lib/axios";
 
 // Define validation schema using Yup
 const validationSchema = Yup.object().shape({
   accountName: Yup.string().required("Account name is required"),
-    interestRate: Yup.string().required("Interest rate is required"),
-    interestMethod: Yup.string().required("Interest method is required"),
-    interestPeriod: Yup.string().required("Interest period is required"),
-  
+  interestRate: Yup.string().required("Interest rate is required"),
+  interestMethod: Yup.string().required("Interest method is required"),
+  interestPeriod: Yup.string().required("Interest period is required"),
 });
 
 const initialValues = {
@@ -23,23 +23,15 @@ const initialValues = {
   interestPeriod: "",
 };
 
-  const apiUrl = import.meta.env.VITE_BASE_URL;
 
-const AddNewAccountType = ({ func}) => {
-  const handleSubmit = async (values, {resetForm}) => {
+const AddNewAccountType = ({ func }) => {
+  const handleSubmit = async (values, { resetForm }) => {
     // Handle form submission logic here
-    await fetch(`${apiUrl}api/account/accounts`, {
-      method: "POST",
-      headers: {
-        "Content-type": "application/json; charset=UTF-8",
-      },
-      body: JSON.stringify(values),
-    });
-    resetForm()
+    await apiClient.post(`/account/accounts`, values);
+    resetForm();
     // set open add branch component to true
     // func(false);
     dispatch(fetchAccount());
-
   };
 
   // handle cancel
@@ -104,7 +96,6 @@ const AddNewAccountType = ({ func}) => {
               <ErrorMessage name="interestPeriod" component="div" />
             </div>
           </div>
-         
 
           <div className="BtnContainer">
             <BocButton
@@ -123,7 +114,7 @@ const AddNewAccountType = ({ func}) => {
               bradius="18px"
               func={handleCancel}
             >
-                Cancel
+              Cancel
             </BocButton>
           </div>
         </Form>

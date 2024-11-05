@@ -20,6 +20,7 @@ import useSearchByDateRange from "../../../../../utilities/useSearchByDateRange.
 import sortByCreatedAt from "../../shared/sortedByDate.js";
 import getDateOnly from "../../../../../utilities/getDate";
 import { fetchLoans } from "../../../../redux/reducers/loanReducer.js";
+import apiClient from "../../../../lib/axios.js";
 
 const CheckSalaryHistory = () => {
   const styles = {
@@ -74,28 +75,19 @@ const CheckSalaryHistory = () => {
   const handleCheck = async (id) => {
     setIsLoading(true);
     try {
-      const apiUrl = import.meta.env.VITE_BASE_URL;
       const loan = allLoans.find((loan) => loan._id === id);
       const customer = loan ? loan.customer : {};
-      const response = await fetch(`${apiUrl}/api/remita/get-salary-history`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          authorisationCode: customer.bvnnumber,
-          firstName: customer.firstname,
-          lastName: customer.lastname,
-          accountNumber: customer.salaryaccountnumber,
-          bankCode: customer.bankcode,
-          bvn: customer.bvnnumber,
-          authorisationChannel: "WEB",
-        }),
+
+      const { data } = await apiClient.post(`/remita/get-salary-history`, {
+        authorisationCode: customer.bvnnumber,
+        firstName: customer.firstname,
+        lastName: customer.lastname,
+        accountNumber: customer.salaryaccountnumber,
+        bankCode: customer.bankcode,
+        bvn: customer.bvnnumber,
+        authorisationChannel: "WEB",
       });
-      if (!response.ok) {
-        throw new Error("Failed to fetch salary history");
-      }
-      const data = await response.json();
+
       setCustomerObj(data);
       await updateSalaryHistory(customer._id, data);
       setIsLoading(false);
@@ -172,11 +164,7 @@ const CheckSalaryHistory = () => {
   };
 
   // handle search by date range
-  const { searchData } = useSearchByDateRange(
-    loanList,
-    dateRange,
-    "createdAt"
-  );
+  const { searchData } = useSearchByDateRange(loanList, dateRange, "createdAt");
 
   useEffect(() => {
     setLoanList(searchData);
@@ -216,7 +204,9 @@ const CheckSalaryHistory = () => {
               </tr>
             </thead>
             <tbody>
-              {loanList?.length === 0 && <NoResult name="Remita Loan Request" />}
+              {loanList?.length === 0 && (
+                <NoResult name="Remita Loan Request" />
+              )}
               {sortByCreatedAt(loanList)?.map((loan) => (
                 <tr key={loan.customer._id}>
                   <td>{loan.customer.firstname}</td>

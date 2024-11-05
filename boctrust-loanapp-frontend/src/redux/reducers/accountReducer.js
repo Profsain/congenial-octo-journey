@@ -1,14 +1,14 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
+import apiClient from '../../lib/axios';
 
 //fetch accounts
-const apiUrl = import.meta.env.VITE_BASE_URL;
   
-const API_ENDPOINT = `${apiUrl}/api/account/accounts`;
+const API_ENDPOINT = `/account/accounts`;
 
 // Thunk to fetch account from the API
 export const fetchAccount = createAsyncThunk('account/fetchAccount', async () => {
-    const response = await axios.get(API_ENDPOINT);
+    const response = await apiClient.get(API_ENDPOINT);
   return response.data;
 });
 

@@ -1,7 +1,7 @@
 import PropTypes from "prop-types";
 import { useSelector } from "react-redux";
-import { Link, useNavigate } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
+import { useState } from "react";
 import "./Dashboard.css";
 
 const SidebarMain = ({ onMenuItemClick }) => {
@@ -13,14 +13,6 @@ const SidebarMain = ({ onMenuItemClick }) => {
   const closeSubReport = () => setIsReportOpen(false);
   const currentUser = useSelector((state) => state.adminAuth.user);
 
-  // check if user is empty and redirect to login page
-  const navigate = useNavigate();
-  useEffect(() => {
-    if (!currentUser || !currentUser.careertype) {
-      // Add a specific property check or adjust as per your user object structure
-      navigate("/login");
-    }
-  }, [currentUser, navigate]);
   const customerCareer = currentUser?.careertype;
 
   return (

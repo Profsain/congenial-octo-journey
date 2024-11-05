@@ -56,14 +56,14 @@ const LoanCalculator = () => {
   };
 
   return (
-    <div className="TransContainer SecCon">
+    <div className="TransContainer SecCon ">
       <DashboardHeadline>Loan Calcualator</DashboardHeadline>
       <Formik
         initialValues={initialValues}
         validationSchema={validationSchema}
         onSubmit={handleSubmit}
       >
-        <Form>
+        <Form className="">
           <div className="FieldRow">
             <div className="FieldGroup" style={{ marginBottom: "18px" }}>
               <label htmlFor="loanProduct">Loan Product</label>
@@ -82,7 +82,7 @@ const LoanCalculator = () => {
                   />
                 ))}
               </Field>
-              <ErrorMessage name="loanProduct" component="div" />
+              <ErrorMessage className="error__msg" name="loanProduct" component="div" />
             </div>
 
             <div className="FieldGroup">

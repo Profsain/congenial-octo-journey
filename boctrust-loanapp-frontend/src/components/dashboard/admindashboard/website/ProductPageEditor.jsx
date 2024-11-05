@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { fetchFrontPageProduct } from "../../../../redux/reducers/frontPageProductsReducer";
 import PageLoader from "../../shared/PageLoader";
 import "./Editor.css"; // Import the CSS file
+import apiClient from "../../../../lib/axios";
 
 const ProductPageEditor = () => {
   const apiUrl = import.meta.env.VITE_BASE_URL;
@@ -61,16 +62,9 @@ const ProductPageEditor = () => {
     setLoading(true);
     try {
       // Save the updated product details
-      const url = `${apiUrl}/api/products-front-page/update-product/${editingProduct._id}`;
-      const options = {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(editingProduct),
-      };
+      const url = `/products-front-page/update-product/${editingProduct._id}`;
 
-      const response = await fetch(url, options);
+      const response = await apiClient.post(url, editingProduct);
 
       if (response) {
         setMessage("Product updated successfully");
@@ -101,12 +95,9 @@ const ProductPageEditor = () => {
     if (confirmDelete) {
       try {
         // Delete the product
-        const url = `${apiUrl}/api/products-front-page/delete-product/${productId}`;
-        const options = {
-          method: "DELETE",
-        };
+        const url = `/products-front-page/delete-product/${productId}`;
 
-        const response = await fetch(url, options);
+        const response = await apiClient.delete(url);
 
         if (response) {
           setMessage("Product deleted successfully");
@@ -163,16 +154,10 @@ const ProductPageEditor = () => {
     e.preventDefault();
     // Handle adding new product
     try {
-      const url = `${apiUrl}/api/products-front-page/add-product`;
-      const options = {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(newProduct),
-      };
+      const url = `/products-front-page/add-product`;
+    
 
-      const response = await fetch(url, options);
+      const response = await apiClient.post(url, newProduct);
 
       if (response) {
         setMessage("Product added successfully");

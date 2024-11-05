@@ -5,6 +5,7 @@ import { toast } from "react-toastify";
 import EmployerLetterRuleForm from "./molecules/EmployerLetterRuleForm";
 import { fetchEmployerLetterRules } from "../../../../redux/reducers/employerLetterRuleReducer";
 import EmployerLetterRuleList from "./molecules/EmployerLetterRuleList";
+import apiClient from "../../../../lib/axios";
 
 const initialValues = {
   ruleTitle: "",
@@ -21,15 +22,9 @@ const EmploymentLetterRule = () => {
   const addRule = async ({ values }) => {
     try {
       setIsLoading(true);
-      const apiUrl = import.meta.env.VITE_BASE_URL;
+     
       // Handle form submission logic here
-      await fetch(`${apiUrl}/api/employer-letter-rule`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(values),
-      });
+      await apiClient.post(`/employer-letter-rule`, values);
       await dispatch(fetchEmployerLetterRules());
     } catch (error) {
       console.log(error);

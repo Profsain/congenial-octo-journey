@@ -8,13 +8,16 @@ import { Outlet } from "react-router-dom";
 
 const BaseLayout = () => {
   const dispatch = useDispatch();
+
+  
+  const settings = useSelector(
+    (state) => state?.settingReducer?.settings?.settings
+  );
+
   useEffect(() => {
     dispatch(fetchSetting());
   }, [dispatch]);
 
-  const settings = useSelector(
-    (state) => state?.settingReducer?.settings?.settings
-  );
   const [appSettings, setAppSettings] = useState({});
   useEffect(() => {
     if (settings) {

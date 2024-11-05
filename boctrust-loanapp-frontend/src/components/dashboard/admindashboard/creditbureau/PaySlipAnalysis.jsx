@@ -3,7 +3,6 @@ import { useEffect, useState } from "react";
 import "../../dashboardcomponents/transferdashboard/Transfer.css";
 import "./Credit.css";
 // function
-import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
 
 // toast styles
@@ -12,7 +11,8 @@ import PageLoader from "../../shared/PageLoader";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchSingleCustomer } from "../../../../redux/reducers/customerReducer";
 import CheckPaylsipFileUpload from "./molecules/CheckPaySlipInput";
-const apiUrl = import.meta.env.VITE_BASE_URL;
+import apiClient from "../../../../lib/axios";
+
 
 const employerGroup = {
   police: "police",
@@ -60,7 +60,7 @@ const PaySlipAnalysis = ({
   useEffect(() => {
     const getData = async () => {
       try {
-        const res = await axios.get(`${apiUrl}/api/agency/payslip-grouping`);
+        const res = await apiClient.get(`/agency/payslip-grouping`);
 
         setEmployerGroupings(res.data);
         setSelectedEmployerGroup(
@@ -137,8 +137,8 @@ const PaySlipAnalysis = ({
   const handleActivateBuyOver = async () => {
     setIsLoading(true);
     try {
-      await axios.put(
-        `${apiUrl}/api/updatecustomer/activate-buyover/${customerId}`
+      await apiClient.put(
+        `/updatecustomer/activate-buyover/${customerId}`
       );
 
       toast.success("Buyover Loan Activation Success", {

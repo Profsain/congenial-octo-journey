@@ -1,11 +1,10 @@
 /* eslint-disable react/prop-types */
 import { useState, useEffect } from "react";
 import { useDispatch } from "react-redux";
-import {fetchAccount} from "../../../../redux/reducers/accountReducer";
+import { fetchAccount } from "../../../../redux/reducers/accountReducer";
 import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
-
-
+import apiClient from "../../../../lib/axios";
 
 const EditAccount = (props) => {
   const apiUrl = import.meta.env.VITE_BASE_URL;
@@ -14,11 +13,11 @@ const EditAccount = (props) => {
   const account = props.account;
 
   // form state
-    const [editAccountName, setEditAccountName] = useState("");
-    const [editInterestRate, setEditInterestRate] = useState("");
-    const [editInterestMethod, setEditInterestMethod] = useState("");
-    const [editInterestPeriod, setEditInterestPeriod] = useState("");
-    const [editStatus, setEditStatus] = useState("");
+  const [editAccountName, setEditAccountName] = useState("");
+  const [editInterestRate, setEditInterestRate] = useState("");
+  const [editInterestMethod, setEditInterestMethod] = useState("");
+  const [editInterestPeriod, setEditInterestPeriod] = useState("");
+  const [editStatus, setEditStatus] = useState("");
 
   // pass object data to form
   const updateFormObject = () => {
@@ -53,27 +52,19 @@ const EditAccount = (props) => {
     e.preventDefault();
 
     const updatedAccount = {
-        accountName: editAccountName,
-        interestRate: editInterestRate,
-        interestMethod: editInterestMethod,
-        interestPeriod: editInterestPeriod,
-        status: editStatus,
+      accountName: editAccountName,
+      interestRate: editInterestRate,
+      interestMethod: editInterestMethod,
+      interestPeriod: editInterestPeriod,
+      status: editStatus,
     };
 
-
-    await fetch(`${apiUrl}/api/account/accounts/${account._id}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(updatedAccount),
-    });
+    await apiClient.put(`/account/accounts/${account._id}`, updatedAccount);
 
     clearForm();
     handleClose();
     dispatch(fetchAccount());
-    };
-    
+  };
 
   return (
     <Modal
@@ -129,8 +120,8 @@ const EditAccount = (props) => {
               value={editInterestMethod}
               onChange={(e) => setEditInterestMethod(e.target.value)}
             />
-                  </div>
-                  
+          </div>
+
           <div className="FieldGroup">
             <label htmlFor="interestPeriod" style={{ marginTop: "-1rem" }}>
               Interest Period
@@ -143,7 +134,6 @@ const EditAccount = (props) => {
               onChange={(e) => setEditInterestPeriod(e.target.value)}
             />
           </div>
-
         </form>
       </Modal.Body>
       <Modal.Footer>

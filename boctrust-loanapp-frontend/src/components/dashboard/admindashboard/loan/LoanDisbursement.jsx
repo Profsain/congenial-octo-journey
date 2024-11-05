@@ -19,10 +19,10 @@ import { IoMdCheckmarkCircleOutline } from "react-icons/io";
 import { FcCancel } from "react-icons/fc";
 import DisplayLoanProductName from "../../shared/DisplayLoanProductName";
 import TransferMoney from "./transferMoney/TransferMoney";
-import axios from "axios";
 import { toast } from "react-toastify";
 import ActionNotification from "../../shared/ActionNotification";
 import { nigerianCurrencyFormat } from "../../../../../utilities/formatToNiaraCurrency";
+import apiClient from "../../../../lib/axios";
 
 const LoanDisbursement = () => {
   const styles = {
@@ -32,7 +32,7 @@ const LoanDisbursement = () => {
     },
     head: {
       color: "#fff",
-      fontSize: "1rem",
+   
     },
     approved: {
       color: "#5cc51c",
@@ -47,9 +47,6 @@ const LoanDisbursement = () => {
       color: "#f64f4f",
     },
   };
-
-  // Base URL for API
-  const apiUrl = import.meta.env.VITE_BASE_URL;
 
   // holds state to check for loged in users permisson to approve
   const [canUserManage, setCanUserManage] = useState(false);
@@ -124,7 +121,7 @@ const LoanDisbursement = () => {
     try {
       setApproveDisburseLoading(true);
 
-      await axios.put(`${apiUrl}/api/loans/disburse/${loanObj._id}`, payload);
+      await apiClient.put(`/loans/disburse/${loanObj._id}`, payload);
       await dispatch(fetchBookedLoans());
       toast.success("Loan Disbursement Initiated and Pending Approval");
     } catch (error) {
@@ -139,7 +136,7 @@ const LoanDisbursement = () => {
     try {
       setApproveDisburseLoading(true);
 
-      await axios.put(`${apiUrl}/api/loans/approve-disburse/${loanObj._id}`);
+      await apiClient.put(`/loans/approve-disburse/${loanObj._id}`);
       await dispatch(fetchBookedLoans());
       toast.success("Loan has been successfully disbursed");
     } catch (error) {
@@ -208,8 +205,8 @@ const LoanDisbursement = () => {
           try {
             setLoanObj(loan);
             setShowDisburse(true);
-            const response = await axios.get(
-              `${apiUrl}/api/bankone/getCustomerAccountsByBankoneId/${loan.customer?.banking?.accountDetails?.CustomerID}`
+            const response = await apiClient.get(
+              `/bankone/getCustomerAccountsByBankoneId/${loan.customer?.banking?.accountDetails?.CustomerID}`
             );
 
             setLoanUserAccounts(

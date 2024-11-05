@@ -7,6 +7,7 @@ import "./EditeRule.css";
 import { useDispatch } from "react-redux";
 import { fetchStatementRules } from "../../../../../../redux/reducers/statementRuleReducer";
 import StatementRuleForm from "../StatementRuleForm";
+import apiClient from "../../../../../../lib/axios";
 
 const EditStatementRule = ({ show, handleClose, selectedMandateRule }) => {
   const [isLoading, setIsLoading] = useState(false);
@@ -17,15 +18,9 @@ const EditStatementRule = ({ show, handleClose, selectedMandateRule }) => {
   const handleUpdateStatementRule = async (values) => {
     try {
       setIsLoading(true);
-      const apiUrl = import.meta.env.VITE_BASE_URL;
+   
       // Handle form submission logic here
-      await fetch(`${apiUrl}/api/statement-rule/${selectedMandateRule._id}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(values),
-      });
+      await apiClient.put(`/statement-rule/${selectedMandateRule._id}`, values);
 
       await dispatch(fetchStatementRules());
 

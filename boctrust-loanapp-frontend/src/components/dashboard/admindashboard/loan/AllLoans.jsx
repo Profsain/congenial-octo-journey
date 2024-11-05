@@ -44,8 +44,7 @@ const AllLoans = ({ showCount, searchTerms }) => {
 
   // fetch all customer
   const dispatch = useDispatch();
-  const { allLoans } = useSelector((state) => state.loanReducer);
-  const status = useSelector((state) => state.customerReducer.status);
+  const { allLoans, status } = useSelector((state) => state.loanReducer);
 
   useEffect(() => {
     const getData = async () => {
@@ -90,8 +89,6 @@ const AllLoans = ({ showCount, searchTerms }) => {
 
   return (
     <div className="loans__tableContainer">
-      {/* data loader */}
-      {status === "loading" && <PageLoader />}
       <DashboardHeadline
         height="52px"
         mspacer="2rem 0 -3.2rem -1rem"
@@ -112,67 +109,72 @@ const AllLoans = ({ showCount, searchTerms }) => {
               <th>Action</th>
             </tr>
           </thead>
-          <tbody>
-            {loansList?.length === 0 && <NoResult name="Loan" />}
-            {loansList &&
-              sortByCreatedAt(loansList)?.map((loan) => {
-                return (
-                  <tr key={loan._id}>
-                    <td>
-                      {loan?.customer?.banking?.accountDetails?.CustomerID}
-                    </td>
-                    <td>
-                      {loan.deductions === "remita" ? (
-                        <img
-                          src="/images/remita-logo.jpg"
-                          alt=""
-                          className=""
-                        />
-                      ) : (
-                        <img
-                          src="/images/nibss.jpg"
-                          alt=""
-                          className=""
-                        />
-                      )}
-                    </td>
-                    <td>
-                      <DisplayLoanProductName loan={loan} />
-                    </td>
-                    <td>
-                      {loan?.customer?.banking?.accountDetails?.CustomerName ??
-                        `${loan?.customer?.firstname} ${loan?.customer?.lastname}`}
-                    </td>
-                    <td>
-                      {loan.customer?.banking?.accountDetails?.AccountNumber}
-                    </td>
-                    <td>{getDateOnly(loan.createdAt)}</td>
-                    <td>N{loan.loanamount}</td>
-                    <td
-                      style={styles.padding}
-                      className={
-                        loan?.customer?.kyc?.loanstatus ===
-                        loanStatusEnum.completed
-                          ? "text-success"
-                          : "text-warning"
-                      }
-                    >
-                      {capitalizeEachWord(loan.loanstatus)}
-                    </td>
-                    <td>
-                      <div>
-                        <button
-                          onClick={() => handleShow(loan._id)}
-                          className="btn btn-info text-white"
-                        >
-                          Details
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                );
-              })}
-          </tbody>
+          {status === "loading" ? (
+            <tr>
+              <td colSpan="9">
+                <PageLoader />
+              </td>
+            </tr>
+          ) : (
+            <tbody>
+              {loansList?.length === 0 && <NoResult name="Loan" />}
+              {loansList &&
+                sortByCreatedAt(loansList)?.map((loan) => {
+                  return (
+                    <tr key={loan._id}>
+                      <td>
+                        {loan?.customer?.banking?.accountDetails?.CustomerID}
+                      </td>
+                      <td>
+                        {loan.deductions === "remita" ? (
+                          <img
+                            src="/images/remita-logo.jpg"
+                            alt=""
+                            className=""
+                          />
+                        ) : (
+                          <img src="/images/nibss.jpg" alt="" className="" />
+                        )}
+                      </td>
+                      <td>
+                        <DisplayLoanProductName loan={loan} />
+                      </td>
+                      <td>
+                        {loan?.customer?.banking?.accountDetails
+                          ?.CustomerName ??
+                          `${loan?.customer?.firstname} ${loan?.customer?.lastname}`}
+                      </td>
+                      <td>
+                        {loan.customer?.banking?.accountDetails?.AccountNumber}
+                      </td>
+                      <td>{getDateOnly(loan.createdAt)}</td>
+                      <td>N{loan.loanamount}</td>
+                      <td
+                        style={styles.padding}
+                        className={
+                          loan?.customer?.kyc?.loanstatus ===
+                          loanStatusEnum.completed
+                            ? "text-success"
+                            : "text-warning"
+                        }
+                      >
+                        {capitalizeEachWord(loan.loanstatus)}
+                      </td>
+                      <td>
+                        <div>
+                          <button
+                            onClick={() => handleShow(loan._id)}
+                            className="btn btn-info text-white"
+                          >
+                            Details
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+            </tbody>
+          )}
         </Table>
       </div>
       <NextPreBtn />

@@ -7,8 +7,8 @@ import "../../dashboardcomponents/transferdashboard/Transfer.css";
 import BocButton from "../../shared/BocButton";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchProduct } from "../../../../redux/reducers/productReducer";
-import axios from "axios";
 import { toast } from "react-toastify";
+import apiClient from "../../../../lib/axios";
 
 // Define validation schema using Yup
 const validationSchema = Yup.object().shape({
@@ -54,10 +54,10 @@ const AddNewLoanProduct = ({ func }) => {
 
   const handleSubmit = async (values, { setSubmitting, resetForm }) => {
     try {
-      const apiUrl = import.meta.env.VITE_BASE_URL;
+      
 
       // send form data to server
-      await axios.post(`${apiUrl}/api/product/products`, {
+      await apiClient.post(`/product/products`, {
         productCode: values.productCode,
         productTitle: values.productTitle,
         interestRate: values.interestRate,

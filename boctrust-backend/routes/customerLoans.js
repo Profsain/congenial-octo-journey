@@ -10,9 +10,53 @@ dotenv.config();
 const baseUrl = process.env.BASE_URL;
 
 // Get Customer and His Loan with KYC
-router.get("/", async (_, res) => {
+router.get("/", async (req, res) => {
   try {
-    let customers = await CustomerModel.find().populate("employer");
+    const { search, dateFilter, sort="latest" } = req.query;
+
+    let queryObject = {};
+
+    if (search) {
+      const stringSearchFields = ["firstname", "lastname", "username", "email"];
+
+      const query = {
+        $or: [
+          ...stringSearchFields.map((field) => ({
+            [field]: new RegExp("^" + search, "i"),
+          })),
+        ],
+      };
+      queryObject = { ...queryObject, ...query };
+    }
+
+    if (dateFilter) {
+      const startOfToday = new Date();
+      startOfToday.setHours(0, 0, 0, 0);
+      const endOfToday = new Date();
+      endOfToday.setHours(23, 59, 59, 999);
+
+      const query = {
+        createdAt: {
+          $gte: startOfToday,
+          $lt: endOfToday,
+        },
+      };
+      queryObject = { ...queryObject, ...query };
+    }
+
+    
+
+    let customerCollection =  CustomerModel.find(queryObject).populate("employer");
+
+    if (sort === "latest") {
+      customerCollection = customerCollection.sort("-kyc.timestamps");
+    }
+    if (sort === "oldest") {
+      customerCollection = customerCollection.sort("kyc.timestamps");
+    }
+
+    let customers = await customerCollection
+
     const customerIds = customers.map((customer) => customer._id);
 
     let customersAndLoans = await Loan.find({

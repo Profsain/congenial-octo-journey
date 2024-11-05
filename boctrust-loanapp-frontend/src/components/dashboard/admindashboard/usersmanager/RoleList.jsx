@@ -14,6 +14,7 @@ import searchList from "../../../../../utilities/searchListFunc";
 import TableOptionsDropdown from "../../shared/tableOptionsDropdown/TableOptionsDropdown";
 import { IoMdCheckmarkCircleOutline } from "react-icons/io";
 import { FcCancel } from "react-icons/fc";
+import apiClient from "../../../../lib/axios";
 
 const RoleList = ({ count, searchTerms, setIsEditMode }) => {
   const styles = {
@@ -62,13 +63,7 @@ const RoleList = ({ count, searchTerms, setIsEditMode }) => {
 
   // handle delete
   const handleDelete = async () => {
-    const apiUrl = import.meta.env.VITE_BASE_URL;
-    await fetch(`${apiUrl}/api/role/${roleId}`, {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+    await apiClient.delete(`/role/${roleId}`);
 
     // remove role from rolesList
     dispatch(fetchRolesAndPermisions());

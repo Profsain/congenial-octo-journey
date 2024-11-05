@@ -4,6 +4,7 @@ import { useDispatch } from "react-redux";
 import { fetchCareer } from "../../../../redux/reducers/careerReducer";
 import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
+import apiClient from "../../../../lib/axios";
 
 const EditCareer = (props) => {
   const dispatch = useDispatch();
@@ -49,7 +50,7 @@ const EditCareer = (props) => {
   // submit update to api endpoint
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const apiUrl = import.meta.env.VITE_BASE_URL;
+   
 
     const updatedCareer = {
       jobtitle: editTitle,
@@ -59,13 +60,7 @@ const EditCareer = (props) => {
       dateposted: editDatePosted,
     };
 
-    await fetch(`${apiUrl}/api/career/careers/${career._id}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(updatedCareer),
-    });
+    await apiClient.put(`/career/careers/${career._id}`, updatedCareer);
 
     clearForm();
     handleClose();

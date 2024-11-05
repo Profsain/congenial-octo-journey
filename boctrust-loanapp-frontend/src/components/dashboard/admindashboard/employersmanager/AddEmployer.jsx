@@ -11,6 +11,7 @@ import { fetchEmployerLetterRules } from "../../../../redux/reducers/employerLet
 import { fetchStatementRules } from "../../../../redux/reducers/statementRuleReducer";
 import { fetchMandateRules } from "../../../../redux/reducers/mandateRuleReducer";
 import PageLoader from "../../shared/PageLoader";
+import apiClient from "../../../../lib/axios";
 
 // Define validation schema using Yup
 const validationSchema = Yup.object().shape({
@@ -56,15 +57,9 @@ const AddEmployer = () => {
   const handleSubmit = async (values, { resetForm }) => {
     try {
       setIsLoading(true);
-      const apiUrl = import.meta.env.VITE_BASE_URL;
+      
       // Handle form submission logic here
-      await fetch(`${apiUrl}/api/agency/employers`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(values),
-      });
+      await apiClient.post(`/agency/employers`, values);
 
       // Reset form after submission
       resetForm();
