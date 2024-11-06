@@ -193,6 +193,21 @@ const KycViewDetails = ({ customer, setShowInfo }) => {
               value={customer?.loan?.monthlyrepayment || ""}
             />
           </div>
+          <div className="InputRow">
+            <KycInput
+              name="Total Repayment"
+              type="text"
+              disabled
+              value={customer?.loan?.loantotalrepayment || ""}
+            />
+            <div className="Space"></div>
+            <KycInput
+              name="No. of Month"
+              type="text"
+              disabled
+              value={customer?.loan?.numberofmonth || ""}
+            />
+          </div>
         </div>
 
         {/* employment details */}

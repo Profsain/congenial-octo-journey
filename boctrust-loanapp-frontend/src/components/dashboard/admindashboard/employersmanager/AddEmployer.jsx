@@ -15,13 +15,11 @@ import apiClient from "../../../../lib/axios";
 
 // Define validation schema using Yup
 const validationSchema = Yup.object().shape({
-  employersId: Yup.string().required("Employers ID is required"),
   employersName: Yup.string().required("Employers name is required"),
   employersAddress: Yup.string().required("Employer address is required"),
 });
 
 const initialValues = {
-  employersId: "",
   employersName: "",
   employersAddress: "",
   mandateRule: "",
@@ -57,7 +55,7 @@ const AddEmployer = () => {
   const handleSubmit = async (values, { resetForm }) => {
     try {
       setIsLoading(true);
-      
+
       // Handle form submission logic here
       await apiClient.post(`/agency/employers`, values);
 
@@ -87,21 +85,6 @@ const AddEmployer = () => {
         >
           <Form className="appForm">
             <div className="FieldRow">
-              <div className="FieldGroup mGroup">
-                <label htmlFor="employersId">Employers ID</label>
-                <Field
-                  type="text"
-                  name="employersId"
-                  id="employersId"
-                  className="Input"
-                />
-                <ErrorMessage
-                  name="employersId"
-                  component="div"
-                  className="error__msg"
-                />
-              </div>
-
               <div className="FieldGroup">
                 <label htmlFor="employersName">Employers Name</label>
                 <Field

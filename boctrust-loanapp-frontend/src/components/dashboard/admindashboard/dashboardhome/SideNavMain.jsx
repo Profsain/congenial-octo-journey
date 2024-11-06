@@ -907,7 +907,7 @@ const SideNavMain = ({ onMenuItemClick }) => {
                   id="report"
                   className={({ isActive }) => (isActive ? "link_active" : "")}
                   onClick={onMenuItemClick}
-                  to="/dashboard/report/account-statement"
+                  to="/dashboard/report"
                   end
                 >
                   Account Statement

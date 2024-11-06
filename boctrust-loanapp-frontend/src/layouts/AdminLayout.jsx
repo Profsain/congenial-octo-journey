@@ -7,6 +7,7 @@ import PropTypes from "prop-types";
 import { useOnClickOutside } from "../hooks/useOnClickOutside.";
 import { useRef } from "react";
 
+
 const AdminLayout = ({
   onMenuItemClick,
   showSidebar,
@@ -28,6 +29,7 @@ const AdminLayout = ({
   };
 
   useOnClickOutside(ref, () => setShowSidebar(false));
+
 
   return (
     <div className="DashboardContainer">

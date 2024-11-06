@@ -24,7 +24,6 @@ router.post("/employers", (req, res) => {
   try {
     // Get post data from request body
     const {
-      employersId,
       employersName,
       employersAddress,
       mandateRule,
@@ -33,18 +32,18 @@ router.post("/employers", (req, res) => {
     } = req.body;
 
     // Validate required fields
-    if (!employersId || !employersName || !employersAddress || !mandateRule) {
+    if (!employersName || !employersAddress || !mandateRule) {
       return res.status(400).json({ error: "All fields are required" });
     }
 
     // Create new Employer
     const employer = new Employer({
-      employersId,
+      employersId: `E00${Math.floor(Math.random() * 100) + 1} ` ,
       employersName,
       employersAddress,
       mandateRule,
-      statementRule: !!statementRule ?  statementRule : null ,
-      employerLetterRule: !!employerLetterRule ?  employerLetterRule : null,
+      statementRule: !!statementRule ? statementRule : null,
+      employerLetterRule: !!employerLetterRule ? employerLetterRule : null,
     });
 
     // Save Employer

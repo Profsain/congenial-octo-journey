@@ -19,11 +19,11 @@ const ReviewSignature = () => {
       justifyContent: "center",
     },
     table: {
-      fontSize: "12px",
+      fontSize: "14px",
     },
     head: {
       color: "#fff",
-      fontSize: "0.8rem",
+      fontSize: "1rem",
     },
     approved: {
       color: "#5cc51c",
@@ -118,7 +118,7 @@ const ReviewSignature = () => {
       <div className="Section RBox DCard">
         <DashboardHeadline
           height="52px"
-          mspacer="2rem 0 -2rem -1rem"
+          mspacer="2rem 0 -3.5rem -1rem"
           bgcolor="#145098"
         ></DashboardHeadline>
         <div style={styles.table}>

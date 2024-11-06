@@ -66,10 +66,10 @@ const LoanDetails = ({
         <Modal.Body>
           <RowCard
             title="Loan ID:"
-            text={loanObj.customer.banking?.accountDetails?.CustomerID}
+            text={loanObj.customer?.banking?.accountDetails?.CustomerID}
           />
           <hr />
-          <RowCard title="Valid BVN:" text={loanObj.customer.bvnnumber} />
+          <RowCard title="Valid BVN:" text={loanObj.customer?.bvnnumber} />
           <hr />
           <RowCard title="KYC:" text="Completed" />
           <hr />

@@ -18,6 +18,7 @@ const CustomerLayout = ({
   const userName = user?.firstname + " " + user?.lastname;
 
 
+
   const handleMouseOver = () => {
     setShowSidebar(true);
   };
@@ -25,6 +26,7 @@ const CustomerLayout = ({
   const handleMouseOut = () => {
     setShowSidebar(false);
   };
+
   return (
     <div className="DashboardContainer">
       {/* mobile navbar  */}
