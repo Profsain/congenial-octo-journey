@@ -29,9 +29,12 @@ const CheckFileUploadsNotice = ({ selectedCustomer }) => {
       )}
       {selectedCustomer?.creditCheck?.creditBureauSearch?.[1]
         ?.bureauSearchReport && (
-        <div className="upload__noticeItem">
-          <GrStatusGood size={22} color="rgb(16 185 129)" />
-          Second Bureau Search Report Uploaded
+          <div className="upload__noticeItem">
+          <GrStatusGood size={22} color="rgb(16 185 129)" />{" "}
+          {selectedCustomer?.creditCheck?.creditBureauSearch?.[1].bureauName
+            .split("_")
+            .join(" ")}{" "}
+          Report Uploaded
         </div>
       )}
     </div>
