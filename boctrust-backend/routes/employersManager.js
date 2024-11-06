@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const Employer = require("../models/EmployersManager"); // import Employer model
-const { findByIdAndUpdate } = require("../models/Role");
+const { authenticateStaffToken } = require("../middleware/auth");
 
 // Employer API Endpoints
 // get all Employer posts endpoint
@@ -20,7 +20,7 @@ router.get("/employers", async (req, res) => {
 });
 
 // create new Employer post endpoint
-router.post("/employers", (req, res) => {
+router.post("/employers", authenticateStaffToken, (req, res) => {
   try {
     // Get post data from request body
     const {
@@ -38,7 +38,7 @@ router.post("/employers", (req, res) => {
 
     // Create new Employer
     const employer = new Employer({
-      employersId: `E00${Math.floor(Math.random() * 100) + 1} ` ,
+      employersId: `E00${Math.floor(Math.random() * 100) + 1} `,
       employersName,
       employersAddress,
       mandateRule,
@@ -57,7 +57,7 @@ router.post("/employers", (req, res) => {
 });
 
 // update single Employer endpoint
-router.put("/employers/:id", async (req, res) => {
+router.put("/employers/:id", authenticateStaffToken, async (req, res) => {
   try {
     // get Employer id from request params
     const { id } = req.params;
@@ -87,40 +87,44 @@ router.put("/employers/:id", async (req, res) => {
 });
 
 // Define a route to update the statementRule for an employer by ID
-router.put("/employers/:id/statementRule", async (req, res) => {
-  const { id } = req.params;
-  console.log(id);
-  try {
-    // Find the employer by ID
-    const employer = await Employer.findById(id);
+router.put(
+  "/employers/:id/statementRule",
+  authenticateStaffToken,
+  async (req, res) => {
+    const { id } = req.params;
+    console.log(id);
+    try {
+      // Find the employer by ID
+      const employer = await Employer.findById(id);
 
-    if (!employer) {
-      return res.status(404).json({ error: "Employer not found" });
+      if (!employer) {
+        return res.status(404).json({ error: "Employer not found" });
+      }
+
+      // Update the statementRule object with the data from the request body
+      const { ruleTitle, maximumTenure, maximumAmount, rule } = req.body;
+
+      employer.statementRule.ruleTitle =
+        ruleTitle || employer.statementRule.ruleTitle;
+      employer.statementRule.maximumTenure =
+        maximumTenure || employer.statementRule.maximumTenure;
+      employer.statementRule.maximumAmount =
+        maximumAmount || employer.statementRule.maximumAmount;
+      employer.statementRule.rule = rule || employer.statementRule.rule;
+
+      // Save the updated employer
+      await employer.save();
+
+      res.json({ message: "Statement updated successfully", employer });
+    } catch (error) {
+      console.error("Error updating Statement:", error);
+      res.status(500).json({ error: "Internal server error" });
     }
-
-    // Update the statementRule object with the data from the request body
-    const { ruleTitle, maximumTenure, maximumAmount, rule } = req.body;
-
-    employer.statementRule.ruleTitle =
-      ruleTitle || employer.statementRule.ruleTitle;
-    employer.statementRule.maximumTenure =
-      maximumTenure || employer.statementRule.maximumTenure;
-    employer.statementRule.maximumAmount =
-      maximumAmount || employer.statementRule.maximumAmount;
-    employer.statementRule.rule = rule || employer.statementRule.rule;
-
-    // Save the updated employer
-    await employer.save();
-
-    res.json({ message: "Statement updated successfully", employer });
-  } catch (error) {
-    console.error("Error updating Statement:", error);
-    res.status(500).json({ error: "Internal server error" });
   }
-});
+);
 
 // delete single Employer endpoint
-router.delete("/employers/:id", async (req, res) => {
+router.delete("/employers/:id", authenticateStaffToken, async (req, res) => {
   try {
     // get Employer id from request params
     const { id } = req.params;
@@ -136,7 +140,7 @@ router.delete("/employers/:id", async (req, res) => {
 });
 
 // DUMMY API to server the employee groupings for the payslip Anlysis
-router.get("/payslip-grouping", async (req, res) => {
+router.get("/payslip-grouping", authenticateStaffToken, async (req, res) => {
   try {
     res.json([
       {

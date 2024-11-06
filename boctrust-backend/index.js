@@ -141,7 +141,7 @@ mongoose
     app.use("/api/updatecustomer", updateCustomerRoutes);
     app.use("/api/account", accountRoutes);
     app.use("/api/disbursement", authenticateStaffToken, disbursementRoutes);
-    app.use("/api/agency", authenticateStaffToken, employersManagerRoutes);
+    app.use("/api/agency", employersManagerRoutes);
     app.use("/api/mandate-rule", authenticateStaffToken, mandateRuleRoutes);
     app.use("/api/statement-rule", authenticateStaffToken, statementRuleRoutes);
     app.use(
