@@ -4,10 +4,12 @@ import CustomerDashboard from "./CustomerDashboard";
 import AdminDashboard from "./admindashboard/dashboardhome/AdminDashboard";
 
 import PageLoader from "./shared/PageLoader";
+import usePersistUser from "../../hooks/usePersistUser";
 
 const Dashboard = () => {
   // show dashboard base on current user admin/customer
   const { user: currentUser } = useSelector((state) => state.adminAuth);
+  usePersistUser();
 
   return (
     <>

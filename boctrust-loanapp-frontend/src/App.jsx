@@ -41,13 +41,13 @@ import { ToastContainer } from "react-toastify";
 // toast styles
 import "react-toastify/dist/ReactToastify.css";
 import { useAxiosInterceptor } from "./lib/axios";
-import usePersistUser from "./hooks/usePersistUser";
+
 
 function App() {
   // fetch settings
 
   useAxiosInterceptor();
-  usePersistUser();
+ 
 
   return (
     <>

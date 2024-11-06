@@ -392,13 +392,35 @@ router.put("/kyc/:customerId", async (req, res) => {
   try {
     const customerId = req.params.customerId;
     const updates = req.body;
+
     const customer = await Customer.findByIdAndUpdate(
       customerId,
-      { kyc: updates },
+      {
+        $set: {
+          "kyc.isFacialMatch": updates.isFacialMatch,
+          "kyc.isIdCardValid": updates.isIdCardValid,
+          "kyc.isKycApproved": updates.isKycApproved,
+          "kyc.isOtherDocsValidated": updates.isOtherDocsValidated,
+          "kyc.isPhotoCaptured": updates.isPhotoCaptured,
+          "kyc.isSignatureValid": updates.isSignatureValid,
+        },
+        $currentDate: { "kyc.timestamps": true },
+      },
       { new: true }
     );
+
+    await Loan.findOneAndUpdate(
+      {
+        customer: customerId,
+      },
+      {
+        loanstatus: "with credit",
+      }
+    );
+
     res.json(customer);
   } catch (error) {
+    console.log(error);
     res.status(500).json({ error: "Failed to update kyc details" });
   }
 });

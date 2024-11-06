@@ -666,10 +666,7 @@ const CreditCheckhtmlForm = ({
       }
     );
 
-    if (!res.ok) {
-      const resObj = await res.json();
-      throw new Error(resObj?.error);
-    }
+  
 
     // clear form fields
     setFormState({

@@ -12,7 +12,7 @@ const baseUrl = process.env.BASE_URL;
 // Get Customer and His Loan with KYC
 router.get("/", async (req, res) => {
   try {
-    const { search, dateFilter, sort="latest" } = req.query;
+    const { search, dateFilter, sort = "latest" } = req.query;
 
     let queryObject = {};
 
@@ -44,18 +44,33 @@ router.get("/", async (req, res) => {
       queryObject = { ...queryObject, ...query };
     }
 
-    
+    // let customerCollection = CustomerModel.find(queryObject)
+    //   .sort(
+    //     sort === "latest" ? { "kyc.timestamps": -1 } : { "kyc.timestamps": 1 }
+    //   )
+    //   .populate("employer");
 
-    let customerCollection =  CustomerModel.find(queryObject).populate("employer");
+    // let customers = await customerCollection;
 
-    if (sort === "latest") {
-      customerCollection = customerCollection.sort("-kyc.timestamps");
-    }
-    if (sort === "oldest") {
-      customerCollection = customerCollection.sort("kyc.timestamps");
-    }
-
-    let customers = await customerCollection
+    let customerCollection = CustomerModel.aggregate([
+      { $match: queryObject },
+      {
+        $lookup: {
+          from: "employers",
+          localField: "employer",
+          foreignField: "_id",
+          as: "employer",
+        },
+      },
+      {
+        $unwind: {
+          path: "$employer",
+          preserveNullAndEmptyArrays: true, // Ensures customers without an employer are included
+        },
+      },
+      { $sort: { "kyc.timestamps": sort === "latest" ? -1 : 1 } },
+    ]);
+    let customers = await customerCollection.exec();
 
     const customerIds = customers.map((customer) => customer._id);
 
@@ -69,7 +84,7 @@ router.get("/", async (req, res) => {
       );
 
       return {
-        ...customer.toJSON(),
+        ...customer,
         loan: loan
           ? {
               ...loan.toJSON(),

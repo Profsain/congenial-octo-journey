@@ -10,6 +10,8 @@ import PageLoader from "../../shared/PageLoader";
 import { nigerianCurrencyFormat } from "../../../../../utilities/formatToNiaraCurrency";
 import { customerApprovalEnum } from "../../../../lib/userRelated";
 import apiClient from "../../../../lib/axios";
+import { VscDebugStart } from "react-icons/vsc";
+import { AiFillStop } from "react-icons/ai";
 
 const percentageIndex = 0.45;
 
@@ -40,7 +42,6 @@ const DecisionSummary = ({ customerId }) => {
 
   useEffect(() => {
     const getData = async () => {
-      console.log(customerId, "customerId");
       try {
         await dispatch(fetchSingleCustomer(customerId));
       } catch (error) {
@@ -211,7 +212,6 @@ const DecisionSummary = ({ customerId }) => {
 
     return true;
   };
-
 
   return (
     <div className="TransContainer RBox">
@@ -576,22 +576,53 @@ const DecisionSummary = ({ customerId }) => {
             </div>
           ) : (
             <div className="already__approved">
-              Customer has been approved by Credit Officer
-              <p className="d-flex gap-2 justify-content-center">
-                <b>Duration:</b>
+              <p> Customer has been approved by Credit Officer</p>
+              {selectedCustomer?.creditCheck.assignment.updatedAt &&
+                selectedCustomer?.creditCheck?.decisionSummary
+                  .creditOfficerApprovedAt && (
+                  <div>
+                    <div className="d-flex justify-content-center gap-4">
+                      <p
+                        style={{
+                          fontSize: "1rem",
+                        }}
+                      >
+                        <VscDebugStart color="green" />{" "}
+                        {format(
+                          new Date(
+                            selectedCustomer?.creditCheck.assignment.updatedAt
+                          ),
+                          "dd/LL/yyyy, hh:mm aaa"
+                        )}
+                      </p>
+                      <p
+                        style={{
+                          fontSize: "1rem",
+                        }}
+                      >
+                        <AiFillStop color="red" />{" "}
+                        {format(
+                          new Date(
+                            selectedCustomer?.creditCheck?.decisionSummary.creditOfficerApprovedAt
+                          ),
+                          "dd/LL/yyyy, hh:mm aaa"
+                        )}
+                      </p>
+                    </div>
+                    <p className="d-flex gap-2 justify-content-center">
+                      <b>Duration:</b>
 
-                {selectedCustomer?.creditCheck.assignment.updatedAt &&
-                  selectedCustomer?.creditCheck?.decisionSummary
-                    .creditOfficerApprovedAt &&
-                  formatDistance(
-                    new Date(
-                      selectedCustomer?.creditCheck.assignment.updatedAt
-                    ),
-                    new Date(
-                      selectedCustomer?.creditCheck?.decisionSummary.creditOfficerApprovedAt
-                    )
-                  )}
-              </p>
+                      {formatDistance(
+                        new Date(
+                          selectedCustomer?.creditCheck.assignment.updatedAt
+                        ),
+                        new Date(
+                          selectedCustomer?.creditCheck?.decisionSummary.creditOfficerApprovedAt
+                        )
+                      )}
+                    </p>
+                  </div>
+                )}
             </div>
           )}
         </div>

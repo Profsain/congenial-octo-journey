@@ -52,7 +52,7 @@ export const useAxiosInterceptor = () => {
 
           dispatch(setToken(newAccessToken));
 
-          console.log(newAccessToken, "newAccessToken")
+        
 
           // Attach new token to the original request and retry it
           originalRequest.headers["Authorization"] = `Bearer ${newAccessToken}`;

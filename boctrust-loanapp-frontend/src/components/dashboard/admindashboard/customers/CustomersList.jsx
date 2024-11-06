@@ -106,7 +106,7 @@ const CustomersList = ({ showCount, searchTerms }) => {
                 <th>Email</th>
                 <th>Username</th>
                 <th>Branch</th>
-                <th>Action</th>
+                {/* <th>Action</th> */}
               </tr>
             </thead>
             <tbody>
@@ -140,7 +140,7 @@ const CustomersList = ({ showCount, searchTerms }) => {
                   <td>{customer.email}</td>
                   <td>{customer.username}</td>
                   <td>{capitalizeEachWord(customer.branch)}</td>
-                  <td>
+                  {/* <td>
                     <BocButton
                       func={() => handleShow(customer._id)}
                       bgcolor="#ecaa00"
@@ -148,7 +148,7 @@ const CustomersList = ({ showCount, searchTerms }) => {
                     >
                       View
                     </BocButton>
-                  </td>
+                  </td> */}
                 </tr>
               ))}
             </tbody>
@@ -156,8 +156,8 @@ const CustomersList = ({ showCount, searchTerms }) => {
         </div>
       </div>
 
-      {/* show loan details model */}
-      {/* {show && (
+      {/* show loan details model  */}
+     {/* {show && (
         <LoanDetails show={show} handleClose={handleClose} loanObj={loanObj} />
       )} */}
     </>

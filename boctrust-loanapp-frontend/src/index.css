@@ -376,6 +376,7 @@ button:disabled {
     margin-top: 6rem !important;
     /* display: none; */
     overflow-x: auto;
+    
   }
   .ChartBar .recharts-wrapper {
     width: fit-content !important;
