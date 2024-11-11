@@ -446,24 +446,28 @@ const DecisionSummary = ({ customerId }) => {
 
             {selectedCustomer?.creditCheck?.creditBureauSearch &&
               selectedCustomer?.creditCheck?.creditBureauSearch.map((item) => (
-                <div className="row ml-4 decision-row" key={item?._id}>
-                  <div className="d-flex gap-2 mt-3 align-items-center">
-                    <h6>{item?.bureauName}</h6>
-                    <span className="validBtn">
-                      {format(item?.bureauDate, "MMM dd")}
-                    </span>
-                  </div>
-                  <div className="col-sm-12 col-md-6">
-                    <button className="viewBtn">
-                      <a
-                        target="_blank"
-                        rel="noreferrer"
-                        href={item?.bureauSearchReport}
-                      >
-                        View Data
-                      </a>
-                    </button>
-                  </div>
+                <div key={item?._id}>
+                  {item?.bureauDate ? (
+                    <div className="row ml-4 decision-row">
+                      <div className="d-flex gap-2 mt-3 align-items-center">
+                        <h6>{item?.bureauName}</h6>
+                        <span className="validBtn">
+                          {format(item?.bureauDate, "MMM dd")}
+                        </span>
+                      </div>
+                      <div className="col-sm-12 col-md-6">
+                        <button className="viewBtn">
+                          <a
+                            target="_blank"
+                            rel="noreferrer"
+                            href={item?.bureauSearchReport}
+                          >
+                            View Data
+                          </a>
+                        </button>
+                      </div>
+                    </div>
+                  ) : null}
                 </div>
               ))}
           </div>
