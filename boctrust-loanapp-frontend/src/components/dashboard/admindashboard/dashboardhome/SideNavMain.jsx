@@ -41,7 +41,7 @@ const SideNavMain = ({ onMenuItemClick }) => {
 
   return (
     <div className="NavIcons SideMain FixSideNav">
-      <div className="BrandCon">
+      <div className="BrandCon mb-4">
         <div className=" LgLogo">
           <img src="/images/dlogo.png" alt="boctrust-logo" />
         </div>
@@ -335,7 +335,7 @@ const SideNavMain = ({ onMenuItemClick }) => {
         </p>
       </div> */}
 
-      <div
+      {/* <div
         className={`link__wrap  ${
           checkSectionActive("transactions") ? "section__active" : ""
         }`}
@@ -355,7 +355,7 @@ const SideNavMain = ({ onMenuItemClick }) => {
           <img id="transaction" src="/images/daccount.png" alt="transaction" />
           <p id="repayment">Transactions</p>
         </NavLink>
-      </div>
+      </div> */}
 
       {/* NIBSS Menu with sub item */}
       <div
@@ -442,7 +442,7 @@ const SideNavMain = ({ onMenuItemClick }) => {
         {checkSectionActive("remita") ? (
           <div className="SubItem">
             <ul>
-              {superAdmin || adminRoles?.includes("get_salary_history") ? (
+              {superAdmin || adminRoles?.includes("salaryHistoryCheck") ? (
                 <li>
                   <NavLink
                     id="checksalaryhistory"

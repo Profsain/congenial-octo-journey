@@ -1,8 +1,13 @@
 import * as Yup from "yup";
 // Define validation schema using Yup
+
+const MAX_FILE_SIZE = 200 * 1024; // 200KB
+
 const validationSchema = Yup.object().shape({
   fullName: Yup.string().required("Full name is required"),
-  photo: Yup.string().required("Photo is required"),
+  photo: Yup.mixed().required("Photo is required").test("fileSize", "File size exceeds 200KB", (value) => {
+    return value && value.size <= MAX_FILE_SIZE;
+  }),
   email: Yup.string()
     .email("Invalid email format")
     .required("Email is required"),

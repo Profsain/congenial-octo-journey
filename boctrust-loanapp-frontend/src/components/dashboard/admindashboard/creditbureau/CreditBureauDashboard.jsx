@@ -247,9 +247,9 @@ const CreditBureauDashboard = () => {
                     <th>Review</th>
                     <th>Assigned</th>
                     <th>Analyst Check</th>
-                    {currentUser.userRole.can.includes(
+                    {(currentUser.userRole.can.includes(
                       "headOfCreditApproval"
-                    ) && <th>HOC Approval</th>}
+                    ) || currentUser.userRole.can.includes("cooApproval")) && <th>HOC Approval</th>}
                     {currentUser.userRole.can.includes("cooApproval") && (
                       <th>COO Approval</th>
                     )}
@@ -289,7 +289,7 @@ const CreditBureauDashboard = () => {
                       {customer.creditCheck.assignment
                         .isCreditAnalystAssigned ? (
                         <td style={styles.yes}>
-                          Yes({customer?.creditCheck.assignment.creditAnalyst})
+                          Yes{" "}({customer?.creditCheck.assignment.creditAnalyst})
                         </td>
                       ) : (
                         <td style={styles.completed}>No</td>
@@ -355,9 +355,9 @@ const CreditBureauDashboard = () => {
                         </td>
                       )}
 
-                      {currentUser.userRole.can.includes(
-                        "headOfCreditApproval"
-                      ) && (
+                      {(currentUser.userRole.can.includes(
+                      "headOfCreditApproval"
+                    ) || currentUser.userRole.can.includes("cooApproval")) && (
                         <td>
                           <BocButton
                             bradius="12px"

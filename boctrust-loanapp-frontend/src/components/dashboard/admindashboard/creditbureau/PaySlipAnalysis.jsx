@@ -559,8 +559,7 @@ const PaySlipAnalysis = ({
                     className="form-check-label"
                     htmlFor="flexSwitchCheckChecked"
                   >
-                    Customer Take home not less than N
-                    {reportConfirmation.isApplicantCivilianPolice &&
+                    Customer Take home not less than N{reportConfirmation.isApplicantCivilianPolice &&
                     selectedEmployerGroup.name === employerGroup.police
                       ? selectedEmployerGroup.civilianPolice
                       : selectedEmployerGroup?.benchmark}
@@ -589,8 +588,7 @@ const PaySlipAnalysis = ({
                     className="form-check-label"
                     htmlFor="flexSwitchCheckChecked"
                   >
-                    Customer Net Pay is N{" "}
-                    {reportConfirmation.isApplicantCivilianPolice &&
+                    Customer Net Pay is N{reportConfirmation.isApplicantCivilianPolice &&
                     selectedEmployerGroup.name === employerGroup.police
                       ? selectedEmployerGroup.civilianPolice
                       : selectedEmployerGroup?.benchmark}{" "}
