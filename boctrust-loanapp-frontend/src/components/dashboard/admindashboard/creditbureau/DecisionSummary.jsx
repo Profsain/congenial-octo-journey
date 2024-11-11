@@ -394,20 +394,24 @@ const DecisionSummary = ({ customerId }) => {
               )}
             </div>
 
-            <div className="col-sm-12 col-md-6">
-              <button className="viewBtn">
-                <a
-                  target="_blank"
-                  rel="noreferrer"
-                  href={
-                    selectedCustomer?.creditCheck?.creditDbSearch
-                      ?.dbSearchReport
-                  }
-                >
-                  View Data
-                </a>
-              </button>
-            </div>
+            {selectedCustomer?.creditCheck?.creditDbSearch?.dbSearchReport ? (
+              <div className="col-sm-12 col-md-6">
+                <button className="viewBtn">
+                  <a
+                    target="_blank"
+                    rel="noreferrer"
+                    href={
+                      selectedCustomer?.creditCheck?.creditDbSearch
+                        ?.dbSearchReport
+                    }
+                  >
+                    View Data
+                  </a>
+                </button>
+              </div>
+            ) : (
+              <span className="viewBtn">No Upload</span>
+            )}
           </div>
           <hr />
 
@@ -424,20 +428,24 @@ const DecisionSummary = ({ customerId }) => {
               )}
             </div>
 
-            <div className="col-sm-12 col-md-6">
-              <button className="viewBtn">
-                <a
-                  target="_blank"
-                  rel="noreferrer"
-                  href={
-                    selectedCustomer?.creditCheck?.deductCheck
-                      ?.deductSearchReport
-                  }
-                >
-                  View Data
-                </a>
-              </button>
-            </div>
+            {selectedCustomer?.creditCheck?.creditDbSearch?.dbSearchReport ? (
+              <div className="col-sm-12 col-md-6">
+                <button className="viewBtn">
+                  <a
+                    target="_blank"
+                    rel="noreferrer"
+                    href={
+                      selectedCustomer?.creditCheck?.deductCheck
+                        ?.deductSearchReport
+                    }
+                  >
+                    View Data
+                  </a>
+                </button>
+              </div>
+            ) : (
+              <span className="viewBtn">No Upload</span>
+            )}
           </div>
           <hr />
 
@@ -455,17 +463,21 @@ const DecisionSummary = ({ customerId }) => {
                           {format(item?.bureauDate, "MMM dd")}
                         </span>
                       </div>
-                      <div className="col-sm-12 col-md-6">
-                        <button className="viewBtn">
-                          <a
-                            target="_blank"
-                            rel="noreferrer"
-                            href={item?.bureauSearchReport}
-                          >
-                            View Data
-                          </a>
-                        </button>
-                      </div>
+                      {item?.bureauSearchReport ? (
+                        <div className="col-sm-12 col-md-6">
+                          <button className="viewBtn">
+                            <a
+                              target="_blank"
+                              rel="noreferrer"
+                              href={item?.bureauSearchReport}
+                            >
+                              View Data
+                            </a>
+                          </button>
+                        </div>
+                      ) : (
+                        <span className="viewBtn">No Upload</span>
+                      )}
                     </div>
                   ) : null}
                 </div>
