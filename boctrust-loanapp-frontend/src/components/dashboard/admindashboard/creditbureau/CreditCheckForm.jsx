@@ -1140,7 +1140,7 @@ const CreditCheckhtmlForm = ({
                       />
 
                       <ReportTypeSelect
-                        bureauName={bureauReportUpload.firstUpload.reportType}
+                        reportType={bureauReportUpload.firstUpload.reportType}
                         reportOptions={reportOptions}
                         handleBureauDataChange={(e) =>
                           handleBureauReportUploadChange(e, "first")
@@ -1190,7 +1190,7 @@ const CreditCheckhtmlForm = ({
                       />
 
                       <ReportTypeSelect
-                        bureauName={bureauReportUpload.secondUpload.reportType}
+                        reportType={bureauReportUpload.secondUpload.reportType}
                         reportOptions={reportOptions}
                         handleBureauDataChange={(e) =>
                           handleBureauReportUploadChange(e, "second")
