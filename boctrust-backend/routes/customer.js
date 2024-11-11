@@ -46,6 +46,7 @@ const multipleUpload = upload.fields([
 
 // Create a new customer
 router.post("/customer", multipleUpload, async (req, res) => {
+  
   if (req.files.valididcard?.length > 0) {
     req.body.valididcard = req.files.valididcard[0].filename;
   }

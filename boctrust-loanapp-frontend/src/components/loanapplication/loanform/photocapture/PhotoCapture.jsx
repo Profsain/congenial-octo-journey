@@ -11,6 +11,7 @@ const PhotoCapture = ({ func }) => {
   // Create capture function
   const capture = useCallback(() => {
     const imageSrc = webcamRef.current.getScreenshot();
+   
     setImgSrc(imageSrc);
     func(imageSrc);
   }, [webcamRef]);

@@ -13,7 +13,6 @@ import getDateOnly from "../../../../../utilities/getDate";
 import getTime from "../../../../../utilities/getTime";
 import OtherDocuments from "./OtherDocuments";
 import ViewBySection from "../remita/ViewBySection";
-import useSearchByDate from "../../../../../utilities/useSearchByDate";
 import useSearchByDateRange from "../../../../../utilities/useSearchByDateRange";
 import sortByCreatedAt from "../../shared/sortedByDate";
 import KycViewDetails from "./KycViewDetails";
@@ -359,6 +358,8 @@ const KycCheck = () => {
                       <div className="Match">
                         <p>Is there a Facial Match?</p>
                         <div className="Radio">
+                          
+                          <label>
                           <input
                             type="radio"
                             className="yes"
@@ -368,8 +369,11 @@ const KycCheck = () => {
                               handleRadioChange("isFacialMatch", e.target.value)
                             }
                           />
-                          <label htmlFor="yes">Yes</label>
+                            <span>Yes</span>
+                          </label>
 
+                          
+                          <label htmlFor="no">
                           <input
                             type="radio"
                             className="no"
@@ -379,40 +383,53 @@ const KycCheck = () => {
                               handleRadioChange("isFacialMatch", e.target.value)
                             }
                           />
-                          <label htmlFor="no">No</label>
+                            <span>No</span>
+                          </label>
                         </div>
                       </div>
 
                       <div className="Match">
                         <p>Is there a Valid ID Card?</p>
                         <div className="Radio">
-                          <input
-                            type="radio"
-                            className="yes"
-                            name="isIdCardValid"
-                            value={true}
-                            onChange={(e) =>
-                              handleRadioChange("isIdCardValid", e.target.value)
-                            }
-                          />
-                          <label htmlFor="yes">Yes</label>
+                          
+                           <label>
+                           <input
+                              type="radio"
+                              className="yes"
+                              name="isIdCardValid"
+                              value={true}
+                              onChange={(e) =>
+                                handleRadioChange("isIdCardValid", e.target.value)
+                              }
+                            />
+                            <span>Yes</span>
+                           </label>
+                         
+                          
+                         
 
-                          <input
-                            type="radio"
-                            className="no"
-                            name="isIdCardValid"
-                            value={false}
-                            onChange={(e) =>
-                              handleRadioChange("isIdCardValid", e.target.value)
-                            }
-                          />
-                          <label htmlFor="no">No</label>
+                         
+                          <label>
+                            
+                            <input
+                              type="radio"
+                              className="no"
+                              name="isIdCardValid"
+                              value={false}
+                              onChange={(e) =>
+                                handleRadioChange("isIdCardValid", e.target.value)
+                              }
+                            />
+                            <span>No</span>
+                          </label>
                         </div>
                       </div>
 
                       <div className="Match">
                         <p>Is there a Photo Capture?</p>
                         <div className="Radio">
+                         
+                          <label>
                           <input
                             type="radio"
                             className="yes"
@@ -425,8 +442,12 @@ const KycCheck = () => {
                               );
                             }}
                           />
-                          <label htmlFor="yes">Yes</label>
+                            
+                            <span>Yes</span>
+                          </label>
 
+                        
+                          <label>
                           <input
                             type="radio"
                             className="no"
@@ -438,14 +459,18 @@ const KycCheck = () => {
                                 e.target.value
                               );
                             }}
-                          />
-                          <label htmlFor="no">No</label>
+                          /> 
+                            
+                           <span>No</span>
+                          </label>
                         </div>
                       </div>
 
                       <div className="Match">
                         <p>Is there a Valid Signature?</p>
                         <div className="Radio">
+                         
+                          <label>
                           <input
                             type="radio"
                             className="yes"
@@ -458,8 +483,11 @@ const KycCheck = () => {
                               );
                             }}
                           />
-                          <label htmlFor="yes">Yes</label>
+                            <span>Yes</span>
+                          </label>
 
+                          
+                          <label >
                           <input
                             type="radio"
                             className="no"
@@ -472,13 +500,16 @@ const KycCheck = () => {
                               );
                             }}
                           />
-                          <label htmlFor="no">No</label>
+                            <span>No</span>
+                          </label>
                         </div>
                       </div>
 
                       <div className="Match">
                         <p>Is Other Document Verified?</p>
                         <div className="Radio">
+                          
+                          <label>
                           <input
                             type="radio"
                             className="yes"
@@ -491,8 +522,11 @@ const KycCheck = () => {
                               );
                             }}
                           />
-                          <label htmlFor="yes">Yes</label>
+                            <span>Yes</span>
+                          </label>
 
+                         
+                          <label>
                           <input
                             type="radio"
                             className="no"
@@ -505,13 +539,17 @@ const KycCheck = () => {
                               );
                             }}
                           />
-                          <label htmlFor="no">No</label>
+                           <span> No</span>
+                            </label>
                         </div>
                       </div>
 
                       <div className="Match matchKyc">
                         <p>KYC Completed & Approved</p>
                         <div className="Radio">
+                         
+                          <label >
+                            
                           <input
                             type="radio"
                             className="yes"
@@ -524,8 +562,12 @@ const KycCheck = () => {
                               );
                             }}
                           />
-                          <label htmlFor="yes">Yes</label>
+                          <span>Yes</span>
+                            
+                          </label>
 
+                         
+                          <label>
                           <input
                             type="radio"
                             className="no"
@@ -538,7 +580,8 @@ const KycCheck = () => {
                               );
                             }}
                           />
-                          <label htmlFor="no">No</label>
+                          <span>No</span>
+                          </label>
                         </div>
                       </div>
                     </div>

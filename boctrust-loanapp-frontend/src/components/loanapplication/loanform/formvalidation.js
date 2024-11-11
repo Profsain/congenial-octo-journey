@@ -1,7 +1,7 @@
 import * as Yup from "yup";
 // validation Yup.Schema
 
-const MAX_FILE_SIZE = 1 * 1024 * 1024; // 1MB
+const MAX_FILE_SIZE = 200 * 1024; // 200KB
 
 const validationSchema = Yup.object({
   loanamount: Yup.string().required("Required"),
@@ -41,7 +41,7 @@ const validationSchema = Yup.object({
   servicenumber: Yup.string().required("Required"),
   valididcard: Yup.mixed()
     .required("File is Required")
-    .test("fileSizeValididcard", "File size exceeds 1MB", (value) => {
+    .test("fileSizeValididcard", "File size exceeds 200KB", (value) => {
       return value && value.size <= MAX_FILE_SIZE;
     }),
 
@@ -70,33 +70,33 @@ const validationSchema = Yup.object({
     .required("Required"),
   uploadpayslip: Yup.mixed()
     .required("Payslip Required")
-    .test("fileSize", "File size exceeds 1MB", (value) => {
+    .test("fileSize", "File size exceeds 200KB", (value) => {
       return value && value.size <= MAX_FILE_SIZE;
     }),
   uploadbankstatement: Yup.mixed().test(
     "fileSizePayslip",
-    "File size exceeds 1MB",
+    "File size exceeds 200KB",
     (value) => {
       return value && value.size <= MAX_FILE_SIZE;
     }
   ),
   employmentletter: Yup.mixed().test(
     "fileSizeEmploymentletter",
-    "File size exceeds 1MB",
+    "File size exceeds 200KB",
     (value) => {
       return value && value.size <= MAX_FILE_SIZE;
     }
   ),
   marketerClientPic: Yup.mixed().test(
     "fileSizeMarketerClientPic",
-    "File size exceeds 1MB",
+    "File size exceeds 200KB",
     (value) => {
       return value && value.size <= MAX_FILE_SIZE;
     }
   ),
   signature: Yup.mixed().test(
     "fileSizeSignature",
-    "File size exceeds 1MB",
+    "File size exceeds 200KB",
     (value) => {
       return value && value.size <= MAX_FILE_SIZE;
     }

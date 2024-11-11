@@ -6,7 +6,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { fetchProduct } from "../../../redux/reducers/productReducer";
 import { fetchEmployers } from "../../../redux/reducers/employersManagerReducer";
 // formik and yup for form data management
-import { Formik, Form, Field } from "formik";
+import { Formik, Form, Field, ErrorMessage } from "formik";
 import validationSchema from "./formvalidation";
 // state and lga
 import NaijaStates from "naija-state-local-government";
@@ -166,19 +166,25 @@ const LoanForm = React.memo(function LoanFormComponent() {
   const [employmentLetter, setEmploymentLetter] = useState("");
   const [signature, setSignature] = useState("");
   const [marketerClientPic, setMarketerClientPic] = useState("");
+
+  const fileFields = [ "valididcard", "uploadbankstatement" , "signature", "marketerClientPic", "photocapture", "employmentletter", "uploadpayslip" ]
+
   const updateFormValues = () => {
     const formValues = getFromLocalStorage("onbaordData");
 
     if (formValues) {
-      // console.log(formValues, "formValues");
+      console.log(formValues, "formValues");
 
-      fileValues.map((item) => {
+      Object.entries(formValues).forEach((item, ) => {
+
         ref.current?.setFieldValue(
           item,
+
+          fileFields.includes(item) ?
           getFile(
             item,
             `${item}_for_${formValues.firstname}_${formValues.lastname}`
-          )
+          ) : formValues[item]
         );
       });
     }
@@ -193,11 +199,12 @@ const LoanForm = React.memo(function LoanFormComponent() {
     window.scrollTo(0, 0);
   }, [step, showForm]);
 
+
   // update photocapture value when captureImg change
   useEffect(() => {
     if (captureImg) {
       ref.current?.setFieldValue("photocapture", captureImg);
-      updateFormValues();
+      storeInLocalStorage({ key: "onbaordData", value: ref.current?.values });
     }
     if (idCard) {
       ref.current?.setFieldValue("valididcard", idCard);
@@ -282,6 +289,9 @@ const LoanForm = React.memo(function LoanFormComponent() {
         // generate customer id
         const customerId = generateCustomerId();
         const formData = new FormData();
+
+        console.log(formValues.photocapture, "formValues.photocapture")
+
         formData.append("customerId", customerId);
         formData.append(
           "loanamount",
@@ -568,7 +578,7 @@ const LoanForm = React.memo(function LoanFormComponent() {
             innerRef={ref}
             encType="multipart/form-data"
           >
-            {({ isSubmitting, values }) => {
+            {({ isSubmitting, values, handleBlur }) => {
               return (
                 <>
                   {showForm ? (
@@ -821,12 +831,14 @@ const LoanForm = React.memo(function LoanFormComponent() {
                                               <input
                                                 type="file"
                                                 name="valididcard"
+                                                onBlur={handleBlur}
                                                 accept="image/png, .jpg, .jpeg"
                                                 className="UploadFile"
                                                 onChange={(e) =>
                                                   convertFile(e, setIdCard)
                                                 }
                                               />
+                                              <ErrorMessage name={"valididcard"} component="div" className="Error" />
                                             </div>
                                           </div>
                                         </div>
@@ -841,12 +853,14 @@ const LoanForm = React.memo(function LoanFormComponent() {
                                           <input
                                             type="file"
                                             name="valididcard"
+                                            onBlur={handleBlur}
                                             accept="image/png, .svg, .jpg, .jpeg, .pdf"
                                             className="UploadFile"
                                             onChange={(e) =>
                                               convertFile(e, setIdCard)
                                             }
                                           />
+                                           <ErrorMessage name={"valididcard"} component="div" className="Error" />
                                         </div>
                                       )}
                                       <hr className="hLine" />
@@ -1048,12 +1062,14 @@ const LoanForm = React.memo(function LoanFormComponent() {
                                       <input
                                         type="file"
                                         name="uploadpayslip"
+                                        onBlur={handleBlur}
                                         accept="image/png, .svg, .jpg, .jpeg"
                                         className="UploadFile"
                                         onChange={(e) =>
                                           convertFile(e, setPaySlip)
                                         }
                                       />
+                                       <ErrorMessage name={"uploadpayslip"} component="div" className="Error" />
                                     </div>
                                   ) : null}
                                   {/* Bank Statement and Employement Letter fro government Employeee*/}
@@ -1068,12 +1084,14 @@ const LoanForm = React.memo(function LoanFormComponent() {
                                         <input
                                           type="file"
                                           name="uploadbankstatement"
+                                          onBlur={handleBlur}
                                           accept="image/png, .svg, .jpg, .jpeg"
                                           className="UploadFile"
                                           onChange={(e) =>
                                             convertFile(e, setBankStatements)
                                           }
                                         />
+                                          <ErrorMessage name={"uploadbankstatement"} component="div" className="Error" />
                                       </div>
                                     ) : employer?.employmentLetterRule
                                         ?.ruleActive ? (
@@ -1624,11 +1642,13 @@ const LoanForm = React.memo(function LoanFormComponent() {
                                         type="file"
                                         name="signature"
                                         accept="image/png, .svg, .jpg, .jpeg, .pdf"
+                                        onBlur={handleBlur}
                                         className="UploadFile"
                                         onChange={(e) =>
                                           convertFile(e, setSignature)
                                         }
                                       />
+                                      <ErrorMessage name={"signature"} component="div" className="Error" />
                                     </div>
                                   </div>
 
@@ -1664,11 +1684,13 @@ const LoanForm = React.memo(function LoanFormComponent() {
                                         type="file"
                                         name="marketerClientPic"
                                         accept="image/png, .svg, .jpg, .jpeg, .pdf"
+                                        onBlur={handleBlur}
                                         className="UploadFile"
                                         onChange={(e) =>
                                           convertFile(e, setMarketerClientPic)
                                         }
                                       />
+                                        <ErrorMessage name={"signature"} component="div" className="Error" />
                                     </div>
                                   </div>
 

@@ -127,13 +127,9 @@ const AllLoans = ({ showCount, searchTerms }) => {
                       </td>
                       <td>
                         {loan.deductions === "remita" ? (
-                          <img
-                            src="/images/remita-logo.jpg"
-                            alt=""
-                            className=""
-                          />
+                         <p>Remita</p>
                         ) : (
-                          <img src="/images/nibss.jpg" alt="" className="" />
+                          <p>Nibss</p>
                         )}
                       </td>
                       <td>
