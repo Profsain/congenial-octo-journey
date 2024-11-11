@@ -36,8 +36,6 @@ const creditBureauOptions = [
   // Add more options as needed
 ];
 
-const apiUrl = import.meta.env.VITE_BASE_URL;
-
 const searchTypes = [
   { value: "defaulters", label: "Defaulters" },
   { value: "request", label: "Request" },
@@ -91,6 +89,15 @@ const CreditCheckhtmlForm = ({
   const [noCRC, setNoCRC] = useState(false);
   const [isUpdateLoading, setIsUpdateLoading] = useState(false);
   const [didUploadAny, setDidUploadAny] = useState(false);
+
+  // credit bureau check logic
+  const [bureauData, setBureauData] = useState({
+    bureauName: "",
+    bvnNo: "",
+    reportType: "",
+    reportReason: "",
+    bureauDate: "",
+  });
 
   // PaySlip form state
   const [formState, setFormState] = useState({
@@ -411,15 +418,6 @@ const CreditCheckhtmlForm = ({
     }
   };
 
-  // credit bureau check logic
-  const [bureauData, setBureauData] = useState({
-    bureauName: "",
-    bvnNo: "",
-    reportType: "",
-    reportReason: "",
-    bureauDate: "",
-  });
-
   const handleBureauDataChange = (e) => {
     const { name, value } = e.target;
     setBureauData({ ...bureauData, [name]: value });
@@ -458,6 +456,7 @@ const CreditCheckhtmlForm = ({
   const [PDFContent, setPDFContent] = useState("");
 
   const [successMsg, setSuccessMsg] = useState("");
+  const [noDetailsFound, setNoDetailsFound] = useState(false);
 
   // update report type options
   // useEffect(() => {
@@ -514,6 +513,46 @@ const CreditCheckhtmlForm = ({
       ]);
     }
   }, [bureauData.bureauName]);
+  useEffect(() => {
+    if (bureauReportUpload.firstUpload.bureauName === "first_central") {
+      setReportOptions([
+        { value: "consumer_report", label: "Consumer Report" },
+        { value: "commercial_report", label: "Commercial Report" },
+      ]);
+    } else if (bureauReportUpload.firstUpload.bureauName === "crc_bureau") {
+      setReportOptions([
+        { value: "consumer_basic", label: "Consumer Basic Report" },
+        { value: "consumer_classic", label: "Consumer Classic Report" },
+        { value: "corporate_classic", label: "Corporate Classic Report" },
+      ]);
+    } else if (
+      bureauReportUpload.firstUpload.bureauName === "credit_register"
+    ) {
+      setReportOptions([
+        { value: "consumer_report", label: "Consumer Report" },
+      ]);
+    }
+  }, [bureauReportUpload.firstUpload.bureauName]);
+  useEffect(() => {
+    if (bureauReportUpload.secondUpload.bureauName === "first_central") {
+      setReportOptions([
+        { value: "consumer_report", label: "Consumer Report" },
+        { value: "commercial_report", label: "Commercial Report" },
+      ]);
+    } else if (bureauReportUpload.secondUpload.bureauName === "crc_bureau") {
+      setReportOptions([
+        { value: "consumer_basic", label: "Consumer Basic Report" },
+        { value: "consumer_classic", label: "Consumer Classic Report" },
+        { value: "corporate_classic", label: "Corporate Classic Report" },
+      ]);
+    } else if (
+      bureauReportUpload.secondUpload.bureauName === "credit_register"
+    ) {
+      setReportOptions([
+        { value: "consumer_report", label: "Consumer Report" },
+      ]);
+    }
+  }, [bureauReportUpload.secondUpload.bureauName]);
 
   const handleBureauCheck = async (e) => {
     e.preventDefault();
@@ -563,6 +602,13 @@ const CreditCheckhtmlForm = ({
       try {
         const bvn = bureauData.bvnNo;
         const { data } = await apiClient.post(apiEndpoint, { bvn });
+
+        if (data.data.ConsumerNoHitResponse) {
+          setNoDetailsFound(true);
+          setTimeout(() => {
+            setNoDetailsFound(false);
+          }, 2000);
+        }
 
         // set  report
         if (reportType === "consumer_basic") {
@@ -620,7 +666,6 @@ const CreditCheckhtmlForm = ({
         `/updatecustomer/creditBureauSearch/${customerId}`,
         bureauData
       );
-
     } catch (error) {
       toast.error(error?.response?.data?.error || "Something Went Wrong");
     }
@@ -688,8 +733,6 @@ const CreditCheckhtmlForm = ({
         },
       }
     );
-
-  
 
     // clear form fields
     setFormState({
@@ -1001,53 +1044,74 @@ const CreditCheckhtmlForm = ({
           </div>
 
           {/* first centra render */}
-          <div className="row m-5">
-            {noReport && <h4>No First Central Report</h4>}
-            {/* generated pdf report component */}
+          {Object.keys(firstCentralCommercialReport).length > 0 ||
+            (firstCentralReport?.length > 0 && (
+              <div className="row m-5">
+                {noReport && <h4>No First Central Report</h4>}
+                {/* generated pdf report component */}
 
-            {firstCentralReport?.length > 0 && (
-              <FirstCentralPdfReport report={firstCentralReport} />
-            )}
-            {Object.keys(firstCentralCommercialReport).length > 0 && (
-              <FirstCentralCommercialPdf
-                report={firstCentralCommercialReport}
-              />
-            )}
-          </div>
+                {firstCentralReport?.length > 0 && (
+                  <FirstCentralPdfReport report={firstCentralReport} />
+                )}
+                {Object.keys(firstCentralCommercialReport).length > 0 && (
+                  <FirstCentralCommercialPdf
+                    report={firstCentralCommercialReport}
+                  />
+                )}
+              </div>
+            ))}
 
           {/* crc render report */}
-          <div className="row m-5">
-            {noCRC && <h4>No CRC Report</h4>}
-            {/* generated pdf report component */}
-            {bureauReport && (
-              <CRCBasicReportPDF
-                report={bureauReport}
-                formData={bureauData}
-                title={crcTitle}
-              />
-            )}
+          {bureauReport ||
+            (crcCooporateReport && (
+              <div className="row m-5">
+                {noCRC && <h4>No CRC Report</h4>}
+                {/* generated pdf report component */}
+                {bureauReport && (
+                  <CRCBasicReportPDF
+                    report={bureauReport}
+                    formData={bureauData}
+                    title={crcTitle}
+                  />
+                )}
 
-            {crcCooporateReport && (
-              <CRCCooporateReport
-                report={crcCooporateReport}
-                formData={bureauData}
-              />
-            )}
-          </div>
+                {crcCooporateReport && (
+                  <CRCCooporateReport
+                    report={crcCooporateReport}
+                    formData={bureauData}
+                  />
+                )}
+              </div>
+            ))}
 
           {/* credit registry report */}
-          <div className="row" style={{ width: "100%" }}>
-            {PDFContent ? (
-              <div style={{ width: "80%", height: "100vh" }}>
-                <h3>Credit Registry Report</h3>
-                <embed
-                  src={`data:application/pdf;base64,${PDFContent}`}
-                  style={{ width: "100%", height: "100%" }}
-                />
+          {PDFContent ||
+            (noDetailsFound && (
+              <div
+                className="row"
+                style={{ width: "100%", marginBottom: "5rem" }}
+              >
+                {PDFContent ? (
+                  <div style={{ width: "80%", height: "100vh" }}>
+                    <h3>Credit Registry Report</h3>
+                    <embed
+                      src={`data:application/pdf;base64,${PDFContent}`}
+                      style={{ width: "100%", height: "100%" }}
+                    />
+                  </div>
+                ) : noDetailsFound ? (
+                  <h4
+                    style={{
+                      width: "100%",
+                      display: "grid",
+                      placeContent: "center",
+                    }}
+                  >
+                    Customer Details not Found
+                  </h4>
+                ) : null}
               </div>
-            ) : null
-            }
-          </div>
+            ))}
 
           {/* attach report */}
           <div className="row">
