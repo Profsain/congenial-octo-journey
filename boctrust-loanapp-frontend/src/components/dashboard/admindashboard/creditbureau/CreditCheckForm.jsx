@@ -1045,17 +1045,8 @@ const CreditCheckhtmlForm = ({
                   style={{ width: "100%", height: "100%" }}
                 />
               </div>
-            ) : (
-              <h4
-                style={{
-                  color: "gray",
-                  paddingBottom: "3rem",
-                  textAlign: "center",
-                }}
-              >
-                ""
-              </h4>
-            )}
+            ) : null
+            }
           </div>
 
           {/* attach report */}
