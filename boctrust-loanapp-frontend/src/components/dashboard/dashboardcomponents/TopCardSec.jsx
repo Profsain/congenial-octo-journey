@@ -63,14 +63,14 @@ const TopCardSec = ({ user }) => {
       );
       setUpcomingPayments(payment?.Total);
     }
-  
+
     if (loansAccountBalance) {
       const currLoan = loansAccountBalance.find(
         (loan) => loan.LoanAccountNo == user?.activeLoan?.Number
       );
       setUserBalance({
         totalPaid: currLoan?.TotalAmountPaidTillDate || "0.00",
-        balance: currLoan.TotalOutstandingAmount|| 0,
+        balance: currLoan?.TotalOutstandingAmount || 0,
       });
     }
   }, [activeLoanRepaymentSchedule, loansAccountBalance]);

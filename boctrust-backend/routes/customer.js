@@ -13,7 +13,10 @@ const Employer = require("../models/EmployersManager");
 const {
   getLoanByCustomerId,
 } = require("../services/bankoneOperationsServices");
-const { authenticateCustomerToken, authenticateToken } = require("../middleware/auth");
+const {
+  authenticateCustomerToken,
+  authenticateToken,
+} = require("../middleware/auth");
 
 // configure dotenv
 dotenv.config();
@@ -46,7 +49,6 @@ const multipleUpload = upload.fields([
 
 // Create a new customer
 router.post("/customer", multipleUpload, async (req, res) => {
-  
   if (req.files.valididcard?.length > 0) {
     req.body.valididcard = req.files.valididcard[0].filename;
   }
@@ -150,6 +152,7 @@ router.post("/login", async (req, res) => {
         const customerLoanAccounts = await getLoanByCustomerId(
           customer.banking?.accountDetails.CustomerID
         );
+
         const activeLoanAccount = customerLoanAccounts.find(
           (account) =>
             account.RealLoanStatus === "Active" && !account.IsLoanWrittenOff
@@ -159,7 +162,7 @@ router.post("/login", async (req, res) => {
       }
 
       const refreshToken = jwt.sign(
-        { user_id: user._id, username },
+        { user_id: customer._id, username },
         process.env.REFRESH_TOKEN_KEY,
         { expiresIn: "7d" }
       );
@@ -181,8 +184,6 @@ router.post("/login", async (req, res) => {
     return res.status(500).json({ error: error.message });
   }
 });
-
-
 
 router.post("/checkValidEmail", async (req, res) => {
   try {
@@ -274,23 +275,27 @@ router.get("/customer/:customerId", authenticateToken, async (req, res) => {
 });
 
 // Update a customer by ID
-router.put("/customer/:customerId", authenticateCustomerToken, async (req, res) => {
-  try {
-    const customer = await CustomerModel.findByIdAndUpdate(
-      req.params.customerId,
-      req.body,
-      {
-        new: true,
+router.put(
+  "/customer/:customerId",
+  authenticateCustomerToken,
+  async (req, res) => {
+    try {
+      const customer = await CustomerModel.findByIdAndUpdate(
+        req.params.customerId,
+        req.body,
+        {
+          new: true,
+        }
+      );
+      if (!customer) {
+        return res.status(404).json({ error: "Customer not found" });
       }
-    );
-    if (!customer) {
-      return res.status(404).json({ error: "Customer not found" });
+      res.json(customer);
+    } catch (error) {
+      res.status(500).json({ error: "Unable to update customer" });
     }
-    res.json(customer);
-  } catch (error) {
-    res.status(500).json({ error: "Unable to update customer" });
   }
-});
+);
 
 // update customer loan status
 router.put(

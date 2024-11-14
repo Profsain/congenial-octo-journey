@@ -15,6 +15,8 @@ const usePersistUser = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate()
 
+  
+
   useEffect(() => {
     const handleRequest = async () => {
       try {
@@ -27,6 +29,7 @@ const usePersistUser = () => {
           dispatch(setUser(user));
         }
       } catch (error) {
+        console.log(error);
         await handleLogout();
         dispatch(logoutUser());
         navigate("/login");

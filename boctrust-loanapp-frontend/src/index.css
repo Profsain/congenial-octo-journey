@@ -108,9 +108,12 @@ button:disabled {
   height: 13px;
 }
 
-.ListSec tr th, .ListSec tr td {
+.ListSec tr th,
+.ListSec tr td {
   font-size: 14px;
 }
+
+
 
 @media screen and (max-width: 600px) {
   .Welcome {
@@ -269,7 +272,6 @@ button:disabled {
 
   /* dashboar section */
 
-
   .DashboardContainer {
     padding: 0 !important;
   }
@@ -332,10 +334,9 @@ button:disabled {
     flex-direction: column;
     padding: 4rem !important;
     margin-bottom: -10rem !important;
-    
   }
 
-  .loan_calculator .FieldRow{
+  .loan_calculator .FieldRow {
     padding: 0rem !important;
     margin-bottom: 0rem !important;
   }
@@ -376,7 +377,6 @@ button:disabled {
     margin-top: 6rem !important;
     /* display: none; */
     overflow-x: auto;
-    
   }
   .ChartBar .recharts-wrapper {
     width: fit-content !important;
@@ -548,7 +548,7 @@ button:disabled {
   .bSection {
     margin-top: 6rem !important;
   }
- .loan__statement .bSection {
+  .loan__statement .bSection {
     margin-top: 6rem !important;
   }
 

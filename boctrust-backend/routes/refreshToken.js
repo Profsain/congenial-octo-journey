@@ -4,6 +4,9 @@ const dotenv = require("dotenv");
 const jwt = require("jsonwebtoken");
 const Customer = require("../models/Customer");
 const User = require("../models/AdminUser");
+const {
+  getLoanByCustomerId,
+} = require("../services/bankoneOperationsServices");
 
 // configure dotenv
 dotenv.config();
@@ -18,18 +21,28 @@ router.get("/refreshToken", async (req, res) => {
 
     const payload = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_KEY);
 
-    let user = await Customer.findOne({ _id: payload.user_id }).populate(
-      "userRole"
-    );
+    let user = await Customer.findOne({ _id: payload.user_id });
 
     if (!user) {
-      user = await User.findOne({ _id: payload.user_id }).populate(
-        "userRole"
-      );
+      user = await User.findOne({ _id: payload.user_id }).populate("userRole");
     }
 
     if (!user) {
       return res.status(400).json({ error: "User with Token not found" });
+    }
+
+    // Add customer active loan to payload
+    if (user?.banking?.isAccountCreated) {
+      const customerLoanAccounts = await getLoanByCustomerId(
+        user?.banking?.accountDetails.CustomerID
+      );
+
+      const activeLoanAccount = customerLoanAccounts.find(
+        (account) =>
+          account.RealLoanStatus === "Active" && !account.IsLoanWrittenOff
+      );
+
+      user = { ...user.toJSON(), activeLoan: activeLoanAccount };
     }
 
     // Create token
@@ -40,6 +53,9 @@ router.get("/refreshToken", async (req, res) => {
         expiresIn: "2m",
       }
     );
+
+   
+
     return res.status(200).json({ success: "Request Success", token, user });
   } catch (error) {
     return res.status(500).json({ error: error.message });
