@@ -11,6 +11,7 @@ import forgotPassword from "./forgotPassword";
 import forgotPassCustomer from "./forgotPassCustomer";
 import HeadLine from "../../shared/Headline";
 import "./Login.css";
+import { IoEyeOutline, IoEyeOffOutline } from "react-icons/io5";
 
 const Login = () => {
   const dispatch = useDispatch();
@@ -125,6 +126,7 @@ const Login = () => {
   // check if user is logged in and redirect to dashboard
   const navigate = useNavigate();
   const currentUser = useSelector((state) => state.adminAuth.user);
+
   useEffect(() => {
     if (currentUser) {
       navigate("/dashboard");
@@ -149,7 +151,7 @@ const Login = () => {
             />
           </Form.Group>
 
-          <Form.Group className="mb-3 password-group">
+          <Form.Group className="mb-3 password-group ">
             <Form.Control
               type={revealPassword ? "text" : "password"}
               placeholder="Password"
@@ -157,13 +159,12 @@ const Login = () => {
               value={formData.password}
               onChange={handleChange}
             />
-            <Button
-              variant="outline-secondary"
+            <button
               onClick={() => setRevealPassword(!revealPassword)}
-              className="reveal-btn"
+              className="reveal-btn "
             >
-              {revealPassword ? "Hide" : "Show"}
-            </Button>
+              {revealPassword ? <IoEyeOffOutline size={18} /> : <IoEyeOutline size={18} />}
+            </button>
           </Form.Group>
           <Form.Group className="mb-3">
             <p className="asText">Login as:</p>
