@@ -1,8 +1,7 @@
 import { useState, useEffect } from "react";
-// formik and yup for form handling and validation
+import axios from "axios"; // Ensure axios is imported
 import { Formik } from "formik";
 import * as Yup from "yup";
-// animation library
 import AOS from "aos";
 import "aos/dist/aos.css";
 import Button from "react-bootstrap/Button";
@@ -17,15 +16,36 @@ import LoanFirstStep from "../loanform/LoanFirstStep";
 
 const LoanHome = () => {
   const [isOpened, setIsOpened] = useState(false);
-  const [startObject, setStartObject] = useState();
+  const [startObject, setStartObject] = useState({});
+  const [minLoanAmount, setMinLoanAmount] = useState("");
+  const [minLoanAmountMessage, setMinLoanAmountMessage] = useState("");
+
+  const apiUrl = import.meta.env.VITE_BASE_URL;
 
   useEffect(() => {
-    AOS.init({
-      duration: 2000,
-    });
+    AOS.init({ duration: 2000 });
+
+    const fetchMinLoanAmount = async () => {
+      try {
+        const response = await axios.get(`${apiUrl}/api/settings/settings`);
+        if (response.data?.settings?.minimumLoanAmount) {
+          setMinLoanAmount(Number(response.data.settings.minimumLoanAmount));
+          setMinLoanAmountMessage(
+            `Minimum Loan Amount: ${Number(
+              response.data.settings.minimumLoanAmount
+            ).toLocaleString()}`
+          );
+        }
+      } catch (error) {
+        console.error("Error fetching Minimum Loan Amount:", error);
+        setMinLoanAmountMessage("Unable to fetch minimum loan amount.");
+      }
+    };
+
+    fetchMinLoanAmount();
   }, []);
 
-  // handle email apply button
+  // Handle Email Apply Button
   const handleApplyBtn = () => {
     setIsOpened(true);
     setStartObject({});
@@ -58,11 +78,24 @@ const LoanHome = () => {
                   careertype: "",
                 }}
                 validationSchema={Yup.object({
-                  loanamount: Yup.string().required("Required"),
+                  loanamount: Yup.string()
+                    .required("Required")
+                    .test(
+                      "is-valid-number",
+                      "Loan amount must be a valid number",
+                      (value) => !isNaN(Number(value?.replace(/,/g, ""))) // Remove commas and check if it's a valid number
+                    )
+                    .test(
+                      "min-loan-amount",
+                      `Loan amount must be at least ${Number(minLoanAmount).toLocaleString()}`,
+                      (value) => {
+                        const numericValue = Number(value?.replace(/,/g, ""));
+                        return numericValue >= minLoanAmount;
+                      }
+                    ),
                   careertype: Yup.string().required("Required"),
                 })}
                 onSubmit={(values, { setSubmitting }) => {
-                  // send value to next page
                   setStartObject(values);
                   setSubmitting(false);
                   setIsOpened(true);
@@ -75,35 +108,31 @@ const LoanHome = () => {
                       spacer="0"
                       text="How much do you need?"
                     />
-                    <img src="/images/naira.png" alt="" className="NairaIcon" />
-                    {/* <input
-                      className="Field"
-                      id="loanamount"
-                      type="text"
-                      value={Number(formik.values.loanamount).toLocaleString()}
-                      {...formik.getFieldProps("loanamount")}
-                    /> */}
+                    <p>{minLoanAmountMessage}</p>
                     <input
                       className="Field"
                       id="loanamount"
                       type="text"
-                      value={formik.values.loanamount} // Keep the raw numeric value in state
+                      value={
+                        formik.values.loanamount
+                          ? `₦${Number(formik.values.loanamount).toLocaleString()}`
+                          : ""
+                      } // Add ₦ and format the number for display
                       onChange={(e) => {
-                        // Handle the change event and update the state with the raw numeric value
-                        const rawValue = e.target.value.replace(/,/g, ""); // Remove commas if present
-                        formik.setFieldValue("loanamount", rawValue);
+                        const rawValue = e.target.value.replace(/₦|,/g, ""); // Remove ₦ and commas
+                        if (!isNaN(rawValue) && rawValue !== "") {
+                          formik.setFieldValue("loanamount", rawValue); // Store only numeric value
+                        } else if (rawValue === "") {
+                          formik.setFieldValue("loanamount", ""); // Allow clearing the field
+                        }
                       }}
                       onBlur={(e) => {
-                        // Format the value with toLocaleString when the input loses focus
-                        const rawValue = e.target.value.replace(/,/g, ""); // Remove commas if present
-                        // formik.values.loanamount = Number(rawValue).toLocaleString();
-                        formik.setFieldValue(
-                          "loanamount",
-                          Number(rawValue).toLocaleString()
-                        );
+                        const rawValue = e.target.value.replace(/₦|,/g, ""); // Remove ₦ and commas
+                        if (!isNaN(rawValue) && rawValue !== "") {
+                          formik.setFieldValue("loanamount", rawValue); // Ensure raw value is stored
+                        }
                       }}
                     />
-
                     {formik.touched.loanamount && formik.errors.loanamount ? (
                       <p className="ErrorMsg">{formik.errors.loanamount}</p>
                     ) : null}
@@ -128,11 +157,18 @@ const LoanHome = () => {
                     {formik.touched.careertype && formik.errors.careertype ? (
                       <p className="ErrorMsg">{formik.errors.careertype}</p>
                     ) : null}
+
                     <Button
                       className="ActionBtn"
                       variant="primary"
                       size="lg"
                       type="submit"
+                      disabled={
+                        !formik.values.loanamount || // Loan amount is missing
+                        Number(formik.values.loanamount.replace(/,/g, "")) < minLoanAmount || // Loan amount is below minimum
+                        !formik.values.careertype || // Profession is missing
+                        formik.values.careertype === "default" // Default option is selected
+                      }
                     >
                       Apply Now
                     </Button>
@@ -142,22 +178,22 @@ const LoanHome = () => {
             </div>
           </div>
 
-          {/* loan step section */}
+          {/* Loan Step Section */}
           <div data-aos="fade-up">
             <LoanStep />
           </div>
 
-          {/* Boctrust about section */}
+          {/* BocTrust About Section */}
           <div data-aos="fade-up">
             <BocTrustMsg />
           </div>
 
-          {/* testimonial section */}
+          {/* Testimonial Section */}
           <div data-aos="fade-up">
             <Testimonial />
           </div>
 
-          {/* Email list section */}
+          {/* Email List Section */}
           <div data-aos="fade-up">
             <EmailSection handleBtn={handleApplyBtn} />
           </div>
