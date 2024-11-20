@@ -15,7 +15,8 @@ const settingsSchema = new mongoose.Schema({
     smtpName: String,
     smtpPort: Number,
     smtpUsername: String,
-    smtpPassword: String
+    smtpPassword: String,
+    minimumLoanAmount: Number
 }, { timestamps: true });
 
 const Settings = mongoose.model('Settings', settingsSchema);

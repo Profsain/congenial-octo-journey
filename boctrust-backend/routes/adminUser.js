@@ -5,11 +5,13 @@ const nodemailer = require("nodemailer");
 const multer = require("multer");
 const User = require("../models/AdminUser");
 const express = require("express");
-const { authenticateStaffToken } = require("../middleware/auth");
+const { authenticateStaffToken, verifyAdminInactivity } = require("../middleware/auth");
 const errorHandlerMiddleware = require("../utils/errorHandler");
 const router = express.Router();
 // const adminUserVerification = require('../middleware/AuthMiddleware');
 
+const ADMIN_REFRESH_TIMEOUT = 5 * 60 * 1000; // 5 minutes in milliseconds
+const DEFAULT_REFRESH_TIMEOUT = 7 * 24 * 60 * 60 * 1000; // 7 days in milliseconds
 const password = process.env.EMAIL_PASSWORD;
 
 // Set up Multer storage to define where to save the uploaded images
@@ -225,46 +227,41 @@ router.post("/verify", (req, res) => {
 // Login user using username and password
 router.post("/login", async (req, res) => {
   try {
-    // get user input
     const { username, password } = req.body;
 
-    // validate user input
     if (!(username && password)) {
       return res.status(400).json({ error: "All input is required" });
     }
 
-    // find user by username
     const user = await User.findOne({ username }).populate("userRole");
 
-    // validate if user exist in our database and create token
     if (user && (await bcrypt.compare(password, user.password))) {
-      // Create token
       const token = jwt.sign(
         { user_id: user._id, username },
         process.env.TOKEN_KEY,
-        {
-          expiresIn: "2m",
-        }
+        { expiresIn: "2m" }
       );
 
-      // save user token
       user.token = token;
 
+      const isAdmin = user.userRole && user.userRole.roleName === "admin";
+      const refreshExpiry = isAdmin
+        ? ADMIN_REFRESH_TIMEOUT
+        : DEFAULT_REFRESH_TIMEOUT;
+
       const refreshToken = jwt.sign(
-        { user_id: user._id, username },
+        { user_id: user._id, username, isAdmin },
         process.env.REFRESH_TOKEN_KEY,
-        { expiresIn: "7d" }
+        { expiresIn: refreshExpiry / 1000 } // Convert ms to seconds
       );
 
-      // Create secure cookie with refresh token
       res.cookie("jwt", refreshToken, {
-        httpOnly: true, //accessible only by web server
-        secure: false, //https
-        sameSite: "lax", //cross-site cookie
-        maxAge: 7 * 24 * 60 * 60 * 1000, //cookie expiry: set to match rT
+        httpOnly: true,
+        secure: false,
+        sameSite: "lax",
+        maxAge: refreshExpiry,
       });
 
-      // user
       return res.status(200).json({ success: "Login successful", user });
     }
 
@@ -272,7 +269,11 @@ router.post("/login", async (req, res) => {
   } catch (error) {
     return res.status(500).json({ error: error.message });
   }
-}); // login logic ends here
+});// login logic ends here
+
+router.get("/admin-only", verifyAdminInactivity, (req, res) => {
+  res.json({ message: "Admin access granted" });
+});
 
 // forget password logic
 router.post("/forgot-password", async (req, res) => {
