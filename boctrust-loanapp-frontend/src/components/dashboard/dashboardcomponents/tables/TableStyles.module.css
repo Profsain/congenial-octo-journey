@@ -1,0 +1,23 @@
+.table__wrapper {
+  padding: 0.5rem;
+  background-color: #f5f6f7;
+  border-radius: 1rem;
+}
+
+.table__wrapper .row {
+  background-color: white;
+  margin-bottom: 0.5rem;
+  border-bottom: 0.5rem solid #f5f6f7;
+}
+
+.table__wrapper .gold_btn {
+  height: 2rem;
+  width: 5rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.repayment__seperator {
+  border-bottom: 2px solid gray;
+  height: 1px;
+}

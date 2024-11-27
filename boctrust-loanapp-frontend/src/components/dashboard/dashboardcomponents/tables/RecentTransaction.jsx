@@ -3,16 +3,16 @@ import BocButton from "../../shared/BocButton";
 import DashboardHeadline from "../../shared/DashboardHeadline";
 import Table from "react-bootstrap/Table";
 import { useDispatch, useSelector } from "react-redux";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { fetchUserTransactions } from "../../../../redux/reducers/transactionReducer";
 import PageLoader from "../../shared/PageLoader";
 import { nigerianCurrencyFormat } from "../../../../../utilities/formatToNiaraCurrency";
+import TableStyles from "./TableStyles.module.css";
+import { format } from "date-fns";
+import TransactionModal from "../account/TransactionModal";
 
 const RecentTransaction = ({ user }) => {
   const styles = {
-    table: {
-      marginLeft: "2rem",
-    },
     th: {
       color: "#145098",
       fontWeight: "bold",
@@ -22,6 +22,8 @@ const RecentTransaction = ({ user }) => {
       color: "#5cc51c",
     },
   };
+
+  const [selectedTransaction, setSelectedTransaction] = useState(null);
 
   const { userTransactions, status } = useSelector(
     (state) => state.transactionReducer
@@ -35,7 +37,9 @@ const RecentTransaction = ({ user }) => {
 
       try {
         await dispatch(
-          fetchUserTransactions(user.banking?.accountDetails?.AccountNumber)
+          fetchUserTransactions({
+            accountNumber: user.banking?.accountDetails?.AccountNumber,
+          })
         );
       } catch (error) {
         console.log(error);
@@ -46,7 +50,7 @@ const RecentTransaction = ({ user }) => {
   }, [user]);
 
   return (
-    <div>
+    <div className={TableStyles.table__wrapper}>
       <DashboardHeadline>Recent Transaction</DashboardHeadline>
       <Table
         borderless
@@ -69,13 +73,13 @@ const RecentTransaction = ({ user }) => {
 
         <tbody>
           {!userTransactions || status === "loading" ? (
-            <tr>
-              <td colSpan="5">
+            <tr className={TableStyles.row}>
+              <td colSpan="7">
                 <PageLoader width="70px" />
               </td>
             </tr>
           ) : userTransactions.length === 0 ? (
-            <tr>
+            <tr className={TableStyles.row}>
               <td colSpan="7" style={{ textAlign: "center" }}>
                 No recent transactions
               </td>
@@ -84,17 +88,25 @@ const RecentTransaction = ({ user }) => {
             userTransactions &&
             userTransactions.slice(0, 5).map((transaction, index) => {
               return (
-                <tr key={index}>
-                  <td>{transaction?.CurrentDate}</td>
+                <tr key={index} className={TableStyles.row}>
+                  <td>
+                    {transaction?.CurrentDate
+                      ? format(
+                          transaction?.CurrentDate,
+                          "dd/LL/yyyy, hh:mm aaa"
+                        )
+                      : ""}
+                  </td>
                   <td>{transaction?.AccountNumber || "NIL"}</td>
                   <td>
                     {nigerianCurrencyFormat.format(transaction?.Amount / 100)}
                   </td>
                   <td>{transaction?.RecordType}</td>
-                  <td> - </td>
+                  <td>{transaction?.PostingType} </td>
                   <td style={styles.completed}>{transaction?.status}</td>
                   <td>
                     <BocButton
+                      func={() => setSelectedTransaction(transaction)}
                       cursor="pointer"
                       bgcolor="#145098"
                       bradius="18px"
@@ -108,6 +120,13 @@ const RecentTransaction = ({ user }) => {
           )}
         </tbody>
       </Table>
+
+      {selectedTransaction ? (
+        <TransactionModal
+          selectedTransaction={selectedTransaction}
+          handleClose={() => setSelectedTransaction(null)}
+        />
+      ) : null}
     </div>
   );
 };

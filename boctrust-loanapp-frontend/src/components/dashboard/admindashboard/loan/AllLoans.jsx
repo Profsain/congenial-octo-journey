@@ -16,7 +16,7 @@ import { loanStatusEnum } from "../../../../lib/userRelated";
 import { fetchLoans } from "../../../../redux/reducers/loanReducer";
 import DisplayLoanProductName from "../../shared/DisplayLoanProductName";
 
-const AllLoans = ({ showCount, searchTerms }) => {
+const AllLoans = ({ showCount, currentPage, setCurrentPage, searchTerms }) => {
   const styles = {
     table: {
       //   margin: "0 2rem 0 3rem",
@@ -53,13 +53,6 @@ const AllLoans = ({ showCount, searchTerms }) => {
     getData();
   }, [dispatch, show]);
 
-  // update loansList to show 10 allLoans on page load
-  // or on count changes
-  useEffect(() => {
-    if (allLoans) {
-      setLoansList(allLoans?.slice(0, showCount));
-    }
-  }, [allLoans, showCount]);
 
   // handle close loan details
   const handleClose = () => {
@@ -80,12 +73,27 @@ const AllLoans = ({ showCount, searchTerms }) => {
       return;
     }
     const currSearch = searchList(allLoans, searchTerms, "agreefullname");
-    setLoansList(currSearch?.slice(0, showCount));
+    setLoansList(currSearch);
   };
 
   useEffect(() => {
     handleSearch();
   }, [searchTerms]);
+
+  const handleGoNext = () => {
+    if (currentPage < loansList?.length - 1) {
+      setCurrentPage((prev) => prev + 1);
+    }
+  };
+
+  const handleGoPrev = () => {
+    if (currentPage > 0) {
+      setCurrentPage((prev) => prev - 1);
+    }
+  };
+
+  console.log(allLoans)
+  console.log(loansList)
 
   return (
     <div className="loans__tableContainer">
@@ -109,17 +117,20 @@ const AllLoans = ({ showCount, searchTerms }) => {
               <th>Action</th>
             </tr>
           </thead>
-          {status === "loading" ? (
-            <tr>
-              <td colSpan="9">
-                <PageLoader />
-              </td>
-            </tr>
-          ) : (
-            <tbody>
-              {loansList?.length === 0 && <NoResult name="Loan" />}
-              {loansList &&
-                sortByCreatedAt(loansList)?.map((loan) => {
+          <tbody>
+            {!loansList || status === "loading" ? (
+              <tr>
+                <td colSpan="9">
+                  <PageLoader />
+                </td>
+              </tr>
+            ) : loansList && loansList?.length === 0 ? (
+              <NoResult name="Loan" />
+            ) : (
+              loansList &&
+              sortByCreatedAt(loansList)
+                ?.slice((currentPage - 1) * showCount, currentPage * showCount)
+                ?.map((loan) => {
                   return (
                     <tr key={loan._id}>
                       <td>
@@ -127,7 +138,7 @@ const AllLoans = ({ showCount, searchTerms }) => {
                       </td>
                       <td>
                         {loan.deductions === "remita" ? (
-                         <p>Remita</p>
+                          <p>Remita</p>
                         ) : (
                           <p>Nibss</p>
                         )}
@@ -168,12 +179,12 @@ const AllLoans = ({ showCount, searchTerms }) => {
                       </td>
                     </tr>
                   );
-                })}
-            </tbody>
-          )}
+                })
+            )}
+          </tbody>
         </Table>
       </div>
-      <NextPreBtn />
+      <NextPreBtn nextFunc={handleGoNext} count={currentPage} prevFunc={handleGoPrev} />
 
       {/* show loan details model */}
       {show && (

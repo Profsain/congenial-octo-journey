@@ -19,6 +19,7 @@ const EmployerLetterRuleSchema = mongoose.Schema(
       type: String,
       trim: true,
     },
+    logicalRelationship: { type: String, enum: ["AND", "OR"], default: "AND" },
   },
   { timestamps: true }
 );

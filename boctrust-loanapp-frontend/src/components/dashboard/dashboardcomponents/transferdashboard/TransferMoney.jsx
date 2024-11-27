@@ -1,11 +1,11 @@
-import TransferBoctrust from "./TransferBoctrust";
+// import TransferBoctrust from "./TransferBoctrust";
 import TransferOtherBank from "./TransferOtherBank";
 
 const TransferMoney = () => {
   return (
     <div>
       <TransferOtherBank />
-      <TransferBoctrust />
+      {/* <TransferBoctrust /> */}
     </div>
   );
 };

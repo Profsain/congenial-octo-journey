@@ -3,6 +3,16 @@ import * as Yup from "yup";
 import DashboardHeadline from "../../shared/DashboardHeadline";
 import "../transferdashboard/Transfer.css";
 import BocButton from "../../shared/BocButton";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchCustomerAccounts } from "../../../../redux/reducers/accountReducer";
+import { useEffect } from "react";
+import PageLoader from "../../shared/PageLoader";
+import { handleCopy } from "../../../../../utilities/handleCopy";
+import { toast } from "react-toastify";
+import { handleExportToExcel } from "../../../../../utilities/handleExportToExcel";
+import { handleExportToPDF } from "../../../../../utilities/handleExportToPDF";
+import { handlePrint } from "../../../../../utilities/handlePrint";
+import { fetchUserTransactions } from "../../../../redux/reducers/transactionReducer";
 
 // Define validation schema using Yup
 const validationSchema = Yup.object().shape({
@@ -11,19 +21,13 @@ const validationSchema = Yup.object().shape({
   accountNumber: Yup.string().required("Account number is required"),
 });
 
-const debitAccountOptions = [
-  { value: "account1", label: "0249584744" },
-  { value: "account2", label: "9854092312" },
-  // Add more options as needed
-];
-
 const initialValues = {
   startDate: "",
   endDate: "",
   accountNumber: "",
 };
 
-const TransactionReportTop = () => {
+const TransactionReportTop = ({ isLoading, setLoading, printRef }) => {
   const styles = {
     container: {
       display: "flex",
@@ -35,9 +39,49 @@ const TransactionReportTop = () => {
       width: "300px",
     },
   };
-  const handleSubmit = (values) => {
-    // Handle form submission logic here
-    console.log(values);
+
+  const { userTransactions } = useSelector((state) => state.transactionReducer);
+
+  const user = useSelector((state) => state.adminAuth.user);
+  const { customerAccounts } = useSelector((state) => state.accountReducer);
+
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    const getData = async () => {
+      if (!user?.banking?.accountDetails?.CustomerID) return;
+      try {
+        await dispatch(
+          fetchCustomerAccounts(user?.banking?.accountDetails?.CustomerID)
+        );
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    getData();
+  }, [user]);
+
+  const handleSubmit = async (values) => {
+    if (!user) return;
+    try {
+      setLoading(true);
+
+      await dispatch(
+        fetchUserTransactions({
+          accountNumber: values.accountNumber,
+          fromDate: values.startDate,
+          toDate: values.endDate,
+        })
+      );
+
+    
+    } catch (error) {
+      toast.error(error?.response?.data?.error);
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -59,7 +103,11 @@ const TransactionReportTop = () => {
                   className="Input"
                   style={styles.input}
                 />
-                <ErrorMessage name="startDate" component="div" />
+                <ErrorMessage
+                  className="error__msg"
+                  name="startDate"
+                  component="div"
+                />
               </div>
               <div className="FieldGroup">
                 <label htmlFor="createAccount">End Date</label>
@@ -69,7 +117,11 @@ const TransactionReportTop = () => {
                   className="Input"
                   style={styles.input}
                 />
-                <ErrorMessage name="endDate" component="div" />
+                <ErrorMessage
+                  className="error__msg"
+                  name="endDate"
+                  component="div"
+                />
               </div>
               <div className="FieldGroup">
                 <label htmlFor="debitAccount">Account Number</label>
@@ -80,15 +132,22 @@ const TransactionReportTop = () => {
                   style={styles.input}
                 >
                   <option value="" label="Select one" />
-                  {debitAccountOptions.map((option) => (
-                    <option
-                      key={option.value}
-                      value={option.value}
-                      label={option.label}
-                    />
-                  ))}
+                  {customerAccounts &&
+                    customerAccounts
+                      .filter((acc) => acc.accountType != "Loan")
+                      .map((option) => (
+                        <option
+                          key={option.NUBAN}
+                          value={option.NUBAN}
+                          label={option.NUBAN}
+                        />
+                      ))}
                 </Field>
-                <ErrorMessage name="accountNumber" component="div" />
+                <ErrorMessage
+                  className="error__msg"
+                  name="accountNumber"
+                  component="div"
+                />
               </div>
             </div>
             <div className="BtnContainer">
@@ -98,8 +157,12 @@ const TransactionReportTop = () => {
                 width="220px"
                 bgcolor="#ecaa00"
                 bradius="25px"
+                disable={isLoading}
               >
                 FILTER
+                {isLoading ? (
+                  <PageLoader width="20px" strokeColor="#145088" />
+                ) : null}
               </BocButton>
             </div>
           </Form>
@@ -107,6 +170,13 @@ const TransactionReportTop = () => {
       </div>
       <div style={styles.container}>
         <BocButton
+          func={() => {
+            if (userTransactions) {
+              handleCopy(JSON.stringify(userTransactions), () => {
+                toast.success("Items Copied to Clipboard");
+              });
+            }
+          }}
           bgcolor="#636363"
           bradius="22px"
           width="90px"
@@ -115,6 +185,11 @@ const TransactionReportTop = () => {
           Copy
         </BocButton>
         <BocButton
+          func={() => {
+            if (userTransactions) {
+              handleExportToExcel(userTransactions, "Transaction_Report");
+            }
+          }}
           bgcolor="#636363"
           bradius="22px"
           width="90px"
@@ -123,6 +198,14 @@ const TransactionReportTop = () => {
           Excel
         </BocButton>
         <BocButton
+          func={() => {
+            if (userTransactions) {
+              handleExportToPDF({
+                filename: "Transaction_Report_PDF",
+                tableId: "transactionReportTable",
+              });
+            }
+          }}
           bgcolor="#636363"
           bradius="22px"
           width="90px"
@@ -131,6 +214,11 @@ const TransactionReportTop = () => {
           PDF
         </BocButton>
         <BocButton
+          func={() => {
+            if (userTransactions) {
+              handlePrint("Transaction Report Print", printRef);
+            }
+          }}
           bgcolor="#636363"
           bradius="22px"
           width="90px"

@@ -8,12 +8,13 @@ import PageLoader from "../../../shared/PageLoader";
 // Define validation schema using Yup
 const validationSchema = Yup.object().shape({
   ruleTitle: Yup.string().required("Rule title is required"),
-  maximumTenure: Yup.string().required("Maximum tenure is required"),
-  maximumAmount: Yup.string().required("Maximum amount is required"),
+  maximumTenure: Yup.string().required("Tenure threshold is required"),
+  maximumAmount: Yup.string().required("Amount threshold is required"),
+  logicalRelationship: Yup.string(),
 });
 
 // Define options for select inputs
- const tenures = [
+const tenures = [
   { value: "3 months", label: "3 Months" },
   { value: "6 months", label: "6 Months" },
   { value: "12 months", label: "12 Months" },
@@ -58,11 +59,27 @@ const StatementRuleForm = ({
                     className="error__msg"
                   />
                 </div>
+
+                <div className="FieldGroup">
+                  <label htmlFor="logicalRelationship">
+                    Logical Relationship
+                  </label>
+                  <Field
+                    as="select"
+                    name="logicalRelationship"
+                    id="logicalRelationship"
+                    className="Select"
+                  >
+                    {["AND", "OR"].map((option) => (
+                      <option key={option} value={option} label={option} />
+                    ))}
+                  </Field>
+                </div>
               </div>
 
               <div className="FieldRow">
                 <div className="FieldGroup">
-                  <label htmlFor="maximumTenure">Maximum Tenure</label>
+                  <label htmlFor="maximumTenure">Tenure Threshold</label>
                   <Field
                     as="select"
                     name="maximumTenure"

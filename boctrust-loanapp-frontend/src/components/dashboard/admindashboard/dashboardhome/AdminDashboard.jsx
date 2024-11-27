@@ -27,7 +27,6 @@ import CheckSalaryHistory from "../remita/CheckSalaryHistory";
 import CollectionNotifications from "../remita/CollectionNotifications";
 import MandateHistory from "../remita/MandateHistory";
 import StopCollection from "../remita/StopCollection";
-import RepaymentDashboard from "../repayment/RepaymentDashboard";
 import AccountStatement from "../report/accountstatement/AccountStatement";
 import AccountBalance from "../report/accountbalance/AccountBalance";
 import LoanReport from "../report/loanreport/LoanReport";
@@ -66,7 +65,7 @@ import ProductPageEditor from "../website/ProductPageEditor";
 import BoardOfDirectorEditor from "../website/BoardOfDirectorEditor";
 import BookLoans from "../loan/BookLoans";
 import CompletedLoans from "../loan/CompletedLoans";
-import OverdueLoans from "../loan/CompletedLoans";
+import OverdueLoans from "../loan/OverdueLoans";
 import { Route, Routes } from "react-router-dom";
 import AdminLayout from "../../../../layouts/AdminLayout";
 import CreateNewAdmin from "../usersmanager/CreateNewAdmin";
@@ -149,9 +148,7 @@ const AdminDashboard = () => {
       case "transfer":
         setCurrentTitle("Transfer Money");
         break;
-      case "repayment":
-        setCurrentTitle("Repayments");
-        break;
+
       case "accounts":
         setCurrentTitle("Accounts");
         break;
@@ -475,7 +472,7 @@ const AdminDashboard = () => {
           {/* <Route path="balanceenquiry" element={<BalanceEnquiry />} /> */}
           <Route path="loanstatement" element={<LoanStatement />} />
         </Route>
-        <Route path="repayment" element={<RepaymentDashboard />} />
+       
         <Route path="accounts">
           <Route index element={<AccountDashboard />} />
           <Route path="types" element={<AccountTypes />} />

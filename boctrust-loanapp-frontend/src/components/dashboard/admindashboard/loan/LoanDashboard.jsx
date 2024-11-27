@@ -1,4 +1,4 @@
-import { useState} from "react"; 
+import { useState } from "react";
 import DashboardHeadline from "../../shared/DashboardHeadline";
 import "../customers/Customer.css";
 import AllLoans from "./AllLoans";
@@ -7,8 +7,7 @@ const LoanDashboard = () => {
   // handle search
   const [showCount, setShowCount] = useState(10);
   const [searchTerms, setSearchTerms] = useState("");
-
-
+  const [currentPage, setCurrentPage] = useState(1);
 
   return (
     <div className="MainBox">
@@ -18,8 +17,8 @@ const LoanDashboard = () => {
           <div className="SearchBar">
             <div className="FormGroup">
               <label htmlFor="show">Show</label>
-              <input 
-                name="showCount" 
+              <input
+                name="showCount"
                 type="number"
                 step={10}
                 min={10}
@@ -28,8 +27,8 @@ const LoanDashboard = () => {
               />
             </div>
             <div className="FormGroup SBox">
-              <input 
-                name="search" 
+              <input
+                name="search"
                 placeholder="Search by name"
                 onChange={(e) => setSearchTerms(e.target.value)}
               />
@@ -41,7 +40,12 @@ const LoanDashboard = () => {
       <div>
         <div className="ListSec">
           {/* Loans list  */}
-          <AllLoans showCount={ showCount} searchTerms={searchTerms} />
+          <AllLoans
+            showCount={showCount}
+            currentPage={currentPage}
+            setCurrentPage={setCurrentPage}
+            searchTerms={searchTerms}
+          />
         </div>
       </div>
     </div>

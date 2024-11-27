@@ -92,7 +92,7 @@ const SideNavMain = ({ onMenuItemClick }) => {
           }
         >
           <img src="/images/dmda.png" alt="branches" />
-          <p  id="branches" >Branches</p>
+          <p id="branches">Branches</p>
         </NavLink>
       </div>
 
@@ -255,29 +255,6 @@ const SideNavMain = ({ onMenuItemClick }) => {
             </ul>
           </div>
         ) : null}
-      </div>
-
-      {/* repayment menu */}
-      <div
-        className={`link__wrap  ${
-          checkSectionActive("repayment") ? "section__active" : ""
-        }`}
-        onClick={(e) => {
-          onMenuItemClick(e);
-          setActiveSection("repayment");
-        }}
-      >
-        <NavLink
-          to="/dashboard/repayment"
-          id="repayment"
-         
-          className={({ isActive }) =>
-            `IconBox ${isActive ? "link_active " : ""}`
-          }
-        >
-          <img id="repayment" src="/images/dtransfer.png" alt="repayment" />
-          <p id="repayment">Repayments</p>
-        </NavLink>
       </div>
 
       {/* account menu */}
@@ -521,7 +498,6 @@ const SideNavMain = ({ onMenuItemClick }) => {
           <NavLink
             to="/dashboard/creditbureau"
             id="creditbureau"
-            
             className={({ isActive }) =>
               `IconBox ${isActive ? "link_active " : ""}`
             }

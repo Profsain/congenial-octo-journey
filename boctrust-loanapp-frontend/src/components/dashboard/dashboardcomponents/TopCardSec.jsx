@@ -58,14 +58,15 @@ const TopCardSec = ({ user }) => {
 
   useEffect(() => {
     if (activeLoanRepaymentSchedule) {
-      const payment = activeLoanRepaymentSchedule.find(
+      const payment = activeLoanRepaymentSchedule?.find(
         (item) => calcDaysDiffFromNow(item.PaymentDueDate) <= 0
       );
       setUpcomingPayments(payment?.Total);
     }
 
-    if (loansAccountBalance) {
-      const currLoan = loansAccountBalance.find(
+    if (loansAccountBalance && typeof loansAccountBalance != "string") {
+     
+      const currLoan = loansAccountBalance?.find(
         (loan) => loan.LoanAccountNo == user?.activeLoan?.Number
       );
       setUserBalance({

@@ -17,10 +17,7 @@ import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useDispatch, useSelector } from "react-redux";
 
-import {
-  fetchAllCustomer,
-  fetchSingleCustomer,
-} from "../../../../redux/reducers/customerReducer";
+import { fetchAllCustomer } from "../../../../redux/reducers/customerReducer";
 import axios from "axios";
 import ReportTypeSelect from "./atoms/ReportTypeSelect";
 import CreditBureauSelect from "./atoms/CreditBureauSelect";
@@ -28,6 +25,7 @@ import ReportReasonSelect from "./atoms/ReportReasonSelect";
 import CheckFileUploadsNotice from "./molecules/CheckFileUploadsNotice";
 import { customerApprovalEnum } from "../../../../lib/userRelated";
 import apiClient from "../../../../lib/axios";
+import { fetchSingleCreditAnalysis } from "../../../../redux/reducers/creditAnalysisReducer";
 
 const creditBureauOptions = [
   { value: "first_central", label: "First Central" },
@@ -60,7 +58,7 @@ const bureauFileReportInit = {
 
 const CreditCheckhtmlForm = ({
   setShowCreditCheckForm,
-  customerId,
+  recordId,
   initFormStep,
 }) => {
   const [reportOptions, setReportOptions] = useState([
@@ -127,12 +125,14 @@ const CreditCheckhtmlForm = ({
 
   const dispatch = useDispatch();
 
-  const { selectedCustomer } = useSelector((state) => state.customerReducer);
+  const { selectedCreditAnalysis } = useSelector(
+    (state) => state.creditAnalysis
+  );
 
   useEffect(() => {
     const getData = async () => {
       try {
-        await dispatch(fetchSingleCustomer(customerId));
+        await dispatch(fetchSingleCreditAnalysis(recordId));
       } catch (error) {
         console.log(error);
       }
@@ -142,58 +142,53 @@ const CreditCheckhtmlForm = ({
   }, []);
 
   useEffect(() => {
-    if (selectedCustomer) {
+    if (selectedCreditAnalysis) {
       setReportConfirmation({
         isApplicantCivilianPolice:
-          selectedCustomer?.creditCheck?.paySlipAnalysis
-            ?.isApplicantCivilianPolice || false,
+          selectedCreditAnalysis?.paySlipAnalysis?.isApplicantCivilianPolice ||
+          false,
         isPaySlipContainsMoreThenFiveLenders:
-          selectedCustomer?.creditCheck?.paySlipAnalysis
+          selectedCreditAnalysis?.paySlipAnalysis
             ?.isPaySlipContainsMoreThenFiveLenders || false,
         monthlyDeductionBelowPercentageBenchmark:
-          selectedCustomer?.creditCheck?.paySlipAnalysis
+          selectedCreditAnalysis?.paySlipAnalysis
             ?.monthlyDeductionBelowPercentageBenchmark || false,
         netPayNotLessThanBenchmark:
-          selectedCustomer?.creditCheck?.paySlipAnalysis
-            ?.netPayNotLessThanBenchmark || false,
+          selectedCreditAnalysis?.paySlipAnalysis?.netPayNotLessThanBenchmark ||
+          false,
         takeHomePayNotLessThan20PercentGross:
-          selectedCustomer?.creditCheck?.paySlipAnalysis
+          selectedCreditAnalysis?.paySlipAnalysis
             ?.takeHomePayNotLessThan20PercentGross || false,
         takeHomePayNotLessThanBenchmark:
-          selectedCustomer?.creditCheck?.paySlipAnalysis
+          selectedCreditAnalysis?.paySlipAnalysis
             ?.takeHomePayNotLessThanBenchmark || false,
       });
 
       setFormState({
-        netPay: selectedCustomer?.creditCheck?.paySlipAnalysis?.netPay || "",
+        netPay: selectedCreditAnalysis?.paySlipAnalysis?.netPay || "",
         numOfExtraLenders:
-          selectedCustomer?.creditCheck?.paySlipAnalysis?.numOfExtraLenders ||
-          0,
+          selectedCreditAnalysis?.paySlipAnalysis?.numOfExtraLenders || 0,
         extraLenders:
-          selectedCustomer?.creditCheck?.paySlipAnalysis?.extraLenders || [],
+          selectedCreditAnalysis?.paySlipAnalysis?.extraLenders || [],
         monthlyLoanRepayment:
-          selectedCustomer?.creditCheck?.paySlipAnalysis
-            ?.monthlyLoanRepayment || 0,
-        dateOfBirth:
-          selectedCustomer?.creditCheck?.paySlipAnalysis?.dateOfBirth || "",
+          selectedCreditAnalysis?.paySlipAnalysis?.monthlyLoanRepayment || 0,
+        dateOfBirth: selectedCreditAnalysis?.paySlipAnalysis?.dateOfBirth || "",
         dateOfAppointment:
-          selectedCustomer?.creditCheck?.paySlipAnalysis?.dateOfAppointment ||
-          "",
+          selectedCreditAnalysis?.paySlipAnalysis?.dateOfAppointment || "",
         uploadPaySlip:
-          selectedCustomer?.creditCheck?.paySlipAnalysis?.uploadPaySlip || "",
-        benchmark:
-          selectedCustomer?.creditCheck?.paySlipAnalysis?.benchmark || 0,
+          selectedCreditAnalysis?.paySlipAnalysis?.uploadPaySlip || "",
+        benchmark: selectedCreditAnalysis?.paySlipAnalysis?.benchmark || 0,
       });
 
       setDbSearchReport(
-        selectedCustomer?.creditCheck?.creditDbSearch?.dbSearchReport || ""
+        selectedCreditAnalysis?.creditDbSearch?.dbSearchReport || ""
       );
       setDeductSearchReport(
-        selectedCustomer?.creditCheck?.deductCheck?.deductSearchReport || ""
+        selectedCreditAnalysis?.deductCheck?.deductSearchReport || ""
       );
 
-      if (selectedCustomer?.creditCheck?.creditBureauSearch?.length > 0) {
-        const bureauSearch = selectedCustomer?.creditCheck?.creditBureauSearch;
+      if (selectedCreditAnalysis?.creditBureauSearch?.length > 0) {
+        const bureauSearch = selectedCreditAnalysis?.creditBureauSearch;
         setBureauReportUpload({
           firstUpload: {
             bureauSearchReport: bureauSearch[0]?.bureauSearchReport || "",
@@ -210,7 +205,7 @@ const CreditCheckhtmlForm = ({
         });
       }
     }
-  }, [selectedCustomer]);
+  }, [selectedCreditAnalysis]);
 
   const handleChange = () => {
     setIsCreditDbCheck(!isCreditDbCheck);
@@ -234,7 +229,7 @@ const CreditCheckhtmlForm = ({
     if (isCreditDbCheck) {
       formData.append("dbSearchReport", dbSearchReport);
       await apiClient.put(
-        `/updatecustomer/creditDbSearch/${customerId}`,
+        `/credit-analysis/creditDbSearch/${recordId}`,
         formData,
         {
           headers: {
@@ -250,7 +245,7 @@ const CreditCheckhtmlForm = ({
     if (isDeductCheck) {
       formData.append("deductSearchReport", deductSearchReport);
       await apiClient.put(
-        `/updatecustomer/deductcheck/${customerId}`,
+        `/credit-analysis/deductcheck/${recordId}`,
         formData,
         {
           headers: {
@@ -273,7 +268,7 @@ const CreditCheckhtmlForm = ({
       });
 
       await apiClient.put(
-        `/updatecustomer/creditBureauSearch/${customerId}/fileupload`,
+        `/credit-analysis/creditBureauSearch/${recordId}/fileupload`,
         formData,
         {
           headers: {
@@ -294,7 +289,7 @@ const CreditCheckhtmlForm = ({
       });
 
       await apiClient.put(
-        `/updatecustomer/creditBureauSearch/${customerId}/fileupload`,
+        `/credit-analysis/creditBureauSearch/${recordId}/fileupload`,
         formData,
         {
           headers: {
@@ -365,7 +360,7 @@ const CreditCheckhtmlForm = ({
 
       // send update to backend
       await apiClient.put(
-        `/updatecustomer/creditDbSearch/${customerId}`,
+        `/credit-analysis/creditDbSearch/${recordId}`,
         searchReport
       );
 
@@ -403,7 +398,7 @@ const CreditCheckhtmlForm = ({
 
       // send update to backend
       await apiClient.put(
-        `/updatecustomer/deductcheck/${customerId}`,
+        `/credit-analysis/deductcheck/${recordId}`,
         searchReport
       );
 
@@ -663,7 +658,7 @@ const CreditCheckhtmlForm = ({
 
     try {
       await apiClient.put(
-        `/updatecustomer/creditBureauSearch/${customerId}`,
+        `/credit-analysis/creditBureauSearch/${recordId}`,
         bureauData
       );
     } catch (error) {
@@ -675,10 +670,10 @@ const CreditCheckhtmlForm = ({
   const uploadPaySlipAnalysis = async () => {
     setIsUpdateLoading(true);
 
-    if (!selectedCustomer) return;
+    if (!selectedCreditAnalysis) return;
 
-    const actualNetPay = selectedCustomer?.buyoverloanactivated
-      ? selectedCustomer?.liquidationbalance + formState.netPay
+    const actualNetPay = selectedCreditAnalysis?.buyoverloanactivated
+      ? selectedCreditAnalysis?.liquidationbalance + formState.netPay
       : formState.netPay;
 
     const formData = new FormData(); // create a new FormData object
@@ -723,13 +718,15 @@ const CreditCheckhtmlForm = ({
       reportConfirmation.netPayNotLessThanBenchmark
     );
 
+    console.log(formState, "formState");
+
     // send formData object to backend
     await apiClient.put(
-      `/updatecustomer/paySlipAnalysis/${customerId}`,
+      `/credit-analysis/paySlipAnalysis/${recordId}`,
       formData,
       {
         headers: {
-          "Content-Type": "multipart/form-data",
+        'Content-Type': 'multipart/form-data'
         },
       }
     );
@@ -817,8 +814,10 @@ const CreditCheckhtmlForm = ({
     <>
       {formStep === 1 && (
         <div className="TransContainer RBox">
-          {selectedCustomer && (
-            <CheckFileUploadsNotice selectedCustomer={selectedCustomer} />
+          {selectedCreditAnalysis && (
+            <CheckFileUploadsNotice
+              selectedCreditAnalysis={selectedCreditAnalysis}
+            />
           )}
           {/* step 1 */}
           <div className="row">
@@ -1320,7 +1319,7 @@ const CreditCheckhtmlForm = ({
       {/* pay slip analysis component */}
       {formStep === 2 && (
         <PaySlipAnalysis
-          customerId={customerId}
+          recordId={recordId}
           formState={formState}
           setFormState={setFormState}
           reportConfirmation={reportConfirmation}
@@ -1328,17 +1327,17 @@ const CreditCheckhtmlForm = ({
         />
       )}
       {/* decision summary */}{" "}
-      {formStep === 3 && <DecisionSummary customerId={customerId} />}
+      {formStep === 3 && <DecisionSummary recordId={recordId} />}
       {/* next prev button */}
       <div className="row d-flex justify-content-center">
-        {selectedCustomer?.creditCheck.decisionSummary
-          .creditOfficerApprovalStatus === customerApprovalEnum.pending && (
+        {selectedCreditAnalysis?.decisionSummary.creditOfficerApprovalStatus ===
+          customerApprovalEnum.pending && (
           <button className="btn btn-warning btn-prev" onClick={handlePrev}>
             Prev
           </button>
         )}
-        {selectedCustomer?.creditCheck.decisionSummary
-          .creditOfficerApprovalStatus === customerApprovalEnum.pending ? (
+        {selectedCreditAnalysis?.decisionSummary.creditOfficerApprovalStatus ===
+        customerApprovalEnum.pending ? (
           <button className="btn btn-primary btn-next" onClick={handleNext}>
             {isUpdateLoading ? <PageLoader width="16px" /> : "Next"}
           </button>
@@ -1360,7 +1359,7 @@ const CreditCheckhtmlForm = ({
 };
 
 CreditCheckhtmlForm.propTypes = {
-  customerId: PropTypes.string,
+  recordId: PropTypes.string,
   setShowCreditCheckForm: PropTypes.func,
   initFormStep: PropTypes.number,
 };
