@@ -69,6 +69,7 @@ import OverdueLoans from "../loan/OverdueLoans";
 import { Route, Routes } from "react-router-dom";
 import AdminLayout from "../../../../layouts/AdminLayout";
 import CreateNewAdmin from "../usersmanager/CreateNewAdmin";
+import RepaymentDashboard from "../repayment/RepaymentDashboard";
 
 const AdminDashboard = () => {
   const [showSidebar, setShowSidebar] = useState(false);
@@ -144,7 +145,9 @@ const AdminDashboard = () => {
       case "loanstatement":
         setCurrentTitle("Loan Statement");
         break;
-
+      case "repayment":
+        setCurrentTitle("Loan Repayment");
+        break;
       case "transfer":
         setCurrentTitle("Transfer Money");
         break;
@@ -155,9 +158,7 @@ const AdminDashboard = () => {
       case "accounttypes":
         setCurrentTitle("Account Types");
         break;
-      // case "withdraw":
-      //   setCurrentTitle("Disbursement");
-      //   break;
+
       case "transaction":
         setCurrentTitle("Transaction History");
         break;
@@ -472,7 +473,7 @@ const AdminDashboard = () => {
           {/* <Route path="balanceenquiry" element={<BalanceEnquiry />} /> */}
           <Route path="loanstatement" element={<LoanStatement />} />
         </Route>
-       
+
         <Route path="accounts">
           <Route index element={<AccountDashboard />} />
           <Route path="types" element={<AccountTypes />} />
@@ -494,6 +495,7 @@ const AdminDashboard = () => {
           <Route path="mandatehistory" element={<MandateHistory />} />
           <Route path="stopcollections" element={<StopCollection />} />
         </Route>
+        <Route path="repayments" element={<RepaymentDashboard />} />
         <Route path="creditbureau" element={<CreditBureauDashboard />} />
         <Route path="mdas">
           <Route index element={<MdasEmployers />} />

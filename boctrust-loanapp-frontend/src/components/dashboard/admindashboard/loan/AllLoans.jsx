@@ -53,7 +53,6 @@ const AllLoans = ({ showCount, currentPage, setCurrentPage, searchTerms }) => {
     getData();
   }, [dispatch, show]);
 
-
   // handle close loan details
   const handleClose = () => {
     setLoanObj({});
@@ -81,19 +80,16 @@ const AllLoans = ({ showCount, currentPage, setCurrentPage, searchTerms }) => {
   }, [searchTerms]);
 
   const handleGoNext = () => {
-    if (currentPage < loansList?.length - 1) {
+    if (currentPage < Math.ceil((loansList?.length - 1) / showCount)) {
       setCurrentPage((prev) => prev + 1);
     }
   };
 
   const handleGoPrev = () => {
-    if (currentPage > 0) {
+    if (currentPage > 1) {
       setCurrentPage((prev) => prev - 1);
     }
   };
-
-  console.log(allLoans)
-  console.log(loansList)
 
   return (
     <div className="loans__tableContainer">
@@ -184,7 +180,12 @@ const AllLoans = ({ showCount, currentPage, setCurrentPage, searchTerms }) => {
           </tbody>
         </Table>
       </div>
-      <NextPreBtn nextFunc={handleGoNext} count={currentPage} prevFunc={handleGoPrev} />
+      <NextPreBtn
+        nextFunc={handleGoNext}
+        numberOfPages={Math.ceil((loansList?.length - 1) / showCount)}
+        count={currentPage}
+        prevFunc={handleGoPrev}
+      />
 
       {/* show loan details model */}
       {show && (

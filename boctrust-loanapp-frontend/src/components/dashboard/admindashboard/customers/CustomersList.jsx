@@ -6,14 +6,18 @@ import PageLoader from "../../shared/PageLoader";
 import Table from "react-bootstrap/Table";
 import "../../Dashboard.css";
 import DashboardHeadline from "../../shared/DashboardHeadline";
-import BocButton from "../../shared/BocButton";
-import LoanDetails from "../loan/LoanDetails";
 import NoResult from "../../../shared/NoResult";
 import capitalizeEachWord from "../../../../../utilities/capitalizeFirstLetter";
 import searchList from "../../../../../utilities/searchListFunc";
 import sortByCreatedAt from "../../shared/sortedByDate";
+import NextPreBtn from "../../shared/NextPreBtn";
 
-const CustomersList = ({ showCount, searchTerms }) => {
+const CustomersList = ({
+  showCount,
+  currentPage,
+  setCurrentPage,
+  searchTerms,
+}) => {
   const styles = {
     table: {
       // margin: "0 2rem 0 3rem",
@@ -47,21 +51,6 @@ const CustomersList = ({ showCount, searchTerms }) => {
     dispatch(fetchAllCustomer());
   }, [dispatch]);
 
-  const [show, setShow] = useState(false);
-  const [loanObj, setLoanObj] = useState({});
-  // handle close loan details
-  const handleClose = () => {
-    setLoanObj({});
-    setShow(false);
-  };
-
-  // handle show loan details
-  const handleShow = (id) => {
-    const loan = customers.find((customer) => customer._id === id);
-    setLoanObj(loan);
-    setShow(true);
-  };
-
   // search customer list
   const [customerList, setCustomerList] = useState([]);
   // check customers not empty and update customerList
@@ -72,19 +61,31 @@ const CustomersList = ({ showCount, searchTerms }) => {
       const filteredCustomer = customers?.filter(
         (customer) => customer?.kyc.isKycApproved === true
       );
-      setCustomerList(filteredCustomer?.slice(0, showCount));
+      setCustomerList(filteredCustomer);
     }
   }, [customers, showCount]);
 
   // update customerList on search
   const handleSearch = () => {
     const currSearch = searchList(customers, searchTerms, `firstname`);
-    setCustomerList(currSearch?.slice(0, showCount));
+    setCustomerList(currSearch);
   };
 
   useEffect(() => {
     handleSearch();
   }, [searchTerms]);
+
+  const handleGoNext = () => {
+    if (currentPage < Math.ceil((customerList?.length - 1) / showCount)) {
+      setCurrentPage((prev) => prev + 1);
+    }
+  };
+
+  const handleGoPrev = () => {
+    if (currentPage > 1) {
+      setCurrentPage((prev) => prev - 1);
+    }
+  };
 
   return (
     <>
@@ -111,36 +112,37 @@ const CustomersList = ({ showCount, searchTerms }) => {
             </thead>
             <tbody>
               {customerList?.length === 0 && (
-                <tr >
+                <tr>
                   <td colSpan="8">
-                  <NoResult name="customer" />
-
+                    <NoResult name="customer" />
                   </td>
                 </tr>
               )}
-              {sortByCreatedAt(customerList)?.map((customer) => (
-                <tr key={customer._id}>
-                  <td>
-                    <img
-                      className="CustomerImg"
-                      src={
-                        customer.photocaptureImg.includes("undefined")
-                          ? "/images/avater.jpg"
-                          : customer.photocaptureImg
-                      }
-                      alt={customer.firstname}
-                    />
-                  </td>
-                  <td>
-                    {/* {customer?.banking.accountDetails.Message.AccountNumber || "-"} */}
-                    {customer?.banking?.accountDetails?.AccountNumber || "-"}
-                  </td>
-                  <td>{customer.firstname}</td>
-                  <td>{customer.lastname}</td>
-                  <td>{customer.email}</td>
-                  <td>{customer.username}</td>
-                  <td>{capitalizeEachWord(customer.branch)}</td>
-                  {/* <td>
+              {sortByCreatedAt(customerList)
+                ?.slice((currentPage - 1) * showCount, currentPage * showCount)
+                ?.map((customer) => (
+                  <tr key={customer._id}>
+                    <td>
+                      <img
+                        className="CustomerImg"
+                        src={
+                          customer.photocaptureImg.includes("undefined")
+                            ? "/images/avater.jpg"
+                            : customer.photocaptureImg
+                        }
+                        alt={customer.firstname}
+                      />
+                    </td>
+                    <td>
+                      {/* {customer?.banking.accountDetails.Message.AccountNumber || "-"} */}
+                      {customer?.banking?.accountDetails?.AccountNumber || "-"}
+                    </td>
+                    <td>{customer.firstname}</td>
+                    <td>{customer.lastname}</td>
+                    <td>{customer.email}</td>
+                    <td>{customer.username}</td>
+                    <td>{capitalizeEachWord(customer.branch)}</td>
+                    {/* <td>
                     <BocButton
                       func={() => handleShow(customer._id)}
                       bgcolor="#ecaa00"
@@ -149,15 +151,23 @@ const CustomersList = ({ showCount, searchTerms }) => {
                       View
                     </BocButton>
                   </td> */}
-                </tr>
-              ))}
+                  </tr>
+                ))}
             </tbody>
           </Table>
         </div>
       </div>
 
+      {/* next and previous button  */}
+      <NextPreBtn
+        nextFunc={handleGoNext}
+        count={currentPage}
+        numberOfPages={Math.ceil((customerList?.length - 1) / showCount)}
+        prevFunc={handleGoPrev}
+      />
+
       {/* show loan details model  */}
-     {/* {show && (
+      {/* {show && (
         <LoanDetails show={show} handleClose={handleClose} loanObj={loanObj} />
       )} */}
     </>

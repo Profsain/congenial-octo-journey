@@ -54,6 +54,9 @@ const CreditBureauDashboard = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [searchTodayEntries, setSearchTodayEntries] = useState(false);
 
+  const [showCount, _] = useState(10);
+  const [currentPage, setCurrentPage] = useState(1);
+
   const [customerInfo, setCustomerInfo] = useState(null);
   const [loanInfo, setLoanInfo] = useState(null);
   // current login superAdmin user
@@ -188,6 +191,18 @@ const CreditBureauDashboard = () => {
     setShowError(false);
   };
 
+  const handleGoNext = () => {
+    if (currentPage < Math.ceil((searchCreditAnalysis?.length - 1) / showCount)) {
+      setCurrentPage((prev) => prev + 1);
+    }
+  };
+
+  const handleGoPrev = () => {
+    if (currentPage > 1) {
+      setCurrentPage((prev) => prev - 1);
+    }
+  };
+
   return (
     <>
       {!showCreditCheckForm && !customerInfo ? (
@@ -252,162 +267,178 @@ const CreditBureauDashboard = () => {
                   ) : (
                     searchCreditAnalysis &&
                     status != "loading" &&
-                    searchCreditAnalysis?.map((record) => (
-                      <tr key={record._id}>
-                        <td>{record?.customer.customerId}</td>
-                        <td>
-                          {record.customer.firstname} {record.customer.lastname}
-                        </td>
-                        {record.customer.employer?.employersName ? (
+                    searchCreditAnalysis
+                      ?.slice(
+                        (currentPage - 1) * showCount,
+                        currentPage * showCount
+                      )
+                      ?.map((record) => (
+                        <tr key={record._id}>
+                          <td>{record?.customer.customerId}</td>
                           <td>
-                            <div
-                              style={{
-                                width: "120px",
-                              }}
-                            >
-                              {record.customer.employer?.employersName}
-                            </div>{" "}
+                            {record.customer.firstname}{" "}
+                            {record.customer.lastname}
                           </td>
-                        ) : (
-                          <td>N/A</td>
-                        )}
-
-                        <td>N{record.loan?.loanamount}</td>
-                        <td
-                          className="cursor-pointer text-primary underline text-underline"
-                          onClick={() => {
-                            setCustomerInfo(record.customer);
-                            setLoanInfo(record.loan);
-                          }}
-                        >
-                          Full Details
-                        </td>
-                        {record.assignment.isCreditAnalystAssigned ? (
-                          <td style={styles.yes}>
-                            Yes ({record?.assignment?.creditAnalyst?.fullName})
-                          </td>
-                        ) : (
-                          <td style={styles.completed}>No</td>
-                        )}
-
-                        {record?.decisionSummary
-                          ?.creditOfficerApprovalStatus ===
-                        customerApprovalEnum.pending ? (
-                          <td>
-                            <div>
-                              <BocButton
-                                bradius="12px"
-                                fontSize="14px"
-                                width="80px"
-                                margin="0 4px"
-                                bgcolor="#FFBF00"
-                                func={() => {
-                                  if (
-                                    record?.assignment.creditAnalyst
-                                      ?.fullName === admin.fullName
-                                  ) {
-                                    setSelectedRecord(record);
-                                    setShowCreditCheckForm(true);
-                                  } else {
-                                    handleStartCheck(record);
-                                  }
+                          {record.customer.employer?.employersName ? (
+                            <td>
+                              <div
+                                style={{
+                                  width: "120px",
                                 }}
                               >
-                                {record?.assignment.creditAnalyst?.fullName ==
-                                admin.fullName
-                                  ? "Continue..."
-                                  : "Start"}
-                              </BocButton>
-                            </div>
+                                {record.customer.employer?.employersName}
+                              </div>{" "}
+                            </td>
+                          ) : (
+                            <td>N/A</td>
+                          )}
+
+                          <td>N{record.loan?.loanamount}</td>
+                          <td
+                            className="cursor-pointer text-primary underline text-underline"
+                            onClick={() => {
+                              setCustomerInfo(record.customer);
+                              setLoanInfo(record.loan);
+                            }}
+                          >
+                            Full Details
                           </td>
-                        ) : (
-                          <td>
-                            <div>
+                          {record.assignment.isCreditAnalystAssigned ? (
+                            <td style={styles.yes}>
+                              Yes ({record?.assignment?.creditAnalyst?.fullName}
+                              )
+                            </td>
+                          ) : (
+                            <td style={styles.completed}>No</td>
+                          )}
+
+                          {record?.decisionSummary
+                            ?.creditOfficerApprovalStatus ===
+                          customerApprovalEnum.pending ? (
+                            <td>
+                              <div>
+                                <BocButton
+                                  bradius="12px"
+                                  fontSize="14px"
+                                  width="80px"
+                                  margin="0 4px"
+                                  bgcolor="#FFBF00"
+                                  func={() => {
+                                    if (
+                                      record?.assignment.creditAnalyst
+                                        ?.fullName === admin.fullName
+                                    ) {
+                                      setSelectedRecord(record);
+                                      setShowCreditCheckForm(true);
+                                    } else {
+                                      handleStartCheck(record);
+                                    }
+                                  }}
+                                >
+                                  {record?.assignment.creditAnalyst?.fullName ==
+                                  admin.fullName
+                                    ? "Continue..."
+                                    : "Start"}
+                                </BocButton>
+                              </div>
+                            </td>
+                          ) : (
+                            <td>
+                              <div>
+                                <BocButton
+                                  bradius="12px"
+                                  fontSize="14px"
+                                  width="80px"
+                                  margin="0 4px"
+                                  bgcolor="#028a0f"
+                                  func={() => {
+                                    if (
+                                      checkViewPermissions([
+                                        "credit_analyst",
+                                        "super_admin",
+                                      ])
+                                    ) {
+                                      setSelectedRecord(record);
+                                      setShowCreditCheckForm(true);
+                                    }
+                                  }}
+                                >
+                                  {
+                                    record?.decisionSummary
+                                      ?.creditOfficerApprovalStatus
+                                  }
+                                </BocButton>
+                              </div>
+                            </td>
+                          )}
+
+                          {(currentUser.userRole.can.includes(
+                            "headOfCreditApproval"
+                          ) ||
+                            currentUser.userRole.can.includes(
+                              "cooApproval"
+                            )) && (
+                            <td>
                               <BocButton
                                 bradius="12px"
                                 fontSize="14px"
                                 width="80px"
                                 margin="0 4px"
-                                bgcolor="#028a0f"
+                                bgcolor={
+                                  record?.decisionSummary
+                                    ?.headOfCreditApprovalStatus ===
+                                  customerApprovalEnum.approved
+                                    ? "#028a0f"
+                                    : "rgb(251 191 36)"
+                                }
                                 func={() => {
-                                  if (
-                                    checkViewPermissions([
-                                      "credit_analyst",
-                                      "super_admin",
-                                    ])
-                                  ) {
-                                    setSelectedRecord(record);
-                                    setShowCreditCheckForm(true);
-                                  }
+                                  setSelectedRecord(record);
+                                  setShowCreditCheckForm(true);
                                 }}
                               >
                                 {
                                   record?.decisionSummary
-                                    ?.creditOfficerApprovalStatus
+                                    ?.headOfCreditApprovalStatus
                                 }
                               </BocButton>
-                            </div>
-                          </td>
-                        )}
-
-                        {(currentUser.userRole.can.includes(
-                          "headOfCreditApproval"
-                        ) ||
-                          currentUser.userRole.can.includes("cooApproval")) && (
-                          <td>
-                            <BocButton
-                              bradius="12px"
-                              fontSize="14px"
-                              width="80px"
-                              margin="0 4px"
-                              bgcolor={
-                                record?.decisionSummary
-                                  ?.headOfCreditApprovalStatus ===
-                                customerApprovalEnum.approved
-                                  ? "#028a0f"
-                                  : "rgb(251 191 36)"
-                              }
-                              func={() => {
-                                setSelectedRecord(record);
-                                setShowCreditCheckForm(true);
-                              }}
-                            >
-                              {
-                                record?.decisionSummary
-                                  ?.headOfCreditApprovalStatus
-                              }
-                            </BocButton>
-                          </td>
-                        )}
-                        {currentUser.userRole.can.includes("cooApproval") && (
-                          <td>
-                            <BocButton
-                              bradius="12px"
-                              fontSize="14px"
-                              width="80px"
-                              margin="0 4px"
-                              bgcolor={
-                                record?.decisionSummary?.cooApprovalStatus ===
-                                customerApprovalEnum.approved
-                                  ? "#028a0f"
-                                  : "rgb(251 191 36)"
-                              }
-                              func={() => {
-                                setSelectedRecord(record);
-                                setShowCreditCheckForm(true);
-                              }}
-                            >
-                              {record?.decisionSummary?.cooApprovalStatus}
-                            </BocButton>
-                          </td>
-                        )}
-                      </tr>
-                    ))
+                            </td>
+                          )}
+                          {currentUser.userRole.can.includes("cooApproval") && (
+                            <td>
+                              <BocButton
+                                bradius="12px"
+                                fontSize="14px"
+                                width="80px"
+                                margin="0 4px"
+                                bgcolor={
+                                  record?.decisionSummary?.cooApprovalStatus ===
+                                  customerApprovalEnum.approved
+                                    ? "#028a0f"
+                                    : "rgb(251 191 36)"
+                                }
+                                func={() => {
+                                  setSelectedRecord(record);
+                                  setShowCreditCheckForm(true);
+                                }}
+                              >
+                                {record?.decisionSummary?.cooApprovalStatus}
+                              </BocButton>
+                            </td>
+                          )}
+                        </tr>
+                      ))
                   )}
                 </tbody>
               </Table>
             </div>
-            <NextPreBtn />
+            <NextPreBtn
+              numberOfPages={Math.ceil(
+                (searchCreditAnalysis?.length - 1) / showCount
+              )}
+              nextFunc={handleGoNext}
+              count={currentPage}
+              prevFunc={handleGoPrev}
+            />
           </div>
         </div>
       ) : showCreditCheckForm ? (

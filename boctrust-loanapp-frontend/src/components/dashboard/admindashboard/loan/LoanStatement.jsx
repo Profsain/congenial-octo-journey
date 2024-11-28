@@ -46,6 +46,7 @@ const LoanStatement = () => {
 
   const [showCount, setShowCount] = useState(10);
   const [searchTerms, setSearchTerms] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
 
   // handle show loan details
   // const apiUrl = import.meta.env.VITE_BASE_URL;
@@ -59,7 +60,7 @@ const LoanStatement = () => {
   // update loanList to show 10 customers on page load
   // or on count changes
   useEffect(() => {
-    setLoanList(completedLoans?.slice(0, showCount));
+    setLoanList(completedLoans);
   }, [completedLoans, showCount]);
 
   // update loanList on search
@@ -67,12 +68,24 @@ const LoanStatement = () => {
     // check filteredCustomers is not empty
     if (!completedLoans) return;
     const currSearch = searchList(completedLoans, searchTerms, "agreefullname");
-    setLoanList(currSearch?.slice(0, showCount));
+    setLoanList(currSearch);
   };
 
   useEffect(() => {
     handleSearch();
   }, [searchTerms]);
+
+  const handleGoNext = () => {
+    if (currentPage < Math.ceil((completedLoans?.length - 1) / showCount)) {
+      setCurrentPage((prev) => prev + 1);
+    }
+  };
+
+  const handleGoPrev = () => {
+    if (currentPage > 1) {
+      setCurrentPage((prev) => prev - 1);
+    }
+  };
 
   return (
     <div className="loan__statement">
@@ -138,22 +151,31 @@ const LoanStatement = () => {
                 </tr>
               ) : (
                 loanList &&
-                loanList?.map((loan) => {
-                  return (
-                    <React.Fragment key={loan._id}>
-                      <LoanStatementRecord
-                        setAccountStatement={setAccountStatement}
-                        setIsProcessing={setIsProcessing}
-                        loan={loan}
-                      />
-                    </React.Fragment>
-                  );
-                })
+                loanList
+                  ?.slice(
+                    (currentPage - 1) * showCount,
+                    currentPage * showCount
+                  )?.map((loan) => {
+                    return (
+                      <React.Fragment key={loan._id}>
+                        <LoanStatementRecord
+                          setAccountStatement={setAccountStatement}
+                          setIsProcessing={setIsProcessing}
+                          loan={loan}
+                        />
+                      </React.Fragment>
+                    );
+                  })
               )}
             </tbody>
           </Table>
         </div>
-        <NextPreBtn />
+        <NextPreBtn
+          numberOfPages={Math.ceil((loanList?.length - 1) / showCount)}
+          nextFunc={handleGoNext}
+          count={currentPage}
+          prevFunc={handleGoPrev}
+        />
 
         {/* show loan details model */}
         {accountStatement && (

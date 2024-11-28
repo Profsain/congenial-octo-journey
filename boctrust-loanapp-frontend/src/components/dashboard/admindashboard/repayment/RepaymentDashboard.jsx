@@ -4,7 +4,7 @@ import "../customers/Customer.css";
 import RepaymentList from "./RepaymentList";
 
 
-const LoanDashboard = () => {
+const RepaymentDashboard = () => {
   return (
     <div className="MainBox">
       {/* <div className="AddBtn">
@@ -36,4 +36,4 @@ const LoanDashboard = () => {
   );
 };
 
-export default LoanDashboard;
+export default RepaymentDashboard;
