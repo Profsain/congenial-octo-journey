@@ -3,7 +3,7 @@ import apiClient from "../../lib/axios";
 
 // Thunk to fetch Loans from the API
 export const fetchMyLoans = createAsyncThunk(
-  "account/fetchMyLoans",
+  "loan/fetchMyLoans",
   async (customerId) => {
     const response = await apiClient.get(`/loans/my/${customerId}`);
 
@@ -12,7 +12,7 @@ export const fetchMyLoans = createAsyncThunk(
 );
 
 // Thunk to fetch Loans from the API
-export const fetchLoans = createAsyncThunk("account/fetchLoans", async () => {
+export const fetchLoans = createAsyncThunk("loan/fetchLoans", async () => {
   const { data: allLoans } = await apiClient.get(`/loans`);
 
   const loanFullPayload = await Promise.all(
@@ -30,7 +30,7 @@ export const fetchLoans = createAsyncThunk("account/fetchLoans", async () => {
 
 // Thunk to fetch All Loans from the API
 export const fetchAllLoans = createAsyncThunk(
-  "account/fetchAllLoans",
+  "loan/fetchAllLoans",
   async () => {
     const response = await apiClient.get(`/loans/all`);
 
@@ -40,7 +40,7 @@ export const fetchAllLoans = createAsyncThunk(
 
 // Thunk to fetch Pending Loans from the API
 export const fetchPendingLoans = createAsyncThunk(
-  "account/fetchPendingLoans",
+  "loan/fetchPendingLoans",
   async () => {
     const response = await apiClient.get(`/loans/pending`);
 
@@ -50,7 +50,7 @@ export const fetchPendingLoans = createAsyncThunk(
 
 // Thunk to fetch Unbooked Loans from the API
 export const fetchUnbookedLoans = createAsyncThunk(
-  "account/fetchUnbookedLoans",
+  "loan/fetchUnbookedLoans",
   async () => {
     const response = await apiClient.get(`/loans/unbooked`);
 
@@ -58,18 +58,18 @@ export const fetchUnbookedLoans = createAsyncThunk(
   }
 );
 
-// Thunk to fetch account from the API
+// Thunk to fetch loan from the API
 export const fetchBookedLoans = createAsyncThunk(
-  "account/fetchBookedLoans",
+  "loan/fetchBookedLoans",
   async () => {
     const res = await apiClient.get(`/loans/booked`);
 
     return res.data;
   }
 );
-// Thunk to fetch account from the API
+// Thunk to fetch loan from the API
 export const fetchCompletedLoan = createAsyncThunk(
-  "account/fetchCompletedLoan",
+  "loan/fetchCompletedLoan",
   async () => {
     const res = await apiClient.get(`/loans/disbursed`);
 
@@ -77,9 +77,32 @@ export const fetchCompletedLoan = createAsyncThunk(
   }
 );
 
-// Thunk to fetch account from the API
+// Thunk to fetch overdue due from the API
+export const fetchOverdueLoans = createAsyncThunk(
+  "loan/fetchOverdueLoans",
+  async ({ searchTerm, dateFilter }) => {
+
+    let pathurl = `/loans/overdue`;
+    if (searchTerm) {
+      pathurl = pathurl + `?search=${searchTerm}`;
+      if (dateFilter) {
+        pathurl = pathurl + `&dateFilter=${dateFilter}`;
+      }
+    }
+    if (dateFilter) {
+      pathurl = pathurl + `?dateFilter=${dateFilter}`;
+    }
+
+
+    const res = await apiClient.get(pathurl);
+
+    return res.data;
+  }
+);
+
+// Thunk to fetch loan from the API
 export const fetchCustomerLoans = createAsyncThunk(
-  "account/fetchCustomerLoans",
+  "loan/fetchCustomerLoans",
   async (customerId) => {
     const response = await apiClient.get(`/bankone/getLoansById/${customerId}`);
 
@@ -87,9 +110,10 @@ export const fetchCustomerLoans = createAsyncThunk(
   }
 );
 
+
 // Thunk to get loan repayent schedule
 export const fetchLoanRepaymentSchedule = createAsyncThunk(
-  "account/fetchLoanRepaymentSchedule",
+  "loan/fetchLoanRepaymentSchedule",
   async (loanAccountNumber) => {
     const response = await apiClient.get(
       `/bankone/getLoanRepaymentSchedule/${loanAccountNumber}`
@@ -99,9 +123,20 @@ export const fetchLoanRepaymentSchedule = createAsyncThunk(
   }
 );
 
+export const fetchCustomerLoanRepaymentSchedule = createAsyncThunk(
+  "loan/fetchCustomerLoanRepaymentSchedule",
+  async (customerId) => {
+    const response = await apiClient.get(
+      `/bankone/getLoanRepaymentSchedule/all/${customerId}`
+    );
+
+    return response.data;
+  }
+);
+
 // Thunk to get loan repayent schedule
 export const fetchLoanAccountBal = createAsyncThunk(
-  "account/fetchLoanAccountBal",
+  "loan/fetchLoanAccountBal",
   async (customerId) => {
     const response = await apiClient.get(
       `/bankone/loanAccountBalance/${customerId}`
@@ -120,8 +155,10 @@ const loanSlice = createSlice({
     unbookedLoans: null,
     bookedLoans: null,
     completedLoans: null,
+    overdueLoans: null,
     selectedCustomerLoan: null,
     activeLoanRepaymentSchedule: null,
+    customerLoanRepaymentSchedule: null,
     loansAccountBalance: null,
     loanFirstInfo: null,
     status: "idle",
@@ -237,6 +274,18 @@ const loanSlice = createSlice({
         state.error = action.error.message;
       })
 
+      .addCase(fetchCustomerLoanRepaymentSchedule.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(fetchCustomerLoanRepaymentSchedule.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        state.customerLoanRepaymentSchedule = action.payload;
+      })
+      .addCase(fetchCustomerLoanRepaymentSchedule.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.error.message;
+      })
+
       .addCase(fetchLoanAccountBal.pending, (state) => {
         state.status = "loading";
       })
@@ -247,7 +296,21 @@ const loanSlice = createSlice({
       .addCase(fetchLoanAccountBal.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.error.message;
-      });
+      })
+
+      .addCase(fetchOverdueLoans.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(fetchOverdueLoans.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        state.overdueLoans = action.payload;
+      })
+      .addCase(fetchOverdueLoans.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.error.message;
+      })
+      
+      ;
   },
 });
 

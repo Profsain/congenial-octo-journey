@@ -92,7 +92,7 @@ const SideNavMain = ({ onMenuItemClick }) => {
           }
         >
           <img src="/images/dmda.png" alt="branches" />
-          <p  id="branches" >Branches</p>
+          <p id="branches">Branches</p>
         </NavLink>
       </div>
 
@@ -232,15 +232,6 @@ const SideNavMain = ({ onMenuItemClick }) => {
                   Loan Calculator
                 </NavLink>
               </li>
-              {/* <li>
-                <Link
-                  id="balanceenquiry"
-                  onClick={onMenuItemClick}
-                  to="/dashboard/loans/balanceenquiry"
-                >
-                  Balance Enquiry
-                </Link>
-              </li> */}
 
               <li>
                 <NavLink
@@ -255,29 +246,6 @@ const SideNavMain = ({ onMenuItemClick }) => {
             </ul>
           </div>
         ) : null}
-      </div>
-
-      {/* repayment menu */}
-      <div
-        className={`link__wrap  ${
-          checkSectionActive("repayment") ? "section__active" : ""
-        }`}
-        onClick={(e) => {
-          onMenuItemClick(e);
-          setActiveSection("repayment");
-        }}
-      >
-        <NavLink
-          to="/dashboard/repayment"
-          id="repayment"
-         
-          className={({ isActive }) =>
-            `IconBox ${isActive ? "link_active " : ""}`
-          }
-        >
-          <img id="repayment" src="/images/dtransfer.png" alt="repayment" />
-          <p id="repayment">Repayments</p>
-        </NavLink>
       </div>
 
       {/* account menu */}
@@ -335,27 +303,27 @@ const SideNavMain = ({ onMenuItemClick }) => {
         </p>
       </div> */}
 
-      {/* <div
+      <div
         className={`link__wrap  ${
-          checkSectionActive("transactions") ? "section__active" : ""
+          checkSectionActive("repayments") ? "section__active" : ""
         }`}
         onClick={(e) => {
           onMenuItemClick(e);
-          setActiveSection("transactions");
+          setActiveSection("repayments");
         }}
       >
         <NavLink
           id="transaction"
           
-          to="/dashboard/transactions"
+          to="/dashboard/repayments"
           className={({ isActive }) =>
             `IconBox ${isActive ? "link_active " : ""}`
           }
         >
           <img id="transaction" src="/images/daccount.png" alt="transaction" />
-          <p id="repayment">Transactions</p>
+          <p id="repayment">Repayments</p>
         </NavLink>
-      </div> */}
+      </div>
 
       {/* NIBSS Menu with sub item */}
       <div
@@ -521,7 +489,6 @@ const SideNavMain = ({ onMenuItemClick }) => {
           <NavLink
             to="/dashboard/creditbureau"
             id="creditbureau"
-            
             className={({ isActive }) =>
               `IconBox ${isActive ? "link_active " : ""}`
             }

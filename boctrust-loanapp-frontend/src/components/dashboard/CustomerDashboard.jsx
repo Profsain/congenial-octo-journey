@@ -6,7 +6,7 @@ import DashboardHome from "./dashboardcomponents/DashboardHome";
 import MyLoan from "./dashboardcomponents/myloan/MyLoan";
 import ApplyLoan from "./dashboardcomponents/myloan/ApplyLoan";
 import LoanCalculator from "./dashboardcomponents/myloan/LoanCalculator";
-import LoanPayment from "./dashboardcomponents/repayments/repayments";
+import LoanPayment from "./dashboardcomponents/repayments/LoanPayment";
 import TransferMoney from "./dashboardcomponents/transferdashboard/TransferMoney";
 import WithdrawMoney from "./dashboardcomponents/withdrawer/WithdrawMoney";
 import MyProfile from "./dashboardcomponents/myprofile/MyProfile";
@@ -146,6 +146,7 @@ const CustomerDashboard = () => {
         </Route>
         <Route path="repayment" element={<LoanPayment />} />
         <Route path="transfer" element={<TransferMoney />} />
+
         <Route path="withdraw" element={<WithdrawMoney />} />
         <Route path="transactions" element={<AccountTransaction />} />
        

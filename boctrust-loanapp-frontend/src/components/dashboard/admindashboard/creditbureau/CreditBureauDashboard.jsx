@@ -11,14 +11,12 @@ import PageLoader from "../../shared/PageLoader";
 import "../customers/Customer.css";
 import "../remita/Remita.css";
 import ViewBySection from "../remita/ViewBySection";
-import useSearch from "../../../../../utilities/useSearchName";
-import useSearchByDate from "../../../../../utilities/useSearchByDate";
 import useSearchByDateRange from "../../../../../utilities/useSearchByDateRange";
 import KycViewDetails from "../kyc/KycViewDetails";
 import { toast } from "react-toastify";
 import { customerApprovalEnum } from "../../../../lib/userRelated";
-import { fetchAllCustomersLoans } from "../../../../redux/reducers/customersLoansReducer";
 import apiClient from "../../../../lib/axios";
+import { fetchAllCreditAnalysis } from "../../../../redux/reducers/creditAnalysisReducer";
 
 const styles = {
   btnBox: {
@@ -48,23 +46,27 @@ const styles = {
 };
 
 const CreditBureauDashboard = () => {
-  const [selectedCustomer, setSelectedCustomer] = useState("");
-  const [searchCustomer, setSearchCustomer] = useState([]);
+  const [selectedRecord, setSelectedRecord] = useState("");
+  const [searchCreditAnalysis, setSearchCreditAnalysis] = useState(null);
   const [showCreditCheckForm, setShowCreditCheckForm] = useState(false);
   const [show, setShow] = useState(false);
   const [showError, setShowError] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [searchTodayEntries, setSearchTodayEntries] = useState(false);
+
+  const [showCount, _] = useState(10);
+  const [currentPage, setCurrentPage] = useState(1);
 
   const [customerInfo, setCustomerInfo] = useState(null);
+  const [loanInfo, setLoanInfo] = useState(null);
   // current login superAdmin user
   const currentUser = useSelector((state) => state.adminAuth.user);
 
   // fetch all customer
   const dispatch = useDispatch();
-  const customers = useSelector(
-    (state) => state.customersLoansReducer.customersAndLoans
+  const { creditAnalysis, status } = useSelector(
+    (state) => state.creditAnalysis
   );
-
-  const status = useSelector((state) => state.customerReducer.status);
 
   // get current login admin
   const admin = useSelector((state) => state.adminAuth.user);
@@ -76,16 +78,21 @@ const CreditBureauDashboard = () => {
 
   useEffect(() => {
     const getData = async () => {
-      await dispatch(fetchAllCustomersLoans({}));
+      await dispatch(
+        fetchAllCreditAnalysis({
+          searchTerm,
+          dateFilter: searchTodayEntries,
+        })
+      );
     };
     getData();
   }, [dispatch]);
 
-  // handle search by
-  const { searchTerm, setSearchTerm, filteredData } = useSearch(
-    customers,
-    "firstname"
-  );
+  useEffect(() => {
+    if (creditAnalysis?.length > 0) {
+      setSearchCreditAnalysis(creditAnalysis);
+    }
+  }, [creditAnalysis]);
 
   const [dateRange, setDateRange] = useState({
     fromDate: "",
@@ -93,18 +100,19 @@ const CreditBureauDashboard = () => {
   });
 
   useEffect(() => {
-    setSearchCustomer(filteredData);
-  }, [searchTerm, filteredData]);
-
-  useEffect(() => {
-    setSearchCustomer(customers);
-  }, [customers]);
-
-  // handle search by date
-  const { filteredDateData } = useSearchByDate(customers, "createdAt");
-  const searchByDate = () => {
-    setSearchCustomer(filteredDateData);
-  };
+    if (
+      searchTerm.length >= 3 ||
+      searchTerm.length == 0 ||
+      searchTodayEntries
+    ) {
+      dispatch(
+        fetchAllCreditAnalysis({
+          searchTerm,
+          dateFilter: searchTodayEntries,
+        })
+      );
+    }
+  }, [searchTerm, searchTodayEntries]);
 
   // handle list reload
   const handleReload = () => {
@@ -112,54 +120,28 @@ const CreditBureauDashboard = () => {
       fromDate: "",
       toDate: "",
     });
-    dispatch(fetchAllCustomersLoans({}));
-    setSearchCustomer(customers);
+    dispatch(fetchAllCreditAnalysis({}));
+    setSearchCreditAnalysis(creditAnalysis);
   };
 
   // handle search by date range
   const { searchData } = useSearchByDateRange(
-    customers,
+    creditAnalysis,
     dateRange,
     "createdAt"
   );
 
   useEffect(() => {
-    setSearchCustomer(searchData);
-  }, [searchData]);
-
-  // check if login admin is coo or credit analyst
-  // if coo, show all customers
-  // if credit analyst, show only customers assigned to him/her
-  const [filteredCustomersData, setFilteredCustomersData] = useState([]);
-
-  const filterCustomers = () => {
-    if (admin.role === "credit analyst") {
-      const filteredCustomers = searchCustomer?.filter((customer) => {
-        return (
-          customer.creditCheck.assignment.isCreditAnalystAssigned === false ||
-          (customer.creditCheck.assignment.creditAnalyst === adminName &&
-            customer.kyc.isKycCompleted === true)
-        );
-      });
-      setFilteredCustomersData(filteredCustomers);
-    } else {
-      const filteredCustomers = searchCustomer?.filter((customer) => {
-        return customer.kyc.isKycApproved === true;
-      });
-
-      setFilteredCustomersData(filteredCustomers);
+    if (searchData?.length > 0) {
+      setSearchCreditAnalysis(searchData);
     }
-  };
-
-  useEffect(() => {
-    filterCustomers();
-  }, [searchCustomer]);
+  }, [searchData, creditAnalysis]);
 
   // handle credit check start btn
-  const handleStartCheck = (customer) => {
-    setSelectedCustomer(customer);
+  const handleStartCheck = (record) => {
+    setSelectedRecord(record);
 
-    if (!customer.creditCheck.assignment.isCreditAnalystAssigned) {
+    if (!record.assignment.isCreditAnalystAssigned) {
       setShow(true);
     } else {
       setShowError(true);
@@ -169,8 +151,8 @@ const CreditBureauDashboard = () => {
   // handle cancel check
   const handleCancelCheck = () => {
     setShowCreditCheckForm(false);
-    setSelectedCustomer("");
-    dispatch(fetchAllCustomersLoans({}));
+    setSelectedRecord("");
+    dispatch(fetchAllCreditAnalysis({}));
   };
 
   useEffect(() => {
@@ -179,12 +161,9 @@ const CreditBureauDashboard = () => {
 
   // handle assignment and start credit check
   const assignCustomer = async () => {
-    await apiClient.put(`/updatecustomer/assignto/${selectedCustomer._id}`, {
-      creditAnalyst: adminName,
-      isCreditAnalystAssigned: true,
-    });
+    await apiClient.put(`/credit-analysis/assignto/${selectedRecord._id}`);
 
-    await dispatch(fetchAllCustomersLoans({}));
+    await dispatch(fetchAllCreditAnalysis({}));
   };
 
   const handleProceed = async () => {
@@ -212,6 +191,18 @@ const CreditBureauDashboard = () => {
     setShowError(false);
   };
 
+  const handleGoNext = () => {
+    if (currentPage < Math.ceil((searchCreditAnalysis?.length - 1) / showCount)) {
+      setCurrentPage((prev) => prev + 1);
+    }
+  };
+
+  const handleGoPrev = () => {
+    if (currentPage > 1) {
+      setCurrentPage((prev) => prev - 1);
+    }
+  };
+
   return (
     <>
       {!showCreditCheckForm && !customerInfo ? (
@@ -222,18 +213,18 @@ const CreditBureauDashboard = () => {
               setSearch={setSearchTerm}
               setDateRange={setDateRange}
               dateRange={dateRange}
-              searchDateFunc={searchByDate}
+              setSearchTodayEntries={setSearchTodayEntries}
               handleReload={handleReload}
             />
           </div>
 
           {/* table section */}
-          {status === "loading" && <PageLoader />}
+
           <div className="RBox">
             <DashboardHeadline
               fontSize="0.2rem"
               height="52px"
-              mspacer="2rem 0 -3.25rem -1rem"
+              mspacer="2rem 0 -3.25rem 0rem"
               bgcolor="#145098"
             ></DashboardHeadline>
             <div style={styles.table}>
@@ -249,7 +240,10 @@ const CreditBureauDashboard = () => {
                     <th>Analyst Check</th>
                     {(currentUser.userRole.can.includes(
                       "headOfCreditApproval"
-                    ) || currentUser.userRole.can.includes("cooApproval")) && <th>HOC Approval</th>}
+                    ) ||
+                      currentUser.userRole.can.includes("cooApproval")) && (
+                      <th>HOC Approval</th>
+                    )}
                     {currentUser.userRole.can.includes("cooApproval") && (
                       <th>COO Approval</th>
                     )}
@@ -257,164 +251,194 @@ const CreditBureauDashboard = () => {
                 </thead>
 
                 <tbody>
-                  {/* show no record if no customer is available */}
-                  {filteredCustomersData.length === 0 && (
+                  {!searchCreditAnalysis || status === "loading" ? (
+                    <tr>
+                      <td colSpan="7">
+                        <PageLoader width="100px" />
+                      </td>
+                    </tr>
+                  ) : searchCreditAnalysis &&
+                    searchCreditAnalysis.length === 0 ? (
                     <tr>
                       <td colSpan="7" style={{ textAlign: "center" }}>
                         No record available
                       </td>
                     </tr>
+                  ) : (
+                    searchCreditAnalysis &&
+                    status != "loading" &&
+                    searchCreditAnalysis
+                      ?.slice(
+                        (currentPage - 1) * showCount,
+                        currentPage * showCount
+                      )
+                      ?.map((record) => (
+                        <tr key={record._id}>
+                          <td>{record?.customer.customerId}</td>
+                          <td>
+                            {record.customer.firstname}{" "}
+                            {record.customer.lastname}
+                          </td>
+                          {record.customer.employer?.employersName ? (
+                            <td>
+                              <div
+                                style={{
+                                  width: "120px",
+                                }}
+                              >
+                                {record.customer.employer?.employersName}
+                              </div>{" "}
+                            </td>
+                          ) : (
+                            <td>N/A</td>
+                          )}
+
+                          <td>N{record.loan?.loanamount}</td>
+                          <td
+                            className="cursor-pointer text-primary underline text-underline"
+                            onClick={() => {
+                              setCustomerInfo(record.customer);
+                              setLoanInfo(record.loan);
+                            }}
+                          >
+                            Full Details
+                          </td>
+                          {record.assignment.isCreditAnalystAssigned ? (
+                            <td style={styles.yes}>
+                              Yes ({record?.assignment?.creditAnalyst?.fullName}
+                              )
+                            </td>
+                          ) : (
+                            <td style={styles.completed}>No</td>
+                          )}
+
+                          {record?.decisionSummary
+                            ?.creditOfficerApprovalStatus ===
+                          customerApprovalEnum.pending ? (
+                            <td>
+                              <div>
+                                <BocButton
+                                  bradius="12px"
+                                  fontSize="14px"
+                                  width="80px"
+                                  margin="0 4px"
+                                  bgcolor="#FFBF00"
+                                  func={() => {
+                                    if (
+                                      record?.assignment.creditAnalyst
+                                        ?.fullName === admin.fullName
+                                    ) {
+                                      setSelectedRecord(record);
+                                      setShowCreditCheckForm(true);
+                                    } else {
+                                      handleStartCheck(record);
+                                    }
+                                  }}
+                                >
+                                  {record?.assignment.creditAnalyst?.fullName ==
+                                  admin.fullName
+                                    ? "Continue..."
+                                    : "Start"}
+                                </BocButton>
+                              </div>
+                            </td>
+                          ) : (
+                            <td>
+                              <div>
+                                <BocButton
+                                  bradius="12px"
+                                  fontSize="14px"
+                                  width="80px"
+                                  margin="0 4px"
+                                  bgcolor="#028a0f"
+                                  func={() => {
+                                    if (
+                                      checkViewPermissions([
+                                        "credit_analyst",
+                                        "super_admin",
+                                      ])
+                                    ) {
+                                      setSelectedRecord(record);
+                                      setShowCreditCheckForm(true);
+                                    }
+                                  }}
+                                >
+                                  {
+                                    record?.decisionSummary
+                                      ?.creditOfficerApprovalStatus
+                                  }
+                                </BocButton>
+                              </div>
+                            </td>
+                          )}
+
+                          {(currentUser.userRole.can.includes(
+                            "headOfCreditApproval"
+                          ) ||
+                            currentUser.userRole.can.includes(
+                              "cooApproval"
+                            )) && (
+                            <td>
+                              <BocButton
+                                bradius="12px"
+                                fontSize="14px"
+                                width="80px"
+                                margin="0 4px"
+                                bgcolor={
+                                  record?.decisionSummary
+                                    ?.headOfCreditApprovalStatus ===
+                                  customerApprovalEnum.approved
+                                    ? "#028a0f"
+                                    : "rgb(251 191 36)"
+                                }
+                                func={() => {
+                                  setSelectedRecord(record);
+                                  setShowCreditCheckForm(true);
+                                }}
+                              >
+                                {
+                                  record?.decisionSummary
+                                    ?.headOfCreditApprovalStatus
+                                }
+                              </BocButton>
+                            </td>
+                          )}
+                          {currentUser.userRole.can.includes("cooApproval") && (
+                            <td>
+                              <BocButton
+                                bradius="12px"
+                                fontSize="14px"
+                                width="80px"
+                                margin="0 4px"
+                                bgcolor={
+                                  record?.decisionSummary?.cooApprovalStatus ===
+                                  customerApprovalEnum.approved
+                                    ? "#028a0f"
+                                    : "rgb(251 191 36)"
+                                }
+                                func={() => {
+                                  setSelectedRecord(record);
+                                  setShowCreditCheckForm(true);
+                                }}
+                              >
+                                {record?.decisionSummary?.cooApprovalStatus}
+                              </BocButton>
+                            </td>
+                          )}
+                        </tr>
+                      ))
                   )}
-                  {filteredCustomersData?.map((customer) => (
-                    <tr key={customer._id}>
-                      <td>{customer?.customerId}</td>
-                      <td>
-                        {customer.firstname} {customer.lastname}
-                      </td>
-                      {customer.employer?.employersName ? (
-                        <td>{customer.employer?.employersName}</td>
-                      ) : (
-                        <td>N/A</td>
-                      )}
-
-                      <td>N{customer.loan?.loanamount}</td>
-                      <td
-                        className="cursor-pointer text-primary underline text-underline"
-                        onClick={() => {
-                          setCustomerInfo(customer);
-                        }}
-                      >
-                        Full Details
-                      </td>
-                      {customer.creditCheck.assignment
-                        .isCreditAnalystAssigned ? (
-                        <td style={styles.yes}>
-                          Yes{" "}({customer?.creditCheck.assignment.creditAnalyst})
-                        </td>
-                      ) : (
-                        <td style={styles.completed}>No</td>
-                      )}
-
-                      {customer?.creditCheck?.decisionSummary
-                        ?.creditOfficerApprovalStatus ===
-                      customerApprovalEnum.pending ? (
-                        <td>
-                          <div>
-                            <BocButton
-                              bradius="12px"
-                              fontSize="14px"
-                              width="80px"
-                              margin="0 4px"
-                              bgcolor="#FFBF00"
-                              func={() => {
-                                if (
-                                  customer?.creditCheck.assignment
-                                    .creditAnalyst === admin.fullName
-                                ) {
-                                  setSelectedCustomer(customer);
-                                  setShowCreditCheckForm(true);
-                                } else {
-                                  handleStartCheck(customer);
-                                }
-                              }}
-                            >
-                              {customer?.creditCheck.assignment.creditAnalyst ==
-                              admin.fullName
-                                ? "Continue..."
-                                : "Start"}
-                            </BocButton>
-                          </div>
-                        </td>
-                      ) : (
-                        <td>
-                          <div>
-                            <BocButton
-                              bradius="12px"
-                              fontSize="14px"
-                              width="80px"
-                              margin="0 4px"
-                              bgcolor="#028a0f"
-                              func={() => {
-                                if (
-                                  checkViewPermissions([
-                                    "credit_analyst",
-                                    "super_admin",
-                                  ])
-                                ) {
-                                  setSelectedCustomer(customer);
-                                  setShowCreditCheckForm(true);
-                                }
-                              }}
-                            >
-                              {
-                                customer?.creditCheck?.decisionSummary
-                                  ?.creditOfficerApprovalStatus
-                              }
-                            </BocButton>
-                          </div>
-                        </td>
-                      )}
-
-                      {(currentUser.userRole.can.includes(
-                      "headOfCreditApproval"
-                    ) || currentUser.userRole.can.includes("cooApproval")) && (
-                        <td>
-                          <BocButton
-                            bradius="12px"
-                            fontSize="14px"
-                            width="80px"
-                            margin="0 4px"
-                            bgcolor={
-                              customer?.creditCheck?.decisionSummary
-                                ?.headOfCreditApprovalStatus ===
-                              customerApprovalEnum.approved
-                                ? "#028a0f"
-                                : "rgb(251 191 36)"
-                            }
-                            func={() => {
-                              setSelectedCustomer(customer);
-                              setShowCreditCheckForm(true);
-                            }}
-                          >
-                            {
-                              customer?.creditCheck?.decisionSummary
-                                ?.headOfCreditApprovalStatus
-                            }
-                          </BocButton>
-                        </td>
-                      )}
-                      {currentUser.userRole.can.includes("cooApproval") && (
-                        <td>
-                          <BocButton
-                            bradius="12px"
-                            fontSize="14px"
-                            width="80px"
-                            margin="0 4px"
-                            bgcolor={
-                              customer?.creditCheck?.decisionSummary
-                                ?.cooApprovalStatus ===
-                              customerApprovalEnum.approved
-                                ? "#028a0f"
-                                : "rgb(251 191 36)"
-                            }
-                            func={() => {
-                              setSelectedCustomer(customer);
-                              setShowCreditCheckForm(true);
-                            }}
-                          >
-                            {
-                              customer?.creditCheck?.decisionSummary
-                                ?.cooApprovalStatus
-                            }
-                          </BocButton>
-                        </td>
-                      )}
-                    </tr>
-                  ))}
                 </tbody>
               </Table>
             </div>
-            <NextPreBtn />
+            <NextPreBtn
+              numberOfPages={Math.ceil(
+                (searchCreditAnalysis?.length - 1) / showCount
+              )}
+              nextFunc={handleGoNext}
+              count={currentPage}
+              prevFunc={handleGoPrev}
+            />
           </div>
         </div>
       ) : showCreditCheckForm ? (
@@ -422,10 +446,10 @@ const CreditBureauDashboard = () => {
           {/* credit check form  */}
           <CreditCheckForm
             setShowCreditCheckForm={setShowCreditCheckForm}
-            customerId={selectedCustomer?._id}
+            recordId={selectedRecord?._id}
             initFormStep={
-              selectedCustomer?.creditCheck?.decisionSummary
-                ?.creditOfficerApprovalStatus === customerApprovalEnum.approved
+              selectedRecord?.decisionSummary?.creditOfficerApprovalStatus ===
+              customerApprovalEnum.approved
                 ? 3
                 : 0
             }
@@ -442,6 +466,7 @@ const CreditBureauDashboard = () => {
       ) : (
         customerInfo && (
           <KycViewDetails
+            loan={loanInfo}
             customer={customerInfo}
             setShowInfo={setCustomerInfo}
           />

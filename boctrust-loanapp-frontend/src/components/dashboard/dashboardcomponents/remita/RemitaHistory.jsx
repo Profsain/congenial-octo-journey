@@ -1,6 +1,7 @@
 import { useState } from "react";
 import BocButton from "../../shared/BocButton";
 import Table from "react-bootstrap/Table";
+import DashboardHeadline from "../../shared/DashboardHeadline";
 
 const RemitaHistory = () => {
   const styles = {
@@ -10,7 +11,7 @@ const RemitaHistory = () => {
       marginLeft: "-1.1rem",
     },
     th: {
-      color: "#145098",
+      color: "#fff",
       fontWeight: "bold",
       fontSize: "1.2rem",
     },
@@ -30,6 +31,11 @@ const RemitaHistory = () => {
         <img width="130px" src="/images/remita-logo.jpg" alt="remita-logo" />
       </div>
       <div className="TReport">
+        <DashboardHeadline
+          height="46px"
+          mspacer="2rem 0 -3.3rem 0"
+          bgcolor="#145098"
+        ></DashboardHeadline>
         <Table borderless hover responsive="sm" className="DTable">
           <thead>
             <tr style={styles.th}>

@@ -1,45 +1,82 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchProduct } from "../../../../redux/reducers/productReducer";
+import { fetchSelectedProduct } from "../../../../redux/reducers/productReducer";
 
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import DashboardHeadline from "../../shared/DashboardHeadline";
 import "../transferdashboard/Transfer.css";
 import BocButton from "../../shared/BocButton";
-import interestRate from "../../../shared/calculatorfunc";
+import interestRate, {
+  calculateSimpleInterest,
+} from "../../../shared/calculatorfunc";
 import apiClient from "../../../../lib/axios";
+import EmailTemplate from "../../../shared/EmailTemplate";
+import sendEmail from "../../../../../utilities/sendEmail";
+import { toast } from "react-toastify";
+import sendSMS from "../../../../../utilities/sendSms";
+import PageLoader from "../../shared/PageLoader";
+import { calcDaysDiffFromNow } from "../../../../../utilities/calcDaysDiff";
 
 // Define validation schema using Yup
 const validationSchema = Yup.object().shape({
-  loanProduct: Yup.string().required("Loan product is required"),
-  duration: Yup.string().required("Loan duration is required"),
-  amount: Yup.number()
+  loanproduct: Yup.string().required("Loan product is required"),
+  numberofmonth: Yup.string().required("Loan Duration is required"),
+  loanamount: Yup.number()
     .typeError("Amount must be a number")
     .required("Amount is required"),
-  note: Yup.string().required("Note is required"),
+  loanpurpose: Yup.string(),
 });
 
 const initialValues = {
-  loanProduct: "",
-  duration: "",
-  amount: "",
-  note: "",
+  loanproduct: "",
+  interestRate: "",
+  numberofmonth: "",
+  loanamount: "",
+  monthlyrepayment: "",
+  loantotalrepayment: "",
+  loanpurpose: "",
 };
 
 const ApplyLoan = () => {
   const [message, setMessage] = useState("");
+  const [choosenProduct, setChoosenProduct] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const ref = useRef();
 
   // fetch loan product
   const dispatch = useDispatch();
 
   useEffect(() => {
-    dispatch(fetchProduct());
+    dispatch(fetchSelectedProduct());
   }, [dispatch]);
 
-  const loanProducts = useSelector(
-    (state) => state?.productReducer?.products?.products
-  );
+  const calculateRepayment = () => {
+    if (
+      ref.current?.values.loanproduct &&
+      ref.current?.values.interestRate &&
+      ref.current?.values.numberofmonth &&
+      ref.current?.values.loanamount
+    ) {
+      // const loanRate = choosenProduct?.interestRate;
+
+      const { totalPayment, monthlyPayment } = calculateSimpleInterest(
+        Number(ref.current?.values.loanamount),
+        Number(ref.current?.values.interestRate),
+        Number(ref.current?.values.numberofmonth)
+      );
+
+      ref.current?.setFieldValue("monthlyrepayment", monthlyPayment);
+      ref.current?.setFieldValue("loantotalrepayment", totalPayment);
+    }
+  };
+
+  useEffect(() => {
+    calculateRepayment();
+  }, [choosenProduct]);
+
+  const loanProducts = useSelector((state) => state.productReducer.products);
 
   // get current login user
   const user = useSelector((state) => state.adminAuth.user);
@@ -53,10 +90,30 @@ const ApplyLoan = () => {
     }, 3000);
   };
 
+  // send email notification
+  const handleSendEmail = async () => {
+    try {
+      const emailTemplateHtml = ReactDOMServer.renderToString(
+        <EmailTemplate
+          firstName={customerName}
+          content="Your loan application has been received. We will get back to you shortly."
+        />
+      );
+      const options = {
+        email: user.email,
+        subject: "Loan Application Notification",
+        html: emailTemplateHtml,
+      };
+      sendEmail(options);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   // handle loan submission
   const handleSubmit = async (values, { resetForm }) => {
-    const customerId = user._id;
-
     if (!isAccountCreated) {
       updateMessage(
         "Your account is being processed. You would be contacted when it is activated"
@@ -64,122 +121,262 @@ const ApplyLoan = () => {
       return;
     }
 
-    // find selected product using id
-    const selectedProduct = loanProducts.find(
-      (product) => product._id === values.loanProduct
+    console.log(
+      calcDaysDiffFromNow(user.employmentstartdate) <
+        Number(user?.employer?.mandateRule?.mandateDuration.split(" ")[0])
     );
-    const rate = selectedProduct.interestRate;
-    const loanProductName = selectedProduct.productName;
-    const principal = parseInt(values.amount);
-    const time = parseInt(values.duration) * 30;
 
-    // calculate total repayment
-    const totalRepayment = interestRate(principal, time, rate);
+    const deductions =
+      calcDaysDiffFromNow(user.employmentstartdate) <
+        Number(user?.employer?.mandateRule?.mandateDuration.split(" ")[0]) &&
+      user?.employer?.mandateRule?.allowStacking == "yes"
+        ? "remita"
+        : calcDaysDiffFromNow(user?.employmentstartdate) >=
+            Number(
+              user?.employer?.mandateRule?.mandateDuration.split(" ")[0]
+            ) && careertype.toLowerCase() === "government employee"
+        ? "ippis"
+        : "";
 
-    // Handle form submission logic here
-    // create a new loan application object
     const loanApplication = {
-      loanId: Math.floor(Math.random() * 1000),
-      loanProduct: values.loanProduct,
-      loanProductName: loanProductName,
-      interestRate: rate,
-      duration: values.duration,
-      amount: values.amount,
-      note: values.note,
-      loanStatus: "pending",
-      isLoanApproved: false,
-      totalRepayment: totalRepayment + principal,
+      loanproduct: values.loanproduct,
+      monthlyrepayment: values.monthlyrepayment,
+      numberofmonth: values.numberofmonth,
+      loanamount: values.loanamount,
+      loanpurpose: values.loanpurpose,
+      loantotalrepayment: values.loantotalrepayment,
+      deductions: deductions,
     };
+
     // send the object to the backend
     try {
-      const { data } = await apiClient.post(
-        `/loan/${customerId}`,
-        loanApplication
+      setIsLoading(true);
+      const { data } = await apiClient.post(`/loans`, loanApplication);
+      const phone = "234" + user.phonenumber.slice(1);
+
+      handleSendEmail();
+      await sendSMS(
+        phone,
+        "Your loan application has been received. We will get back to you shortly."
       );
 
       // reset form
       resetForm();
+
       updateMessage("Loan application submitted successfully");
+      toast.success("Loan application submitted successfully");
 
       return data;
     } catch (error) {
       updateMessage("An error occurred. Please try again");
-      throw new Error(error);
+      toast.error(error?.message || "Something Went Wrong");
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
-    <div className="TransContainer SecCon">
-      <DashboardHeadline>Apply for New Loan</DashboardHeadline>
-      <Formik
-        initialValues={initialValues}
-        validationSchema={validationSchema}
-        onSubmit={handleSubmit}
-      >
-        <Form>
-          <div className="FieldRow">
-            <div className="FieldGroup" style={{ marginBottom: "18px" }}>
-              <label htmlFor="loanProduct">Loan Product</label>
-              <Field
-                as="select"
-                name="loanProduct"
-                id="loanProduct"
-                className="Select"
+    <div className="apply__forLoan">
+      <div className="TransContainer SecCon">
+        <DashboardHeadline>Apply for New Loan</DashboardHeadline>
+        <Formik
+          initialValues={initialValues}
+          validationSchema={validationSchema}
+          onSubmit={handleSubmit}
+          innerRef={ref}
+        >
+          <Form className="appForm">
+            <div className="FieldRow">
+              <div className="FieldGroup">
+                <label htmlFor="loanproduct">Loan Product</label>
+
+                <Field name="loanproduct" id="loanproduct">
+                  {({ field, form }) => (
+                    <select
+                      {...field}
+                      onChange={(event) => {
+                        field.onChange(event);
+
+                        const found = loanProducts.find(
+                          (product) => product?._id == event.target.value
+                        );
+
+                        setChoosenProduct(found);
+                      }}
+                      onBlur={(event) => {
+                        field.onBlur(event);
+
+                        if (choosenProduct) {
+                          form.setFieldValue(
+                            "interestRate",
+                            choosenProduct?.interestRate
+                          );
+                        }
+                      }}
+                      id="loanproduct"
+                      className="Select"
+                    >
+                      <option value="" label="Select a product" />
+                      {/* <option>Select Product</option> */}
+                      {loanProducts?.map((product) => (
+                        <option key={product?.productCode} value={product?._id}>
+                          {product.productTitle}
+                        </option>
+                      ))}
+                    </select>
+                  )}
+                </Field>
+
+                <ErrorMessage
+                  name="loanproduct"
+                  className="error__msg"
+                  component="div"
+                />
+              </div>
+
+              <div className="FieldGroup">
+                <label htmlFor="interestRate">Interest Rate</label>
+                <Field
+                  type="text"
+                  name="interestRate"
+                  id="interestRate"
+                  className="Input"
+                  disabled
+                />
+
+                <ErrorMessage
+                  name="interestRate"
+                  className="error__msg"
+                  component="div"
+                />
+              </div>
+            </div>
+            <div className="FieldRow">
+              <div className="FieldGroup">
+                <label htmlFor="loanamount">Loan Amount</label>
+
+                <Field name="loanamount" id="loanamount">
+                  {({ field }) => (
+                    <input
+                      {...field}
+                      type="text"
+                      name="loanamount"
+                      id="loanamount"
+                      className="Input"
+                      onBlur={(e) => {
+                        field.onBlur(e);
+                        calculateRepayment();
+                      }}
+                    />
+                  )}
+                </Field>
+
+                <ErrorMessage
+                  name="loanamount"
+                  className="error__msg"
+                  component="div"
+                />
+              </div>
+
+              <div className="FieldGroup">
+                <label htmlFor="numberofmonth">Number of months</label>
+
+                <Field name="numberofmonth" id="numberofmonth">
+                  {({ field }) => (
+                    <input
+                      {...field}
+                      type="text"
+                      name="numberofmonth"
+                      id="numberofmonth"
+                      className="Input"
+                      onBlur={(e) => {
+                        field.onBlur(e);
+                        calculateRepayment();
+                      }}
+                    />
+                  )}
+                </Field>
+
+                <ErrorMessage
+                  name="numberofmonth"
+                  className="error__msg"
+                  component="div"
+                />
+              </div>
+            </div>
+            <div className="FieldRow">
+              <div className="FieldGroup">
+                <label htmlFor="numberofmonth">Loan Purpose</label>
+
+                <Field
+                  type="text"
+                  name="loanpurpose"
+                  id="loanpurpose"
+                  className="Input"
+                />
+                <ErrorMessage
+                  name="loanpurpose"
+                  className="error__msg"
+                  component="div"
+                />
+              </div>
+            </div>
+            <div className="FieldRow autoFill">
+              <div className="FieldGroup">
+                <label htmlFor="monthlyrepayment">Monthly Repayment</label>
+                <Field
+                  type="text"
+                  name="monthlyrepayment"
+                  id="monthlyrepayment"
+                  className="Input"
+                  disabled
+                />
+                <ErrorMessage
+                  name="monthlyrepayment"
+                  className="error__msg"
+                  component="div"
+                />
+              </div>
+
+              <div className="FieldGroup">
+                <label htmlFor="loantotalrepayment">Loan Total Repayment</label>
+                <Field
+                  type="text"
+                  name="loantotalrepayment"
+                  id="loantotalrepayment"
+                  className="Input"
+                  disabled
+                />
+                <ErrorMessage
+                  name="loantotalrepayment"
+                  className="error__msg"
+                  component="div"
+                />
+              </div>
+            </div>
+
+            {message && (
+              <div style={{ color: "orange", textAlign: "center" }}>
+                {message}
+              </div>
+            )}
+            <div className="BtnContainer">
+              <BocButton
+                fontSize="1.6rem"
+                type="submit"
+                bgcolor="#ecaa00"
+                bradius="18px"
+                disable={isLoading}
               >
-                <option value="" label="Select a product" />
-                {loanProducts?.map((option) => (
-                  <option
-                    key={option._id}
-                    value={option._id}
-                    label={option.productName}
-                  />
-                ))}
-              </Field>
-              <ErrorMessage name="loanProduct" component="div" />
+                Submit Application
+                {isLoading ? (
+                  <PageLoader width="20px" strokeColor="#145088" />
+                ) : null}
+              </BocButton>
             </div>
-
-            <div className="FieldGroup">
-              <label htmlFor="duration">Duration</label>
-              <Field
-                type="text"
-                name="duration"
-                id="duration"
-                className="Input"
-              />
-              <ErrorMessage name="duration" component="div" />
-            </div>
-          </div>
-          <div className="FieldRow">
-            <div className="FieldGroup">
-              <label htmlFor="amount">Amount</label>
-              <Field type="text" name="amount" id="amount" className="Input" />
-              <ErrorMessage name="amount" component="div" />
-            </div>
-
-            <div className="FieldGroup">
-              <label htmlFor="note">Note</label>
-              <Field type="text" name="note" id="note" className="Input" />
-              <ErrorMessage name="note" component="div" />
-            </div>
-          </div>
-
-          {message && (
-            <div style={{ color: "orange", textAlign: "center" }}>
-              {message}
-            </div>
-          )}
-          <div className="BtnContainer">
-            <BocButton
-              fontSize="1.6rem"
-              type="submit"
-              bgcolor="#ecaa00"
-              bradius="18px"
-            >
-              Submit Application
-            </BocButton>
-          </div>
-        </Form>
-      </Formik>
+          </Form>
+        </Formik>
+      </div>
     </div>
   );
 };

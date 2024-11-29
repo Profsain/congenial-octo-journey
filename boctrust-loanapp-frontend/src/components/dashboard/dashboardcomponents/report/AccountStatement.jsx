@@ -3,6 +3,16 @@ import * as Yup from "yup";
 import DashboardHeadline from "../../shared/DashboardHeadline";
 import "../transferdashboard/Transfer.css";
 import BocButton from "../../shared/BocButton";
+import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchCustomerAccounts } from "../../../../redux/reducers/accountReducer";
+import { toast } from "react-toastify";
+import PageLoader from "../../shared/PageLoader";
+import apiClient from "../../../../lib/axios";
+import { handleExportToExcel } from "../../../../../utilities/handleExportToExcel";
+import { handleExportToPDF } from "../../../../../utilities/handleExportToPDF";
+import { handleCopy } from "../../../../../utilities/handleCopy";
+import { handlePrint } from "../../../../../utilities/handlePrint";
 
 // Define validation schema using Yup
 const validationSchema = Yup.object().shape({
@@ -11,19 +21,24 @@ const validationSchema = Yup.object().shape({
   accountNumber: Yup.string().required("Account number is required"),
 });
 
-const debitAccountOptions = [
-  { value: "account1", label: "0249584744" },
-  { value: "account2", label: "9854092312" },
-  // Add more options as needed
-];
+const today = new Date();
+const oneMonthAgo = new Date();
+
+oneMonthAgo.setMonth(today.getMonth() - 1);
 
 const initialValues = {
-  startDate: "",
-  endDate: "",
+  startDate: oneMonthAgo,
+  endDate: today,
   accountNumber: "",
 };
 
-const AccountStatement = () => {
+const AccountStatement = ({
+  isLoading,
+  setLoading,
+  setAccountStatement,
+  accountStatement,
+  printRef,
+}) => {
   const styles = {
     container: {
       display: "flex",
@@ -35,9 +50,41 @@ const AccountStatement = () => {
       width: "300px",
     },
   };
-  const handleSubmit = (values) => {
-    // Handle form submission logic here
-    console.log(values);
+
+  const user = useSelector((state) => state.adminAuth.user);
+  const { customerAccounts } = useSelector((state) => state.accountReducer);
+
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    const getData = async () => {
+      if (!user?.banking?.accountDetails?.CustomerID) return;
+      try {
+        await dispatch(
+          fetchCustomerAccounts(user?.banking?.accountDetails?.CustomerID)
+        );
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    getData();
+  }, [user]);
+
+  const handleSubmit = async (values) => {
+    try {
+      setLoading(true);
+
+      const { data } = await apiClient.get(
+        `/bankone/loanAccountStatement?accountNumber=${values.accountNumber}&fromDate=${values.startDate}&toDate=${values.endDate}`
+      );
+      setAccountStatement(data);
+    } catch (error) {
+      toast.error(error?.response?.data?.error);
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -59,7 +106,11 @@ const AccountStatement = () => {
                   className="Input"
                   style={styles.input}
                 />
-                <ErrorMessage name="startDate" component="div" />
+                <ErrorMessage
+                  className="error__msg"
+                  name="startDate"
+                  component="div"
+                />
               </div>
               <div className="FieldGroup">
                 <label htmlFor="createAccount">End Date</label>
@@ -69,7 +120,11 @@ const AccountStatement = () => {
                   className="Input"
                   style={styles.input}
                 />
-                <ErrorMessage name="endDate" component="div" />
+                <ErrorMessage
+                  className="error__msg"
+                  name="endDate"
+                  component="div"
+                />
               </div>
               <div className="FieldGroup">
                 <label htmlFor="debitAccount">Account Number</label>
@@ -80,15 +135,22 @@ const AccountStatement = () => {
                   style={styles.input}
                 >
                   <option value="" label="Select one" />
-                  {debitAccountOptions.map((option) => (
-                    <option
-                      key={option.value}
-                      value={option.value}
-                      label={option.label}
-                    />
-                  ))}
+                  {customerAccounts &&
+                    customerAccounts
+                      .filter((acc) => acc.accountType == "Loan")
+                      .map((option) => (
+                        <option
+                          key={option.accountNumber}
+                          value={option.accountNumber}
+                          label={option.accountNumber}
+                        />
+                      ))}
                 </Field>
-                <ErrorMessage name="accountNumber" component="div" />
+                <ErrorMessage
+                  className="error__msg"
+                  name="accountNumber"
+                  component="div"
+                />
               </div>
             </div>
             <div className="BtnContainer">
@@ -100,44 +162,72 @@ const AccountStatement = () => {
                 bradius="25px"
               >
                 FILTER
+                {isLoading ? (
+                  <PageLoader width="20px" strokeColor="#145088" />
+                ) : null}
               </BocButton>
             </div>
           </Form>
         </Formik>
-      <div style={styles.container}>
-        <BocButton
-          bgcolor="#636363"
-          bradius="22px"
-          width="90px"
-          margin="0 8px"
-        >
-          Copy
-        </BocButton>
-        <BocButton
-          bgcolor="#636363"
-          bradius="22px"
-          width="90px"
-          margin="0 8px"
-        >
-          Excel
-        </BocButton>
-        <BocButton
-          bgcolor="#636363"
-          bradius="22px"
-          width="90px"
-          margin="0 8px"
-        >
-          PDF
-        </BocButton>
-        <BocButton
-          bgcolor="#636363"
-          bradius="22px"
-          width="90px"
-          margin="0 8px"
-        >
-          Print
-        </BocButton>
-      </div>
+        <div style={styles.container}>
+          <BocButton
+            bgcolor="#636363"
+            bradius="22px"
+            width="90px"
+            margin="0 8px"
+            func={() => {
+              if (accountStatement) {
+                handleCopy(JSON.stringify(accountStatement), () => {
+                  toast.success("Items Copied to Clipboard");
+                });
+              }
+            }}
+          >
+            Copy
+          </BocButton>
+          <BocButton
+            bgcolor="#636363"
+            bradius="22px"
+            width="90px"
+            margin="0 8px"
+            func={() => {
+              if (accountStatement) {
+                handleExportToExcel(accountStatement, "Account_Statement");
+              }
+            }}
+          >
+            Excel
+          </BocButton>
+          <BocButton
+            bgcolor="#636363"
+            bradius="22px"
+            width="90px"
+            margin="0 8px"
+            func={() => {
+              if (accountStatement) {
+                handleExportToPDF({
+                  filename: "Account_Statement_PDF",
+                  tableId: "accountStatementTable",
+                });
+              }
+            }}
+          >
+            PDF
+          </BocButton>
+          <BocButton
+            bgcolor="#636363"
+            bradius="22px"
+            width="90px"
+            margin="0 8px"
+            func={() => {
+              if (accountStatement) {
+                handlePrint("Account Statement Print", printRef);
+              }
+            }}
+          >
+            Print
+          </BocButton>
+        </div>
       </div>
     </>
   );

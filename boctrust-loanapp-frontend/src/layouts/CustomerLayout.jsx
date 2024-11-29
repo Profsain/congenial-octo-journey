@@ -17,8 +17,6 @@ const CustomerLayout = ({
   
   const userName = user?.firstname + " " + user?.lastname;
 
-
-
   const handleMouseOver = () => {
     setShowSidebar(true);
   };

@@ -21,15 +21,9 @@
   gap: 2rem;
 }
 
-.transfer__container .form__btn {
+.transfer__container .gold__gradientBtn {
   height: 50px;
-  display: grid;
-  place-content: center;
-  background: #ea8209;
-  border: 0;
-  border-radius: 2rem;
-  color: white;
-  background: linear-gradient(0deg, #ea8209, #f4d2a2);
+ 
 }
 
 .transfer__container .credit_accountName {

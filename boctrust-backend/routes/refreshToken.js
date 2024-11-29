@@ -21,8 +21,23 @@ router.get("/refreshToken", async (req, res) => {
 
     const payload = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_KEY);
 
-    let user = await Customer.findOne({ _id: payload.user_id });
-
+    let user = await Customer.findOne({ _id: payload.user_id }).populate({
+      path: "employer",
+      populate: [
+        {
+          path: "mandateRule",
+          model: "MandateRule",
+        },
+        {
+          path: "statementRule",
+          model: "StatementRule",
+        },
+        {
+          path: "employerLetterRule",
+          model: "EmployerLetterRule",
+        },
+      ],
+    });
     if (!user) {
       user = await User.findOne({ _id: payload.user_id }).populate("userRole");
     }
@@ -53,8 +68,6 @@ router.get("/refreshToken", async (req, res) => {
         expiresIn: "2m",
       }
     );
-
-   
 
     return res.status(200).json({ success: "Request Success", token, user });
   } catch (error) {

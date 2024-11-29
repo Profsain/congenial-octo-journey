@@ -19,7 +19,7 @@ router.get("/", async (req, res) => {
 // Define a route to update the statementRule for an employer by ID
 router.post("/", async (req, res) => {
   try {
-    const { ruleTitle, maximumTenure, maximumAmount } = req.body;
+    const { ruleTitle, maximumTenure, maximumAmount, logicalRelationship } = req.body;
 
     // Validate required fields
     if (!ruleTitle) {
@@ -31,6 +31,7 @@ router.post("/", async (req, res) => {
       ruleTitle,
       maximumTenure,
       maximumAmount,
+      logicalRelationship,
     });
 
     // Save the updated employer

@@ -38,7 +38,7 @@ import {
   getFromLocalStorage,
   storeInLocalStorage,
 } from "../../../../utilities/localStorage";
-import { decryptText } from "../../../../utilities/encryptDecrypt";
+
 import axios from "axios";
 
 const apiUrl = import.meta.env.VITE_BASE_URL;
@@ -79,18 +79,18 @@ const LoanForm = React.memo(function LoanFormComponent() {
   const initializeApp = async () => {
     const urlSearchParams = new URLSearchParams(window.location.search);
     const code = urlSearchParams.get("code");
-    
-    // setFirstStepData(JSON.parse(sessionStorage.getItem("loanFirstInfo")));
+
+    setFirstStepData(JSON.parse(sessionStorage.getItem("loanFirstInfo")));
 
     if (code) {
-      const { bvn } = await getBvnDetails(code); // Call this function if there's an authorization code in the URL
-      const firstDataResponse = await axios.get(
-        `${import.meta.env.VITE_BASE_URL}/api/tempdata/tempdata/${bvn}`
-      );
-      setFirstStepData(firstDataResponse.data.data);
-      await axios.delete(
-        `${import.meta.env.VITE_BASE_URL}/api/tempdata/tempdata/${bvn}`
-      );
+      // const { bvn } = await getBvnDetails(code); // Call this function if there's an authorization code in the URL
+      // const firstDataResponse = await axios.get(
+      //   `${import.meta.env.VITE_BASE_URL}/api/tempdata/tempdata/${bvn}`
+      // );
+      // setFirstStepData(firstDataResponse.data.data);
+      // await axios.delete(
+      //   `${import.meta.env.VITE_BASE_URL}/api/tempdata/tempdata/${bvn}`
+      // );
     } else {
       // Optionally, handle other initialization tasks here
       console.log("No authorization code found. Proceed with the normal flow.");
@@ -152,6 +152,9 @@ const LoanForm = React.memo(function LoanFormComponent() {
 
   const [step, setStep] = useState(1);
   const [showForm, setShowForm] = useState(true);
+  const [showBankStatement, setShowBankStatement] = useState(false);
+  const [showEmploymentLetter, setShowEmploymentLetter] = useState(false);
+
   const [stepImg, setStepImg] = useState("https://i.imgur.com/DPMDjLy.png");
   const [state, setState] = useState("");
   const [lga, setLga] = useState([]);
@@ -167,24 +170,30 @@ const LoanForm = React.memo(function LoanFormComponent() {
   const [signature, setSignature] = useState("");
   const [marketerClientPic, setMarketerClientPic] = useState("");
 
-  const fileFields = [ "valididcard", "uploadbankstatement" , "signature", "marketerClientPic", "photocapture", "employmentletter", "uploadpayslip" ]
+  const fileFields = [
+    "valididcard",
+    "uploadbankstatement",
+    "signature",
+    "marketerClientPic",
+    "photocapture",
+    "employmentletter",
+    "uploadpayslip",
+  ];
 
   const updateFormValues = () => {
     const formValues = getFromLocalStorage("onbaordData");
 
     if (formValues) {
-      console.log(formValues, "formValues");
-
-      Object.entries(formValues).forEach((item, ) => {
-
+      Object.entries(formValues).forEach((item) => {
         ref.current?.setFieldValue(
           item,
 
-          fileFields.includes(item) ?
-          getFile(
-            item,
-            `${item}_for_${formValues.firstname}_${formValues.lastname}`
-          ) : formValues[item]
+          fileFields.includes(item)
+            ? getFile(
+                item,
+                `${item}_for_${formValues.firstname}_${formValues.lastname}`
+              )
+            : formValues[item]
         );
       });
     }
@@ -198,7 +207,6 @@ const LoanForm = React.memo(function LoanFormComponent() {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [step, showForm]);
-
 
   // update photocapture value when captureImg change
   useEffect(() => {
@@ -235,6 +243,50 @@ const LoanForm = React.memo(function LoanFormComponent() {
   const [employer, setEmployer] = useState({});
   const findEmployer = (id) => {
     const employer = employers.find((employer) => employer._id === id);
+
+    if (careerType?.toLowerCase() === "government employee") {
+      const statementDurationThreshold =
+        employer?.statementRule?.maximumTenure.length > 0
+          ? employer?.statementRule?.maximumTenure.split(" ")[0]
+          : employer?.statementRule?.maximumTenure;
+
+      if (employer?.statementRule?.logicalRelationship === "AND") {
+        Number(ref.current?.values?.loanamount.replace(/,/g, "")) >
+          Number(employer?.statementRule?.maximumAmount) &&
+        Number(ref.current?.values?.numberofmonth) > Number(statementDurationThreshold)
+          ? setShowBankStatement(true)
+          : setShowBankStatement(false);
+      } else if (employer?.statementRule?.logicalRelationship === "OR") {
+        Number(ref.current?.values?.loanamount.replace(/,/g, "")) >
+          Number(employer?.statementRule?.maximumAmount) ||
+        Number(ref.current?.values?.numberofmonth) > Number(statementDurationThreshold)
+          ? setShowBankStatement(true)
+          : setShowBankStatement(false);
+      }
+
+ 
+
+      // Employment Letter
+      const emplmLetterThresholdDuration =
+        employer?.employerLetterRule?.maximumTenure.length > 0
+          ? employer?.employerLetterRule?.maximumTenure.split(" ")[0]
+          : employer?.employerLetterRule?.maximumTenure;
+
+      if (employer?.employerLetterRule?.logicalRelationship === "AND") {
+        Number(ref.current?.values?.loanamount.replace(/,/g, "")) >
+          Number(employer?.employerLetterRule?.maximumAmount) &&
+        Number(ref.current?.values?.numberofmonth) > Number(emplmLetterThresholdDuration)
+          ? setShowEmploymentLetter(true)
+          : setShowEmploymentLetter(false);
+      } else if (employer?.employerLetterRule?.logicalRelationship === "OR") {
+        Number(ref.current?.values?.loanamount.replace(/,/g, "")) >
+          Number(employer?.employerLetterRule?.maximumAmount) ||
+        Number(ref.current?.values?.numberofmonth) > Number(emplmLetterThresholdDuration)
+          ? setShowEmploymentLetter(true)
+          : setShowEmploymentLetter(false);
+      }
+    }
+
     return employer;
   };
   useEffect(() => {
@@ -290,7 +342,7 @@ const LoanForm = React.memo(function LoanFormComponent() {
         const customerId = generateCustomerId();
         const formData = new FormData();
 
-        console.log(formValues.photocapture, "formValues.photocapture")
+        console.log(formValues.photocapture, "formValues.photocapture");
 
         formData.append("customerId", customerId);
         formData.append(
@@ -564,7 +616,7 @@ const LoanForm = React.memo(function LoanFormComponent() {
       setStepImg("https://i.imgur.com/SCIwWO7.png");
     }
   };
-
+  
   return (
     <div className="container-fluid FormContainer">
       <div>
@@ -838,7 +890,11 @@ const LoanForm = React.memo(function LoanFormComponent() {
                                                   convertFile(e, setIdCard)
                                                 }
                                               />
-                                              <ErrorMessage name={"valididcard"} component="div" className="Error" />
+                                              <ErrorMessage
+                                                name={"valididcard"}
+                                                component="div"
+                                                className="Error"
+                                              />
                                             </div>
                                           </div>
                                         </div>
@@ -860,7 +916,11 @@ const LoanForm = React.memo(function LoanFormComponent() {
                                               convertFile(e, setIdCard)
                                             }
                                           />
-                                           <ErrorMessage name={"valididcard"} component="div" className="Error" />
+                                          <ErrorMessage
+                                            name={"valididcard"}
+                                            component="div"
+                                            className="Error"
+                                          />
                                         </div>
                                       )}
                                       <hr className="hLine" />
@@ -1045,14 +1105,7 @@ const LoanForm = React.memo(function LoanFormComponent() {
 
                                   {/* pay slip upload private employee*/}
                                   {careerType?.toLowerCase() ===
-                                    "private employee" ||
-                                  (values?.loanamount >
-                                    employer?.statementRule?.maximumAmount &&
-                                    values?.noofmonth >
-                                      employer?.statementRule?.maximumTenure.slice(
-                                        0,
-                                        3
-                                      )) ? (
+                                  "private employee" ? (
                                     <div className="FileUploadBox ">
                                       <Headline
                                         color="#000"
@@ -1069,12 +1122,17 @@ const LoanForm = React.memo(function LoanFormComponent() {
                                           convertFile(e, setPaySlip)
                                         }
                                       />
-                                       <ErrorMessage name={"uploadpayslip"} component="div" className="Error" />
+                                      <ErrorMessage
+                                        name={"uploadpayslip"}
+                                        component="div"
+                                        className="Error"
+                                      />
                                     </div>
                                   ) : null}
+
                                   {/* Bank Statement and Employement Letter fro government Employeee*/}
                                   <div className="d-flex gap-3">
-                                    {employer?.statementRule?.ruleActive ? (
+                                    {showBankStatement ? (
                                       <div className="FileUploadBox ">
                                         <Headline
                                           color="#000"
@@ -1091,15 +1149,22 @@ const LoanForm = React.memo(function LoanFormComponent() {
                                             convertFile(e, setBankStatements)
                                           }
                                         />
-                                          <ErrorMessage name={"uploadbankstatement"} component="div" className="Error" />
+                                        <ErrorMessage
+                                          name={"uploadbankstatement"}
+                                          component="div"
+                                          className="Error"
+                                        />
                                       </div>
-                                    ) : employer?.employmentLetterRule
-                                        ?.ruleActive ? (
+                                    ) : null}
+                                  </div>
+
+                                  <div className="d-flex gap-3">
+                                    {showEmploymentLetter ? (
                                       <div className="FileUploadBox ">
                                         <Headline
                                           color="#000"
                                           fontSize="22px"
-                                          text="Upload Pay Slip"
+                                          text="Upload Employment Letter"
                                         />
                                         <input
                                           type="file"
@@ -1648,7 +1713,11 @@ const LoanForm = React.memo(function LoanFormComponent() {
                                           convertFile(e, setSignature)
                                         }
                                       />
-                                      <ErrorMessage name={"signature"} component="div" className="Error" />
+                                      <ErrorMessage
+                                        name={"signature"}
+                                        component="div"
+                                        className="Error"
+                                      />
                                     </div>
                                   </div>
 
@@ -1690,7 +1759,11 @@ const LoanForm = React.memo(function LoanFormComponent() {
                                           convertFile(e, setMarketerClientPic)
                                         }
                                       />
-                                        <ErrorMessage name={"signature"} component="div" className="Error" />
+                                      <ErrorMessage
+                                        name={"signature"}
+                                        component="div"
+                                        className="Error"
+                                      />
                                     </div>
                                   </div>
 

@@ -11,6 +11,7 @@ const initialValues = {
   ruleTitle: "",
   maximumTenure: "",
   maximumAmount: "",
+  logicalRelationship: ""
 };
 
 const EmploymentLetterRule = () => {

@@ -11,7 +11,6 @@ import PageLoader from "../../../shared/PageLoader";
 
 import apiClient from "../../../../../lib/axios";
 
-
 const TransferMoney = ({
   show,
   debitAccounts,
@@ -32,15 +31,12 @@ const TransferMoney = ({
   useEffect(() => {
     const getData = async () => {
       try {
-        const response = await apiClient.post(
-          `/bankone/accountNameEnquiry`,
-          {
-            bankCode: loanObj?.customer?.bankcode,
-            accountNumber: loanObj?.customer?.salaryaccountnumber,
-          }
-        );
+        const response = await apiClient.post(`/bankone/accountNameEnquiry`, {
+          bankCode: loanObj?.customer?.bankcode,
+          accountNumber: loanObj?.customer?.salaryaccountnumber,
+        });
 
-        console.log(response, "response")
+        console.log(response, "response");
 
         setCreditAccountName(response.data?.Name);
       } catch (error) {
@@ -75,7 +71,7 @@ const TransferMoney = ({
         ...userDetails,
         creditAccountName,
       });
-      handleClose()
+      handleClose();
     } catch (error) {
       toast.error(error.message);
     } finally {
@@ -140,7 +136,7 @@ const TransferMoney = ({
                 />
               </div>
 
-              <button disabled={isLoading} className="form__btn">
+              <button disabled={isLoading} className="gold__gradientBtn">
                 <span className="d-flex">
                   {btnText}
                   {isLoading && <PageLoader strokeColor="white" width="20px" />}

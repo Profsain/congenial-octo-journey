@@ -2,12 +2,14 @@ import { useState } from "react";
 import DashboardHeadline from "../../shared/DashboardHeadline";
 import "./Customer.css";
 import CustomersList from "./CustomersList";
-import NextPreBtn from "../../shared/NextPreBtn";
 
 const CustomersDashboard = () => {
   // handle search
   const [showCount, setShowCount] = useState(10);
   const [searchTerms, setSearchTerms] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+
+  
 
   return (
     <div className="MainBox">
@@ -40,10 +42,14 @@ const CustomersDashboard = () => {
       <div>
         {/* customers list  */}
         <div className="ListSec">
-          <CustomersList showCount={showCount} searchTerms={searchTerms}/>
+          <CustomersList
+            showCount={showCount}
+            currentPage={currentPage}
+            setCurrentPage={setCurrentPage}
+            searchTerms={searchTerms}
+          />
         </div>
-        {/* next and previous button  */}
-        <NextPreBtn />
+       
       </div>
     </div>
   );
