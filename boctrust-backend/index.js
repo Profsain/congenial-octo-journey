@@ -59,6 +59,9 @@ const termiiOTPRoute = require("./routes/termii");
 // refresh token
 const refreshTokenRoutes = require("./routes/refreshToken");
 
+// nibss direct debit 
+const directDebitRoutes = require("./routes/nddMandateOperation");
+ 
 const {
   authenticateToken,
   authenticateStaffToken,
@@ -195,6 +198,9 @@ mongoose
     app.use("/api/products-front-page", productsFrontPage);
     app.use("/api/otp", termiiOTPRoute);
     app.use("/api/sharedAuth", refreshTokenRoutes);
+
+    // nibss direct debit
+    app.use("/api/direct-debit", directDebitRoutes);
 
     app.listen(process.env.PORT || 3030, () =>
       console.log("Server running on port 3030")
