@@ -1,3 +1,4 @@
+
 .DashboardContainer {
   margin-top: 1rem;
   margin-bottom: 4rem;
@@ -231,6 +232,13 @@
   width: 30px;
   height: 30px;
   object-fit: contain;
+}
+
+#topUpCta {
+  text-align: center !important;
+  margin-top: 18px !important;
+  cursor: pointer;
+
 }
 
 @media screen and (max-width: 1024px) {

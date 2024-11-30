@@ -24,17 +24,6 @@ const CustomerDashboard = () => {
   const [currentComponent, setCurrentComponent] = useState("dashboard");
   const [currentTitle, setCurrentTitle] = useState("Dashboard");
 
-  // // check if user is empty and redirect to login page
-  // const navigate = useNavigate();
-  // useEffect(() => {
-  //   if (!user || !user.firstname) {
-  //     // Add a specific property check or adjust as per your user object structure
-  //     navigate("/login");
-  //   }
-  // }, [user, navigate]);
-
-
-
   const handleMenuItemClick = (e) => {
     const id = e.target.id;
     setCurrentComponent(id);
