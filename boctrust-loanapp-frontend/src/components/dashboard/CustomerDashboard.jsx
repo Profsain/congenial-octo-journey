@@ -74,40 +74,6 @@ const CustomerDashboard = () => {
     setShowSidebar(false);
   };
 
-  // handle component rendering
-  // const renderComponent = () => {
-  //   switch (currentComponent) {
-  //     case "dashboard":
-  //       return <DashboardHome />;
-  //     case "myloan":
-  //       return <MyLoan />;
-  //     case "applyloan":
-  //       return <ApplyLoan />;
-  //     case "loancalculator":
-  //       return <LoanCalculator />;
-  //     case "loanrepayment":
-  //       return <LoanPayment />;
-  //     case "transfer":
-  //       return <TransferMoney />;
-  //     case "withdraw":
-  //       return <WithdrawMoney />;
-  //     case "transaction":
-  //       return <AccountTransaction />;
-  //     case "remita":
-  //       return <RemitaHistory />;
-  //     case "profile":
-  //       return <MyProfile />;
-  //     case "report":
-  //       return <Report />;
-  //     case "transactionreport":
-  //       return <TransactionReport />;
-  //     case "accountbalance":
-  //       return <AccountBalance />;
-  //     default:
-  //       return null;
-  //   }
-  // };
-
   // scroll to the top of the page
   useEffect(() => {
     window.scrollTo(0, 0);

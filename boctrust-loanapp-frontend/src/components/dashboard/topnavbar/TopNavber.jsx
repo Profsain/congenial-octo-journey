@@ -1,9 +1,13 @@
 import { useState, useEffect } from "react";
+import { useSelector } from "react-redux";
 import PropTypes from "prop-types";
 import "./TopNavbar.css";
 import LoanTopUpModal from "../dashboardcomponents/LoanTopUpModal";
 
 const TopNavber = ({ title, user = "Femi Akinwade" }) => {
+  // current login user
+  const { user: currentUser } = useSelector((state) => state.adminAuth);
+
   // check is qualify for topUp. true or false
   // persist to server state
   const [showTopUpModal, setShowTopUpModal] = useState(false);
@@ -35,9 +39,13 @@ const TopNavber = ({ title, user = "Femi Akinwade" }) => {
           <h4 id="Title">{title}</h4>
         </div>
         <div className="Inline Profile">
-          <div className="Inline UserCard topup" onClick={handleOpenTopUp}>
-            <p>Request Top-up Loan</p>
-          </div>
+          {/* top up cta btn */}
+          {currentUser?.userType === "staff" ||
+          currentUser?.userType === "super_admin" ? null : (
+            <div className="Inline UserCard topup" onClick={handleOpenTopUp}>
+              <p>Request Top-up Loan</p>
+            </div>
+          )}
 
           <div className={`notifyBox ${hasNewNotification ? "new" : ""}`}>
             <img src="/images/notificationicon.png" alt="alert" />
