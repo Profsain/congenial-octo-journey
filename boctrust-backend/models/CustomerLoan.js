@@ -58,7 +58,8 @@ const LoanSchema = new Schema({
         type: Boolean,
         default: false,
         required: true
-    }
+    },
+    isTopUpLoan: { type: Boolean, default: false },
 });
 
 module.exports = mongoose.model('CustomerLoan', LoanSchema);

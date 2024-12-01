@@ -26,4 +26,12 @@ router.put('/settings', async (req, res) => {
     }
 });
 
+
+// Update top-up eligibility months
+router.put("/set-month", async (req, res) => {
+    const { topUpEligibilityMonths } = req.body;
+    const settings = await Settings.findOneAndUpdate({}, { topUpEligibilityMonths }, { new: true });
+    res.json(settings);
+});
+
 module.exports = router;

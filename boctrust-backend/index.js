@@ -61,6 +61,11 @@ const refreshTokenRoutes = require("./routes/refreshToken");
 
 // nibss direct debit 
 const directDebitRoutes = require("./routes/nddMandateOperation");
+
+// top-up eligibility 
+const cron = require("node-cron");
+const updateTopUpEligibility = require("./cronworkers/updateTopUpEligibility");
+const updateMonthsSinceLastLoan = require("./path/to/updateMonthsSinceLastLoan");
  
 const {
   authenticateToken,
@@ -100,6 +105,18 @@ mongoose
         }
       })
       .catch((err) => console.log(err));
+
+    // Schedule the cron worker job to run at midnight daily
+    cron.schedule("0 0 * * *", async () => {
+        console.log("Running daily top-up eligibility update...");
+        await updateTopUpEligibility();
+    });
+
+    // Schedule the job to run daily at midnight
+cron.schedule("0 0 * * *", async () => {
+    console.log("Running monthly update for monthsSinceLastLoan...");
+    await updateMonthsSinceLastLoan();
+});
 
     // create new instance of express
     const app = express();

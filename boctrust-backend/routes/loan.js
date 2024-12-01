@@ -548,6 +548,15 @@ router.put("/disburse/:loanId", async (req, res) => {
       return res.status(404).json({ error: "Loan not found" });
     }
 
+    // Update monthsSinceLastLoan for the customer
+        const now = new Date();
+        await Customer.findByIdAndUpdate(loan.customerId, {
+            $set: {
+                "topUpLoanEligibility.monthsSinceLastLoan": 0, // Reset since this is a new loan
+            },
+        });
+
+
     // Return the allLoans array
     res.status(200).json(loan);
   } catch (err) {
