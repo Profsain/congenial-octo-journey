@@ -8,11 +8,19 @@ router.post("/top-up-request", async (req, res) => {
     const { customerId, loanAmount, loanDuration, note } = req.body;
 
     try {
+        // Find the customer by ID
         const customer = await Customer.findById(customerId);
         if (!customer) {
             return res.status(404).json({ message: "Customer not found" });
         }
 
+        // Fetch or derive the customer's interest rate
+        const interestRate = parseFloat(customer.loanproduct.interestRate) || 0.1; // Default to 10% if not available
+
+        // Calculate total repayment based on the interest rate
+        const totalRepayment = loanAmount + loanAmount * interestRate;
+
+        // Create a new loan with the calculated total repayment
         const newLoan = new CustomerLoan({
             customerId,
             customerName: `${customer.firstname} ${customer.lastname}`,
@@ -22,15 +30,16 @@ router.post("/top-up-request", async (req, res) => {
             loanProduct: customer.loanproduct,
             loanDuration,
             loanAmount,
-            totalRepayment: loanAmount * 1.1, // Example calculation
+            totalRepayment, // Use the calculated total repayment
             currentBalance: loanAmount,
-            totalBalance: loanAmount * 1.1,
+            totalBalance: totalRepayment, // Reflect total repayment here as well
             note,
             loanStatus: "Pending",
             isLoanApproved: false,
-            isTopUpLoan: true
+            isTopUpLoan: true,
         });
 
+        // Save the new loan
         await newLoan.save();
         res.status(201).json({ message: "Top-up loan request submitted", loan: newLoan });
     } catch (error) {
