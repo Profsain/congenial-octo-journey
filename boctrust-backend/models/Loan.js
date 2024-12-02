@@ -94,7 +94,12 @@ const loanSchema = new mongoose.Schema(
     },
     moratorium: String,
     paymentRecord: [paymentRecordSchema],
+    
+    isTopUpLoan: { type: Boolean, default: false },
+    isTopUpLoanSent: { type: Boolean, default: false },
+    currentLoanTerminationStatus: { type: String, enum: ["pending", "initiated", "completed"], default: "pending" },
   },
+  
   { timestamps: true }
 );
 

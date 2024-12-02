@@ -7,6 +7,7 @@ import LoanTopUpModal from "../dashboardcomponents/LoanTopUpModal";
 const TopNavber = ({ title, user = "Femi Akinwade" }) => {
   // current login user
   const { user: currentUser } = useSelector((state) => state.adminAuth);
+  
 
   // check is qualify for topUp. true or false
   // persist to server state
@@ -63,6 +64,7 @@ const TopNavber = ({ title, user = "Femi Akinwade" }) => {
       <LoanTopUpModal
         showModal={showTopUpModal}
         handleCloseModal={handleCloseTopUpModal}
+        customerID={currentUser?._id}
       />
     </>
   );

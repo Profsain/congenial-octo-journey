@@ -1,18 +1,51 @@
 import { Modal, Button, Form } from "react-bootstrap";
 import { useState } from "react";
 import "./LoanTopUp.css";
+import PageLoader from "../shared/PageLoader";
 
-const LoanTopUpModal = ({ showModal, handleCloseModal }) => {
+const LoanTopUpModal = ({ showModal, handleCloseModal, customerID }) => {
+
+  const apiUrl = import.meta.env.VITE_BASE_URL;
   const [loanAmount, setLoanAmount] = useState("");
   const [repaymentMonths, setRepaymentMonths] = useState("");
+  const [processing, setProcessing] = useState(false);
 
   const handleLoanAmountChange = (e) => setLoanAmount(e.target.value);
   const handleRepaymentMonthsChange = (e) => setRepaymentMonths(e.target.value);
 
-  const handleSubmit = () => {
-    // Handle top-up submission logic
-    console.log({ loanAmount, repaymentMonths });
-    handleCloseModal(); // Use the prop to close the modal
+  const handleSubmit = async () => {
+    setProcessing(true);
+
+    const loanData = {
+      loanAmount,
+      loanDuration: repaymentMonths, // Ensure `repaymentMonths` is defined
+      customerId: customerID, // Pass the valid customer ID
+      note: "Top-up loan request", // Optional note
+    };
+
+    try {
+      const response = await fetch(`${apiUrl}/api/top-up/top-up-request`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(loanData),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log("Top-up loan request successful:", data);
+        setProcessing(false);
+        handleCloseModal(); // Use the modal closing logic
+      } else {
+        const error = await response.json();
+        console.error("Error:", error.message);
+        setProcessing(false);
+      }
+    } catch (error) {
+      console.error("Error submitting top-up request:", error);
+      setProcessing(false);
+    }
   };
 
   return (
@@ -50,6 +83,7 @@ const LoanTopUpModal = ({ showModal, handleCloseModal }) => {
         </Form>
       </Modal.Body>
       <Modal.Footer>
+        {processing && <PageLoader />}
         <Button variant="secondary" onClick={handleCloseModal}>
           Cancel
         </Button>

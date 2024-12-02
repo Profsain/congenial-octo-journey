@@ -62,6 +62,9 @@ const refreshTokenRoutes = require("./routes/refreshToken");
 // nibss direct debit 
 const directDebitRoutes = require("./routes/nddMandateOperation");
 
+//top-up route
+const topupLoanRoute = require("./routes/topupLoanRoute");
+
 // top-up eligibility 
 const cron = require("node-cron");
 const updateTopUpEligibility = require("./cronworkers/updateTopUpEligibility");
@@ -218,6 +221,9 @@ cron.schedule("0 0 * * *", async () => {
 
     // nibss direct debit
     app.use("/api/direct-debit", directDebitRoutes);
+
+    // top-up loan route
+    app.use("/api/top-up", topupLoanRoute);
 
     app.listen(process.env.PORT || 3030, () =>
       console.log("Server running on port 3030")

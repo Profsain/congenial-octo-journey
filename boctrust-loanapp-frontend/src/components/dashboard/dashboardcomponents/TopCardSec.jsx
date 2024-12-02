@@ -90,13 +90,14 @@ const TopCardSec = ({ user }) => {
 
   // handle open top up
   const handleOpenTopUp = () => {
-    setShowTopUpModal(true)
+    setShowTopUpModal(true);
   };
 
   const handleCloseTopUpModal = () => {
     setShowTopUpModal(false);
   };
 
+  console.log("user", user);
   return (
     <>
       <div className="TopCard">
@@ -200,6 +201,7 @@ const TopCardSec = ({ user }) => {
       <LoanTopUpModal
         showModal={showTopUpModal}
         handleCloseModal={handleCloseTopUpModal}
+        customerID={user?._id}
       />
     </>
   );

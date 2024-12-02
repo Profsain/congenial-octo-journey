@@ -11,6 +11,19 @@ const Employer = require("../models/EmployersManager");
 const { default: axios } = require("axios");
 const CreditAnalysis = require("../models/CreditAnalysis");
 
+
+// Add this endpoint to fetch all top-up loans
+router.get("/top-up-loans", async (req, res) => {
+    try {
+        const topUpLoans = await Loan.find({ isTopUpLoan: true }).populate("customer");
+        res.status(200).json(topUpLoans);
+    } catch (error) {
+        console.error("Error fetching top-up loans:", error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+
 router.post("/", async (req, res) => {
   try {
     const {
