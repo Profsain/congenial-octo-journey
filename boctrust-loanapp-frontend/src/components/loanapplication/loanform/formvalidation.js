@@ -20,13 +20,11 @@ const validationSchema = Yup.object({
   firstname: Yup.string().required("Required"),
   lastname: Yup.string().required("Required"),
   phonenumber: Yup.string()
-    .required("Required")
     .matches(
-      /^0[789][01]\d{8}$/,
-      "Phone number must be a valid Nigerian number, e.g., 09023653676"
+      /^(\+?[1-9]\d{1,14}|(\+234|0)[789][01]\d{8})$/,
+      "Phone number must be in E.164 format or a valid Nigerian number (e.g., +2347012345678 or 07012345678)"
     )
-    .min(11, "Must be exactly 11 digits")
-    .max(11, "Must be exactly 11 digits"),
+    .required("Phone number is required"),
   dob: Yup.date().required("Required"),
   email: Yup.string().email("Invalid email format").required("Required"),
   maritalstatus: Yup.string().required("Required"),
@@ -49,13 +47,11 @@ const validationSchema = Yup.object({
   nkinfirstname: Yup.string().required("Required"),
   nkinlastname: Yup.string().required("Required"),
   nkinphonenumber: Yup.string()
-    .required("Required")
     .matches(
-      /^0[789][01]\d{8}$/,
-      "Phone number must be a valid Nigerian number, e.g., 09023653676"
+      /^(\+?[1-9]\d{1,14}|(\+234|0)[789][01]\d{8})$/,
+      "Phone number must be in E.164 format or a valid Nigerian number (e.g., +2347012345678 or 07012345678)"
     )
-    .min(11, "Must be exactly 11 digits")
-    .max(11, "Must be exactly 11 digits"),
+    .required("Phone number is required"),
   nkinrelationship: Yup.string().required("Required"),
   nkinresidentialaddress: Yup.string().required("Required"),
 

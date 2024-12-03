@@ -178,11 +178,17 @@ const CreateNewAdmin = () => {
               <input
                 type="tel"
                 name="phone"
-                placeholder="e.g. 09082312333"
+                placeholder="e.g. +2347047202860"
                 id="phone"
                 onBlur={formik.handleBlur}
                 className="Input"
-                onChange={formik.handleChange}
+                onChange={(event) => {
+                  const value = event.target.value;
+                  // Ensure the phone number starts with a "+" and only contains digits after the "+"
+                  const formattedValue = value.startsWith("+") ? value : `+${value}`;
+                  formik.setFieldValue("phone", formattedValue);
+                }}
+                value={formik.values.phone}
               />
               {formik.errors.phone && formik.touched.phone ? (
                 <div className="Error">{formik.errors.phone}</div>

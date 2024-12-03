@@ -27,6 +27,7 @@ import ReconfirmBvn from "./ReconfirmBvn";
 import fetchAllBanks from "./fetchBanks";
 import { getBvnDetails } from "./bvnVerification";
 import { toast } from "react-toastify";
+import Select from "react-select";
 
 // toast styles
 import "react-toastify/dist/ReactToastify.css";
@@ -79,23 +80,29 @@ const LoanForm = React.memo(function LoanFormComponent() {
   const initializeApp = async () => {
     const urlSearchParams = new URLSearchParams(window.location.search);
     const code = urlSearchParams.get("code");
-    
-    // setFirstStepData(JSON.parse(sessionStorage.getItem("loanFirstInfo")));
 
-    if (code) {
-      const { bvn } = await getBvnDetails(code); // Call this function if there's an authorization code in the URL
-      const firstDataResponse = await axios.get(
-        `${import.meta.env.VITE_BASE_URL}/api/tempdata/tempdata/${bvn}`
-      );
-      setFirstStepData(firstDataResponse.data.data);
-      await axios.delete(
-        `${import.meta.env.VITE_BASE_URL}/api/tempdata/tempdata/${bvn}`
-      );
-    } else {
-      // Optionally, handle other initialization tasks here
-      console.log("No authorization code found. Proceed with the normal flow.");
-    }
+    setFirstStepData(JSON.parse(sessionStorage.getItem("loanFirstInfo")));
+
+    // if (code) {
+    //   const { bvn } = await getBvnDetails(code); // Call this function if there's an authorization code in the URL
+    //   const firstDataResponse = await axios.get(
+    //     `${import.meta.env.VITE_BASE_URL}/api/tempdata/tempdata/${bvn}`
+    //   );
+    //   setFirstStepData(firstDataResponse.data.data);
+    //   await axios.delete(
+    //     `${import.meta.env.VITE_BASE_URL}/api/tempdata/tempdata/${bvn}`
+    //   );
+    // } else {
+    //   // Optionally, handle other initialization tasks here
+    //   console.log("No authorization code found. Proceed with the normal flow.");
+    // }
   };
+
+  useEffect(() => {
+    if (firstStepData) {
+      // console.log("AAAAAA", firstStepData);
+    }
+  }, [firstStepData]);
 
   // Fetch Officers, Products and Employers
   useEffect(() => {
@@ -133,7 +140,7 @@ const LoanForm = React.memo(function LoanFormComponent() {
       ref.current?.setFieldValue("bvnnumber", firstStepData?.bvn || "");
       ref.current?.setFieldValue("loanamount", firstStepData?.loanAmount || "");
       ref.current?.setFieldValue("careertype", firstStepData?.careerType || "");
-      setCareerType(firstStepData.careerType || "");
+      setCareerType(firstStepData.careerType || "government employee");
       ref.current?.setFieldValue(
         "numberofmonth",
         firstStepData?.numberOfMonths || ""
@@ -167,7 +174,17 @@ const LoanForm = React.memo(function LoanFormComponent() {
   const [signature, setSignature] = useState("");
   const [marketerClientPic, setMarketerClientPic] = useState("");
 
-  const fileFields = [ "valididcard", "uploadbankstatement" , "signature", "marketerClientPic", "photocapture", "employmentletter", "uploadpayslip" ]
+  const fileFields = [
+    "valididcard",
+    "uploadbankstatement",
+    "signature",
+    "marketerClientPic",
+    "photocapture",
+    "employmentletter",
+    "uploadpayslip",
+  ];
+
+  const [agentCode, setAgentCode] = useState("");
 
   const updateFormValues = () => {
     const formValues = getFromLocalStorage("onbaordData");
@@ -175,20 +192,22 @@ const LoanForm = React.memo(function LoanFormComponent() {
     if (formValues) {
       console.log(formValues, "formValues");
 
-      Object.entries(formValues).forEach((item, ) => {
-
+      Object.entries(formValues).forEach((item) => {
         ref.current?.setFieldValue(
           item,
 
-          fileFields.includes(item) ?
-          getFile(
-            item,
-            `${item}_for_${formValues.firstname}_${formValues.lastname}`
-          ) : formValues[item]
+          fileFields.includes(item)
+            ? getFile(
+                item,
+                `${item}_for_${formValues.firstname}_${formValues.lastname}`
+              )
+            : formValues[item]
         );
       });
     }
   };
+
+  const [sigError, setSigError] = useState(false);
 
   useEffect(() => {
     updateFormValues();
@@ -198,7 +217,6 @@ const LoanForm = React.memo(function LoanFormComponent() {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [step, showForm]);
-
 
   // update photocapture value when captureImg change
   useEffect(() => {
@@ -275,6 +293,8 @@ const LoanForm = React.memo(function LoanFormComponent() {
     ref.current?.setFieldValue("stateofresidence", state);
   };
 
+  const [guar, setGuar] = useState(false);
+
   // handle form submit/move to next step
   const handleSubmit = async () => {
     // handle form submit to backend here
@@ -290,7 +310,7 @@ const LoanForm = React.memo(function LoanFormComponent() {
         const customerId = generateCustomerId();
         const formData = new FormData();
 
-        console.log(formValues.photocapture, "formValues.photocapture")
+        console.log(formValues.photocapture, "formValues.photocapture");
 
         formData.append("customerId", customerId);
         formData.append(
@@ -394,7 +414,7 @@ const LoanForm = React.memo(function LoanFormComponent() {
             "image.jpg"
           ); // Convert data URI to Blob
         formData.append("haveagent", formValues.haveagent);
-        formData.append("agentcode", formValues.agentcode);
+        formData.append("agentcode", agentCode);
         formData.append("username", formValues.username);
         formData.append("password", formValues.password);
         formData.append("confirmpassword", formValues.confirmpassword);
@@ -416,6 +436,141 @@ const LoanForm = React.memo(function LoanFormComponent() {
         toast.success("Customer Account Created!!!");
         deleteFromLocalStorage("onbaordData");
         fileValues.map((item) => deleteFromLocalStorage(item));
+      } else if (onboardData.salaryaccountname !== null) {
+        // const employer = employers.find(
+        //   (employer) => employer._id === formValues.employerId
+        // );
+
+        // // generate customer id
+        // const customerId = generateCustomerId();
+        // const formData = new FormData();
+
+        // console.log(formValues.photocapture, "formValues.photocapture");
+
+        // formData.append("customerId", customerId);
+        // formData.append(
+        //   "loanamount",
+        //   parseInt(onboardData.loanamount.replace(/,/g, ""))
+        // );
+        // formData.append("numberofmonth", onboardData.numberofmonth);
+        // formData.append("loantotalrepayment", loanRepaymentTotal);
+        // formData.append("monthlyrepayment", monthlyRepayment);
+        // formData.append("careertype", onboardData.careertype);
+        // formData.append("loanproduct", product?._id);
+        // formData.append("loanpurpose", onboardData.loanpurpose);
+        // formData.append("otherpurpose", onboardData.otherpurpose);
+        // formData.append("bvnnumber", onboardData.bvnnumber);
+        // formData.append("title", onboardData.title);
+        // formData.append("gender", onboardData.gender);
+        // formData.append("firstname", onboardData.firstname);
+        // formData.append("lastname", onboardData.lastname);
+        // formData.append("phonenumber", onboardData.phonenumber);
+        // formData.append("dob", onboardData.dob);
+        // formData.append("email", onboardData.email);
+        // formData.append("maritalstatus", onboardData.maritalstatus);
+        // formData.append("noofdependent", onboardData.noofdependent);
+        // formData.append("educationlevel", onboardData.educationlevel);
+        // formData.append(
+        //   "howdidyouhearaboutus",
+        //   onboardData.howdidyouhearaboutus
+        // );
+        // formData.append("houseaddress", onboardData.houseaddress);
+        // formData.append("stateofresidence", onboardData.stateofresidence);
+        // formData.append("lga", onboardData.lga);
+        // formData.append("stateoforigin", onboardData.stateoforigin);
+        // formData.append("ippis", onboardData.ippis);
+        // formData.append("servicenumber", onboardData.servicenumber);
+        // formData.append("valididcard", onboardData.valididcard);
+        // formData.append("idcardnotinclude", onboardData.idcardnotinclude);
+        // formData.append("nkinfirstname", onboardData.nkinfirstname);
+        // formData.append("nkinlastname", onboardData.nkinlastname);
+        // formData.append("nkinphonenumber", onboardData.nkinphonenumber);
+        // formData.append("nkinrelationship", onboardData.nkinrelationship);
+        // formData.append(
+        //   "nkinresidentialaddress",
+        //   onboardData.nkinresidentialaddress
+        // );
+        // formData.append("employer", employer?._id);
+        // formData.append("otheremployername", onboardData.otheremployername);
+        // formData.append("employeraddress", onboardData.employeraddress);
+        // formData.append("employmentstartdate", onboardData.employmentstartdate);
+        // formData.append("employmentletter", onboardData.employmentletter);
+        // formData.append("netmonthlyincome", onboardData.netmonthlyincome);
+        // formData.append("totalannualincome", onboardData.totalannualincome);
+        // formData.append("officialemail", onboardData.officialemail);
+        // formData.append("uploadbankstatement", onboardData.uploadbankstatement);
+        // formData.append("uploadpayslip", onboardData.uploadpayslip);
+
+        // // financial info
+        // formData.append("salaryaccountname", onboardData.salaryaccountname);
+        // formData.append("salaryaccountnumber", onboardData.salaryaccountnumber);
+        // formData.append("bankcode", onboardData.bankcode);
+        // formData.append(
+        //   "disbursementbankname",
+        //   onboardData.disbursementbankname
+        // );
+        // formData.append(
+        //   "disbursementaccountnumber",
+        //   onboardData.disbursementaccountnumber
+        // );
+        // formData.append("hasloan", onboardData.hasloan);
+        // formData.append(
+        //   "currentmonthlyplanrepaymentamount",
+        //   onboardData.currentmonthlyplanrepaymentamount
+        // );
+        // formData.append(
+        //   "estimatedmonthlylivingexpense",
+        //   onboardData.estimatedmonthlylivingexpense
+        // );
+        // formData.append("buyoverloan", onboardData.buyoverloan);
+        // formData.append("beneficiaryname", onboardData.beneficiaryname);
+        // formData.append("beneficiarybank", onboardData.beneficiarybank);
+        // formData.append(
+        //   "beneficiaryaccountnumber",
+        //   onboardData.beneficiaryaccountnumber
+        // );
+        // formData.append("liquidationbalance", onboardData.liquidationbalance);
+        // formData.append("deductions", onboardData.deductions);
+        // formData.append("guarantee", onboardData.guarantee);
+
+        // // agree and sign
+        // formData.append("acceptterms", onboardData.acceptterms);
+        // formData.append("acceptpolicy", onboardData.acceptpolicy);
+        // formData.append("sharemyremita", onboardData.sharemyremita);
+        // formData.append("agreenibbsdebit", onboardData.agreeNibbsDebit);
+        // formData.append("agreefullname", onboardData.agreefullname);
+        // formData.append("agreedate", onboardData.agreedate);
+        // formData.append("signature", onboardData.signature);
+        // formData.append("marketerClientPic", onboardData.marketerClientPic);
+        // onboardData.photocapture &&
+        //   formData.append(
+        //     "photocapture",
+        //     dataURItoBlob(onboardData.photocapture),
+        //     "image.jpg"
+        //   ); // Convert data URI to Blob
+        // formData.append("haveagent", onboardData.haveagent);
+        // formData.append("agentcode", agentCode);
+        // formData.append("username", onboardData.username);
+        // formData.append("password", onboardData.password);
+        // formData.append("confirmpassword", onboardData.confirmpassword);
+
+        // // send formData to database
+
+        // const res = await fetch(`${apiUrl}/api/customer/customer`, {
+        //   method: "POST",
+        //   mode: "cors",
+        //   enctype: "multipart/form-data",
+        //   body: formData,
+        // });
+
+        // const responsePayload = await res.json();
+
+        // if (!res.ok) {
+        //   throw new Error(responsePayload.error);
+        // }
+        // toast.success("Customer Account Created!!!");
+        // deleteFromLocalStorage("onbaordData");
+        // fileValues.map((item) => deleteFromLocalStorage(item));
       }
     } catch (error) {
       console.log(error);
@@ -430,6 +585,22 @@ const LoanForm = React.memo(function LoanFormComponent() {
     const formContainer = document.querySelector(".FormContainer");
     formContainer.style.padding = "12px";
     setShowForm(false);
+  };
+
+  const [loanOfficerOptions, setLoanOfficerOptions] = useState([]);
+
+  useEffect(() => {
+    if (allLoanOfficers) {
+      const options = allLoanOfficers.map((officer) => ({
+        value: officer.Code,
+        label: officer.Name,
+      }));
+      setLoanOfficerOptions(options);
+    }
+  }, [allLoanOfficers]);
+
+  const handleChangeAgentCode = (selectedOption) => {
+    setAgentCode(selectedOption);
   };
 
   // todo: fetch banks and code
@@ -447,6 +618,19 @@ const LoanForm = React.memo(function LoanFormComponent() {
       position: "bottom-right",
     });
   };
+
+  const [onboardData, setOnBoardData] = useState(null);
+
+  useEffect(() => {
+    setOnBoardData(JSON.parse(localStorage.getItem("onbaordData")));
+  }, []);
+
+  useEffect(() => {
+    if (onboardData) {
+      console.log("AAAA Onboard", onboardData);
+      setStep(5);
+    }
+  }, [onboardData]);
 
   // handle next step, check validation schema and move to next step
   const handleNext = () => {
@@ -565,6 +749,8 @@ const LoanForm = React.memo(function LoanFormComponent() {
     }
   };
 
+  const [isMarketer, setIsMarketer] = useState(null); // Track Yes/No selection
+
   return (
     <div className="container-fluid FormContainer">
       <div>
@@ -633,7 +819,7 @@ const LoanForm = React.memo(function LoanFormComponent() {
                                         label="Phone Number"
                                         name="phonenumber"
                                         type="tel"
-                                        placeholder="08012345678"
+                                        placeholder="e.g. +2347047202860"
                                       />
                                       <div className="Space"></div>
                                       <SelectField
@@ -838,7 +1024,11 @@ const LoanForm = React.memo(function LoanFormComponent() {
                                                   convertFile(e, setIdCard)
                                                 }
                                               />
-                                              <ErrorMessage name={"valididcard"} component="div" className="Error" />
+                                              <ErrorMessage
+                                                name={"valididcard"}
+                                                component="div"
+                                                className="Error"
+                                              />
                                             </div>
                                           </div>
                                         </div>
@@ -860,7 +1050,11 @@ const LoanForm = React.memo(function LoanFormComponent() {
                                               convertFile(e, setIdCard)
                                             }
                                           />
-                                           <ErrorMessage name={"valididcard"} component="div" className="Error" />
+                                          <ErrorMessage
+                                            name={"valididcard"}
+                                            component="div"
+                                            className="Error"
+                                          />
                                         </div>
                                       )}
                                       <hr className="hLine" />
@@ -988,7 +1182,7 @@ const LoanForm = React.memo(function LoanFormComponent() {
                                             </option>
                                           );
                                         })}
-                                        {/* <option value="other">Other</option> */}
+                                        <option value="other">Other</option>
                                       </SelectField>
                                     )}
 
@@ -1069,7 +1263,11 @@ const LoanForm = React.memo(function LoanFormComponent() {
                                           convertFile(e, setPaySlip)
                                         }
                                       />
-                                       <ErrorMessage name={"uploadpayslip"} component="div" className="Error" />
+                                      <ErrorMessage
+                                        name={"uploadpayslip"}
+                                        component="div"
+                                        className="Error"
+                                      />
                                     </div>
                                   ) : null}
                                   {/* Bank Statement and Employement Letter fro government Employeee*/}
@@ -1091,7 +1289,11 @@ const LoanForm = React.memo(function LoanFormComponent() {
                                             convertFile(e, setBankStatements)
                                           }
                                         />
-                                          <ErrorMessage name={"uploadbankstatement"} component="div" className="Error" />
+                                        <ErrorMessage
+                                          name={"uploadbankstatement"}
+                                          component="div"
+                                          className="Error"
+                                        />
                                       </div>
                                     ) : employer?.employmentLetterRule
                                         ?.ruleActive ? (
@@ -1127,7 +1329,11 @@ const LoanForm = React.memo(function LoanFormComponent() {
                                   <button
                                     type="button"
                                     onClick={handleNext}
-                                    disabled={isSubmitting}
+                                    disabled={
+                                      isSubmitting ||
+                                      (careerType === "government employee" &&
+                                        employerId === "other")
+                                    }
                                     className="BtnAction BtnSecondary"
                                   >
                                     Next
@@ -1451,6 +1657,7 @@ const LoanForm = React.memo(function LoanFormComponent() {
                                             type="radio"
                                             name="guarantee"
                                             value="guranteeofemployer"
+                                            onClick={() => setGuar(true)}
                                           />
                                         </label>
                                         Guarantee of Employer
@@ -1461,6 +1668,7 @@ const LoanForm = React.memo(function LoanFormComponent() {
                                             type="radio"
                                             name="guarantee"
                                             value="individualguarantee"
+                                            onClick={() => setGuar(true)}
                                           />
                                         </label>
                                         Individual Guarantee
@@ -1481,7 +1689,7 @@ const LoanForm = React.memo(function LoanFormComponent() {
                                   <button
                                     type="button"
                                     onClick={handleNext}
-                                    disabled={isSubmitting}
+                                    disabled={isSubmitting || guar === false}
                                     className="BtnAction BtnSecondary"
                                   >
                                     Next
@@ -1608,21 +1816,20 @@ const LoanForm = React.memo(function LoanFormComponent() {
                                         </div>
                                       </div>
                                       {values.haveagent === "yes" && (
-                                        <SelectField
-                                          label="Select Loan Officer"
-                                          name="agentcode"
-                                        >
-                                          <option value=""></option>
-                                          {allLoanOfficers &&
-                                            allLoanOfficers.map((officers) => (
-                                              <option
-                                                key={officers.Code}
-                                                value={officers.Code}
-                                              >
-                                                {officers.Name}
-                                              </option>
-                                            ))}
-                                        </SelectField>
+                                        <div>
+                                          <label htmlFor="agentCode">
+                                            Select Loan Officer
+                                          </label>
+                                          <Select
+                                            name="agentCode"
+                                            id="agentCode"
+                                            options={loanOfficerOptions}
+                                            value={agentCode} // Handle missing agentCode
+                                            onChange={handleChangeAgentCode}
+                                            placeholder="Select Loan Officer"
+                                            isClearable
+                                          />
+                                        </div>
                                       )}
                                     </div>
                                     <hr />
@@ -1644,11 +1851,33 @@ const LoanForm = React.memo(function LoanFormComponent() {
                                         accept="image/png, .svg, .jpg, .jpeg, .pdf"
                                         onBlur={handleBlur}
                                         className="UploadFile"
-                                        onChange={(e) =>
-                                          convertFile(e, setSignature)
-                                        }
+                                        onChange={(e) => {
+                                          const file = e.currentTarget.files[0];
+                                          if (file && file.size > 200 * 1024) {
+                                            // Manually set validation error for file size
+                                            setSigError(true);
+                                            console.log("ADASDASDASDsa");
+                                            setFieldError(
+                                              "signature",
+                                              "File size exceeds 200KB"
+                                            );
+                                            return;
+                                          } else {
+                                            setSigError(false);
+                                          }
+                                          convertFile(e, setSignature); // Proceed with valid file
+                                        }}
                                       />
-                                      <ErrorMessage name={"signature"} component="div" className="Error" />
+                                      {sigError && (
+                                        <p style={{ color: "red" }}>
+                                          File Limit Exceeds 200 KB
+                                        </p>
+                                      )}
+                                      <ErrorMessage
+                                        name="signature"
+                                        component="div"
+                                        className="Error"
+                                      />
                                     </div>
                                   </div>
 
@@ -1673,26 +1902,66 @@ const LoanForm = React.memo(function LoanFormComponent() {
                                     />
                                   </div>
                                   {/*  marketerClientPic Upload */}
-                                  <div className="SelfiCon">
-                                    <Headline
-                                      fontSize="16px"
-                                      text="Are you a DSA / Marketer? Upload client picture below. "
-                                    />
-
-                                    <div>
-                                      <input
-                                        type="file"
-                                        name="marketerClientPic"
-                                        accept="image/png, .svg, .jpg, .jpeg, .pdf"
-                                        onBlur={handleBlur}
-                                        className="UploadFile"
-                                        onChange={(e) =>
-                                          convertFile(e, setMarketerClientPic)
-                                        }
+                                  {(isMarketer === null ||
+                                    isMarketer === true) && (
+                                    <div className="SelfiCon">
+                                      <Headline
+                                        fontSize="16px"
+                                        text="Are you a DSA / Marketer?  "
                                       />
-                                        <ErrorMessage name={"signature"} component="div" className="Error" />
+
+                                      {/* Radio Buttons */}
+                                      <div style={{ marginBottom: "16px" }}>
+                                        <label>
+                                          <input
+                                            type="radio"
+                                            name="isMarketer"
+                                            value="yes"
+                                            onChange={() => setIsMarketer(true)}
+                                          />
+                                          Yes
+                                        </label>
+                                        <label style={{ marginLeft: "16px" }}>
+                                          <input
+                                            type="radio"
+                                            name="isMarketer"
+                                            value="no"
+                                            onChange={() =>
+                                              setIsMarketer(false)
+                                            }
+                                          />
+                                          No
+                                        </label>
+                                      </div>
+
+                                      {/* Conditionally Render File Upload */}
+                                      {isMarketer && (
+                                        <>
+                                          <p>Upload client picture below.</p>
+                                          <div>
+                                            <input
+                                              type="file"
+                                              name="marketerClientPic"
+                                              accept="image/png, .svg, .jpg, .jpeg, .pdf"
+                                              onBlur={handleBlur}
+                                              className="UploadFile"
+                                              onChange={(e) =>
+                                                convertFile(
+                                                  e,
+                                                  setMarketerClientPic
+                                                )
+                                              }
+                                            />
+                                            <ErrorMessage
+                                              name={"signature"}
+                                              component="div"
+                                              className="Error"
+                                            />
+                                          </div>
+                                        </>
+                                      )}
                                     </div>
-                                  </div>
+                                  )}
 
                                   <div className="ButtonContainer">
                                     <button

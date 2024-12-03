@@ -76,7 +76,7 @@ const PhoneOtp = (props) => {
   // handle otp request
   const requestOtp = async (e) => {
     e.preventDefault();
-    const phone = "234" + updatePhone.slice(1);
+    const phoneNumber = (updatePhone[0]==="+")?updatePhone:"+234"+updatePhone.slice(1);
 
     setErrorMsg("");
 
@@ -84,7 +84,7 @@ const PhoneOtp = (props) => {
       return setErrorMsg("Please enter a valid phone number");
     try {
       setLoading(true);
-      const response = await setUpRecaptcha(phone);
+      const response = await setUpRecaptcha(phoneNumber);
 
       if (response) {
         setConfirmOtp(response);
@@ -127,7 +127,9 @@ const PhoneOtp = (props) => {
   const verifyOtp = async (e) => {
     e.preventDefault();
 
-    if (!window.recaptchaVerifier) return;
+    const phoneNumber = (updatePhone[0]==="+")?updatePhone:"+234"+updatePhone.slice(1);
+
+    console.log("AAAA");
 
     if (otp === "" || otp.length !== 6)
       return setErrorMsg("Please enter a valid OTP");
@@ -145,7 +147,7 @@ const PhoneOtp = (props) => {
 
       // send loan application email and sms notification
       await sendSMS(
-        number,
+        phoneNumber,
         "Your loan application has been received. We will get back to you shortly."
       );
 
@@ -153,7 +155,7 @@ const PhoneOtp = (props) => {
 
       navigate("/login");
     } catch (error) {
-      console.error("Error verifying OTP:", error);
+      console.log("Error verifying OTP:", error);
       setErrorMsg(`Error verifying OTP: ${error?.message}`);
       toast.error(error?.message || "Something Went Wrong");
     } finally {
@@ -218,9 +220,8 @@ const PhoneOtp = (props) => {
             <div style={styles.btnBox}>
               <Button
                 variant="secondary"
-                onClick={() => {
-                  setFlag(false);
-                  setOtp("");
+                onClick={(e) => {
+                  requestOtp(e)
                 }}
               >
                 Resend OTP

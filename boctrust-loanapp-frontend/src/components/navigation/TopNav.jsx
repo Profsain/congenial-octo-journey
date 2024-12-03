@@ -68,6 +68,8 @@ const TopNav = ({ settings }) => {
 
       <div className="BottomStyle">
         {/* navbar section start */}
+        {
+          !currentUser &&
         <Navbar variant="dark" expand="lg" className="Nav">
           <Container>
             <Navbar.Toggle aria-controls="basic-navbar-nav" />
@@ -218,6 +220,7 @@ const TopNav = ({ settings }) => {
             </Navbar.Collapse>
           </Container>
         </Navbar>
+        }
       </div>
     </div>
   );
