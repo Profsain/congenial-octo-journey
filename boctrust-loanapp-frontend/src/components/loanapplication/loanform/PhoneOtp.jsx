@@ -129,18 +129,19 @@ const PhoneOtp = (props) => {
 
     const phoneNumber = (updatePhone[0]==="+")?updatePhone:"+234"+updatePhone.slice(1);
 
-    console.log("AAAA");
+    console.log("AAAA",phoneNumber);
 
     if (otp === "" || otp.length !== 6)
       return setErrorMsg("Please enter a valid OTP");
     try {
       setLoading(true);
       setErrorMsg("");
-
+      
       // verification here
       await verifyOTP({ pinId: confirmOtp.pin_id, pin: otp });
-
+      
       props.onHide(false);
+       console.log("OPOPOP here",otp)
 
       // submit customer details
       await handleSubmit();
