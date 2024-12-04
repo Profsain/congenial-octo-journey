@@ -22,6 +22,10 @@ import BookingModal from "./BookingModal";
 import DisplayLoanProductName from "../../shared/DisplayLoanProductName";
 import { nigerianCurrencyFormat } from "../../../../../utilities/formatToNiaraCurrency";
 
+// custom hook
+import usePagination from "../../../../customHooks/usePagination";
+import usePaginatedData from "../../../../customHooks/usePaginationData";
+
 const BookLoans = () => {
   const styles = {
     head: {
@@ -66,8 +70,18 @@ const BookLoans = () => {
   const [canUserApprove, setCanUserApprove] = useState(false);
 
   // handle search
-  const [showCount, setShowCount] = useState(10);
+  const [showCount, setShowCount] = useState(5);
   const [searchTerms, setSearchTerms] = useState("");
+  const [totalPages, setTotalPages] = useState(1);
+
+  // custom hook destructuring
+  const { currentPage, goToNextPage, goToPreviousPage, setPage } =
+    usePagination(1, totalPages);
+  const { paginatedData: paginatedLoansList } = usePaginatedData(
+    unbookedLoans,
+    showCount,
+    currentPage
+  );
 
   useEffect(() => {
     const getData = async () => {
@@ -106,15 +120,20 @@ const BookLoans = () => {
   // search customer list
   const [loansList, setLoansList] = useState(unbookedLoans);
   const [selectedLoan, setSelectedLoan] = useState(null);
-  // update loansList to show 10 customers on page load
+
+  // update loansList to show 5 pendingLoans on page load
   // or on count changes
   useEffect(() => {
-    setLoansList(unbookedLoans?.slice(0, showCount));
-  }, [unbookedLoans, showCount]);
+    setLoansList(paginatedLoansList); // Update local state with paginated data
+  }, [paginatedLoansList]);
+
+  useEffect(() => {
+    setTotalPages(totalPages); // Update total pages when it changes
+  }, [totalPages, setTotalPages]);
 
   // update loansList on search
   const handleSearch = () => {
-    const currSearch = searchList(unbookedLoans, searchTerms, "agreefullname");
+    const currSearch = searchList(unbookedLoans, searchTerms, "firstname");
     setLoansList(currSearch?.slice(0, showCount));
   };
 
@@ -171,6 +190,7 @@ const BookLoans = () => {
 
     return tableOptions;
   };
+
 
   return (
     <>
@@ -273,7 +293,12 @@ const BookLoans = () => {
                 </tbody>
               </Table>
             </div>
-            <NextPreBtn />
+            <NextPreBtn
+              currentPage={currentPage}
+              totalPages={totalPages}
+              goToNextPage={goToNextPage}
+              goToPreviousPage={goToPreviousPage}
+            />
           </div>
         </div>
       </div>

@@ -16,6 +16,10 @@ import sortByCreatedAt from "../../shared/sortedByDate";
 import { fetchCompletedLoan } from "../../../../redux/reducers/loanReducer";
 import DisplayLoanProductName from "../../shared/DisplayLoanProductName";
 
+// custom hook
+import usePagination from "../../../../customHooks/usePagination";
+import usePaginatedData from "../../../../customHooks/usePaginationData";
+
 const OverdueLoans = () => {
   const styles = {
     head: {
@@ -83,21 +87,35 @@ const OverdueLoans = () => {
   };
 
   // handle search
-  const [showCount, setShowCount] = useState(10);
+  const [showCount, setShowCount] = useState(5);
   const [searchTerms, setSearchTerms] = useState("");
+  const [totalPages, setTotalPages] = useState(1);
+
+  // custom hook destructuring
+  const { currentPage, goToNextPage, goToPreviousPage, setPage } =
+    usePagination(1, totalPages);
+  const { paginatedData: paginatedLoansList } = usePaginatedData(
+    completedLoans,
+    showCount,
+    currentPage
+  );
 
   // search loan list
   const [loanList, setLoanList] = useState(completedLoans);
 
-  // update loanList to show 10 customers on page load
+  // update loansList to show 5 pendingLoans on page load
   // or on count changes
   useEffect(() => {
-    setLoanList(completedLoans?.slice(0, showCount));
-  }, [completedLoans, showCount]);
+    setLoanList(paginatedLoansList); // Update local state with paginated data
+  }, [paginatedLoansList]);
+
+  useEffect(() => {
+    setTotalPages(totalPages); // Update total pages when it changes
+  }, [totalPages, setTotalPages]);
 
   // update loanList on search
   const handleSearch = () => {
-    const currSearch = searchList(completedLoans, searchTerms, "agreefullname");
+    const currSearch = searchList(completedLoans, searchTerms, "firstname");
     setLoanList(currSearch?.slice(0, showCount));
   };
 
@@ -215,7 +233,12 @@ const OverdueLoans = () => {
                 </tbody>
               </Table>
             </div>
-            <NextPreBtn />
+            <NextPreBtn
+              currentPage={currentPage}
+              totalPages={totalPages}
+              goToNextPage={goToNextPage}
+              goToPreviousPage={goToPreviousPage}
+            />
           </div>
         </div>
       </div>
