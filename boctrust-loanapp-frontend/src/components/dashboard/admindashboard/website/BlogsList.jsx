@@ -14,7 +14,10 @@ import getDateOnly from "../../../../../utilities/getDate";
 import searchList from "../../../../../utilities/searchListFunc";
 import apiClient from "../../../../lib/axios";
 
-const BlogsList = ({ count, searchTerms }) => {
+// custom hook
+import usePaginatedData from "../../../../customHooks/usePaginationData";
+
+const BlogsList = ({ count, searchTerms, setTotalPages, currentPage })  => {
   const [modalShow, setModalShow] = useState(false);
   const [action, setAction] = useState(false);
   const [actionId, setActionId] = useState("");
@@ -35,11 +38,29 @@ const BlogsList = ({ count, searchTerms }) => {
     setCanUserManage(currentUser?.userRole?.can.includes("websiteManagement"));
   }, [currentUser]);
 
+  
+
   // Get the blogs from the store
   const blogs = useSelector((state) => state.blogReducer.posts.posts);
   const status = useSelector((state) => state.blogReducer.status);
   // local state
   const [blogsList, setBlogsList] = useState(blogs);
+
+
+  // custom pagination update
+  const { paginatedData: paginatedBlogsList, totalPages } = usePaginatedData(
+    blogs,
+    count,
+    currentPage
+  );
+
+  useEffect(() => {
+    setBlogsList(paginatedBlogsList); // Update local state with paginated data
+  }, [paginatedBlogsList]);
+
+  useEffect(() => {
+    setTotalPages(totalPages); // Update total pages when it changes
+  }, [totalPages, setTotalPages]);
 
   // update blogsList to show 10 blogs on page load
   // or when count changes
