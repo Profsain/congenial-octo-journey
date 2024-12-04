@@ -20,6 +20,11 @@ import { fetchAllCustomersLoans } from "../../../../redux/reducers/customersLoan
 import apiClient from "../../../../lib/axios";
 import { useLocation } from "react-router-dom";
 
+
+// custom hook
+import usePagination from "../../../../customHooks/usePagination";
+import usePaginatedData from "../../../../customHooks/usePaginationData";
+
 const KycCheck = () => {
   const styles = {
     btnBox: {
@@ -52,6 +57,19 @@ const KycCheck = () => {
   const customers = useSelector(
     (state) => state.customersLoansReducer.customersAndLoans
   );
+  
+  // custom hook state pagination
+  const [showCount, setShowCount] = useState(5);
+  const [searchTerms, setSearchTerms] = useState("");
+  const [totalPage, setTotalPage] = useState(1);
+  // custom hook destructuring
+  const { currentPage, goToNextPage, goToPreviousPage, setPage } =
+    usePagination(1, totalPage);
+
+  const { paginatedData: paginatedCustomersList, totalPages } =
+    usePaginatedData(customers, showCount, currentPage);
+  
+
   const status = useSelector((state) => state.customerReducer.status);
   // component state
   const [searchTerm, setSearchTerm] = useState("");
@@ -327,7 +345,12 @@ const KycCheck = () => {
                 </tbody>
               </Table>
             </div>
-            <NextPreBtn />
+            <NextPreBtn
+              currentPage={currentPage}
+              totalPages={totalPage}
+              goToNextPage={goToNextPage}
+              goToPreviousPage={goToPreviousPage}
+            />
           </div>
 
           {/* kyc detail section */}

@@ -9,7 +9,10 @@ import PageLoader from "../../shared/PageLoader";
 import EditEmployer from "./EditEmployer";
 import ActionNotification from "../../shared/ActionNotification";
 import getDateOnly from "../../../../../utilities/getDate";
-import apiClient from "../../../../lib/axios";
+
+// custom hook
+import usePagination from "../../../../customHooks/usePagination";
+import usePaginatedData from "../../../../customHooks/usePaginationData";
 
 const MdasEmployers = () => {
   const styles = {
@@ -44,6 +47,7 @@ const MdasEmployers = () => {
   const [employersObj, setEmployersObj] = useState({});
   const [action, setAction] = useState(false);
   const [deleteId, setDeleteId] = useState("");
+  const [employersList, setEmployersList] = useState([]);
 
   const dispatch = useDispatch();
   useEffect(() => {
@@ -54,6 +58,28 @@ const MdasEmployers = () => {
     (state) => state.employersManagerReducer.employers.employers
   );
   const status = useSelector((state) => state.employersManagerReducer.status);
+
+  // custom hook state pagination
+   const [showCount, setShowCount] = useState(5);
+   const [searchTerms, setSearchTerms] = useState("");
+   const [totalPage, setTotalPage] = useState(1);
+
+   // custom hook destructuring
+   const { currentPage, goToNextPage, goToPreviousPage, setPage } =
+     usePagination(1, totalPage);
+
+   const { paginatedData: paginatedEmployersList, totalPages } =
+     usePaginatedData(employers, showCount, currentPage);
+
+   // update loansList to show 5 pendingLoans on page load
+   // or on count changes
+   useEffect(() => {
+     setEmployersList(paginatedEmployersList); // Update local state with paginated data
+   }, [paginatedEmployersList]);
+  
+    useEffect(() => {
+      setTotalPage(totalPages); // Update total pages when it changes
+    }, [totalPages, setTotalPage]);
 
   // handle edit action
   const handleEdit = (e) => {
@@ -69,8 +95,13 @@ const MdasEmployers = () => {
 
   // handle delete action
   const handleDelete = async () => {
-    
-    await apiClient.delete(`/agency/employers/${deleteId}`);
+    const apiUrl = import.meta.env.VITE_BASE_URL;
+    await fetch(`${apiUrl}/api/agency/employers/${deleteId}`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
     // close modal
     setAction(false);
     // fetch employers
@@ -113,7 +144,7 @@ const MdasEmployers = () => {
                 </tr>
               </thead>
               <tbody>
-                {employers?.map((employer) => (
+                {employersList?.map((employer) => (
                   <tr key={employer._id}>
                     <td>{employer.employersId}</td>
                     <td>{employer.employersName}</td>
@@ -150,7 +181,12 @@ const MdasEmployers = () => {
               </tbody>
             </Table>
           </div>
-          <NextPreBtn />
+          <NextPreBtn
+            currentPage={currentPage}
+            totalPages={totalPage}
+            goToNextPage={goToNextPage}
+            goToPreviousPage={goToPreviousPage}
+          />
         </div>
       </div>
       {/* edit employer modal */}
