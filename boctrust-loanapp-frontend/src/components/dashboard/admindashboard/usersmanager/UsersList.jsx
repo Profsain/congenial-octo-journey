@@ -13,7 +13,10 @@ import EditUser from "./EditUser";
 import handleAdminRoles from "../../../../../utilities/getAdminRoles";
 import apiClient from "../../../../lib/axios";
 
-const UsersList = ({ count }) => {
+// custom hook
+import usePaginatedData from "../../../../customHooks/usePaginationData";
+
+const UsersList = ({ count, searchTerms, setTotalPages, currentPage }) => {
   const styles = {
     head: { color: "#fff", fontSize: "1rem", backgroundColor: "#145098" },
     img: { width: "50px", height: "40px" },
@@ -40,6 +43,18 @@ const UsersList = ({ count }) => {
   useEffect(() => {
     dispatch(fetchAdmins(searchTerm));
   }, [dispatch, searchTerm]);
+
+  // Update usersList based on the current page and count
+  const { paginatedData: paginatedUsersList, totalPages } = usePaginatedData(users, count, currentPage);
+
+  useEffect(() => {
+    setUsersList(paginatedUsersList); // Update local state with paginated data
+  }, [paginatedUsersList]);
+
+  useEffect(() => {
+    setTotalPages(totalPages); // Update total pages when it changes
+  }, [totalPages, setTotalPages]);
+  
 
   // Update users list based on count
   useEffect(() => {
@@ -177,6 +192,7 @@ const UsersList = ({ count }) => {
 
 UsersList.propTypes = {
   count: PropTypes.number,
+  searchTerms: PropTypes.string,
 };
 
 export default UsersList;

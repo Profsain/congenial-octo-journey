@@ -17,6 +17,8 @@ import { toast } from "react-toastify";
 // toast styles
 import "react-toastify/dist/ReactToastify.css";
 
+import usePagination from "../../../../customHooks/usePagination";
+
 const roleInputInit = {
   label: "",
   description: "",
@@ -29,6 +31,11 @@ const ManageUserRole = () => {
   const [searchTerms, setSearchTerms] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [newRoleInput, setNewRoleInput] = useState(roleInputInit);
+
+
+  // from usePagination
+  const { currentPage, goToNextPage, goToPreviousPage, setPage } =
+    usePagination(1, totalPages);
 
   const handleAddNew = () => setShowAddNew(true);
 
@@ -150,7 +157,12 @@ const ManageUserRole = () => {
             searchTerms={searchTerms}
           />
           {/* next and previous button  */}
-          <NextPreBtn />
+          <NextPreBtn
+            currentPage={currentPage}
+            totalPages={totalPages}
+            goToNextPage={goToNextPage}
+            goToPreviousPage={goToPreviousPage}
+          />
         </div>
       </div>
 
