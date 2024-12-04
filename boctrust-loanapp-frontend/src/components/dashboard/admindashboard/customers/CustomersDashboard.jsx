@@ -4,10 +4,18 @@ import "./Customer.css";
 import CustomersList from "./CustomersList";
 import NextPreBtn from "../../shared/NextPreBtn";
 
+// custom hook
+import usePagination from "../../../../customHooks/usePagination";
+
 const CustomersDashboard = () => {
   // handle search
   const [showCount, setShowCount] = useState(10);
   const [searchTerms, setSearchTerms] = useState("");
+
+  const [totalPages, setTotalPages] = useState(1);
+
+  const { currentPage, goToNextPage, goToPreviousPage, setPage } =
+    usePagination(1, totalPages);
 
   return (
     <div className="MainBox">
@@ -40,10 +48,20 @@ const CustomersDashboard = () => {
       <div>
         {/* customers list  */}
         <div className="ListSec">
-          <CustomersList showCount={showCount} searchTerms={searchTerms}/>
+          <CustomersList
+            count={showCount}
+            searchTerms={searchTerms}
+            setTotalPages={setTotalPages}
+            currentPage={currentPage}
+          />
         </div>
         {/* next and previous button  */}
-        <NextPreBtn />
+        <NextPreBtn
+          currentPage={currentPage}
+          totalPages={totalPages}
+          goToNextPage={goToNextPage}
+          goToPreviousPage={goToPreviousPage}
+        />
       </div>
     </div>
   );

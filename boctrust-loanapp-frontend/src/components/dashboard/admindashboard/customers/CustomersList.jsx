@@ -13,7 +13,10 @@ import capitalizeEachWord from "../../../../../utilities/capitalizeFirstLetter";
 import searchList from "../../../../../utilities/searchListFunc";
 import sortByCreatedAt from "../../shared/sortedByDate";
 
-const CustomersList = ({ showCount, searchTerms }) => {
+// custom hook
+import usePaginatedData from "../../../../customHooks/usePaginationData";
+
+const CustomersList = ({ count, setTotalPages, currentPage, searchTerms }) => {
   const styles = {
     table: {
       // margin: "0 2rem 0 3rem",
@@ -67,19 +70,30 @@ const CustomersList = ({ showCount, searchTerms }) => {
   // check customers not empty and update customerList
   // update customerList to show 10 customers on page load
   // or on count changes
+  // custom pagination update
+  const { paginatedData: paginatedCustomersList, totalPages } = usePaginatedData(
+    customers,
+    count,
+    currentPage
+  );
   useEffect(() => {
-    if (customers?.length > 0) {
-      const filteredCustomer = customers?.filter(
+    // setBranchesList(paginatedCustomersList); // Update local state with paginated data
+    if (paginatedCustomersList?.length > 0) {
+      const filteredCustomer = paginatedCustomersList?.filter(
         (customer) => customer?.kyc.isKycApproved === true
       );
-      setCustomerList(filteredCustomer?.slice(0, showCount));
+      setCustomerList(filteredCustomer?.slice(0, count));
     }
-  }, [customers, showCount]);
+  }, [paginatedCustomersList]);
+
+  useEffect(() => {
+    setTotalPages(totalPages); // Update total pages when it changes
+  }, [totalPages, setTotalPages]);
 
   // update customerList on search
   const handleSearch = () => {
     const currSearch = searchList(customers, searchTerms, `firstname`);
-    setCustomerList(currSearch?.slice(0, showCount));
+    setCustomerList(currSearch?.slice(0, count));
   };
 
   useEffect(() => {
