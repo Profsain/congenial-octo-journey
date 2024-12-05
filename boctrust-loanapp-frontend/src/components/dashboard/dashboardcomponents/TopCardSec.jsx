@@ -65,9 +65,9 @@ const TopCardSec = ({ user }) => {
     }
 
     if (loansAccountBalance) {
-      const currLoan = loansAccountBalance.find(
+      const currLoan = Array.isArray(loansAccountBalance)?loansAccountBalance.find(
         (loan) => loan.LoanAccountNo == user?.activeLoan?.Number
-      );
+      ):null;
       setUserBalance({
         totalPaid: currLoan?.TotalAmountPaidTillDate || "0.00",
         balance: currLoan?.TotalOutstandingAmount || 0,
