@@ -204,7 +204,7 @@ const LoanFirstStep = ({ data }) => {
       .then((response) => response.json())
       .then(() => {
         // search for bvn details and verify
-        // bvnVerification();
+        bvnVerification();
         navigate("/app/nibbs-login")
         // set show loan form to true
         // setShowLoanForm(true);
