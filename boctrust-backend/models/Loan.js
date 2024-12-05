@@ -35,6 +35,7 @@ const loanSchema = new mongoose.Schema(
         "booked",
         "completed",
         "declined",
+        "terminated",
       ],
     },
     bookingInitiated: {

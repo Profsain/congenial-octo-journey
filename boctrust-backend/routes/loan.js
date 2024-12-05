@@ -12,18 +12,7 @@ const { default: axios } = require("axios");
 const CreditAnalysis = require("../models/CreditAnalysis");
 
 
-// Add this endpoint to fetch all top-up loans
-router.get("/top-up-loans", async (req, res) => {
-    try {
-        const topUpLoans = await Loan.find({ isTopUpLoan: true }).populate("customer");
-        res.status(200).json(topUpLoans);
-    } catch (error) {
-        console.error("Error fetching top-up loans:", error);
-        res.status(500).json({ error: error.message });
-    }
-});
-
-
+// create new loan
 router.post("/", async (req, res) => {
   try {
     const {
@@ -223,6 +212,7 @@ const calcDaysDiffFromNow = (refDate) => {
   return Difference_In_Days;
 };
 
+// repayment schedule
 router.get("/overdue", async (req, res) => {
   const token = process.env.BANKONE_TOKEN;
   const { search, dateFilter, sort = "latest" } = req.query;
@@ -563,7 +553,7 @@ router.put("/disburse/:loanId", async (req, res) => {
 
     // Update monthsSinceLastLoan for the customer
         const now = new Date();
-        await Customer.findByIdAndUpdate(loan.customerId, {
+        await Customer.findByIdAndUpdate(loan.customer, {
             $set: {
                 "topUpLoanEligibility.monthsSinceLastLoan": 0, // Reset since this is a new loan
             },

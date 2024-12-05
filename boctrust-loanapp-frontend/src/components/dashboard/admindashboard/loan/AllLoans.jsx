@@ -35,6 +35,10 @@ const AllLoans = ({ showCount, currentPage, setCurrentPage, searchTerms }) => {
     padding: {
       color: "#ecaa00",
     },
+    topUp: {
+      color: "#ecaa00",
+      fontSize: "0.6rem",
+    }
   };
 
   const [show, setShow] = useState(false);
@@ -66,13 +70,37 @@ const AllLoans = ({ showCount, currentPage, setCurrentPage, searchTerms }) => {
     setShow(true);
   };
 
-  // update loansList on search
+  // update loansList on search and filter them for top-up loans
   const handleSearch = () => {
     if (!allLoans) {
       return;
     }
+
+    // Filter loans matching the search terms
     const currSearch = searchList(allLoans, searchTerms, "agreefullname");
-    setLoansList(currSearch);
+
+    // Include loans where isTopUpLoan and isTopUpLoanSent are both true
+    const topUpLoans = currSearch.filter(
+      (loan) => loan.isTopUpLoan === true && loan.isTopUpLoanSent === true
+    );
+
+    // filter loans where isTopUpLoan is false
+    const nonTopUpLoans = currSearch.filter(
+      (loan) => loan.isTopUpLoan === false
+    );
+
+    // Merge and remove duplicates by loan ID
+    const mergedLoans = [...nonTopUpLoans, ...topUpLoans].reduce(
+      (acc, loan) => {
+        if (!acc.some((item) => item._id === loan._id)) {
+          acc.push(loan);
+        }
+        return acc;
+      },
+      []
+    );
+
+    setLoansList(mergedLoans);
   };
 
   useEffect(() => {
@@ -134,9 +162,19 @@ const AllLoans = ({ showCount, currentPage, setCurrentPage, searchTerms }) => {
                       </td>
                       <td>
                         {loan.deductions === "remita" ? (
-                          <p>Remita</p>
+                          <p>
+                            Remita{" "}
+                            <span style={styles.topUp}>
+                              {loan.isTopUpLoan && "Top-up"}
+                            </span>
+                          </p>
                         ) : (
-                          <p>Nibss</p>
+                          <p>
+                            Nibss{" "}
+                            <span style={styles.topUp}>
+                              {loan.isTopUpLoan && "Top-up"}
+                            </span>
+                          </p>
                         )}
                       </td>
                       <td>
