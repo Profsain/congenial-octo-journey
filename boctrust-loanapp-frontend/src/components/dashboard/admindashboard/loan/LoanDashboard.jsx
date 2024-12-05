@@ -1,12 +1,20 @@
-import { useState} from "react"; 
+import { useState } from "react";
 import DashboardHeadline from "../../shared/DashboardHeadline";
 import "../customers/Customer.css";
 import AllLoans from "./AllLoans";
+import NextPreBtn from "../../shared/NextPreBtn";
+
+// custom hook
+import usePagination from "../../../../customHooks/usePagination";
 
 const LoanDashboard = () => {
   // handle search
-  const [showCount, setShowCount] = useState(10);
+  const [showCount, setShowCount] = useState(5);
   const [searchTerms, setSearchTerms] = useState("");
+  const [totalPages, setTotalPages] = useState(1);
+
+  const { currentPage, goToNextPage, goToPreviousPage, setPage } =
+    usePagination(1, totalPages);
 
 
 
@@ -18,8 +26,8 @@ const LoanDashboard = () => {
           <div className="SearchBar">
             <div className="FormGroup">
               <label htmlFor="show">Show</label>
-              <input 
-                name="showCount" 
+              <input
+                name="showCount"
                 type="number"
                 step={10}
                 min={10}
@@ -28,8 +36,8 @@ const LoanDashboard = () => {
               />
             </div>
             <div className="FormGroup SBox">
-              <input 
-                name="search" 
+              <input
+                name="search"
                 placeholder="Search by name"
                 onChange={(e) => setSearchTerms(e.target.value)}
               />
@@ -41,7 +49,20 @@ const LoanDashboard = () => {
       <div>
         <div className="ListSec">
           {/* Loans list  */}
-          <AllLoans showCount={ showCount} searchTerms={searchTerms} />
+          <AllLoans
+            count={showCount}
+            searchTerms={searchTerms}
+            setTotalPages={setTotalPages}
+            currentPage={currentPage}
+          />
+
+          {/* next and previous button */}
+          <NextPreBtn
+            currentPage={currentPage}
+            totalPages={totalPages}
+            goToNextPage={goToNextPage}
+            goToPreviousPage={goToPreviousPage}
+          />
         </div>
       </div>
     </div>

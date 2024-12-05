@@ -20,6 +20,10 @@ import { customerApprovalEnum } from "../../../../lib/userRelated";
 import { fetchAllCustomersLoans } from "../../../../redux/reducers/customersLoansReducer";
 import apiClient from "../../../../lib/axios";
 
+// custom hook
+import usePagination from "../../../../customHooks/usePagination";
+import usePaginatedData from "../../../../customHooks/usePaginationData";
+
 const styles = {
   btnBox: {
     display: "flex",
@@ -96,6 +100,27 @@ const CreditBureauDashboard = () => {
     setSearchCustomer(filteredData);
   }, [searchTerm, filteredData]);
 
+  // handle search
+  const [showCount, setShowCount] = useState(5);
+  const [searchTerms, setSearchTerms] = useState("");
+  const [totalPage, setTotalPage] = useState(1);
+  // custom hook destructuring
+  const { currentPage, goToNextPage, goToPreviousPage, setPage } =
+    usePagination(1, totalPage);
+  
+  const { paginatedData: paginatedCustomersList, totalPages } = usePaginatedData(customers, showCount, currentPage);
+
+  // update loansList to show 5 pendingLoans on page load
+  // or on count changes
+  useEffect(() => {
+    setSearchCustomer(paginatedCustomersList); // Update local state with paginated data
+  }, [paginatedCustomersList]);
+
+
+  useEffect(() => {
+    setTotalPage(totalPages); // Update total pages when it changes
+  }, [totalPages, setTotalPage]);
+
   useEffect(() => {
     setSearchCustomer(customers);
   }, [customers]);
@@ -103,7 +128,7 @@ const CreditBureauDashboard = () => {
   // handle search by date
   const { filteredDateData } = useSearchByDate(customers, "createdAt");
   const searchByDate = () => {
-    setSearchCustomer(filteredDateData);
+    setSearchCustomer(paginatedCustomersList);
   };
 
   // handle list reload
@@ -113,12 +138,12 @@ const CreditBureauDashboard = () => {
       toDate: "",
     });
     dispatch(fetchAllCustomersLoans({}));
-    setSearchCustomer(customers);
+    setSearchCustomer(paginatedCustomersList);
   };
 
   // handle search by date range
   const { searchData } = useSearchByDateRange(
-    customers,
+    paginatedCustomersList,
     dateRange,
     "createdAt"
   );
@@ -321,7 +346,7 @@ const CreditBureauDashboard = () => {
                               {customer?.creditCheck.assignment.creditAnalyst ==
                               admin.fullName
                                 ? "Continue..."
-                                : "Start"}
+                                : "Assigned"}
                             </BocButton>
                           </div>
                         </td>
@@ -414,7 +439,12 @@ const CreditBureauDashboard = () => {
                 </tbody>
               </Table>
             </div>
-            <NextPreBtn />
+            <NextPreBtn
+              currentPage={currentPage}
+              totalPages={totalPage}
+              goToNextPage={goToNextPage}
+              goToPreviousPage={goToPreviousPage}
+            />
           </div>
         </div>
       ) : showCreditCheckForm ? (

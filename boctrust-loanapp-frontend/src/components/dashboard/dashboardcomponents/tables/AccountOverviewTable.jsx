@@ -55,31 +55,25 @@ const AccountOverviewTable = ({ user }) => {
           </tr>
         </thead>
         <tbody>
-          {!loansAccountBalance || status === "loading" ? (
+          {!Array.isArray(loansAccountBalance) || status === "loading" ? (
             <tr>
               <td colSpan="5">
                 <PageLoader width="70px" />
               </td>
             </tr>
-          ) : loansAccountBalance && loansAccountBalance?.length === 0 ? (
+          ) : loansAccountBalance.length === 0 ? (
             <tr>
               <td colSpan="5" style={{ textAlign: "center" }}>
                 No account overview
               </td>
             </tr>
           ) : (
-            loansAccountBalance &&
             loansAccountBalance.map((loan) => (
               <tr key={loan.LoanAccountNo}>
                 <td>{loan.LoanAccountNo}</td>
-
                 <td>{nigerianCurrencyFormat.format(loan.AccountBalance)}</td>
-                <td>
-                  {nigerianCurrencyFormat.format(loan.TotalOutstandingAmount)}
-                </td>
-                <td>
-                  {nigerianCurrencyFormat.format(loan?.TotalAmountPaidTillDate)}
-                </td>
+                <td>{nigerianCurrencyFormat.format(loan.TotalOutstandingAmount)}</td>
+                <td>{nigerianCurrencyFormat.format(loan?.TotalAmountPaidTillDate)}</td>
               </tr>
             ))
           )}

@@ -15,10 +15,19 @@ import TableOptionsDropdown from "../../shared/tableOptionsDropdown/TableOptions
 import { IoMdCheckmarkCircleOutline } from "react-icons/io";
 import { FcCancel } from "react-icons/fc";
 import apiClient from "../../../../lib/axios";
+// custom hook
+import usePaginatedData from "../../../../customHooks/usePaginationData";
 
-const LoanProductsList = ({ count, searchTerm, admin, adminRoles }) => {
-  // styles
-  const styles = {
+const LoanProductsList = ({
+  count,
+  searchTerm,
+  setTotalPages,
+  currentPage,
+  admin,
+  adminRoles,
+}) => {
+   // styles
+   const styles = {
     head: {
       color: "#fff",
       fontSize: "1.2rem",
@@ -47,11 +56,22 @@ const LoanProductsList = ({ count, searchTerm, admin, adminRoles }) => {
   const [showEditModel, setShowEditModel] = useState(false);
   const [action, setAction] = useState(false);
 
-  // update productsList to show 10 products on page load
+  // update productsList to show 5 products on page load
   // or when count changes
+  // custom pagination update
+  const { paginatedData: paginatedProductsList, totalPages } = usePaginatedData(
+    products,
+    count,
+    currentPage
+  );
+
   useEffect(() => {
-    setProductsList(products?.slice(0, count));
-  }, [products, count]);
+    setProductsList(paginatedProductsList); // Update local state with paginated data
+  }, [paginatedProductsList]);
+
+  useEffect(() => {
+    setTotalPages(totalPages); // Update total pages when it changes
+  }, [totalPages, setTotalPages]);
 
   // update productsList on search
   const handleSearch = () => {
@@ -62,11 +82,15 @@ const LoanProductsList = ({ count, searchTerm, admin, adminRoles }) => {
     handleSearch();
   }, [searchTerm]);
 
-
   // handle delete action
   const handleDelete = async (productId) => {
-   
-    await apiClient.delete(`/product/products/${productId}`);
+    const apiUrl = import.meta.env.VITE_BASE_URL;
+    await fetch(`${apiUrl}/api/product/products/${productId}`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
 
     dispatch(fetchSelectedProduct());
     setAction(false);
@@ -90,7 +114,7 @@ const LoanProductsList = ({ count, searchTerm, admin, adminRoles }) => {
         label: "Delete",
         isDisabled: false,
         func: async () => {
-          setSelectedProduct(product)
+          setSelectedProduct(product);
           setAction(true);
         },
       },

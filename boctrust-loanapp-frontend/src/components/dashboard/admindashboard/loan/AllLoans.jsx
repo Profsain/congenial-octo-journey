@@ -16,7 +16,11 @@ import { loanStatusEnum } from "../../../../lib/userRelated";
 import { fetchLoans } from "../../../../redux/reducers/loanReducer";
 import DisplayLoanProductName from "../../shared/DisplayLoanProductName";
 
-const AllLoans = ({ showCount, searchTerms }) => {
+// custom hook
+import usePagination from "../../../../customHooks/usePagination";
+import usePaginatedData from "../../../../customHooks/usePaginationData";
+
+const AllLoans = ({ count, searchTerms, setTotalPages, currentPage }) => {
   const styles = {
     table: {
       //   margin: "0 2rem 0 3rem",
@@ -55,11 +59,19 @@ const AllLoans = ({ showCount, searchTerms }) => {
 
   // update loansList to show 10 allLoans on page load
   // or on count changes
+  // custom pagination update
+  const { paginatedData: paginatedLoansList, totalPages } = usePaginatedData(
+    allLoans,
+    count,
+    currentPage
+  );
   useEffect(() => {
-    if (allLoans) {
-      setLoansList(allLoans?.slice(0, showCount));
-    }
-  }, [allLoans, showCount]);
+    setLoansList(paginatedLoansList); // Update local state with paginated data
+  }, [paginatedLoansList]);
+
+  useEffect(() => {
+    setTotalPages(totalPages); // Update total pages when it changes
+  }, [totalPages, setTotalPages]);
 
   // handle close loan details
   const handleClose = () => {
@@ -79,8 +91,8 @@ const AllLoans = ({ showCount, searchTerms }) => {
     if (!allLoans) {
       return;
     }
-    const currSearch = searchList(allLoans, searchTerms, "agreefullname");
-    setLoansList(currSearch?.slice(0, showCount));
+    const currSearch = searchList(allLoans, searchTerms, "firstname");
+    setLoansList(currSearch?.slice(0, count));
   };
 
   useEffect(() => {
@@ -173,7 +185,7 @@ const AllLoans = ({ showCount, searchTerms }) => {
           )}
         </Table>
       </div>
-      <NextPreBtn />
+      {/* <NextPreBtn /> */}
 
       {/* show loan details model */}
       {show && (

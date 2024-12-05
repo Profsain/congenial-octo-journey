@@ -16,6 +16,11 @@ import sortByCreatedAt from "../../shared/sortedByDate";
 import { fetchPendingLoans } from "../../../../redux/reducers/loanReducer";
 import DisplayLoanProductName from "../../shared/DisplayLoanProductName";
 
+
+// custom hook
+import usePagination from "../../../../customHooks/usePagination";
+import usePaginatedData from "../../../../customHooks/usePaginationData";
+
 const PaddingLoans = () => {
   const styles = {
     head: {
@@ -57,8 +62,18 @@ const PaddingLoans = () => {
   const [canUserManage, setCanUserManage] = useState(false);
 
   // handle search
-  const [showCount, setShowCount] = useState(10);
+  const [showCount, setShowCount] = useState(5);
   const [searchTerms, setSearchTerms] = useState("");
+  const [totalPages, setTotalPages] = useState(1);
+
+  // custom hook destructuring
+  const { currentPage, goToNextPage, goToPreviousPage, setPage } =
+    usePagination(1, totalPages);
+  const { paginatedData: paginatedLoansList } = usePaginatedData(
+    pendingLoans,
+    showCount,
+    currentPage
+  );
 
   useEffect(() => {
     setCanUserManage(currentUser?.userRole?.can.includes("loanManagement"));
@@ -75,8 +90,11 @@ const PaddingLoans = () => {
   // update loansList to show 10 pendingLoans on page load
   // or on count changes
   useEffect(() => {
-    setLoansList(pendingLoans?.slice(0, showCount));
-  }, [pendingLoans, showCount]);
+    setLoansList(paginatedLoansList); // Update local state with paginated data
+  }, [paginatedLoansList]);
+  useEffect(() => {
+    setTotalPages(totalPages); // Update total pages when it changes
+  }, [totalPages, setTotalPages]);
 
   // handle close notification
   const closeNotification = () => {
@@ -102,7 +120,7 @@ const PaddingLoans = () => {
 
   // update loansList on search
   const handleSearch = () => {
-    const currSearch = searchList(pendingLoans, searchTerms, "agreefullname");
+    const currSearch = searchList(pendingLoans, searchTerms, "firstname");
     setLoansList(currSearch?.slice(0, showCount));
   };
 
@@ -122,8 +140,8 @@ const PaddingLoans = () => {
                 <input
                   name="showCount"
                   type="number"
-                  step={10}
-                  min={10}
+                  step={5}
+                  min={5}
                   value={showCount}
                   onChange={(e) => setShowCount(e.target.value)}
                 />
@@ -214,7 +232,12 @@ const PaddingLoans = () => {
                 </tbody>
               </Table>
             </div>
-            <NextPreBtn />
+            <NextPreBtn
+              currentPage={currentPage}
+              totalPages={totalPages}
+              goToNextPage={goToNextPage}
+              goToPreviousPage={goToPreviousPage}
+            />
           </div>
         </div>
       </div>

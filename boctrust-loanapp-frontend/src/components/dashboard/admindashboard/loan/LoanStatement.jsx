@@ -14,6 +14,10 @@ import NoResult from "../../../shared/NoResult";
 import sortByCreatedAt from "../../shared/sortedByDate";
 import DisplayLoanProductName from "../../shared/DisplayLoanProductName";
 
+// custom hook
+import usePagination from "../../../../customHooks/usePagination";
+import usePaginatedData from "../../../../customHooks/usePaginationData";
+
 const LoanStatement = () => {
   const styles = {
     table: {
@@ -52,8 +56,18 @@ const LoanStatement = () => {
     dispatch(fetchAllCustomer());
   }, [dispatch]);
 
-  const [showCount, setShowCount] = useState(10);
+  const [showCount, setShowCount] = useState(5);
   const [searchTerms, setSearchTerms] = useState("");
+  const [totalPages, setTotalPages] = useState(1);
+
+  // custom hook destructuring
+  const { currentPage, goToNextPage, goToPreviousPage, setPage } =
+    usePagination(1, totalPages);
+  const { paginatedData: paginatedLoansList } = usePaginatedData(
+    completedLoans,
+    showCount,
+    currentPage
+  );
 
   const [show, setShow] = useState(false);
   const [loanObj, setLoanObj] = useState({});
@@ -76,17 +90,29 @@ const LoanStatement = () => {
   // search loan list
   const [loanList, setLoanList] = useState(completedLoans);
 
+
+  // update loansList to show 5 pendingLoans on page load
+  // or on count changes
+   useEffect(() => {
+     setLoanList(paginatedLoansList); // Update local state with paginated data
+   }, [paginatedLoansList]);
+
+   useEffect(() => {
+     setTotalPages(totalPages); // Update total pages when it changes
+   }, [totalPages, setTotalPages]);
+  
+  
   // update loanList to show 10 customers on page load
   // or on count changes
-  useEffect(() => {
-    setLoanList(completedLoans?.slice(0, showCount));
-  }, [completedLoans, showCount]);
+  // useEffect(() => {
+  //   setLoanList(completedLoans?.slice(0, showCount));
+  // }, [completedLoans, showCount]);
 
   // update loanList on search
   const handleSearch = () => {
     // check filteredCustomers is not empty
     if (!completedLoans) return;
-    const currSearch = searchList(completedLoans, searchTerms, "agreefullname");
+    const currSearch = searchList(completedLoans, searchTerms, "firstname");
     setLoanList(currSearch?.slice(0, showCount));
   };
 
@@ -95,7 +121,7 @@ const LoanStatement = () => {
   }, [searchTerms]);
 
   return (
-    <div className="loan__statement">
+    <>
       {/* top search bar */}
       <div className="Search">
         <DashboardHeadline padding="0" height="70px" bgcolor="#d9d9d9">
@@ -105,8 +131,8 @@ const LoanStatement = () => {
               <input
                 name="showCount"
                 type="number"
-                step={10}
-                min={10}
+                step={5}
+                min={5}
                 value={showCount}
                 onChange={(e) => setShowCount(e.target.value)}
               />
@@ -128,7 +154,7 @@ const LoanStatement = () => {
         {status === "loading" && <PageLoader />}
         <DashboardHeadline
           height="52px"
-          mspacer="2rem 0 -3.3rem -1rem"
+          mspacer="2rem 0 -2.5rem -1rem"
           bgcolor="#145098"
         ></DashboardHeadline>
         <div style={styles.table}>
@@ -152,22 +178,19 @@ const LoanStatement = () => {
                   return (
                     <tr key={loan._id}>
                       <td>
-                        {loan?.customer?.banking?.accountDetails?.Message.Id}
+                        {loan?.customer?.banking?.accountDetails?.Message?.Id ??
+                          "N/A"}
                       </td>
                       <td>
                         <DisplayLoanProductName loan={loan} />
                       </td>
                       <td>
-                        {
-                          loan?.customer?.banking?.accountDetails?.Message
-                            .FullName
-                        }
+                        {loan?.customer?.banking?.accountDetails?.Message
+                          .FullName ?? "N/A"}
                       </td>
                       <td>
-                        {
-                          loan?.customer?.banking?.accountDetails?.Message
-                            ?.AccountNumber
-                        }
+                        {loan?.customer?.banking?.accountDetails?.Message
+                          ?.AccountNumber ?? "N/A"}
                       </td>
                       <td>N{loan.loanamount}</td>
                       <td style={styles.date}>
@@ -207,7 +230,12 @@ const LoanStatement = () => {
             </tbody>
           </Table>
         </div>
-        <NextPreBtn />
+        <NextPreBtn
+          currentPage={currentPage}
+          totalPages={totalPages}
+          goToNextPage={goToNextPage}
+          goToPreviousPage={goToPreviousPage}
+        />
 
         {/* show loan details model */}
         {show && (
@@ -218,7 +246,7 @@ const LoanStatement = () => {
           />
         )}
       </div>
-    </div>
+    </>
   );
 };
 

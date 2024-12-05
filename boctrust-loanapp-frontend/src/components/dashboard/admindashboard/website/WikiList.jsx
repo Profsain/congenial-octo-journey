@@ -13,7 +13,10 @@ import getDateOnly from "../../../../../utilities/getDate";
 import searchList from "../../../../../utilities/searchListFunc";
 import apiClient from "../../../../lib/axios";
 
-const WikiList = ({ count, searchTerms }) => {
+// custom hook
+import usePaginatedData from "../../../../customHooks/usePaginationData";
+
+const WikiList = ({ count, searchTerms, setTotalPages, currentPage }) => {
   const [openModel, setOpenModel] = useState(false);
   const [action, setAction] = useState(false);
   const [wikiId, setWikiId] = useState("");
@@ -27,6 +30,22 @@ const WikiList = ({ count, searchTerms }) => {
   const wikis = useSelector((state) => state.wikiReducer.wikis.wikis);
   const status = useSelector((state) => state.wikiReducer.status);
   const [wikisList, setWikisList] = useState(wikis);
+
+
+  // custom pagination update
+  const { paginatedData: paginatedWikisList, totalPages } = usePaginatedData(
+    wikis,
+    count,
+    currentPage
+  );
+
+  useEffect(() => {
+    setWikisList(paginatedWikisList); // Update local state with paginated data
+  }, [paginatedWikisList]);
+
+  useEffect(() => {
+    setTotalPages(totalPages); // Update total pages when it changes
+  }, [totalPages, setTotalPages]);
 
   // update wikisList to show 10 wikis on page load
   // or when count changes
