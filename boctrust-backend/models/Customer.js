@@ -95,7 +95,7 @@ const customerSchema = new mongoose.Schema(
     agreedate: String,
     signature: String,
     photocapture: String,
-
+    marketerClientPic: String,
     username: { type: String, unique: true, required: true },
     password: String,
     confirmpassword: String,
