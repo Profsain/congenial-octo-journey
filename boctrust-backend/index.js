@@ -60,7 +60,7 @@ const termiiOTPRoute = require("./routes/termii");
 const refreshTokenRoutes = require("./routes/refreshToken");
 
 // nibss direct debit 
-const directDebitRoutes = require("./routes/nddMandateOperation");
+const directDebitRoutes = require("./routes/directDebitOperation");
 
 //top-up route
 const topupLoanRoute = require("./routes/topupLoanRoute");
@@ -148,8 +148,9 @@ cron.schedule("0 0 * * *", async () => {
     app.use("/public/filesUpload", express.static("public/filesUpload"));
 
     // Middleware
-    app.use(bodyParser.json());
-    app.use(bodyParser.urlencoded({ extended: true }));
+    // Increase the payload limit
+    app.use(bodyParser.json({ limit: '50mb' }));
+    // app.use(bodyParser.urlencoded({ extended: true }));
 
     // use routes
     app.use("/api/blog", blogRoutes);

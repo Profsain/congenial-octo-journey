@@ -13,7 +13,7 @@ const DirectDebitModal = ({ show, handleClose, customer }) => {
 
   const [file, setFile] = useState(null);
   const [formData, setFormData] = useState({
-    productId: "1",
+    productId: 1,
     accountNumber: "0937258920",
     bankCode: "76768",
     payerName: "test",
@@ -37,66 +37,110 @@ const DirectDebitModal = ({ show, handleClose, customer }) => {
     });
   };
 
-  const handleFileChange = (e) => {
-    setFile(e.target.files[0]);
-  };
+  // const handleFileChange = (e) => {
+  //   setFile(e.target.files[0]);
+  // };
 
   // Handle file selection and conversion to Base64
-  //   const handleFileChange = async (e) => {
-  //     const file = e.target.files[0];
-  //     if (file) {
-  //       const reader = new FileReader();
-  //       reader.onloadend = () => {
-  //         setMandateFile(reader.result.split(",")[1]); // Set Base64 content
-  //       };
-  //       reader.readAsDataURL(file); // Convert file to Base64
-  //     }
-  //   };
+  const handleFileChange = async (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setMandateFile(reader.result.split(",")[1]); // Set Base64 content
+      };
+      reader.readAsDataURL(file); // Convert file to Base64
+    }
+  };
+  // console.log(mandateFile)
 
   // Handle direct debit request processing
+  // const handleCreateDebit = async () => {
+  //   setLoading(true);
+
+  //   // Validate required fields
+  //   if (!startDate || !endDate) {
+  //     setLoading(false);
+  //     return alert(
+  //       "Please fill in all fields, including uploading a mandate file."
+  //     );
+  //   }
+
+  //   try {
+  //     // Create FormData object
+  //     const data = {
+  //       mandateFile
+  //     }
+
+  //     // Make API request
+  //     const response = await fetch(`${apiUrl}/api/direct-debit/create-mandate`, {
+  //       method: "POST",
+  //       headers: {
+  //         content
+  //       },
+  //       body: data, // Send the FormData
+  //     });
+
+  //     if (!response.ok) {
+  //       // If response is not OK, try to parse JSON for error details
+  //       const errorText = await response.text();
+  //       console.error("Server returned an error:", errorText);
+  //       throw new Error(`Failed with status ${response.status}`);
+  //     }
+
+  //     // Parse JSON response
+  //     const responseData = await response.json();
+  //     console.log("Direct debit request processed successfully:", responseData);
+
+  //     // Reset loading state and close modal
+  //     setLoading(false);
+  //     handleClose();
+  //   } catch (error) {
+  //     console.error("Error processing direct debit request:", error.message);
+  //     setLoading(false);
+  //   }
+  // };
+
   const handleCreateDebit = async () => {
     setLoading(true);
 
-    // Validate required fields
-    if (!startDate || !endDate || !file) {
+    // Check if required fields are filled
+    if (!startDate || !endDate || !mandateFile) {
       setLoading(false);
       return alert(
         "Please fill in all fields, including uploading a mandate file."
       );
     }
 
-    // Create FormData
-    const data = new FormData();
-    Object.keys(formData).forEach((key) => {
-      data.append(key, formData[key]);
-    });
-
-    if (file) {
-      data.append("mandateImageFile", file);
-    }
-
     try {
-      // Make API request
+      const bodyData = {
+        customerId: customer._id,
+        startDate,
+        endDate,
+        // mandateFile, // Include Base64-encoded file
+      };
+
       const response = await fetch(
         `${apiUrl}/api/direct-debit/create-mandate`,
         {
           method: "POST",
-          body: data, // FormData automatically sets the correct Content-Type
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(bodyData),
         }
       );
 
-      if (!response.ok) {
-        // If response is not OK, try to parse JSON for error details
-        const errorText = await response.text();
-        console.error("Server returned an error:", errorText);
-        throw new Error(`Failed with status ${response.status}`);
+      if (response.ok) {
+        const data = await response.json();
+        console.log("Direct debit request processed successfully", data);
+        setLoading(false);
+        handleClose();
+      } else {
+        const errorData = await response.json();
+        console.error("Failed to process direct debit request:", errorData);
+        setLoading(false);
       }
-
-      // Parse JSON response
-      const responseData = await response.json();
-      console.log("Direct debit request processed successfully:", responseData);
-      setLoading(false);
-      handleClose();
     } catch (error) {
       console.error("Error processing direct debit request:", error.message);
       setLoading(false);

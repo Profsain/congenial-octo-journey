@@ -1,10 +1,15 @@
 const express = require('express');
 const router = express.Router();
+const Customer = require("../models/Customer");
 const unirest = require("unirest");
 const multer = require("multer");
-const fetchAccessToken = require('../utils/nddAccessToken');
+const getAccessToken = require('../utils/nddAccessToken');
+const NIBSSCLIENT = require('../utils/nibssClient');
 
 const BASE_URL = 'https://apitest.nibss-plc.com.ng/ndd/v2/api';
+
+// Create a new NIBSSClient instance
+const nibssClient = new NIBSSCLIENT();
 
 // Multer setup for file uploads
 const storage = multer.diskStorage({
@@ -19,10 +24,24 @@ const storage = multer.diskStorage({
 const upload = multer({ storage });
 
 // API Endpoint to handle Direct Debit Mandate Creation
-router.post("/create-mandate", upload.single("mandateImageFile"), async (req, res) => {
+router.post("/nncreate-mandate", async (req, res) => {
+  console.log("create-mandate");
+  try {
+    const data = req.body; // Assuming mandate data is sent in the request body
+    console.log(data);
+    const response = await nibssClient.createMandateDirectDebit(data);
+    res.json(response);
+  } catch (error) {
+    console.error("Error creating mandate:", error);
+    res.status(500).json({ error: "Failed to create mandate" });
+  }
+});
+
+// API Endpoint to handle Direct Debit Mandate Creation
+router.post("/create-mandate", async (req, res) => {
   try {
     // Fetch the access token
-    const token = await fetchAccessToken(); // Wait for the token to resolve
+    const token = await getAccessToken(); // Wait for the token to resolve
     console.log("auth token", token);
 
     const {
@@ -44,7 +63,7 @@ router.post("/create-mandate", upload.single("mandateImageFile"), async (req, re
 
     console.log(req.body);
 
-    const filePath = req.file ? req.file.path : null; // Uploaded file path
+    // const filePath = req.file ? req.file.path : null; // Uploaded file path
 
     // Ensure all required fields are present
     if (
@@ -58,12 +77,11 @@ router.post("/create-mandate", upload.single("mandateImageFile"), async (req, re
       !phoneNumber ||
       !subscriberCode ||
       !startDate ||
-      !endDate ||
-      !filePath ||
-      !billerId
+      !endDate
     ) {
       return res.status(400).json({ error: "All fields are required, including the file." });
     }
+
 
     // Create unirest request
     const reqUnirest = unirest("POST", `${BASE_URL}/MandateRequest/CreateMandateDirectDebit`);
@@ -89,7 +107,7 @@ router.post("/create-mandate", upload.single("mandateImageFile"), async (req, re
     reqUnirest.field("startDate", startDate);
     reqUnirest.field("endDate", endDate);
     reqUnirest.field("billerId", billerId);
-    reqUnirest.attach("mandateImageFile", filePath);
+    // reqUnirest.attach("mandateImageFile", filePath);
 
     // Handle unirest response
     reqUnirest.end(function (apiRes) {
