@@ -8,8 +8,9 @@ import PageLoader from "../../../shared/PageLoader";
 // Define validation schema using Yup
 const validationSchema = Yup.object().shape({
   ruleTitle: Yup.string().required("Rule title is required"),
-  maximumTenure: Yup.string().required("Maximum tenure is required"),
-  maximumAmount: Yup.string().required("Maximum amount is required"),
+  maximumTenure: Yup.string().required("Tenure threshold is required"),
+  maximumAmount: Yup.string().required("Amount threshold is required"),
+  logicalRelationship: Yup.string(),
 });
 
 // Define options for select inputs
@@ -32,7 +33,6 @@ const EmployerLetterRuleForm = ({
   handleSubmit,
   message,
 }) => {
-  
   return (
     <div className="add__statementContainer">
       <div className="TransContainer ">
@@ -58,6 +58,22 @@ const EmployerLetterRuleForm = ({
                     component="div"
                     className="error__msg"
                   />
+                </div>
+
+                <div className="FieldGroup">
+                  <label htmlFor="logicalRelationship">
+                    Logical Relationship
+                  </label>
+                  <Field
+                    as="select"
+                    name="logicalRelationship"
+                    id="logicalRelationship"
+                    className="Select"
+                  >
+                    {["AND", "OR"].map((option) => (
+                      <option key={option} value={option} label={option} />
+                    ))}
+                  </Field>
                 </div>
               </div>
 

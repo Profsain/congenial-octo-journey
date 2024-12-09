@@ -1,9 +1,13 @@
 import { useSelector } from "react-redux";
-import BocButton from "../../shared/BocButton";
 import DashboardHeadline from "../../shared/DashboardHeadline";
 import Table from "react-bootstrap/Table";
+import TableStyles from "../tables/TableStyles.module.css";
+import PageLoader from "../../shared/PageLoader";
+import { format } from "date-fns";
+import { nigerianCurrencyFormat } from "../../../../../utilities/formatToNiaraCurrency";
 
-const TransactionReportSection = () => {
+
+const TransactionReportSection = ({ printRef }) => {
   const styles = {
     th: {
       color: "#145098",
@@ -15,18 +19,18 @@ const TransactionReportSection = () => {
     },
   };
 
-  // current user
-  const user = useSelector((state) => state.adminAuth.user);
+  const { userTransactions, status } = useSelector(
+    (state) => state.transactionReducer
+  );
 
-  const transactions = user?.transactions || [];
 
   return (
-    <div>
+    <div ref={printRef}>
       <DashboardHeadline mspacer="0 3rem 0 0">
         Recent Transactions
       </DashboardHeadline>
       <div className="TReport">
-        <Table borderless hover responsive="sm" className="DTable">
+        <Table id="transactionReportTable" borderless hover responsive="sm" className="DTable">
           <thead>
             <tr style={styles.th}>
               <th>Date</th>
@@ -35,72 +39,48 @@ const TransactionReportSection = () => {
               <th>Dr/Cr</th>
               <th>Type</th>
               <th>Status</th>
-              <th>Details</th>
+       
             </tr>
           </thead>
           <tbody>
-            {transactions.length === 0 ? (
-              <tr>
-                <td colSpan="7" style={{ textAlign: "center" }}>
-                  No transaction record
-                </td>
-              </tr>
-            ) : (
-              <div>
-                <tr>
-                  <td>2023-03</td>
-                  <td>1234567891</td>
-                  <td>N2134</td>
-                  <td>Dr</td>
-                  <td>Loan Repayment</td>
-                  <td style={styles.completed}>Completed</td>
+          {!userTransactions && status === "loading" ? (
+            <tr className={TableStyles.row}>
+              <td colSpan="7">
+                <PageLoader width="70px" />
+              </td>
+            </tr>
+          ) : !userTransactions || userTransactions.length === 0 ? (
+            <tr className={TableStyles.row}>
+              <td colSpan="7" style={{ textAlign: "center" }}>
+                Nothing to Display
+              </td>
+            </tr>
+          ) : (
+            userTransactions &&
+            userTransactions.slice(0, 5).map((transaction, index) => {
+              return (
+                <tr key={index} className={TableStyles.row}>
                   <td>
-                    <BocButton
-                      cursor="pointer"
-                      bgcolor="#145098"
-                      bradius="18px"
-                    >
-                      View
-                    </BocButton>
+                    {transaction?.CurrentDate
+                      ? format(
+                          transaction?.CurrentDate,
+                          "dd/LL/yyyy, hh:mm aaa"
+                        )
+                      : ""}
                   </td>
-                </tr>
-                <tr>
-                  <td>2023-25-03</td>
-                  <td>1234567891</td>
-                  <td>N2134</td>
-                  <td>Dr</td>
-                  <td>Loan Repayment</td>
-                  <td style={styles.completed}>Completed</td>
+                  <td>{transaction?.AccountNumber || "NIL"}</td>
                   <td>
-                    <BocButton
-                      cursor="pointer"
-                      bgcolor="#145098"
-                      bradius="18px"
-                    >
-                      View
-                    </BocButton>
+                    {nigerianCurrencyFormat.format(transaction?.Amount / 100)}
                   </td>
+                  <td>{transaction?.RecordType}</td>
+                  <td>{transaction?.PostingType} </td>
+                  <td style={styles.completed}>{transaction?.status}</td>
+                  
                 </tr>
-                <tr>
-                  <td>2023-25-05</td>
-                  <td>1234567891</td>
-                  <td>N1134</td>
-                  <td>Cr</td>
-                  <td>Loan Repayment</td>
-                  <td style={styles.completed}>Completed</td>
-                  <td>
-                    <BocButton
-                      cursor="pointer"
-                      bgcolor="#145098"
-                      bradius="18px"
-                    >
-                      View
-                    </BocButton>
-                  </td>
-                </tr>
-              </div>
-            )}
-          </tbody>
+              );
+            })
+          )}
+        </tbody>
         </Table>
       </div>
     </div>

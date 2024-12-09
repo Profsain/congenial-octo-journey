@@ -129,7 +129,23 @@ router.post("/login", async (req, res) => {
     }
 
     // find customer by username
-    const customer = await CustomerModel.findOne({ username });
+    const customer = await CustomerModel.findOne({ username }).populate({
+      path: "employer",
+      populate: [
+        {
+          path: "mandateRule",
+          model: "MandateRule",
+        },
+        {
+          path: "statementRule",
+          model: "StatementRule",
+        },
+        {
+          path: "employerLetterRule",
+          model: "EmployerLetterRule",
+        },
+      ],
+    });
 
     // validate if user exist in our database and create token
     if (customer && bcrypt.compare(password, customer.password)) {

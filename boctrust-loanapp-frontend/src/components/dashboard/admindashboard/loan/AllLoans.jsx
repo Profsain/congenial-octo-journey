@@ -16,11 +16,15 @@ import { loanStatusEnum } from "../../../../lib/userRelated";
 import { fetchLoans } from "../../../../redux/reducers/loanReducer";
 import DisplayLoanProductName from "../../shared/DisplayLoanProductName";
 
+<<<<<<< HEAD
 // custom hook
 import usePagination from "../../../../customHooks/usePagination";
 import usePaginatedData from "../../../../customHooks/usePaginationData";
 
 const AllLoans = ({ count, searchTerms, setTotalPages, currentPage }) => {
+=======
+const AllLoans = ({ showCount, currentPage, setCurrentPage, searchTerms }) => {
+>>>>>>> user-area
   const styles = {
     table: {
       //   margin: "0 2rem 0 3rem",
@@ -57,6 +61,7 @@ const AllLoans = ({ count, searchTerms, setTotalPages, currentPage }) => {
     getData();
   }, [dispatch, show]);
 
+<<<<<<< HEAD
   // update loansList to show 10 allLoans on page load
   // or on count changes
   // custom pagination update
@@ -73,6 +78,8 @@ const AllLoans = ({ count, searchTerms, setTotalPages, currentPage }) => {
     setTotalPages(totalPages); // Update total pages when it changes
   }, [totalPages, setTotalPages]);
 
+=======
+>>>>>>> user-area
   // handle close loan details
   const handleClose = () => {
     setLoanObj({});
@@ -91,13 +98,30 @@ const AllLoans = ({ count, searchTerms, setTotalPages, currentPage }) => {
     if (!allLoans) {
       return;
     }
+<<<<<<< HEAD
     const currSearch = searchList(allLoans, searchTerms, "firstname");
     setLoansList(currSearch?.slice(0, count));
+=======
+    const currSearch = searchList(allLoans, searchTerms, "agreefullname");
+    setLoansList(currSearch);
+>>>>>>> user-area
   };
 
   useEffect(() => {
     handleSearch();
   }, [searchTerms]);
+
+  const handleGoNext = () => {
+    if (currentPage < Math.ceil((loansList?.length - 1) / showCount)) {
+      setCurrentPage((prev) => prev + 1);
+    }
+  };
+
+  const handleGoPrev = () => {
+    if (currentPage > 1) {
+      setCurrentPage((prev) => prev - 1);
+    }
+  };
 
   return (
     <div className="loans__tableContainer">
@@ -121,17 +145,20 @@ const AllLoans = ({ count, searchTerms, setTotalPages, currentPage }) => {
               <th>Action</th>
             </tr>
           </thead>
-          {status === "loading" ? (
-            <tr>
-              <td colSpan="9">
-                <PageLoader />
-              </td>
-            </tr>
-          ) : (
-            <tbody>
-              {loansList?.length === 0 && <NoResult name="Loan" />}
-              {loansList &&
-                sortByCreatedAt(loansList)?.map((loan) => {
+          <tbody>
+            {!loansList || status === "loading" ? (
+              <tr>
+                <td colSpan="9">
+                  <PageLoader />
+                </td>
+              </tr>
+            ) : loansList && loansList?.length === 0 ? (
+              <NoResult name="Loan" />
+            ) : (
+              loansList &&
+              sortByCreatedAt(loansList)
+                ?.slice((currentPage - 1) * showCount, currentPage * showCount)
+                ?.map((loan) => {
                   return (
                     <tr key={loan._id}>
                       <td>
@@ -139,7 +166,7 @@ const AllLoans = ({ count, searchTerms, setTotalPages, currentPage }) => {
                       </td>
                       <td>
                         {loan.deductions === "remita" ? (
-                         <p>Remita</p>
+                          <p>Remita</p>
                         ) : (
                           <p>Nibss</p>
                         )}
@@ -180,12 +207,21 @@ const AllLoans = ({ count, searchTerms, setTotalPages, currentPage }) => {
                       </td>
                     </tr>
                   );
-                })}
-            </tbody>
-          )}
+                })
+            )}
+          </tbody>
         </Table>
       </div>
+<<<<<<< HEAD
       {/* <NextPreBtn /> */}
+=======
+      <NextPreBtn
+        nextFunc={handleGoNext}
+        numberOfPages={Math.ceil((loansList?.length - 1) / showCount)}
+        count={currentPage}
+        prevFunc={handleGoPrev}
+      />
+>>>>>>> user-area
 
       {/* show loan details model */}
       {show && (

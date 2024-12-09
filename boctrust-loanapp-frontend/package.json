@@ -36,6 +36,8 @@
     "firebase": "^10.4.0",
     "formik": "^2.4.2",
     "googleapis": "^134.0.0",
+    "jspdf": "^2.5.2",
+    "jspdf-autotable": "^3.8.4",
     "mdb-react-ui-kit": "^6.1.0",
     "naija-state-local-government": "^1.1.2",
     "react": "^18.2.0",
@@ -61,6 +63,7 @@
     "recharts": "^2.7.2",
     "redux-thunk": "^3.1.0",
     "sass": "^1.62.1",
+    "xlsx": "^0.18.5",
     "yup": "^1.2.0"
   },
   "devDependencies": {

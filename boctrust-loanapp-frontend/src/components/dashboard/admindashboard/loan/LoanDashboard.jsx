@@ -11,12 +11,16 @@ const LoanDashboard = () => {
   // handle search
   const [showCount, setShowCount] = useState(5);
   const [searchTerms, setSearchTerms] = useState("");
+<<<<<<< HEAD
   const [totalPages, setTotalPages] = useState(1);
 
   const { currentPage, goToNextPage, goToPreviousPage, setPage } =
     usePagination(1, totalPages);
 
 
+=======
+  const [currentPage, setCurrentPage] = useState(1);
+>>>>>>> user-area
 
   return (
     <div className="MainBox">
@@ -50,6 +54,7 @@ const LoanDashboard = () => {
         <div className="ListSec">
           {/* Loans list  */}
           <AllLoans
+<<<<<<< HEAD
             count={showCount}
             searchTerms={searchTerms}
             setTotalPages={setTotalPages}
@@ -62,6 +67,12 @@ const LoanDashboard = () => {
             totalPages={totalPages}
             goToNextPage={goToNextPage}
             goToPreviousPage={goToPreviousPage}
+=======
+            showCount={showCount}
+            currentPage={currentPage}
+            setCurrentPage={setCurrentPage}
+            searchTerms={searchTerms}
+>>>>>>> user-area
           />
         </div>
       </div>

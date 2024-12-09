@@ -223,7 +223,6 @@ const BookLoans = () => {
         </div>
         <div>
           {/* data loader */}
-          {status === "loading" && <PageLoader />}
 
           {/* Loans list  */}
           <div className="ListSec">
@@ -248,10 +247,16 @@ const BookLoans = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {loansList && sortByCreatedAt(loansList)?.length === 0 && (
-                    <NoResult name="Loan" />
-                  )}
-                  {loansList &&
+                  {!loansList && status === "loading" ? (
+                    <td colSpan="7">
+                      <PageLoader />
+                    </td>
+                  ) : loansList && sortByCreatedAt(loansList)?.length === 0 ? (
+                    <td colSpan="7">
+                      <NoResult name="Loan" />
+                    </td>
+                  ) : (
+                    loansList &&
                     loansList?.map((loan, index) => {
                       return (
                         <tr key={loan.id}>
@@ -289,7 +294,8 @@ const BookLoans = () => {
                           )}
                         </tr>
                       );
-                    })}
+                    })
+                  )}
                 </tbody>
               </Table>
             </div>

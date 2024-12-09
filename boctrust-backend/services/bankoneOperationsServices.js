@@ -54,15 +54,15 @@ const getAccountProduct = async ({
   const token = process.env.BANKONE_TOKEN;
 
   try {
-    // const customerAccountProductCode = 102;
-    const customerAccountProductCode =
-      careertype == "government employee" &&
-      deductions == "ippis" &&
-      !otheremployername
-        ? 107
-        : careertype !== "business owner" && otheremployername
-        ? 200
-        : 201;
+    const customerAccountProductCode = 102;
+    // const customerAccountProductCode =
+    //   careertype == "government employee" &&
+    //   deductions == "ippis" &&
+    //   !otheremployername
+    //     ? 107
+    //     : careertype !== "business owner" && otheremployername
+    //     ? 200
+    //     : 201;
     const response = await axios.get(
       `${baseUrl}/BankOneWebAPI/api/Product/GetByCode/2?authToken=${token}&productCode=${customerAccountProductCode}`
     );
@@ -93,12 +93,13 @@ const getLoanProduct = async ({
   // * Term Loan: 305
 
   try {
-    // const customerAccountProductCode = 401;
-    const customerAccountProductCode = careertype == "government employee" &&
-    deductions == "ippis" &&
-    !otheremployername
-      ? 306
-      : loanproduct;
+    const customerAccountProductCode = 401;
+    // const customerAccountProductCode =
+    //   careertype == "government employee" &&
+    //   deductions == "ippis" &&
+    //   !otheremployername
+    //     ? 306
+    //     : loanproduct;
 
     // const { data } = await axios.get(
     //   `${baseUrl}/BankOneWebAPI/api/Product/GetByCode/2?authToken=${token}&productCode=${customerAccountProductCode}`
@@ -143,6 +144,24 @@ const getLoanByCustomerId = async (customerId) => {
   }
 };
 
+const getLoanAccountStatement = async ({ accountNumber, fromDate, toDate }) => {
+  const baseUrl = process.env.BANKONE_BASE_URL;
+  const token = process.env.BANKONE_TOKEN;
+  // Construct the URL with the provided parameters
+  const apiUrl = `${baseUrl}/BankOneWebAPI/api/LoanAccount/LoanAccountStatement/2?authToken=${token}&accountNumber=${accountNumber}`;
+
+  if (fromDate) {
+    apiUrl + `&fromDate=${fromDate}`;
+  }
+  if (toDate) {
+    apiUrl + `&toDate=${toDate}`;
+  }
+
+  const { data } = await axios(apiUrl);
+
+  return data
+};
+
 function generateTrackingId() {
   // Get the current timestamp in milliseconds
   const timestamp = Date.now().toString();
@@ -163,4 +182,5 @@ module.exports = {
   getLoanProduct,
   getLoanByCustomerId,
   generateTrackingId,
+  getLoanAccountStatement
 };

@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import "../../dashboardcomponents/transferdashboard/Transfer.css";
 import "./Credit.css";
 import PropTypes from "prop-types";
-import { fetchSingleCustomer } from "../../../../redux/reducers/customerReducer";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import { format, formatDistance } from "date-fns";
@@ -12,10 +11,11 @@ import { customerApprovalEnum } from "../../../../lib/userRelated";
 import apiClient from "../../../../lib/axios";
 import { VscDebugStart } from "react-icons/vsc";
 import { AiFillStop } from "react-icons/ai";
+import { fetchSingleCreditAnalysis } from "../../../../redux/reducers/creditAnalysisReducer";
 
 const percentageIndex = 0.45;
 
-const DecisionSummary = ({ customerId }) => {
+const DecisionSummary = ({ recordId }) => {
   const dispatch = useDispatch();
 
   const [decisionSummaryInfo, setDecisionSummaryInfo] = useState(null);
@@ -35,7 +35,9 @@ const DecisionSummary = ({ customerId }) => {
   });
   const [isLoading, setIsLoading] = useState(false);
 
-  const { selectedCustomer } = useSelector((state) => state.customerReducer);
+  const { selectedCreditAnalysis } = useSelector(
+    (state) => state.creditAnalysis
+  );
 
   // current login superAdmin user
   const currentUser = useSelector((state) => state.adminAuth.user);
@@ -43,7 +45,7 @@ const DecisionSummary = ({ customerId }) => {
   useEffect(() => {
     const getData = async () => {
       try {
-        await dispatch(fetchSingleCustomer(customerId));
+        await dispatch(fetchSingleCreditAnalysis(recordId));
       } catch (error) {
         console.log(error);
       }
@@ -53,16 +55,16 @@ const DecisionSummary = ({ customerId }) => {
   }, []);
 
   useEffect(() => {
-    if (selectedCustomer) {
+    if (selectedCreditAnalysis) {
       setDecisionSummaryInfo({
         ...decisionSummaryInfo,
 
         maxAmountLendable: (
-          Number(selectedCustomer?.creditCheck?.paySlipAnalysis?.netPay) *
+          Number(selectedCreditAnalysis?.paySlipAnalysis?.netPay) *
           percentageIndex
         ).toFixed(2),
         totalMonthlyDeductions:
-          selectedCustomer?.creditCheck?.paySlipAnalysis?.extraLenders.reduce(
+          selectedCreditAnalysis?.paySlipAnalysis?.extraLenders.reduce(
             (acc, curr) => acc + Number(curr.deductions),
             0
           ),
@@ -70,51 +72,47 @@ const DecisionSummary = ({ customerId }) => {
 
       setValidateInfo({
         isCustomerOnSoftSuit:
-          selectedCustomer?.creditCheck?.decisionSummary?.isCustomerOnSoftSuit,
+          selectedCreditAnalysis?.decisionSummary?.isCustomerOnSoftSuit,
         isCustomerNextOfKinOk:
-          selectedCustomer?.creditCheck?.decisionSummary?.isCustomerNextOfKinOk,
+          selectedCreditAnalysis?.decisionSummary?.isCustomerNextOfKinOk,
         isCreditCheckOk:
-          selectedCustomer?.creditCheck?.decisionSummary?.isCreditCheckOk,
-        isBvnCheckOk:
-          selectedCustomer?.creditCheck?.decisionSummary?.isBvnCheckOk,
+          selectedCreditAnalysis?.decisionSummary?.isCreditCheckOk,
+        isBvnCheckOk: selectedCreditAnalysis?.decisionSummary?.isBvnCheckOk,
         disbursementInstruction:
-          selectedCustomer?.creditCheck?.decisionSummary
-            ?.disbursementInstruction,
+          selectedCreditAnalysis?.decisionSummary?.disbursementInstruction,
         creditOfficerReview:
-          selectedCustomer?.creditCheck?.decisionSummary?.creditOfficerReview,
+          selectedCreditAnalysis?.decisionSummary?.creditOfficerReview,
       });
 
       setApprovalStatus({
         cooApprovalStatus:
-          selectedCustomer?.creditCheck?.decisionSummary?.cooApprovalStatus,
+          selectedCreditAnalysis?.decisionSummary?.cooApprovalStatus,
         creditOfficerApprovalStatus:
-          selectedCustomer?.creditCheck?.decisionSummary
-            ?.creditOfficerApprovalStatus,
+          selectedCreditAnalysis?.decisionSummary?.creditOfficerApprovalStatus,
         headOfCreditApprovalStatus:
-          selectedCustomer?.creditCheck?.decisionSummary
-            ?.headOfCreditApprovalStatus,
+          selectedCreditAnalysis?.decisionSummary?.headOfCreditApprovalStatus,
       });
     }
-  }, [selectedCustomer]);
+  }, [selectedCreditAnalysis]);
 
   useEffect(() => {
     if (!decisionSummaryInfo) return;
     if (
       decisionSummaryInfo?.totalMonthlyDeductions === 0 &&
-      selectedCustomer?.creditCheck?.paySlipAnalysis?.monthlyLoanRepayment >
+      selectedCreditAnalysis?.paySlipAnalysis?.monthlyLoanRepayment >
         decisionSummaryInfo.maxAmountLendable
     ) {
       setIsGoodCreditHistory(false);
     } else if (
       decisionSummaryInfo?.totalMonthlyDeductions === 0 &&
-      selectedCustomer?.creditCheck?.paySlipAnalysis?.monthlyLoanRepayment <
+      selectedCreditAnalysis?.paySlipAnalysis?.monthlyLoanRepayment <
         decisionSummaryInfo.maxAmountLendable
     ) {
       setIsGoodCreditHistory(true);
     }
     if (decisionSummaryInfo?.totalMonthlyDeductions > 0) {
       if (
-        (selectedCustomer?.creditCheck?.paySlipAnalysis?.netPay -
+        (selectedCreditAnalysis?.paySlipAnalysis?.netPay -
           decisionSummaryInfo?.totalMonthlyDeductions) *
           percentageIndex <
         decisionSummaryInfo.maxAmountLendable
@@ -124,7 +122,7 @@ const DecisionSummary = ({ customerId }) => {
         setIsGoodCreditHistory(false);
       }
     }
-  }, [decisionSummaryInfo, selectedCustomer]);
+  }, [decisionSummaryInfo, selectedCreditAnalysis]);
 
   const handleApproveCustomer = async () => {
     const requestObj = {
@@ -148,20 +146,20 @@ const DecisionSummary = ({ customerId }) => {
         customerApprovalEnum.pending
       ) {
         await apiClient.put(
-          `/updatecustomer/approve/co/${customerId}`,
+          `/credit-analysis/approve/co/${recordId}`,
           requestObj
         );
       } else if (
         approvalStatus.headOfCreditApprovalStatus ==
         customerApprovalEnum.pending
       ) {
-        await apiClient.put(`/updatecustomer/approve/hoc/${customerId}`);
+        await apiClient.put(`/credit-analysis/approve/hoc/${recordId}`);
       } else if (
         approvalStatus.cooApprovalStatus == customerApprovalEnum.pending
       ) {
-        await apiClient.put(`/updatecustomer/approve/coo/${customerId}`);
+        await apiClient.put(`/credit-analysis/approve/coo/${recordId}`);
       }
-      await dispatch(fetchSingleCustomer(customerId));
+      await dispatch(fetchSingleCreditAnalysis(recordId));
       toast.success("Customer Approval Success");
     } catch (error) {
       toast.error(error?.response?.data?.error || "Something Went Wrong");
@@ -220,60 +218,67 @@ const DecisionSummary = ({ customerId }) => {
       </div>
 
       <div className="mx-1">
-        <p className="row">
-          <span className="col-7"> Customer&apos;s Net pay is </span>
-          <span className="figure col-5">
-            {nigerianCurrencyFormat.format(
-              selectedCustomer?.creditCheck?.paySlipAnalysis?.netPay
-            )}
-          </span>
-        </p>
-        <p className="row">
-          <span className="col-7"> 45% of Customer&apos;s Net pay is </span>
-          <span className="figure col-5">
-            {nigerianCurrencyFormat.format(
-              decisionSummaryInfo?.maxAmountLendable
-            )}
-          </span>
-        </p>
-        <p className="row">
-          <span className="col-7"> Monthy Repayment</span>{" "}
-          <span className="figure col-5">
-            {nigerianCurrencyFormat.format(
-              selectedCustomer?.creditCheck?.paySlipAnalysis
-                ?.monthlyLoanRepayment
-            )}
-          </span>
-        </p>
-        <p className="row">
-          <span className="col-7"> Total Monthy Deductions</span>{" "}
-          <span className="figure col-5">
-            {decisionSummaryInfo?.totalMonthlyDeductions}
-          </span>
-        </p>
-        <p className="row">
-          <span className="col-7">
-            If Loan is approved, customer&apos;s Take Home is{" "}
-          </span>
-          <div className="col-5">
-            <span className="figure">
-              {nigerianCurrencyFormat.format(
-                decisionSummaryInfo?.maxAmountLendable -
-                  decisionSummaryInfo?.totalMonthlyDeductions
-              )}
-            </span>{" "}
-            which is{" "}
-            <span className="figure">
-              {(
-                ((decisionSummaryInfo?.maxAmountLendable -
-                  decisionSummaryInfo?.totalMonthlyDeductions) *
-                  100) /
-                selectedCustomer?.creditCheck?.paySlipAnalysis?.netPay
-              ).toFixed(2)}
-            </span>
-            % of his/her Net pay.
+        {decisionSummaryInfo ? (
+          <>
+            <p className="row">
+              <span className="col-7"> Customer&apos;s Net pay is </span>
+              <span className="figure col-5">
+                {nigerianCurrencyFormat.format(
+                  selectedCreditAnalysis?.paySlipAnalysis?.netPay
+                )}
+              </span>
+            </p>
+            <p className="row">
+              <span className="col-7"> 45% of Customer&apos;s Net pay is </span>
+              <span className="figure col-5">
+                {nigerianCurrencyFormat.format(
+                  decisionSummaryInfo?.maxAmountLendable
+                )}
+              </span>
+            </p>
+            <p className="row">
+              <span className="col-7"> Monthy Repayment</span>{" "}
+              <span className="figure col-5">
+                {nigerianCurrencyFormat.format(
+                  selectedCreditAnalysis?.paySlipAnalysis?.monthlyLoanRepayment
+                )}
+              </span>
+            </p>
+            <p className="row">
+              <span className="col-7"> Total Monthy Deductions</span>{" "}
+              <span className="figure col-5">
+                {decisionSummaryInfo?.totalMonthlyDeductions}
+              </span>
+            </p>
+            <p className="row">
+              <span className="col-7">
+                If Loan is approved, customer&apos;s Take Home is{" "}
+              </span>
+              <div className="col-5">
+                <span className="figure">
+                  {nigerianCurrencyFormat.format(
+                    decisionSummaryInfo?.maxAmountLendable -
+                      decisionSummaryInfo?.totalMonthlyDeductions
+                  )}
+                </span>{" "}
+                which is{" "}
+                <span className="figure">
+                  {(
+                    ((decisionSummaryInfo?.maxAmountLendable -
+                      decisionSummaryInfo?.totalMonthlyDeductions) *
+                      100) /
+                    selectedCreditAnalysis?.paySlipAnalysis?.netPay
+                  ).toFixed(2)}
+                </span>
+                % of his/her Net pay.
+              </div>
+            </p>
+          </>
+        ) : (
+          <div className="d-flex justify-content-center align-items-center">
+            <PageLoader width="70px" />
           </div>
-        </p>
+        )}
         <div id="validate">
           <p className="decision-row ">
             <span className=""> Customer has good credit History </span>
@@ -384,25 +389,24 @@ const DecisionSummary = ({ customerId }) => {
           <div className="row mt-2 decision-row">
             <div>
               Credit DB Search{" "}
-              {selectedCustomer?.creditCheck?.creditDbSearch?.updatedAt && (
+              {selectedCreditAnalysis?.creditDbSearch?.updatedAt && (
                 <span className="validBtn">
                   {format(
-                    selectedCustomer?.creditCheck?.creditDbSearch?.updatedAt,
+                    selectedCreditAnalysis?.creditDbSearch?.updatedAt,
                     "MMM dd, HH:mm"
                   )}
                 </span>
               )}
             </div>
 
-            {selectedCustomer?.creditCheck?.creditDbSearch?.dbSearchReport ? (
+            {selectedCreditAnalysis?.creditDbSearch?.dbSearchReport ? (
               <div className="col-sm-12 col-md-6">
                 <button className="viewBtn">
                   <a
                     target="_blank"
                     rel="noreferrer"
                     href={
-                      selectedCustomer?.creditCheck?.creditDbSearch
-                        ?.dbSearchReport
+                      selectedCreditAnalysis?.creditDbSearch?.dbSearchReport
                     }
                   >
                     View Data
@@ -418,25 +422,24 @@ const DecisionSummary = ({ customerId }) => {
           <div className="row mt-2 decision-row">
             <div>
               Deduct Search{" "}
-              {selectedCustomer?.creditCheck?.deductCheck?.updatedAt && (
+              {selectedCreditAnalysis?.deductCheck?.updatedAt && (
                 <span className="validBtn">
                   {format(
-                    selectedCustomer?.creditCheck?.deductCheck?.updatedAt,
+                    selectedCreditAnalysis?.deductCheck?.updatedAt,
                     "MMM dd, HH:mm"
                   )}
                 </span>
               )}
             </div>
 
-            {selectedCustomer?.creditCheck?.creditDbSearch?.dbSearchReport ? (
+            {selectedCreditAnalysis?.creditDbSearch?.dbSearchReport ? (
               <div className="col-sm-12 col-md-6">
                 <button className="viewBtn">
                   <a
                     target="_blank"
                     rel="noreferrer"
                     href={
-                      selectedCustomer?.creditCheck?.deductCheck
-                        ?.deductSearchReport
+                      selectedCreditAnalysis?.deductCheck?.deductSearchReport
                     }
                   >
                     View Data
@@ -452,8 +455,8 @@ const DecisionSummary = ({ customerId }) => {
           <div className=" mt-2">
             <div>Credit Bureau Search </div>
 
-            {selectedCustomer?.creditCheck?.creditBureauSearch &&
-              selectedCustomer?.creditCheck?.creditBureauSearch.map((item) => (
+            {selectedCreditAnalysis?.creditBureauSearch &&
+              selectedCreditAnalysis?.creditBureauSearch.map((item) => (
                 <div key={item?._id}>
                   {item?.bureauDate ? (
                     <div className="row ml-4 decision-row">
@@ -488,10 +491,10 @@ const DecisionSummary = ({ customerId }) => {
           <div className="row mt-2 decision-row">
             <div>
               Payslip Analysis{" "}
-              {selectedCustomer?.creditCheck?.paySlipAnalysis?.updatedAt && (
+              {selectedCreditAnalysis?.paySlipAnalysis?.updatedAt && (
                 <span className="validBtn">
                   {format(
-                    selectedCustomer?.creditCheck?.paySlipAnalysis?.updatedAt,
+                    selectedCreditAnalysis?.paySlipAnalysis?.updatedAt,
                     "MMM dd, HH:mm"
                   )}
                 </span>
@@ -503,10 +506,7 @@ const DecisionSummary = ({ customerId }) => {
                 <a
                   target="_blank"
                   rel="noreferrer"
-                  href={
-                    selectedCustomer?.creditCheck?.paySlipAnalysis
-                      ?.uploadPaySlip
-                  }
+                  href={selectedCreditAnalysis?.paySlipAnalysis?.uploadPaySlip}
                 >
                   View Data
                 </a>
@@ -593,8 +593,8 @@ const DecisionSummary = ({ customerId }) => {
           ) : (
             <div className="already__approved">
               <p> Customer has been approved by Credit Officer</p>
-              {selectedCustomer?.creditCheck.assignment.updatedAt &&
-                selectedCustomer?.creditCheck?.decisionSummary
+              {selectedCreditAnalysis?.assignment.updatedAt &&
+                selectedCreditAnalysis?.decisionSummary
                   .creditOfficerApprovedAt && (
                   <div>
                     <div className="d-flex justify-content-center gap-4">
@@ -606,7 +606,7 @@ const DecisionSummary = ({ customerId }) => {
                         <VscDebugStart color="green" />{" "}
                         {format(
                           new Date(
-                            selectedCustomer?.creditCheck.assignment.updatedAt
+                            selectedCreditAnalysis?.assignment.updatedAt
                           ),
                           "dd/LL/yyyy, hh:mm aaa"
                         )}
@@ -619,7 +619,7 @@ const DecisionSummary = ({ customerId }) => {
                         <AiFillStop color="red" />{" "}
                         {format(
                           new Date(
-                            selectedCustomer?.creditCheck?.decisionSummary.creditOfficerApprovedAt
+                            selectedCreditAnalysis?.decisionSummary.creditOfficerApprovedAt
                           ),
                           "dd/LL/yyyy, hh:mm aaa"
                         )}
@@ -629,11 +629,9 @@ const DecisionSummary = ({ customerId }) => {
                       <b>Duration:</b>
 
                       {formatDistance(
+                        new Date(selectedCreditAnalysis?.assignment.updatedAt),
                         new Date(
-                          selectedCustomer?.creditCheck.assignment.updatedAt
-                        ),
-                        new Date(
-                          selectedCustomer?.creditCheck?.decisionSummary.creditOfficerApprovedAt
+                          selectedCreditAnalysis?.decisionSummary.creditOfficerApprovedAt
                         )
                       )}
                     </p>
@@ -643,7 +641,7 @@ const DecisionSummary = ({ customerId }) => {
           )}
         </div>
 
-        {selectedCustomer?.creditCheck?.decisionSummary
+        {selectedCreditAnalysis?.decisionSummary
           ?.creditOfficerApprovalStatus === customerApprovalEnum.approved && (
           <div className="row mt-4 ">
             <p className="cooApprove ">
@@ -670,7 +668,7 @@ const DecisionSummary = ({ customerId }) => {
 };
 
 DecisionSummary.propTypes = {
-  customerId: PropTypes.string,
+  recordId: PropTypes.string,
 };
 
 export default DecisionSummary;

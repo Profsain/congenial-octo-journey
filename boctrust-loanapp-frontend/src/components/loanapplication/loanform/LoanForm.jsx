@@ -39,7 +39,7 @@ import {
   getFromLocalStorage,
   storeInLocalStorage,
 } from "../../../../utilities/localStorage";
-import { decryptText } from "../../../../utilities/encryptDecrypt";
+
 import axios from "axios";
 
 const apiUrl = import.meta.env.VITE_BASE_URL;
@@ -81,17 +81,17 @@ const LoanForm = React.memo(function LoanFormComponent() {
     const urlSearchParams = new URLSearchParams(window.location.search);
     const code = urlSearchParams.get("code");
 
-    // setFirstStepData(JSON.parse(sessionStorage.getItem("loanFirstInfo")));
+    setFirstStepData(JSON.parse(sessionStorage.getItem("loanFirstInfo")));
 
     if (code) {
-      const { bvn } = await getBvnDetails(code); // Call this function if there's an authorization code in the URL
-      const firstDataResponse = await axios.get(
-        `${import.meta.env.VITE_BASE_URL}/api/tempdata/tempdata/${bvn}`
-      );
-      setFirstStepData(firstDataResponse.data.data);
-      await axios.delete(
-        `${import.meta.env.VITE_BASE_URL}/api/tempdata/tempdata/${bvn}`
-      );
+      // const { bvn } = await getBvnDetails(code); // Call this function if there's an authorization code in the URL
+      // const firstDataResponse = await axios.get(
+      //   `${import.meta.env.VITE_BASE_URL}/api/tempdata/tempdata/${bvn}`
+      // );
+      // setFirstStepData(firstDataResponse.data.data);
+      // await axios.delete(
+      //   `${import.meta.env.VITE_BASE_URL}/api/tempdata/tempdata/${bvn}`
+      // );
     } else {
       // Optionally, handle other initialization tasks here
       console.log("No authorization code found. Proceed with the normal flow.");
@@ -153,7 +153,6 @@ const LoanForm = React.memo(function LoanFormComponent() {
 
   const [step, setStep] = useState(1);
   const [showForm, setShowForm] = useState(true);
-
   const [showBankStatement, setShowBankStatement] = useState(false);
   const [showEmploymentLetter, setShowEmploymentLetter] = useState(false);
 

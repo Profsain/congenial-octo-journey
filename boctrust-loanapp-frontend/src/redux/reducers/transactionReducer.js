@@ -4,10 +4,22 @@ import apiClient from "../../lib/axios";
 // Thunk to fetch account from the API
 export const fetchUserTransactions = createAsyncThunk(
   "transaction/fetchUserTransactions",
-  async (accountNumber) => {
-    const { data: transactionsData } = await apiClient.get(
-      `/bankone/getUserTransactions/${accountNumber}`
-    );
+  async ({ accountNumber, fromDate, toDate }) => {
+
+    let pathUrl = `/bankone/getUserTransactions/${accountNumber}`;
+
+    
+    if (fromDate) {
+      pathUrl = pathUrl + `?fromDate=${fromDate}`;
+      if (toDate) {
+        pathUrl = pathUrl +  `&toDate=${toDate}`;
+      }
+    }
+    if (!fromDate && toDate) {
+      pathUrl =  pathUrl + `?toDate=${toDate}`;
+    }
+
+    const { data: transactionsData } = await apiClient.get(pathUrl);
 
     const transactionWithStatus = await Promise.all(
       transactionsData.Message.map(async (transaction) => {
@@ -58,6 +70,6 @@ const transactionsSlice = createSlice({
   },
 });
 
-export const { updateTransactionState } = transactionsSlice.actions;
+export const { updateTransactionState,  } = transactionsSlice.actions;
 
 export default transactionsSlice.reducer;

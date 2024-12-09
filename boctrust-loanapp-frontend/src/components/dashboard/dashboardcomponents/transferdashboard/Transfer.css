@@ -31,6 +31,13 @@
   width: 100%;
 }
 
+.autoFill {
+  background: #f8f8f8;
+  border: 1px solid #145098;
+  border-radius: 1rem;
+  padding: 1rem;
+}
+
 .SingleRow {
   margin-left: 1.4rem;
 }
@@ -102,7 +109,8 @@
 
 .add__employerContainer .appForm,
 .add__mandateRule .appForm,
-.employer__letterContainer .appForm {
+.employer__letterContainer .appForm,
+.apply__forLoan .appForm {
   display: grid;
   gap: 2rem;
 }
@@ -122,7 +130,8 @@
 
 .add__employerContainer label,
 .add__mandateRule label,
-.employer__letterContainer label {
+.employer__letterContainer label,
+.apply__forLoan label {
   padding-bottom: 8px;
   font-size: 18px;
   color: #475569;
@@ -137,7 +146,10 @@
 .employer__letterContainer select,
 .add__employerContainer label,
 .add__employerContainer input,
-.add__employerContainer select {
+.add__employerContainer select,
+.apply__forLoan label,
+.apply__forLoan input,
+.apply__forLoan select {
   margin: 0 !important;
 }
 

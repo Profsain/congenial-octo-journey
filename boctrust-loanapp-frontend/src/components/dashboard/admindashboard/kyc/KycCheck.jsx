@@ -37,7 +37,6 @@ const KycCheck = () => {
     },
     head: {
       color: "#fff",
-
     },
     approved: {
       color: "#5cc51c",
@@ -102,9 +101,8 @@ const KycCheck = () => {
   useEffect(() => {
     if (customers?.length > 0) {
       setSearchCustomer(customers);
-    } else {
-      setSearchCustomer([]);
-    }
+    } 
+    
   }, [customers]);
 
   useEffect(() => {
@@ -113,7 +111,6 @@ const KycCheck = () => {
       searchTerm.length == 0 ||
       searchTodayEntries
     ) {
-      console.log(searchTodayEntries, "searchTodayEntries");
       dispatch(
         fetchAllCustomersLoans({
           searchTerm,
@@ -197,12 +194,8 @@ const KycCheck = () => {
 
     // send update to backend
     await apiClient.put(`/updatecustomer/kyc/${customerId}`, data);
-
-    if (isKycApproved === true) {
-      await apiClient.put(`/loans/status/${currentCustomer.loan._id}`, {
-        loanstatus: "with credit",
-      });
-    }
+    console.log(isKycApproved)
+   
 
     await dispatch(fetchAllCustomersLoans({}));
     setShowKycDetails(false);
@@ -384,7 +377,6 @@ const KycCheck = () => {
                       <div className="Match">
                         <p>Is there a Facial Match?</p>
                         <div className="Radio">
-
                           <label>
                             <input
                               type="radio"
@@ -392,12 +384,14 @@ const KycCheck = () => {
                               name="isFacialMatch"
                               value={true}
                               onChange={(e) =>
-                                handleRadioChange("isFacialMatch", e.target.value)
+                                handleRadioChange(
+                                  "isFacialMatch",
+                                  e.target.value
+                                )
                               }
                             />
                             <span>Yes</span>
                           </label>
-
 
                           <label htmlFor="no">
                             <input
@@ -406,7 +400,10 @@ const KycCheck = () => {
                               name="isFacialMatch"
                               value={false}
                               onChange={(e) =>
-                                handleRadioChange("isFacialMatch", e.target.value)
+                                handleRadioChange(
+                                  "isFacialMatch",
+                                  e.target.value
+                                )
                               }
                             />
                             <span>No</span>
@@ -417,7 +414,6 @@ const KycCheck = () => {
                       <div className="Match">
                         <p>Is there a Valid ID Card?</p>
                         <div className="Radio">
-
                           <label>
                             <input
                               type="radio"
@@ -425,25 +421,26 @@ const KycCheck = () => {
                               name="isIdCardValid"
                               value={true}
                               onChange={(e) =>
-                                handleRadioChange("isIdCardValid", e.target.value)
+                                handleRadioChange(
+                                  "isIdCardValid",
+                                  e.target.value
+                                )
                               }
                             />
                             <span>Yes</span>
                           </label>
 
-
-
-
-
                           <label>
-
                             <input
                               type="radio"
                               className="no"
                               name="isIdCardValid"
                               value={false}
                               onChange={(e) =>
-                                handleRadioChange("isIdCardValid", e.target.value)
+                                handleRadioChange(
+                                  "isIdCardValid",
+                                  e.target.value
+                                )
                               }
                             />
                             <span>No</span>
@@ -454,7 +451,6 @@ const KycCheck = () => {
                       <div className="Match">
                         <p>Is there a Photo Capture?</p>
                         <div className="Radio">
-
                           <label>
                             <input
                               type="radio"
@@ -471,7 +467,6 @@ const KycCheck = () => {
 
                             <span>Yes</span>
                           </label>
-
 
                           <label>
                             <input
@@ -495,7 +490,6 @@ const KycCheck = () => {
                       <div className="Match">
                         <p>Is there a Valid Signature?</p>
                         <div className="Radio">
-
                           <label>
                             <input
                               type="radio"
@@ -534,7 +528,6 @@ const KycCheck = () => {
                       <div className="Match">
                         <p>Is Other Document Verified?</p>
                         <div className="Radio">
-
                           <label>
                             <input
                               type="radio"
@@ -550,7 +543,6 @@ const KycCheck = () => {
                             />
                             <span>Yes</span>
                           </label>
-
 
                           <label>
                             <input
@@ -573,9 +565,7 @@ const KycCheck = () => {
                       <div className="Match matchKyc">
                         <p>KYC Completed & Approved</p>
                         <div className="Radio">
-
-                          <label >
-
+                          <label>
                             <input
                               type="radio"
                               className="yes"
@@ -589,9 +579,7 @@ const KycCheck = () => {
                               }}
                             />
                             <span>Yes</span>
-
                           </label>
-
 
                           <label>
                             <input
@@ -705,7 +693,11 @@ const KycCheck = () => {
         />
       )}
       {showInfo && (
-        <KycViewDetails customer={currentCustomer} setShowInfo={setShowInfo} />
+        <KycViewDetails
+          loan={currentCustomer?.loan}
+          customer={currentCustomer}
+          setShowInfo={setShowInfo}
+        />
       )}
     </>
   );

@@ -21,6 +21,7 @@ const StatementRuleSchema = mongoose.Schema(
       trim: true,
       default: 0,
     },
+    logicalRelationship: { type: String, enum: ["AND", "OR"] },
   },
   { timestamps: true }
 );

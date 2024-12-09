@@ -7,6 +7,17 @@ const DisbursmentSchema = new mongoose.Schema({
   creditAccountName: String,
 });
 
+const paymentRecordSchema = new mongoose.Schema({
+  bankoneRecordId: {
+    type: Number,
+    required: true,
+  },
+  paymentDate: {
+    type: Date,
+    required: true,
+  },
+});
+
 const loanSchema = new mongoose.Schema(
   {
     customer: {
@@ -82,6 +93,7 @@ const loanSchema = new mongoose.Schema(
       default: "0",
     },
     moratorium: String,
+    paymentRecord: [paymentRecordSchema],
   },
   { timestamps: true }
 );

@@ -9,6 +9,8 @@ const SidebarMain = ({ onMenuItemClick }) => {
 
   const currentUser = useSelector((state) => state.adminAuth.user);
 
+  const isAccountCreated = currentUser?.banking?.isAccountCreated;
+
   const customerCareer = currentUser?.careertype;
 
   useEffect(() => {
@@ -42,6 +44,9 @@ const SidebarMain = ({ onMenuItemClick }) => {
           id="dashboard"
           to="/dashboard"
           onClick={onMenuItemClick}
+          style={() => ({
+            pointerEvents: isAccountCreated ? "auto" : "none",
+          })}
           className={({ isActive }) =>
             `IconBox ${isActive ? "link_active " : ""}`
           }
@@ -75,6 +80,9 @@ const SidebarMain = ({ onMenuItemClick }) => {
               <li>
                 <NavLink
                   id="myloan"
+                  style={() => ({
+                    pointerEvents: isAccountCreated ? "auto" : "none",
+                  })}
                   onClick={onMenuItemClick}
                   to="/dashboard/loans"
                   className={({ isActive }) => (isActive ? "link_active" : "")}
@@ -85,6 +93,9 @@ const SidebarMain = ({ onMenuItemClick }) => {
               </li>
               <li>
                 <NavLink
+                  style={() => ({
+                    pointerEvents: isAccountCreated ? "auto" : "none",
+                  })}
                   id="applyloan"
                   onClick={onMenuItemClick}
                   to={"/dashboard/loans/apply"}
@@ -94,7 +105,7 @@ const SidebarMain = ({ onMenuItemClick }) => {
                   Apply for Loan
                 </NavLink>
               </li>
-              <li>
+              {/* <li>
                 <NavLink
                   id="loancalculator"
                   onClick={onMenuItemClick}
@@ -104,7 +115,7 @@ const SidebarMain = ({ onMenuItemClick }) => {
                 >
                   Loan Calculator
                 </NavLink>
-              </li>
+              </li> */}
             </ul>
           </div>
         ) : null}
@@ -120,6 +131,9 @@ const SidebarMain = ({ onMenuItemClick }) => {
         }}
       >
         <NavLink
+          style={() => ({
+            pointerEvents: isAccountCreated ? "auto" : "none",
+          })}
           to="/dashboard/repayment"
           id="loanrepayment"
           className={({ isActive }) =>
@@ -131,7 +145,33 @@ const SidebarMain = ({ onMenuItemClick }) => {
         </NavLink>
       </div>
 
-      {customerCareer !== "government employee" ? (
+      {customerCareer === "government employee" ? (
+        <div
+          className={`link__wrap  ${
+            checkSectionActive("remita") ? "section__active" : ""
+          }`}
+          onClick={(e) => {
+            onMenuItemClick(e);
+            setActiveSection("remita");
+          }}
+        >
+          <NavLink
+            style={() => ({
+              pointerEvents: isAccountCreated ? "auto" : "none",
+            })}
+            to="/dashboard/remita"
+            id="remita"
+            className={({ isActive }) =>
+              `IconBox ${isActive ? "link_active " : ""}`
+            }
+          >
+            <img id="remita" src="/images/dremita.png" alt="remita" />
+            <p id="remita">Remita History</p>
+          </NavLink>
+        </div>
+      ) : null}
+
+      {/* {customerCareer !== "government employee" ? (
         <div
           className={`link__wrap ${
             checkSectionActive("transfer") ? "section__active" : ""
@@ -188,9 +228,35 @@ const SidebarMain = ({ onMenuItemClick }) => {
             </div>
           ) : null}
         </div>
+      ) : null} */}
+
+      {customerCareer !== "government employee" ? (
+        <div
+          className={`link__wrap  ${
+            checkSectionActive("transfer") ? "section__active" : ""
+          }`}
+          onClick={(e) => {
+            onMenuItemClick(e);
+            setActiveSection("transfer");
+          }}
+        >
+          <NavLink
+            style={() => ({
+              pointerEvents: isAccountCreated ? "auto" : "none",
+            })}
+            to="/dashboard/transfer"
+            id="transfer"
+            className={({ isActive }) =>
+              `IconBox ${isActive ? "link_active " : ""}`
+            }
+          >
+            <img id="transfer" src="/images/dtransfer.png" alt="transfer" />
+            <p>Transfer Money</p>
+          </NavLink>
+        </div>
       ) : null}
 
-      {customerCareer !== "government employee" &&
+      {/* {customerCareer !== "government employee" &&
       customerCareer !== "private employee" ? (
         <div
           className={`link__wrap  ${
@@ -212,7 +278,7 @@ const SidebarMain = ({ onMenuItemClick }) => {
             <p id="withdraw">Withdrawal</p>
           </NavLink>
         </div>
-      ) : null}
+      ) : null} */}
 
       <div
         className={`link__wrap  ${
@@ -224,6 +290,9 @@ const SidebarMain = ({ onMenuItemClick }) => {
         }}
       >
         <NavLink
+          style={() => ({
+            pointerEvents: isAccountCreated ? "auto" : "none",
+          })}
           to={"/dashboard/transactions"}
           id="transaction"
           className={({ isActive }) =>
@@ -251,6 +320,9 @@ const SidebarMain = ({ onMenuItemClick }) => {
           }}
         >
           <NavLink
+            style={() => ({
+              pointerEvents: isAccountCreated ? "auto" : "none",
+            })}
             to={"/dashboard/remita"}
             id="remita"
             className={({ isActive }) =>
@@ -278,6 +350,9 @@ const SidebarMain = ({ onMenuItemClick }) => {
         }}
       >
         <NavLink
+          style={() => ({
+            pointerEvents: isAccountCreated ? "auto" : "none",
+          })}
           to={"/dashboard/profile"}
           id="profile"
           className={({ isActive }) =>
@@ -307,6 +382,9 @@ const SidebarMain = ({ onMenuItemClick }) => {
             <ul>
               <li>
                 <NavLink
+                  style={() => ({
+                    pointerEvents: isAccountCreated ? "auto" : "none",
+                  })}
                   id="report"
                   className={({ isActive }) => (isActive ? "link_active" : "")}
                   onClick={onMenuItemClick}
@@ -318,6 +396,9 @@ const SidebarMain = ({ onMenuItemClick }) => {
               </li>
               <li>
                 <NavLink
+                  style={() => ({
+                    pointerEvents: isAccountCreated ? "auto" : "none",
+                  })}
                   className={({ isActive }) => (isActive ? "link_active" : "")}
                   id="transactionreport"
                   onClick={onMenuItemClick}
@@ -328,6 +409,9 @@ const SidebarMain = ({ onMenuItemClick }) => {
               </li>
               <li>
                 <NavLink
+                  style={() => ({
+                    pointerEvents: isAccountCreated ? "auto" : "none",
+                  })}
                   className={({ isActive }) => (isActive ? "link_active" : "")}
                   id="accountbalance"
                   onClick={onMenuItemClick}

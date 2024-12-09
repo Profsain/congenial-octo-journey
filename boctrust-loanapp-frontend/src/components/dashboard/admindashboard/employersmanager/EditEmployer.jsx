@@ -8,6 +8,7 @@ import "./EmployerManager.css";
 import { fetchMandateRules } from "../../../../redux/reducers/mandateRuleReducer";
 import { fetchStatementRules } from "../../../../redux/reducers/statementRuleReducer";
 import apiClient from "../../../../lib/axios";
+import { fetchEmployerLetterRules } from "../../../../redux/reducers/employerLetterRuleReducer";
 
 const EditEmployer = (props) => {
   const dispatch = useDispatch();
@@ -51,6 +52,7 @@ const EditEmployer = (props) => {
     const getData = async () => {
       await dispatch(fetchMandateRules());
       await dispatch(fetchStatementRules());
+      await dispatch(fetchEmployerLetterRules());
     };
 
     getData();
@@ -93,6 +95,7 @@ const EditEmployer = (props) => {
     clearForm();
     handleClose();
   };
+
 
   return (
     <Modal
@@ -272,10 +275,11 @@ const EditEmployer = (props) => {
               }}
               value={editEmploymentLetterRule?._id}
               onChange={(e) => {
-                const rule = editEmploymentLetterRule?.find(
+                const rule = employerLetterRules?.find(
                   (item) => e.target.value == item._id
                 );
-                setEditStatementRule(rule);
+                
+                setEditEmploymentLetterRule(rule);
               }}
             >
               <option>-None Selected-</option>
