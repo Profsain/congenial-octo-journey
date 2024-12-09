@@ -1,3 +1,4 @@
+// top up loan update here
 import PropTypes from "prop-types";
 import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -104,7 +105,6 @@ const LoanTopUpRequest = () => {
 
   // handle start termination
   const handleStartTermination = async (id) => {
-
     setIsTerminating(true);
     try {
       const currentLoanTerminationStatus = "initiated";
@@ -148,7 +148,7 @@ const LoanTopUpRequest = () => {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
-          }
+          },
         }
       );
 
@@ -167,7 +167,6 @@ const LoanTopUpRequest = () => {
       setIsTerminating(false);
       toast.error("Error approving termination");
     }
-
   };
 
   // handle close loan details

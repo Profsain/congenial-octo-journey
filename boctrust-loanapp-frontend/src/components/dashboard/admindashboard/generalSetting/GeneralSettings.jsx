@@ -16,6 +16,7 @@ const validationSchema = Yup.object().shape({
   phoneNumber2: Yup.string().required("Phone number is required"),
   email: Yup.string().required("Email is required"),
   copyrightText: Yup.string().required("Copyright is required"),
+  // top up update
   topUpEligibilityMonths: Yup.number()
     .min(1, "Must be at least 1 month")
     .required("Top-Up Eligibility Months is required"),
@@ -143,6 +144,7 @@ const GeneralSettings = () => {
               </div>
             </div>
 
+              {/* top up loan update */}
             <div className="FieldRow">
               <div className="FieldGroup">
                 <label htmlFor="topUpEligibilityMonths">

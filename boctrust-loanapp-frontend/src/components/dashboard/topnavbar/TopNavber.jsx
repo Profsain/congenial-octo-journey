@@ -7,10 +7,9 @@ import LoanTopUpModal from "../dashboardcomponents/LoanTopUpModal";
 const TopNavber = ({ title, user = "Femi Akinwade" }) => {
   // current login user
   const { user: currentUser } = useSelector((state) => state.adminAuth);
-  
 
   // check is qualify for topUp. true or false
-  // persist to server state
+  // top up loan update here
   const [showTopUpModal, setShowTopUpModal] = useState(false);
 
   // handle open top up
@@ -41,10 +40,17 @@ const TopNavber = ({ title, user = "Femi Akinwade" }) => {
         </div>
         <div className="Inline Profile">
           {/* top up cta btn */}
-          {currentUser?.userType === "staff" ||
-          currentUser?.userType === "super_admin" ? null : (
-            <div className="Inline UserCard topup" onClick={handleOpenTopUp}>
-              <p>Request Top-up Loan</p>
+          {!currentUser.topUpLoanEligibility.isEligible && (
+            <div>
+              {currentUser?.userType === "staff" ||
+              currentUser?.userType === "super_admin" ? null : (
+                <div
+                  className="Inline UserCard topup"
+                  onClick={handleOpenTopUp}
+                >
+                  <p>Request Top-up Loan</p>
+                </div>
+              )}
             </div>
           )}
 

@@ -169,7 +169,7 @@ const customerSchema = new mongoose.Schema(
         default: {}, //  default empty object
       },
     },
-    // top up loan update
+    // top up loan update here
     topUpLoanEligibility: {
         isEligible: { type: Boolean, default: false },
         monthsSinceLastLoan: { type: Number, default: 0 },

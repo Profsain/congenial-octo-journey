@@ -85,7 +85,9 @@ const TopCardSec = ({ user }) => {
   }, [userTransactions]);
 
   // check topup qualification and show topup card
-  const [isTopupQaulify, setIsTopUpQaulify] = useState(true);
+  const [isTopupQaulify, setIsTopUpQaulify] = useState(
+    !user.topUpLoanEligibility.isEligible
+  );
   const [showTopUpModal, setShowTopUpModal] = useState(false);
 
   // handle open top up

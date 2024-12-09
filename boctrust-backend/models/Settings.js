@@ -16,6 +16,7 @@ const settingsSchema = new mongoose.Schema({
     smtpPort: Number,
     smtpUsername: String,
     smtpPassword: String,
+    // top update here
     topUpEligibilityMonths: { type: Number, default: 6 },
 }, { timestamps: true });
 
