@@ -9,6 +9,9 @@ import "../../dashboardcomponents/transferdashboard/Transfer.css";
 import CareerList from "./CareerList";
 import apiClient from "../../../../lib/axios";
 
+// custom hook
+import usePagination from "../../../../customHooks/usePagination";
+
 // Define validation schema using Yup
 const validationSchema = Yup.object().shape({
   jobtitle: Yup.string().required("Jobs title is required"),
@@ -30,8 +33,13 @@ const PostJobs = () => {
   const [showAddNew, setShowAddNew] = useState(false);
   const handleAddNew = () => setShowAddNew(true);
   const handleClose = () => setShowAddNew(false);
-  const [showCount, setShowCount] = useState(10);
+  // handle search
+  const [showCount, setShowCount] = useState(5);
   const [searchTerms, setSearchTerms] = useState("");
+  const [totalPages, setTotalPages] = useState(1);
+
+  const { currentPage, goToNextPage, goToPreviousPage, setPage } =
+    usePagination(1, totalPages);
 
   const handleSubmit = async (values, { setSubmitting, resetForm }) => {
     const apiUrl = import.meta.env.VITE_BASE_URL;

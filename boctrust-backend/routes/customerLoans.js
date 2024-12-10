@@ -96,12 +96,27 @@ router.get("/", async (req, res) => {
     result = result.map((customer) => {
       return {
         ...customer,
-        valididcard: `${baseUrl}/public/filesUpload/${customer.valididcard}`,
-        uploadpayslip: `${baseUrl}/public/filesUpload/${customer.uploadpayslip}`,
-        uploadbankstatement: `${baseUrl}/public/filesUpload/${customer.uploadbankstatement}`,
-        signature: `${baseUrl}/public/filesUpload/${customer.signature}`,
-        employmentletter: `${baseUrl}/public/filesUpload/${customer.employmentletter}`,
-        photocaptureImg: `${baseUrl}/public/filesUpload/${customer.photocapture}`,
+        valididcard: customer.valididcard
+        ? `${baseUrl}/public/filesUpload/${customer.valididcard}`
+        : null,
+      uploadpayslip: customer.uploadpayslip
+        ? `${baseUrl}/public/filesUpload/${customer.uploadpayslip}`
+        : null,
+      uploadbankstatement: customer.uploadbankstatement
+        ? `${baseUrl}/public/filesUpload/${customer.uploadbankstatement}`
+        : null,
+      signature: customer.signature
+        ? `${baseUrl}/public/filesUpload/${customer.signature}`
+        : null,
+      employmentletter: customer.employmentletter
+        ? `${baseUrl}/public/filesUpload/${customer.employmentletter}`
+        : null,
+      photocaptureImg: customer.photocapture
+        ? `${baseUrl}/public/filesUpload/${customer.photocapture}`
+        : null,
+        marketerClientPic: customer.marketerClientPic
+        ? `${baseUrl}/public/filesUpload/${customer.marketerClientPic}`
+        : null,
       };
     });
 

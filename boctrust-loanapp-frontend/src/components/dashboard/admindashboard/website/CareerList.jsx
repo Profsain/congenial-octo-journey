@@ -13,7 +13,10 @@ import getDateOnly from "../../../../../utilities/getDate";
 import apiClient from "../../../../lib/axios";
 // import searchList from "../../../../../utilities/searchListFunc";
 
-const CareerList = ({ count, searchTerms }) => {
+// custom hook
+import usePaginatedData from "../../../../customHooks/usePaginationData";
+
+const CareerList = ({ count, searchTerms, setTotalPages, currentPage }) => {
   const [openModel, setOpenModel] = useState(false);
   const [action, setAction] = useState(false);
   const [actionOption, setActionOption] = useState("");
@@ -48,6 +51,21 @@ const CareerList = ({ count, searchTerms }) => {
   const handleEdit = () => {
     setOpenModel(true);
   };
+
+  // custom pagination update
+  const { paginatedData: paginatedCareersList, totalPages } = usePaginatedData(
+    careers,
+    count,
+    currentPage
+  );
+
+  useEffect(() => {
+    setCareerList(paginatedCareersList); // Update local state with paginated data
+  }, [paginatedCareersList]);
+
+  useEffect(() => {
+    setTotalPages(totalPages); // Update total pages when it changes
+  }, [totalPages, setTotalPages]);
 
   // handle select action
   const handleSelect = (e) => {

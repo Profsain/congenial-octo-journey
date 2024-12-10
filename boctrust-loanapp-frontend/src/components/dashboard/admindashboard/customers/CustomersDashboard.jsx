@@ -3,13 +3,18 @@ import DashboardHeadline from "../../shared/DashboardHeadline";
 import "./Customer.css";
 import CustomersList from "./CustomersList";
 
+// custom hook
+import usePagination from "../../../../customHooks/usePagination";
+
 const CustomersDashboard = () => {
   // handle search
   const [showCount, setShowCount] = useState(10);
   const [searchTerms, setSearchTerms] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
 
-  
+  const [totalPages, setTotalPages] = useState(1);
+
+  const { currentPage, goToNextPage, goToPreviousPage, setPage } =
+    usePagination(1, totalPages);
 
   return (
     <div className="MainBox">
@@ -43,13 +48,19 @@ const CustomersDashboard = () => {
         {/* customers list  */}
         <div className="ListSec">
           <CustomersList
-            showCount={showCount}
-            currentPage={currentPage}
-            setCurrentPage={setCurrentPage}
+            count={showCount}
             searchTerms={searchTerms}
+            setTotalPages={setTotalPages}
+            currentPage={currentPage}
           />
         </div>
-       
+        {/* next and previous button  */}
+        <NextPreBtn
+          currentPage={currentPage}
+          totalPages={totalPages}
+          goToNextPage={goToNextPage}
+          goToPreviousPage={goToPreviousPage}
+        />
       </div>
     </div>
   );

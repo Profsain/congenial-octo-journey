@@ -13,6 +13,10 @@ import LoanStatementModal from "./loanStatementModal/LoanStatementModal";
 import LoanStatementRecord from "./loanStatementRecord/LoanStatementRecord";
 import { fetchCompletedLoan } from "../../../../redux/reducers/loanReducer";
 
+// custom hook
+import usePagination from "../../../../customHooks/usePagination";
+import usePaginatedData from "../../../../customHooks/usePaginationData";
+
 const LoanStatement = () => {
   const styles = {
     table: {
@@ -44,9 +48,24 @@ const LoanStatement = () => {
     dispatch(fetchCompletedLoan());
   }, [dispatch]);
 
-  const [showCount, setShowCount] = useState(10);
+  const [showCount, setShowCount] = useState(5);
   const [searchTerms, setSearchTerms] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+
+    // search loan list
+    const [loanList, setLoanList] = useState(completedLoans);
+
+  // custom hook destructuring
+  const { currentPage, goToNextPage, goToPreviousPage, setPage } =
+    usePagination(1, totalPages);
+  const { paginatedData: paginatedLoansList } = usePaginatedData(
+    loanList,
+    showCount,
+    currentPage
+  );
+
+
+  
 
   // handle show loan details
   // const apiUrl = import.meta.env.VITE_BASE_URL;
@@ -54,9 +73,16 @@ const LoanStatement = () => {
 
   const [accountStatement, setAccountStatement] = useState(null);
 
-  // search loan list
-  const [loanList, setLoanList] = useState(completedLoans);
+  // update loansList to show 5 pendingLoans on page load
+  // or on count changes
+   useEffect(() => {
+     setLoanList(paginatedLoansList); // Update local state with paginated data
+   }, [paginatedLoansList]);
 
+   useEffect(() => {
+     setTotalPages(totalPages); // Update total pages when it changes
+   }, [totalPages, setTotalPages]);
+  
   // update loanList to show 10 customers on page load
   // or on count changes
   useEffect(() => {
@@ -75,20 +101,10 @@ const LoanStatement = () => {
     handleSearch();
   }, [searchTerms]);
 
-  const handleGoNext = () => {
-    if (currentPage < Math.ceil((completedLoans?.length - 1) / showCount)) {
-      setCurrentPage((prev) => prev + 1);
-    }
-  };
-
-  const handleGoPrev = () => {
-    if (currentPage > 1) {
-      setCurrentPage((prev) => prev - 1);
-    }
-  };
+  
 
   return (
-    <div className="loan__statement">
+    <>
       {/* top search bar */}
       <div className="Search">
         <DashboardHeadline padding="0" height="70px" bgcolor="#d9d9d9">
@@ -98,8 +114,8 @@ const LoanStatement = () => {
               <input
                 name="showCount"
                 type="number"
-                step={10}
-                min={10}
+                step={5}
+                min={5}
                 value={showCount}
                 onChange={(e) => setShowCount(e.target.value)}
               />
@@ -121,7 +137,7 @@ const LoanStatement = () => {
         {status === "loading" && <PageLoader />}
         <DashboardHeadline
           height="52px"
-          mspacer="2rem 0 -3.3rem -1rem"
+          mspacer="2rem 0 -2.5rem -1rem"
           bgcolor="#145098"
         ></DashboardHeadline>
         <div style={styles.table}>
@@ -139,23 +155,19 @@ const LoanStatement = () => {
               </tr>
             </thead>
             <tbody>
-              {!loanList || status === "loading" ? (
+              {!paginatedLoansList || status === "loading" ? (
                 <td colSpan="8">
                   <PageLoader />
                 </td>
-              ) : loanList && loanList?.length === 0 ? (
+              ) : paginatedLoansList && paginatedLoansList?.length === 0 ? (
                 <tr>
                   <td colSpan="8">
                     <NoResult name="loan" />
                   </td>
                 </tr>
               ) : (
-                loanList &&
-                loanList
-                  ?.slice(
-                    (currentPage - 1) * showCount,
-                    currentPage * showCount
-                  )?.map((loan) => {
+                paginatedLoansList &&
+                paginatedLoansList?.map((loan) => {
                     return (
                       <React.Fragment key={loan._id}>
                         <LoanStatementRecord
@@ -171,10 +183,10 @@ const LoanStatement = () => {
           </Table>
         </div>
         <NextPreBtn
-          numberOfPages={Math.ceil((loanList?.length - 1) / showCount)}
-          nextFunc={handleGoNext}
-          count={currentPage}
-          prevFunc={handleGoPrev}
+          currentPage={currentPage}
+          totalPages={totalPages}
+          goToNextPage={goToNextPage}
+          goToPreviousPage={goToPreviousPage}
         />
 
         {/* show loan details model */}
@@ -187,7 +199,7 @@ const LoanStatement = () => {
           />
         )}
       </div>
-    </div>
+    </>
   );
 };
 

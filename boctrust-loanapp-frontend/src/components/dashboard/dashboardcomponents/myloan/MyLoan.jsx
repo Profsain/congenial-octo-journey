@@ -1,6 +1,5 @@
 import { useDispatch, useSelector } from "react-redux";
 import Table from "react-bootstrap/Table";
-import BocButton from "../../shared/BocButton";
 import "../../Dashboard.css";
 import DashboardHeadline from "../../shared/DashboardHeadline";
 import { useEffect } from "react";
@@ -24,7 +23,6 @@ const MyLoan = () => {
 
   const dispatch = useDispatch();
 
-  console.log(loansAccountBalance, "loansAccountBalance");
 
   useEffect(() => {
     const getData = async () => {

@@ -6,10 +6,18 @@ import NextPreBtn from "../../shared/NextPreBtn";
 import BlogsList from "./BlogsList";
 import AddNewBlog from "./AddNewBlog";
 
+// custom hook
+import usePagination from "../../../../customHooks/usePagination";
+
 const WebsiteManagerDashboard = () => {
   const [showAddNew, setShowAddNew] = useState(false);
+  // handle search
+  const [showCount, setShowCount] = useState(5);
   const [searchTerms, setSearchTerms] = useState("");
-  const [showCount, setShowCount] = useState(10);
+  const [totalPages, setTotalPages] = useState(1);
+
+  const { currentPage, goToNextPage, goToPreviousPage, setPage } =
+    usePagination(1, totalPages);
   const handleAddNew = () => setShowAddNew(true);
 
   return (
@@ -52,9 +60,19 @@ const WebsiteManagerDashboard = () => {
           </div>
           <div>
             {/* blogs list  */}
-            <BlogsList count={ showCount} searchTerms={searchTerms} />
+            <BlogsList
+              count={showCount}
+              searchTerms={searchTerms}
+              setTotalPages={setTotalPages}
+              currentPage={currentPage}
+            />
             {/* next and previous button  */}
-            <NextPreBtn />
+            <NextPreBtn
+              currentPage={currentPage}
+              totalPages={totalPages}
+              goToNextPage={goToNextPage}
+              goToPreviousPage={goToPreviousPage}
+            />
           </div>
         </div>
       ) : (

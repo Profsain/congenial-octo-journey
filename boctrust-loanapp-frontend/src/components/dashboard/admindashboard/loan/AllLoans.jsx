@@ -15,8 +15,9 @@ import sortByCreatedAt from "../../shared/sortedByDate";
 import { loanStatusEnum } from "../../../../lib/userRelated";
 import { fetchLoans } from "../../../../redux/reducers/loanReducer";
 import DisplayLoanProductName from "../../shared/DisplayLoanProductName";
+import usePaginatedData from "../../../../customHooks/usePaginationData";
 
-const AllLoans = ({ showCount, currentPage, setCurrentPage, searchTerms }) => {
+const AllLoans = ({ count, searchTerms, setTotalPages, currentPage }) => {
   const styles = {
     table: {
       //   margin: "0 2rem 0 3rem",
@@ -46,12 +47,30 @@ const AllLoans = ({ showCount, currentPage, setCurrentPage, searchTerms }) => {
   const dispatch = useDispatch();
   const { allLoans, status } = useSelector((state) => state.loanReducer);
 
+
+
   useEffect(() => {
     const getData = async () => {
       await dispatch(fetchLoans());
     };
     getData();
   }, [dispatch, show]);
+
+  // update loansList to show 10 allLoans on page load
+  // or on count changes
+  // custom pagination update
+  const { paginatedData: paginatedLoansList, totalPages } = usePaginatedData(
+    allLoans,
+    count,
+    currentPage
+  );
+  useEffect(() => {
+    setLoansList(paginatedLoansList); // Update local state with paginated data
+  }, [paginatedLoansList]);
+
+  useEffect(() => {
+    setTotalPages(totalPages); // Update total pages when it changes
+  }, [totalPages, setTotalPages]);
 
   // handle close loan details
   const handleClose = () => {
@@ -71,25 +90,13 @@ const AllLoans = ({ showCount, currentPage, setCurrentPage, searchTerms }) => {
     if (!allLoans) {
       return;
     }
-    const currSearch = searchList(allLoans, searchTerms, "agreefullname");
+    const currSearch = searchList(allLoans, searchTerms, "firstname");
     setLoansList(currSearch);
   };
 
   useEffect(() => {
     handleSearch();
   }, [searchTerms]);
-
-  const handleGoNext = () => {
-    if (currentPage < Math.ceil((loansList?.length - 1) / showCount)) {
-      setCurrentPage((prev) => prev + 1);
-    }
-  };
-
-  const handleGoPrev = () => {
-    if (currentPage > 1) {
-      setCurrentPage((prev) => prev - 1);
-    }
-  };
 
   return (
     <div className="loans__tableContainer">
@@ -114,78 +121,70 @@ const AllLoans = ({ showCount, currentPage, setCurrentPage, searchTerms }) => {
             </tr>
           </thead>
           <tbody>
-            {!loansList || status === "loading" ? (
+            {!paginatedLoansList || status === "loading" ? (
               <tr>
                 <td colSpan="9">
                   <PageLoader />
                 </td>
               </tr>
-            ) : loansList && loansList?.length === 0 ? (
+            ) : paginatedLoansList && paginatedLoansList?.length === 0 ? (
               <NoResult name="Loan" />
             ) : (
-              loansList &&
-              sortByCreatedAt(loansList)
-                ?.slice((currentPage - 1) * showCount, currentPage * showCount)
-                ?.map((loan) => {
-                  return (
-                    <tr key={loan._id}>
-                      <td>
-                        {loan?.customer?.banking?.accountDetails?.CustomerID}
-                      </td>
-                      <td>
-                        {loan.deductions === "remita" ? (
-                          <p>Remita</p>
-                        ) : (
-                          <p>Nibss</p>
-                        )}
-                      </td>
-                      <td>
-                        <DisplayLoanProductName loan={loan} />
-                      </td>
-                      <td>
-                        {loan?.customer?.banking?.accountDetails
-                          ?.CustomerName ??
-                          `${loan?.customer?.firstname} ${loan?.customer?.lastname}`}
-                      </td>
-                      <td>
-                        {loan.customer?.banking?.accountDetails?.AccountNumber}
-                      </td>
-                      <td>{getDateOnly(loan.createdAt)}</td>
-                      <td>N{loan.loanamount}</td>
-                      <td
-                        style={styles.padding}
-                        className={
-                          loan?.customer?.kyc?.loanstatus ===
-                          loanStatusEnum.completed
-                            ? "text-success"
-                            : "text-warning"
-                        }
-                      >
-                        {capitalizeEachWord(loan.loanstatus)}
-                      </td>
-                      <td>
-                        <div>
-                          <button
-                            onClick={() => handleShow(loan._id)}
-                            className="btn btn-info text-white"
-                          >
-                            Details
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                })
+              paginatedLoansList &&
+              paginatedLoansList?.map((loan) => {
+                return (
+                  <tr key={loan._id}>
+                    <td>
+                      {loan?.customer?.banking?.accountDetails?.CustomerID}
+                    </td>
+                    <td>
+                      {loan.deductions === "remita" ? (
+                        <p>Remita</p>
+                      ) : (
+                        <p>Nibss</p>
+                      )}
+                    </td>
+                    <td>
+                      <DisplayLoanProductName loan={loan} />
+                    </td>
+                    <td>
+                      {loan?.customer?.banking?.accountDetails?.CustomerName ??
+                        `${loan?.customer?.firstname} ${loan?.customer?.lastname}`}
+                    </td>
+                    <td>
+                      {loan.customer?.banking?.accountDetails?.AccountNumber}
+                    </td>
+                    <td>{getDateOnly(loan.createdAt)}</td>
+                    <td>N{loan.loanamount}</td>
+                    <td
+                      style={styles.padding}
+                      className={
+                        loan?.customer?.kyc?.loanstatus ===
+                        loanStatusEnum.completed
+                          ? "text-success"
+                          : "text-warning"
+                      }
+                    >
+                      {capitalizeEachWord(loan.loanstatus)}
+                    </td>
+                    <td>
+                      <div>
+                        <button
+                          onClick={() => handleShow(loan._id)}
+                          className="btn btn-info text-white"
+                        >
+                          Details
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })
             )}
           </tbody>
         </Table>
       </div>
-      <NextPreBtn
-        nextFunc={handleGoNext}
-        numberOfPages={Math.ceil((loansList?.length - 1) / showCount)}
-        count={currentPage}
-        prevFunc={handleGoPrev}
-      />
+      {/* <NextPreBtn /> */}
 
       {/* show loan details model */}
       {show && (

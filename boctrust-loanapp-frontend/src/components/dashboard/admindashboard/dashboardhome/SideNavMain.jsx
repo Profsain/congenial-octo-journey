@@ -248,6 +248,28 @@ const SideNavMain = ({ onMenuItemClick }) => {
         ) : null}
       </div>
 
+      {/* repayment menu */}
+      <div
+        className={`link__wrap  ${
+          checkSectionActive("repayment") ? "section__active" : ""
+        }`}
+        onClick={(e) => {
+          onMenuItemClick(e);
+          setActiveSection("repayment");
+        }}
+      >
+        <NavLink
+          to="/dashboard/repayment"
+          id="repayment"
+          className={({ isActive }) =>
+            `IconBox ${isActive ? "link_active " : ""}`
+          }
+        >
+          <img id="repayment" src="/images/dtransfer.png" alt="repayment" />
+          <p id="repayment">Repayments</p>
+        </NavLink>
+      </div>
+
       {/* account menu */}
       <div
         className={`link__wrap ${
@@ -628,30 +650,6 @@ const SideNavMain = ({ onMenuItemClick }) => {
                     Review Report
                   </NavLink>
                 </li>
-                <li>
-                  <NavLink
-                    id="employmentLetters"
-                    onClick={onMenuItemClick}
-                    className={({ isActive }) =>
-                      isActive ? "link_active" : ""
-                    }
-                    to="/dashboard/kyc/employmentLetters"
-                  >
-                    Employment Letters
-                  </NavLink>
-                </li>
-                <li>
-                  <NavLink
-                    id="bankStatements"
-                    onClick={onMenuItemClick}
-                    className={({ isActive }) =>
-                      isActive ? "link_active" : ""
-                    }
-                    to="/dashboard/kyc/bankStatements"
-                  >
-                    Bank Statement
-                  </NavLink>
-                </li>
               </ul>
             </div>
           ) : null}
@@ -665,10 +663,12 @@ const SideNavMain = ({ onMenuItemClick }) => {
           setActiveSection("webmanager");
         }}
       >
-        <div className="IconBox">
-          <img src="/images/dwebsite.png" alt="webmanager" />
-          <p>Website Manager</p>
-        </div>
+        {(superAdmin || !shouldNotSee?.includes("websiteManager")) && (
+          <div className="IconBox">
+            <img src="/images/dwebsite.png" alt="webmanager" />
+            <p>Website Manager</p>
+          </div>
+        )}
 
         {checkSectionActive("webmanager") && (
           <div className="SubItem">

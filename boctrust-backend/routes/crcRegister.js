@@ -7,6 +7,7 @@ router.post('/getcrc', async (req, res) => {
   
     // Extract BVN from the request body
     let { bvn } = req.body;
+
     bvn = bvn.replace(/\s/g, '');
     // const bvn = '22170216986';
 

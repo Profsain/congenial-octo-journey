@@ -8,10 +8,17 @@ import LoanProductsList from "./LoanProductsList";
 import AddNewLoanProduct from "./AddNewLoanProduct";
 import handleAdminRoles from "../../../../../utilities/getAdminRoles";
 
+// custom hook
+import usePagination from "../../../../customHooks/usePagination";
+
 const CustomersDashboard = () => {
   const [openAddLoanProduct, setOpenAddLoanProduct] = useState(false);
-  const [showCount, setShowCount] = useState(10);
+  const [showCount, setShowCount] = useState(5);
   const [searchTerm, setSearchTerm] = useState("");
+  const [totalPages, setTotalPages] = useState(1);
+
+  const { currentPage, goToNextPage, goToPreviousPage, setPage } =
+    usePagination(1, totalPages);
 
   // const [product, setProduct] = useState({});
   const handleAddLoanProduct = () => {
@@ -31,6 +38,7 @@ const CustomersDashboard = () => {
       handleAdminRoles(currentUser, setAdminRoles);
     }
   }, []);
+
 
   return (
     <>
@@ -82,11 +90,18 @@ const CustomersDashboard = () => {
               count={showCount}
               searchTerm={searchTerm}
               admin={admin}
+              setTotalPages={setTotalPages}
+              currentPage={currentPage}
               adminRoles={adminRoles}
             />
 
             {/* next and previous button  */}
-            <NextPreBtn />
+            <NextPreBtn
+              currentPage={currentPage}
+              totalPages={totalPages}
+              goToNextPage={goToNextPage}
+              goToPreviousPage={goToPreviousPage}
+            />
           </div>
         </div>
       ) : (

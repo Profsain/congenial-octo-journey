@@ -2,12 +2,21 @@ import { useState } from "react";
 import DashboardHeadline from "../../shared/DashboardHeadline";
 import "../customers/Customer.css";
 import AllLoans from "./AllLoans";
+import NextPreBtn from "../../shared/NextPreBtn";
+
+// custom hook
+import usePagination from "../../../../customHooks/usePagination";
 
 const LoanDashboard = () => {
   // handle search
-  const [showCount, setShowCount] = useState(10);
+  const [showCount, setShowCount] = useState(5);
   const [searchTerms, setSearchTerms] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+
+  const { currentPage, goToNextPage, goToPreviousPage, setPage } =
+    usePagination(1, totalPages);
+
+
 
   return (
     <div className="MainBox">
@@ -41,10 +50,18 @@ const LoanDashboard = () => {
         <div className="ListSec">
           {/* Loans list  */}
           <AllLoans
-            showCount={showCount}
-            currentPage={currentPage}
-            setCurrentPage={setCurrentPage}
+            count={showCount}
             searchTerms={searchTerms}
+            setTotalPages={setTotalPages}
+            currentPage={currentPage}
+          />
+
+          {/* next and previous button */}
+          <NextPreBtn
+            currentPage={currentPage}
+            totalPages={totalPages}
+            goToNextPage={goToNextPage}
+            goToPreviousPage={goToPreviousPage}
           />
         </div>
       </div>

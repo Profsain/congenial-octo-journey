@@ -19,10 +19,14 @@ import { IoMdCheckmarkCircleOutline } from "react-icons/io";
 import { FcCancel } from "react-icons/fc";
 import DisplayLoanProductName from "../../shared/DisplayLoanProductName";
 import TransferMoney from "./transferMoney/TransferMoney";
+import axios from "axios";
 import { toast } from "react-toastify";
 import ActionNotification from "../../shared/ActionNotification";
 import { nigerianCurrencyFormat } from "../../../../../utilities/formatToNiaraCurrency";
-import apiClient from "../../../../lib/axios";
+
+// custom hook
+import usePagination from "../../../../customHooks/usePagination";
+import usePaginatedData from "../../../../customHooks/usePaginationData";
 
 const LoanDisbursement = () => {
   const styles = {
@@ -32,7 +36,7 @@ const LoanDisbursement = () => {
     },
     head: {
       color: "#fff",
-   
+      fontSize: "1rem",
     },
     approved: {
       color: "#5cc51c",
@@ -48,6 +52,9 @@ const LoanDisbursement = () => {
     },
   };
 
+  // Base URL for API
+  const apiUrl = import.meta.env.VITE_BASE_URL;
+
   // holds state to check for loged in users permisson to approve
   const [canUserManage, setCanUserManage] = useState(false);
   const [canUserDisburse, setCanUserDisburse] = useState(false);
@@ -55,8 +62,18 @@ const LoanDisbursement = () => {
 
   const { bookedLoans } = useSelector((state) => state.loanReducer);
 
-  const [showCount, setShowCount] = useState(10);
+  const [showCount, setShowCount] = useState(5);
   const [searchTerms, setSearchTerms] = useState("");
+  const [totalPages, setTotalPages] = useState(1);
+
+  // custom hook destructuring
+  const { currentPage, goToNextPage, goToPreviousPage, setPage } =
+    usePagination(1, totalPages);
+  const { paginatedData: paginatedLoansList } = usePaginatedData(
+    bookedLoans,
+    showCount,
+    currentPage
+  );
 
   const [show, setShow] = useState(false);
   const [loanObj, setLoanObj] = useState({});
@@ -97,11 +114,22 @@ const LoanDisbursement = () => {
     getData();
   }, [dispatch]);
 
+
+  // update loansList to show 5 pendingLoans on page load
+  // or on count changes
+   useEffect(() => {
+     setLoansList(paginatedLoansList); // Update local state with paginated data
+   }, [paginatedLoansList]);
+
+   useEffect(() => {
+     setTotalPages(totalPages); // Update total pages when it changes
+   }, [totalPages, setTotalPages]);
+
   // update loansList to show 10 customers on page load
   // or on count changes
-  useEffect(() => {
-    setLoansList(bookedLoans?.slice(0, showCount));
-  }, [bookedLoans, showCount]);
+  // useEffect(() => {
+  //   setLoansList(bookedLoans?.slice(0, showCount));
+  // }, [bookedLoans, showCount]);
 
   // handle close loan details
   const handleClose = () => {
@@ -121,7 +149,7 @@ const LoanDisbursement = () => {
     try {
       setApproveDisburseLoading(true);
 
-      await apiClient.put(`/loans/disburse/${loanObj._id}`, payload);
+      await axios.put(`${apiUrl}/api/loans/disburse/${loanObj._id}`, payload);
       await dispatch(fetchBookedLoans());
       toast.success("Loan Disbursement Initiated and Pending Approval");
     } catch (error) {
@@ -136,7 +164,7 @@ const LoanDisbursement = () => {
     try {
       setApproveDisburseLoading(true);
 
-      await apiClient.put(`/loans/approve-disburse/${loanObj._id}`);
+      await axios.put(`${apiUrl}/api/loans/approve-disburse/${loanObj._id}`);
       await dispatch(fetchBookedLoans());
       toast.success("Loan has been successfully disbursed");
     } catch (error) {
@@ -174,7 +202,7 @@ const LoanDisbursement = () => {
   const handleSearch = () => {
     // check bookedLoans is not empty
     if (!bookedLoans) return;
-    const currSearch = searchList(bookedLoans, searchTerms, "agreefullname");
+    const currSearch = searchList(bookedLoans, searchTerms, "firstname");
     setLoansList(currSearch?.slice(0, showCount));
   };
 
@@ -205,8 +233,8 @@ const LoanDisbursement = () => {
           try {
             setLoanObj(loan);
             setShowDisburse(true);
-            const response = await apiClient.get(
-              `/bankone/getCustomerAccountsByBankoneId/${loan.customer?.banking?.accountDetails?.CustomerID}`
+            const response = await axios.get(
+              `${apiUrl}/api/bankone/getCustomerAccountsByBankoneId/${loan.customer?.banking?.accountDetails?.CustomerID}`
             );
 
             setLoanUserAccounts(
@@ -250,8 +278,8 @@ const LoanDisbursement = () => {
               <input
                 name="showCount"
                 type="number"
-                step={10}
-                min={10}
+                step={5}
+                min={5}
                 value={showCount}
                 onChange={(e) => setShowCount(e.target.value)}
               />
@@ -338,7 +366,12 @@ const LoanDisbursement = () => {
             </tbody>
           </Table>
         </div>
-        <NextPreBtn />
+        <NextPreBtn
+          currentPage={currentPage}
+          totalPages={totalPages}
+          goToNextPage={goToNextPage}
+          goToPreviousPage={goToPreviousPage}
+        />
 
         {/* show loan details model */}
         {show && (

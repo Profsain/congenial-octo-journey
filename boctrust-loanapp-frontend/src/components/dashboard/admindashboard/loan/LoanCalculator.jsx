@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import {  fetchSelectedProduct } from "../../../../redux/reducers/productReducer";
+import { fetchSelectedProduct } from "../../../../redux/reducers/productReducer";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import DashboardHeadline from "../../shared/DashboardHeadline";
@@ -9,7 +9,6 @@ import BocButton from "../../shared/BocButton";
 import axios from "axios";
 import { calculateSimpleInterest } from "../../../shared/calculatorfunc";
 
-
 // Define validation schema using Yup
 const validationSchema = Yup.object().shape({
   loanproduct: Yup.string().required("Loan product is required"),
@@ -17,7 +16,6 @@ const validationSchema = Yup.object().shape({
   loanamount: Yup.number()
     .typeError("Amount must be a number")
     .required("Amount is required"),
- 
 });
 
 const initialValues = {
@@ -27,13 +25,10 @@ const initialValues = {
   loanamount: "",
   monthlyrepayment: "",
   loantotalrepayment: "",
-
 };
 
 const LoanCalculator = () => {
-
   const [choosenProduct, setChoosenProduct] = useState(null);
-  
 
   const ref = useRef();
 
@@ -69,6 +64,50 @@ const LoanCalculator = () => {
   }, [choosenProduct]);
 
   const loanProducts = useSelector((state) => state.productReducer.products);
+
+  const apiUrl = import.meta.env.VITE_BASE_URL;
+
+  const [minLoanAmount, setMinLoanAmount] = useState("");
+  const [minLoanAmountMessage, setMinLoanAmountMessage] = useState("");
+
+  useEffect(() => {
+    const fetchMinLoanAmount = async () => {
+      try {
+        const response = await axios.get(`${apiUrl}/api/settings/settings`);
+        console.log("PAPAPAPAP", response.data);
+        if (response.data && response.data.settings.minimumLoanAmount) {
+          setMinLoanAmount(response.data.settings.minimumLoanAmount);
+        }
+      } catch (error) {
+        console.error("Error fetching Minimum Loan Amount:", error);
+      }
+    };
+
+    fetchMinLoanAmount();
+  }, []);
+
+  // Handler for submitting the Minimum Loan Amount
+  const handleMinLoanAmountSubmit = async () => {
+    if (!minLoanAmount || isNaN(minLoanAmount) || Number(minLoanAmount) <= 0) {
+      setMinLoanAmountMessage("Please enter a valid minimum loan amount.");
+      return;
+    }
+    try {
+      const response = await axios.post(
+        `${apiUrl}/api/settings/settings/minimumLoanAmount`,
+        {
+          minLoanAmount: Number(minLoanAmount),
+        }
+      );
+      setMinLoanAmountMessage("Minimum Loan Amount updated successfully!");
+      console.log("Response:", response.data);
+    } catch (error) {
+      console.error("Error sending Minimum Loan Amount:", error);
+      setMinLoanAmountMessage("Failed to update Minimum Loan Amount.");
+    }
+  };
+
+ 
 
   return (
     <div className="apply__forLoan">
@@ -198,7 +237,7 @@ const LoanCalculator = () => {
                 />
               </div>
             </div>
-            
+
             <div className="FieldRow autoFill">
               <div className="FieldGroup">
                 <label htmlFor="monthlyrepayment">Monthly Repayment</label>
@@ -234,6 +273,33 @@ const LoanCalculator = () => {
             </div>
           </Form>
         </Formik>
+        <div className="MinLoanAmountContainer">
+          <h3>Set Minimum Loan Amount</h3>
+          <div className="FieldGroup">
+            <label htmlFor="minLoanAmountInput">Minimum Loan Amount</label>
+            <input
+              type="number"
+              id="minLoanAmountInput"
+              className="Input"
+              value={minLoanAmount}
+              onChange={(e) => setMinLoanAmount(e.target.value)}
+              min="1"
+            />
+          </div>
+          <button
+            className="BocButton"
+            style={{
+              fontSize: "1.6rem",
+              width: "420px",
+              backgroundColor: "#ecaa00",
+              borderRadius: "18px",
+            }}
+            onClick={handleMinLoanAmountSubmit}
+          >
+            Update Minimum Loan
+          </button>
+          {minLoanAmountMessage && <p>{minLoanAmountMessage}</p>}
+        </div>
       </div>
     </div>
   );

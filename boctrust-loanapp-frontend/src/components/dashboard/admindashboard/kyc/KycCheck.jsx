@@ -18,6 +18,11 @@ import sortByCreatedAt from "../../shared/sortedByDate";
 import KycViewDetails from "./KycViewDetails";
 import { fetchAllCustomersLoans } from "../../../../redux/reducers/customersLoansReducer";
 import apiClient from "../../../../lib/axios";
+import { useLocation } from "react-router-dom";
+
+// custom hook
+import usePagination from "../../../../customHooks/usePagination";
+import usePaginatedData from "../../../../customHooks/usePaginationData";
 
 const KycCheck = () => {
   const styles = {
@@ -43,11 +48,14 @@ const KycCheck = () => {
     },
   };
 
+  const location = useLocation();
+
   // fetch all customer
   const dispatch = useDispatch();
   const customers = useSelector(
     (state) => state.customersLoansReducer.customersAndLoans
   );
+
   const status = useSelector((state) => state.customerReducer.status);
   // component state
   const [searchTerm, setSearchTerm] = useState("");
@@ -55,6 +63,17 @@ const KycCheck = () => {
   const [customerId, setCustomerId] = useState("");
   const [currentCustomer, setCurrentCustomer] = useState({});
   const [showKycDetails, setShowKycDetails] = useState(false);
+
+  // custom hook state pagination
+  const [showCount, _] = useState(10);
+  const [totalPage, setTotalPage] = useState(1);
+  // custom hook destructuring
+  const { currentPage, goToNextPage, goToPreviousPage, setPage } =
+    usePagination(1, totalPage);
+
+  const { paginatedData: paginatedCustomersList, totalPages } =
+    usePaginatedData(searchCustomer, showCount, currentPage);
+
   // form input state
   const [isFacialMatch, setIsFacialMatch] = useState(null);
   const [isIdCardValid, setIsIdCardValid] = useState(null);
@@ -80,9 +99,12 @@ const KycCheck = () => {
   useEffect(() => {
     if (customers?.length > 0) {
       setSearchCustomer(customers);
-    } 
-    
+    }
   }, [customers]);
+
+  useEffect(() => {
+    setTotalPage(totalPages);
+  }, [totalPages]);
 
   useEffect(() => {
     if (
@@ -106,6 +128,7 @@ const KycCheck = () => {
 
   // handle radio input changes
   const handleRadioChange = (name, value) => {
+
     switch (name) {
       case "isFacialMatch":
         setIsFacialMatch(value);
@@ -173,8 +196,7 @@ const KycCheck = () => {
 
     // send update to backend
     await apiClient.put(`/updatecustomer/kyc/${customerId}`, data);
-    console.log(isKycApproved)
-   
+
 
     await dispatch(fetchAllCustomersLoans({}));
     setShowKycDetails(false);
@@ -238,13 +260,17 @@ const KycCheck = () => {
               <Table borderless hover responsive="sm">
                 <thead style={styles.head}>
                   <tr>
-                    <th>Customer ID</th>
+                    <th>Customer ss ID</th>
                     <th>Full Name</th>
                     <th>Phone</th>
                     <th>Date</th>
-                    <th>View Details</th>
+                    {location.pathname === "/dashboard/kyc" && (
+                      <th>View Details</th>
+                    )}
                     <th>View Documents</th>
-                    <th>Do Review</th>
+                    {location.pathname === "/dashboard/kyc" && (
+                      <th>Do Review</th>
+                    )}
                   </tr>
                 </thead>
                 <tbody>
@@ -255,19 +281,21 @@ const KycCheck = () => {
                       </td>
                     </tr>
                   ) : (
-                    sortByCreatedAt(searchData)?.map((customer) => (
+                    sortByCreatedAt(paginatedCustomersList)?.map((customer) => (
                       <tr key={customer._id}>
                         <td>{customer.customerId}</td>
                         <td>{customer.firstname + " " + customer.lastname}</td>
                         <td>{customer.phonenumber}</td>
                         <td>{getDateOnly(customer.createdAt)}</td>
-                        <td
-                          onClick={() => handleViewInfo(customer._id)}
-                          style={styles.padding}
-                          className="viewDocs"
-                        >
-                          View
-                        </td>
+                        {location.pathname === "/dashboard/kyc" && (
+                          <td
+                            onClick={() => handleViewInfo(customer._id)}
+                            style={styles.padding}
+                            className="viewDocs"
+                          >
+                            View
+                          </td>
+                        )}
                         <td
                           onClick={() => handleViewDocs(customer._id)}
                           style={styles.padding}
@@ -275,49 +303,56 @@ const KycCheck = () => {
                         >
                           View
                         </td>
-                        <td>
-                          <div>
-                            {customer.kyc.isKycApproved ? (
-                              <BocButton
-                                bradius="12px"
-                                fontSize="14px"
-                                margin="0 4px"
-                                bgcolor="#5cc51c"
-                              >
-                                Done
-                              </BocButton>
-                            ) : customer.kyc.isKycApproved === null ? (
-                              <a href="#kycSection">
+                        {location.pathname === "/dashboard/kyc" && (
+                          <td>
+                            <div>
+                              {customer.kyc.isKycApproved ? (
                                 <BocButton
                                   bradius="12px"
                                   fontSize="14px"
                                   margin="0 4px"
-                                  bgcolor="#f59e0b"
+                                  bgcolor="#5cc51c"
+                                >
+                                  Done
+                                </BocButton>
+                              ) : customer.kyc.isKycApproved === null ? (
+                                <a href="#kycSection">
+                                  <BocButton
+                                    bradius="12px"
+                                    fontSize="14px"
+                                    margin="0 4px"
+                                    bgcolor="#f59e0b"
+                                    func={() => handleStartCheck(customer._id)}
+                                  >
+                                    Check
+                                  </BocButton>
+                                </a>
+                              ) : (
+                                <BocButton
+                                  bradius="12px"
+                                  fontSize="14px"
+                                  margin="0 4px"
+                                  bgcolor="#f43f5e"
                                   func={() => handleStartCheck(customer._id)}
                                 >
-                                  Check
+                                  Canceled
                                 </BocButton>
-                              </a>
-                            ) : (
-                              <BocButton
-                                bradius="12px"
-                                fontSize="14px"
-                                margin="0 4px"
-                                bgcolor="#f43f5e"
-                                func={() => handleStartCheck(customer._id)}
-                              >
-                                Canceled
-                              </BocButton>
-                            )}
-                          </div>
-                        </td>
+                              )}
+                            </div>
+                          </td>
+                        )}
                       </tr>
                     ))
                   )}
                 </tbody>
               </Table>
             </div>
-            <NextPreBtn />
+            <NextPreBtn
+              currentPage={currentPage}
+              totalPages={totalPage}
+              goToNextPage={goToNextPage}
+              goToPreviousPage={goToPreviousPage}
+            />
           </div>
 
           {/* kyc detail section */}
@@ -328,19 +363,16 @@ const KycCheck = () => {
                 <div className="col-sm-12 col-md-6">
                   <Headline fontSize="24px" text="Valid ID Card View" />
                   <div className="IdCard">
-                    {currentCustomer?.valididcard ? (
-                      <img
-                        src={currentCustomer.valididcard}
-                        alt="official-id"
-                        className="OfficialIdCard"
-                      />
-                    ) : (
-                      <img
-                        src="/images/officialid.png"
-                        alt="official-id"
-                        className="OfficialIdCard"
-                      />
-                    )}
+                    <div>
+                      {currentCustomer?.valididcard ? (
+                        <img
+                          src={currentCustomer.valididcard}
+                          alt="official-id"
+                        />
+                      ) : (
+                        <img src="/images/officialid.png" alt="official-id" />
+                      )}
+                    </div>
 
                     <div className="MatchCon">
                       <Headline
@@ -640,6 +672,16 @@ const KycCheck = () => {
                     margin="8px 28px"
                     bgcolor="#145098"
                     func={handleSaveCheck}
+                    disable={
+                      !(
+                        isFacialMatch === "true" &&
+                        isIdCardValid === "true" &&
+                        isPhotoCaptured === "true" &&
+                        isSignatureValid === "true" &&
+                        isOtherDocsValidated === "true" &&
+                        isKycApproved === "true"
+                      )
+                    }
                   >
                     Validate/Approve
                   </BocButton>

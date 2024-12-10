@@ -9,6 +9,9 @@ import "../../dashboardcomponents/transferdashboard/Transfer.css";
 import WikiList from "./WikiList";
 import apiClient from "../../../../lib/axios";
 
+// custom hook
+import usePagination from "../../../../customHooks/usePagination";
+
 // Define validation schema using Yup
 const validationSchema = Yup.object().shape({
   question: Yup.string().required("Question is required"),
@@ -26,8 +29,13 @@ const AddWiki = () => {
   const [showAddNew, setShowAddNew] = useState(false);
   const handleAddNew = () => setShowAddNew(true);
   const handleClose = () => setShowAddNew(false);
-  const [showCount, setShowCount] = useState(10);
+  // handle search
+  const [showCount, setShowCount] = useState(5);
   const [searchTerms, setSearchTerms] = useState("");
+  const [totalPages, setTotalPages] = useState(1);
+
+  const { currentPage, goToNextPage, goToPreviousPage, setPage } =
+    usePagination(1, totalPages);
 
   const handleSubmit = async (values, { setSubmitting, resetForm }) => {
    
@@ -83,9 +91,19 @@ const AddWiki = () => {
           </div>
           <div>
             {/* wiki list  */}
-            <WikiList count={showCount} searchTerms={searchTerms} />
+            <WikiList
+              count={showCount}
+              searchTerms={searchTerms}
+              setTotalPages={setTotalPages}
+              currentPage={currentPage}
+            />
             {/* next and previous button  */}
-            <NextPreBtn />
+            <NextPreBtn
+              currentPage={currentPage}
+              totalPages={totalPages}
+              goToNextPage={goToNextPage}
+              goToPreviousPage={goToPreviousPage}
+            />
           </div>
         </div>
       ) : (

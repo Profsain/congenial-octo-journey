@@ -11,6 +11,10 @@ import useSearch from "../../../../../utilities/useSearchName";
 import useSearchByDate from "../../../../../utilities/useSearchByDate";
 import useSearchByDateRange from "../../../../../utilities/useSearchByDateRange";
 
+// custom hook
+import usePagination from "../../../../customHooks/usePagination";
+import usePaginatedData from "../../../../customHooks/usePaginationData";
+
 
 const ReviewSignature = () => {
   const styles = {
@@ -41,6 +45,20 @@ const ReviewSignature = () => {
   const customers = useSelector(
     (state) => state.customerReducer.customers.customer
   );
+
+  // custom hook state pagination
+  const [showCount, setShowCount] = useState(5);
+  const [searchTerms, setSearchTerms] = useState("");
+  const [totalPage, setTotalPage] = useState(1);
+
+  // custom hook destructuring
+  const { currentPage, goToNextPage, goToPreviousPage, setPage } =
+    usePagination(1, totalPage);
+
+  const { paginatedData: paginatedCustomersList, totalPages } =
+    usePaginatedData(customers, showCount, currentPage);
+
+    
   const status = useSelector((state) => state.customerReducer.status);
   console.log(customers, "customers")
   useEffect(() => {
@@ -186,7 +204,12 @@ const ReviewSignature = () => {
             </tbody>
           </Table>
         </div>
-        <NextPreBtn />
+        <NextPreBtn
+          currentPage={currentPage}
+          totalPages={totalPage}
+          goToNextPage={goToNextPage}
+          goToPreviousPage={goToPreviousPage}
+        />
       </div>
     </div>
   );

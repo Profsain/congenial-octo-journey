@@ -1,99 +1,44 @@
 import PropTypes from "prop-types";
-import { useState } from "react";
-import { Table } from "react-bootstrap";
+
 import BocButton from "../../shared/BocButton";
-import DashboardHeadline from "../../shared/DashboardHeadline";
-import "./Kyc.css";
+import styles from "./OtherDocuments.module.css";
+
+import { FaRegFile } from "react-icons/fa6";
+import { BsDownload } from "react-icons/bs";
+import { HiOutlineEye } from "react-icons/hi2";
 
 const OtherDocuments = ({ customerObj, setShowDocs }) => {
-  const styles = {
-    btnBox: {
-      display: "flex",
-      justifyContent: "center",
-    },
-    table: {
-      //   margin: "0 2rem 0 3rem",
-      fontSize: "14px",
-    },
-    head: {
-      color: "#fff",
-      fontSize: "1rem",
-    },
-    approved: {
-      color: "#5cc51c",
-    },
-    completed: {
-      color: "#f64f4f",
-    },
-    padding: {
-      color: "#ecaa00",
-    },
-  };
-
-  const [currentDocs, setCurrentDocs] = useState(customerObj.photocaptureImg);
-
-  const handleDocs = (docs) => {
-    setCurrentDocs(docs);
-  };
-
   return (
     <div>
       {/* table section */}
       <div className="Section RBox DCard">
-        <DashboardHeadline
-          height="52px"
-          mspacer="2rem 0 -2.55rem -1rem"
-          bgcolor="#145098"
-        ></DashboardHeadline>
-        <div style={styles.table}>
-          <Table hover responsive="sm">
-            <thead style={styles.head}>
-              <tr>
-                <th>Customer ID</th>
-                <th>Full Name</th>
-                <th>Employment Letters</th>
-                <th>Bank Statements</th>
-                <th>Pay Slip</th>
-                <th>Time Stamp</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>-</td>
-                <td>-</td>
-                <td style={styles.completed}>-</td>
-                <td style={styles.approved}>-</td>
-                <td>-</td>
-              </tr>
-              <tr>
-                <td>{customerObj.customerId}</td>
-                <td>{customerObj.firstname + " " + customerObj.lastname}</td>
-                <td
-                  onClick={() => handleDocs(customerObj.employmentletter)}
-                  className="viewDocsBtn"
-                  style={styles.completed}
-                >
-                  View
-                </td>
-                <td
-                  onClick={() => handleDocs(customerObj.uploadbankstatement)}
-                  className="viewDocsBtn"
-                  style={styles.approved}
-                >
-                  View
-                </td>
-                <td
-                  onClick={() => handleDocs(customerObj.uploadpayslip)}
-                  className="viewDocsBtn"
-                  style={styles.approved}
-                >
-                  View
-                </td>
-                <td>-</td>
-              </tr>
-            </tbody>
-          </Table>
+        <div className="">
+          <p>
+            Below are the files uploaded by{" "}
+            <strong>
+              {customerObj.firstname} {customerObj.lastname}
+            </strong>
+          </p>
+
+          <div className={styles.file__itemsList}>
+            <FileItem
+              file={customerObj.employmentletter}
+              fileName={"Employment Letter"}
+            />
+            <FileItem
+              file={customerObj.uploadbankstatement}
+              fileName={"Bank Statement"}
+            />
+            <FileItem
+              file={customerObj.marketerClientPic}
+              fileName={"DSA/Marketer Image"}
+            />
+            {customerObj.careertype?.toLowerCase() === "private employee" ? (
+              <FileItem file={customerObj.uploadpayslip} fileName={"Payslip"} />
+            ) : null}
+          </div>
         </div>
+
         <div className="checkBtn">
           <BocButton
             margin="1rem 0 3rem 0"
@@ -105,17 +50,53 @@ const OtherDocuments = ({ customerObj, setShowDocs }) => {
             Close Docs View
           </BocButton>
         </div>
-        <div className="checkBtn">
-          <img src={currentDocs} alt="other docs" />
-        </div>
       </div>
     </div>
   );
 };
 
 OtherDocuments.propTypes = {
-  customerObj: PropTypes.string,
+  customerObj: PropTypes.object,
   setShowDocs: PropTypes.func,
 };
 
 export default OtherDocuments;
+
+const FileItem = ({ fileName, file }) => {
+  const downloadFile = () => {
+    const link = document.createElement("a");
+    link.href = file;
+    link.download = fileName;
+    link.click();
+  };
+  return (
+    <div className={styles.file__itemWrap}>
+      <div>
+        <FaRegFile size={35} />
+
+        <h5>
+          {fileName}
+          {!file && (
+            <span className={styles.not__avialable}>Not Avialable</span>
+          )}
+        </h5>
+      </div>
+      <div>
+        <button
+          disabled={!file}
+          onClick={downloadFile}
+          className="btn btn-dark"
+        >
+          <BsDownload />
+          Download
+        </button>
+        <button disabled={!file} className="btn btn-outline-dark">
+          <a href={file} target="_blank">
+            <HiOutlineEye />
+            View
+          </a>
+        </button>
+      </div>
+    </div>
+  );
+};

@@ -6,11 +6,18 @@ import NextPreBtn from "../../shared/NextPreBtn";
 import UsersList from "./UsersList";
 import { useNavigate } from "react-router-dom";
 
-const UserManagerDashboard = () => {
-  const [showCount, setShowCount] = useState(10);
-  const [searchTerms, setSearchTerms] = useState("");
+// custom hook
+import usePagination from "../../../../customHooks/usePagination";
 
-  const navigate = useNavigate()
+const UserManagerDashboard = () => {
+  const [showCount, setShowCount] = useState(5);
+  const [searchTerms, setSearchTerms] = useState("");
+  const [totalPages, setTotalPages] = useState(1);
+
+  const navigate = useNavigate();
+
+  const { currentPage, goToNextPage, goToPreviousPage, setPage } =
+    usePagination(1, totalPages);
 
   return (
     <div className="MainBox">
@@ -56,10 +63,19 @@ const UserManagerDashboard = () => {
           </DashboardHeadline>
         </div>
         <div>
-          {/* users list  */}
-          <UsersList count={showCount} searchTerms={searchTerms} />
-          {/* next and previous button  */}
-          <NextPreBtn />
+        <UsersList
+            count={showCount}
+            searchTerms={searchTerms}
+            setTotalPages={setTotalPages}
+            currentPage={currentPage}
+          />
+          {/* next and previous button */}
+          <NextPreBtn
+            currentPage={currentPage}
+            totalPages={totalPages}
+            goToNextPage={goToNextPage}
+            goToPreviousPage={goToPreviousPage}
+          />
         </div>
       </div>
     </div>
