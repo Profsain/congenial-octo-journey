@@ -11,6 +11,8 @@ const Employer = require("../models/EmployersManager");
 const { default: axios } = require("axios");
 const CreditAnalysis = require("../models/CreditAnalysis");
 
+
+// create new loan
 router.post("/", async (req, res) => {
   try {
     const {
@@ -210,6 +212,7 @@ const calcDaysDiffFromNow = (refDate) => {
   return Difference_In_Days;
 };
 
+// repayment schedule
 router.get("/overdue", async (req, res) => {
   const token = process.env.BANKONE_TOKEN;
   const { search, dateFilter, sort = "latest" } = req.query;
@@ -547,6 +550,15 @@ router.put("/disburse/:loanId", async (req, res) => {
     if (!loan) {
       return res.status(404).json({ error: "Loan not found" });
     }
+
+    // Update monthsSinceLastLoan for the customer
+        const now = new Date();
+        await Customer.findByIdAndUpdate(loan.customer, {
+            $set: {
+                "topUpLoanEligibility.monthsSinceLastLoan": 0, // Reset since this is a new loan
+            },
+        });
+
 
     // Return the allLoans array
     res.status(200).json(loan);

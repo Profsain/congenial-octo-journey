@@ -1,5 +1,5 @@
 import PropTypes from "prop-types";
-const FigCard = ({ classname, children }) => {
+const FigCard = ({ classname, func, children }) => {
   const style = {
     display: "flex",
     flexDirection: "column",
@@ -13,12 +13,13 @@ const FigCard = ({ classname, children }) => {
     color: "#fff",
     background: "linear-gradient(to bottom, #48A7FF, #145098)",
   };
-  return <div className={classname } style={style}>{children}</div>;
+  return <div className={classname } style={style} onClick={func}>{children}</div>;
 };
 
 FigCard.propTypes = {
   children: PropTypes.any,
   classname: PropTypes.string,
+  func: PropTypes.func,
 };
 
 export default FigCard;

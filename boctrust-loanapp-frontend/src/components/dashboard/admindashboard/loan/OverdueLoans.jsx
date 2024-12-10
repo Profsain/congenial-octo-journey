@@ -20,6 +20,8 @@ import useSearchByDateRange from "../../../../../utilities/useSearchByDateRange"
 import usePagination from "@mui/material/usePagination/usePagination";
 import usePaginatedData from "../../../../customHooks/usePaginationData";
 
+import ReviewDirectDebit from "./ReviewDirectDebit";
+
 const CompletedLoans = () => {
   const styles = {
     head: {
@@ -65,17 +67,15 @@ const CompletedLoans = () => {
   const [overdueLoanEntries, setOverdueLoanEntries] = useState(null);
   const [searchTodayEntries, setSearchTodayEntries] = useState(false);
 
+  // review direct debit
+  const [showReviewModal, setShowReviewModal] = useState(false);
+  const [selectedCustomer, setSelectedCustomer] = useState(null);
 
-  // Pagination State
-  const [totalPage, setTotalPage] = useState(1);
-  const [showCount, _] = useState(10);
-
-  const { currentPage, goToNextPage, goToPreviousPage, setPage } =
-    usePagination(1, totalPage);
-
-  const { paginatedData: paginatedOverdueLoans, totalPages } =
-    usePaginatedData(overdueLoanEntries, showCount, currentPage);
-
+  // Open review modal
+  const handleReviewClick = (customer) => {
+    setSelectedCustomer(customer);
+    setShowReviewModal(true);
+  };
 
   const dispatch = useDispatch();
 
@@ -173,32 +173,6 @@ const CompletedLoans = () => {
         />
       </div>
       <div>
-        {/* top search bar */}
-        {/* <div className="Search">
-          <DashboardHeadline padding="0" height="70px" bgcolor="#d9d9d9">
-            <div className="SearchBar">
-              <div className="FormGroup">
-                <label htmlFor="show">Show</label>
-                <input
-                  name="showCount"
-                  type="number"
-                  step={10}
-                  min={10}
-                  value={showCount}
-                  onChange={(e) => setShowCount(e.target.value)}
-                />
-              </div>
-              <div className="FormGroup SBox">
-                <input
-                  name="search"
-                  placeholder="Search by name"
-                  onChange={(e) => setSearchTerms(e.target.value)}
-                />
-                <img src="/images/search.png" alt="search-icon" />
-              </div>
-            </div>
-          </DashboardHeadline>
-        </div> */}
         <div>
           {/* Loans list  */}
           <div className="ListSec">
@@ -271,7 +245,7 @@ const CompletedLoans = () => {
                             <td>
                               <div style={styles.btnBox}>
                                 <BocButton
-                                  func={() => handleShow(overdueLoan._id)}
+                                  func={() => handleReviewClick(overdueLoan)}
                                   bradius="12px"
                                   fontSize="14px"
                                   margin="2px"
@@ -303,6 +277,15 @@ const CompletedLoans = () => {
         <LoanDetails show={show} handleClose={handleClose} loanObj={loanObj} />
       )}
 
+      {/* Review Direct Debit Modal */}
+      {selectedCustomer && (
+        <ReviewDirectDebit
+          show={showReviewModal}
+          handleClose={() => setShowReviewModal(false)}
+          customer={selectedCustomer}
+        />
+      )}
+      
       {/* show notification model */}
       {showNotification && (
         <NotificationBox

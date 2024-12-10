@@ -15,7 +15,11 @@ const validationSchema = Yup.object().shape({
   phoneNumber1: Yup.string().required("Phone number is required"),
   phoneNumber2: Yup.string().required("Phone number is required"),
   email: Yup.string().required("Email is required"),
-  copyrightText: Yup.string().required("copyright is required"),
+  copyrightText: Yup.string().required("Copyright is required"),
+  // top up update
+  topUpEligibilityMonths: Yup.number()
+    .min(1, "Must be at least 1 month")
+    .required("Top-Up Eligibility Months is required"),
 });
 
 const GeneralSettings = () => {
@@ -25,13 +29,14 @@ const GeneralSettings = () => {
   );
   const status = useSelector((state) => state.settingReducer.status);
   const [settingData, setSettingData] = useState({});
+  const [successMsg, setSuccessMsg] = useState("");
+  const [processing, setProcessing] = useState(false);
 
   useEffect(() => {
     dispatch(fetchSetting());
   }, [dispatch]);
 
   useEffect(() => {
-    // check settings and update the state
     if (settings && settings.length > 0) {
       setSettingData(settings[0]);
     } else {
@@ -39,59 +44,33 @@ const GeneralSettings = () => {
     }
   }, [settings]);
 
-  const {
-    siteTitle,
-    address,
-    phoneNumber1,
-    phoneNumber2,
-    email,
-    copyrightText,
-  } = settingData;
-  const [successMsg, setSuccessMsg] = useState("");
-  const [processing, setProcessing] = useState(false);
-
   const initialValues = {
-    siteTitle: siteTitle || "",
-    address: address || "",
-    phoneNumber1: phoneNumber1 || "",
-    phoneNumber2: phoneNumber2 || "",
-    email: email || "",
-    copyrightText: copyrightText || "",
+    siteTitle: settingData.siteTitle || "",
+    address: settingData.address || "",
+    phoneNumber1: settingData.phoneNumber1 || "",
+    phoneNumber2: settingData.phoneNumber2 || "",
+    email: settingData.email || "",
+    copyrightText: settingData.copyrightText || "",
+    topUpEligibilityMonths: settingData.topUpEligibilityMonths || 6, // Default value
   };
 
   const handleSubmit = async (values) => {
     setProcessing(true);
-
     try {
-      // Handle form submission logic here
-      const data = {
-        siteTitle: values.siteTitle,
-        address: values.address,
-        phoneNumber1: values.phoneNumber1,
-        phoneNumber2: values.phoneNumber2,
-        email: values.email,
-        copyrightText: values.copyrightText,
-      };
-
-      const response = await updateSettings(data);
-
+      const response = await updateSettings(values);
       if (response) {
         setSuccessMsg("Settings updated successfully");
-        setProcessing(false);
       } else {
         setSuccessMsg("Error updating settings");
-        setProcessing(false);
       }
-
-      //  resetForm();
     } catch (error) {
       console.error("Error updating settings:", error);
     }
+    setProcessing(false);
   };
 
   return (
     <div className="TransContainer">
-      {/* show loading */}
       {status === "loading" ? (
         <PageLoader />
       ) : (
@@ -103,7 +82,7 @@ const GeneralSettings = () => {
           <Form>
             <div className="FieldRow">
               <div className="FieldGroup">
-                <label htmlFor="siteTitle">SiteTitle</label>
+                <label htmlFor="siteTitle">Site Title</label>
                 <Field
                   type="text"
                   name="siteTitle"
@@ -135,7 +114,6 @@ const GeneralSettings = () => {
                 />
                 <ErrorMessage name="phoneNumber1" component="div" />
               </div>
-
               <div className="FieldGroup">
                 <label htmlFor="phoneNumber2">Phone Number 2</label>
                 <Field
@@ -147,13 +125,13 @@ const GeneralSettings = () => {
                 <ErrorMessage name="phoneNumber2" component="div" />
               </div>
             </div>
+
             <div className="FieldRow">
               <div className="FieldGroup">
-                <label htmlFor="email">Email Address</label>
+                <label htmlFor="email">Email</label>
                 <Field type="text" name="email" id="email" className="Input" />
                 <ErrorMessage name="email" component="div" />
               </div>
-
               <div className="FieldGroup">
                 <label htmlFor="copyrightText">Copyright Text</label>
                 <Field
@@ -166,9 +144,25 @@ const GeneralSettings = () => {
               </div>
             </div>
 
+              {/* top up loan update */}
+            <div className="FieldRow">
+              <div className="FieldGroup">
+                <label htmlFor="topUpEligibilityMonths">
+                  Top-Up Eligibility (Months)
+                </label>
+                <Field
+                  type="number"
+                  name="topUpEligibilityMonths"
+                  id="topUpEligibilityMonths"
+                  className="Input"
+                />
+                <ErrorMessage name="topUpEligibilityMonths" component="div" />
+              </div>
+            </div>
+
             <div className="BtnContainer">
-                <p>{successMsg}</p>
-                {processing && <PageLoader />}
+              <p>{successMsg}</p>
+              {processing && <PageLoader />}
               <BocButton
                 type="submit"
                 width="220px"

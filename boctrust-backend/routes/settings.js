@@ -28,6 +28,7 @@ router.put('/settings', async (req, res) => {
 });
 
 
+<<<<<<< HEAD
 // Update settings
 router.post('/settings/minimumLoanAmount', async (req, res) => {
     console.log("Request Body:", req.body);
@@ -56,4 +57,13 @@ router.post('/settings/minimumLoanAmount', async (req, res) => {
 
 
 
+=======
+// Update top-up eligibility months here
+router.put("/set-month", async (req, res) => {
+    const { topUpEligibilityMonths } = req.body;
+    const settings = await Settings.findOneAndUpdate({}, { topUpEligibilityMonths }, { new: true });
+    res.json(settings);
+});
+
+>>>>>>> new-topup
 module.exports = router;
