@@ -40,7 +40,7 @@ const TopNavber = ({ title, user = "Femi Akinwade" }) => {
         </div>
         <div className="Inline Profile">
           {/* top up cta btn */}
-          {!currentUser.topUpLoanEligibility.isEligible && (
+          {!currentUser?.topUpLoanEligibility?.isEligible && (
             <div>
               {currentUser?.userType === "staff" ||
               currentUser?.userType === "super_admin" ? null : (

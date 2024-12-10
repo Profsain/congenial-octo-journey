@@ -99,7 +99,6 @@ const TopCardSec = ({ user }) => {
     setShowTopUpModal(false);
   };
 
-  console.log("user", user);
   return (
     <>
       <div className="TopCard">
