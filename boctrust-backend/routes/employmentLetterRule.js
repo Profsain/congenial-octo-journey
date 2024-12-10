@@ -19,7 +19,8 @@ router.get("/", async (req, res) => {
 // Define a route to update the employerLetterRule for an employer by ID
 router.post("/", async (req, res) => {
   try {
-    const { ruleTitle, maximumTenure, maximumAmount } = req.body;
+    const { ruleTitle, maximumTenure, maximumAmount, logicalRelationship } =
+      req.body;
 
     // Validate required fields
     if (!ruleTitle) {
@@ -31,12 +32,16 @@ router.post("/", async (req, res) => {
       ruleTitle,
       maximumTenure,
       maximumAmount,
+      logicalRelationship,
     });
 
     // Save the updated employer
     await employerLetterRule.save();
 
-    res.json({ message: "EmployerLetterRule Created successfully", employerLetterRule });
+    res.json({
+      message: "EmployerLetterRule Created successfully",
+      employerLetterRule,
+    });
   } catch (error) {
     console.error("Error Creating EmployerLetterRule:", error);
     return res.status(500).json({ error: error.message });
@@ -55,9 +60,13 @@ router.put("/:id", async (req, res) => {
       return res.status(400).json({ error: "All fields are required" });
     }
 
-    const updatedMandate = await EmployerLetterRule.findByIdAndUpdate(id, req.body, {
-      new: true,
-    });
+    const updatedMandate = await EmployerLetterRule.findByIdAndUpdate(
+      id,
+      req.body,
+      {
+        new: true,
+      }
+    );
 
     if (!updatedMandate) {
       return res.status(404).json({ error: "EmployerLetter Rule not Found" });

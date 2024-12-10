@@ -15,9 +15,6 @@ import sortByCreatedAt from "../../shared/sortedByDate";
 import { loanStatusEnum } from "../../../../lib/userRelated";
 import { fetchLoans } from "../../../../redux/reducers/loanReducer";
 import DisplayLoanProductName from "../../shared/DisplayLoanProductName";
-
-// custom hook
-import usePagination from "../../../../customHooks/usePagination";
 import usePaginatedData from "../../../../customHooks/usePaginationData";
 
 const AllLoans = ({ count, searchTerms, setTotalPages, currentPage }) => {
@@ -49,6 +46,8 @@ const AllLoans = ({ count, searchTerms, setTotalPages, currentPage }) => {
   // fetch all customer
   const dispatch = useDispatch();
   const { allLoans, status } = useSelector((state) => state.loanReducer);
+
+
 
   useEffect(() => {
     const getData = async () => {
@@ -92,7 +91,7 @@ const AllLoans = ({ count, searchTerms, setTotalPages, currentPage }) => {
       return;
     }
     const currSearch = searchList(allLoans, searchTerms, "firstname");
-    setLoansList(currSearch?.slice(0, count));
+    setLoansList(currSearch);
   };
 
   useEffect(() => {
@@ -121,68 +120,68 @@ const AllLoans = ({ count, searchTerms, setTotalPages, currentPage }) => {
               <th>Action</th>
             </tr>
           </thead>
-          {status === "loading" ? (
-            <tr>
-              <td colSpan="9">
-                <PageLoader />
-              </td>
-            </tr>
-          ) : (
-            <tbody>
-              {loansList?.length === 0 && <NoResult name="Loan" />}
-              {loansList &&
-                sortByCreatedAt(loansList)?.map((loan) => {
-                  return (
-                    <tr key={loan._id}>
-                      <td>
-                        {loan?.customer?.banking?.accountDetails?.CustomerID}
-                      </td>
-                      <td>
-                        {loan.deductions === "remita" ? (
-                         <p>Remita</p>
-                        ) : (
-                          <p>Nibss</p>
-                        )}
-                      </td>
-                      <td>
-                        <DisplayLoanProductName loan={loan} />
-                      </td>
-                      <td>
-                        {loan?.customer?.banking?.accountDetails
-                          ?.CustomerName ??
-                          `${loan?.customer?.firstname} ${loan?.customer?.lastname}`}
-                      </td>
-                      <td>
-                        {loan.customer?.banking?.accountDetails?.AccountNumber}
-                      </td>
-                      <td>{getDateOnly(loan.createdAt)}</td>
-                      <td>N{loan.loanamount}</td>
-                      <td
-                        style={styles.padding}
-                        className={
-                          loan?.customer?.kyc?.loanstatus ===
-                          loanStatusEnum.completed
-                            ? "text-success"
-                            : "text-warning"
-                        }
-                      >
-                        {capitalizeEachWord(loan.loanstatus)}
-                      </td>
-                      <td>
-                        <div>
-                          <button
-                            onClick={() => handleShow(loan._id)}
-                            className="btn btn-info text-white"
-                          >
-                            Details
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                })}
-            </tbody>
-          )}
+          <tbody>
+            {!paginatedLoansList || status === "loading" ? (
+              <tr>
+                <td colSpan="9">
+                  <PageLoader />
+                </td>
+              </tr>
+            ) : paginatedLoansList && paginatedLoansList?.length === 0 ? (
+              <NoResult name="Loan" />
+            ) : (
+              paginatedLoansList &&
+              paginatedLoansList?.map((loan) => {
+                return (
+                  <tr key={loan._id}>
+                    <td>
+                      {loan?.customer?.banking?.accountDetails?.CustomerID}
+                    </td>
+                    <td>
+                      {loan.deductions === "remita" ? (
+                        <p>Remita</p>
+                      ) : (
+                        <p>Nibss</p>
+                      )}
+                    </td>
+                    <td>
+                      <DisplayLoanProductName loan={loan} />
+                    </td>
+                    <td>
+                      {loan?.customer?.banking?.accountDetails?.CustomerName ??
+                        `${loan?.customer?.firstname} ${loan?.customer?.lastname}`}
+                    </td>
+                    <td>
+                      {loan.customer?.banking?.accountDetails?.AccountNumber}
+                    </td>
+                    <td>{getDateOnly(loan.createdAt)}</td>
+                    <td>N{loan.loanamount}</td>
+                    <td
+                      style={styles.padding}
+                      className={
+                        loan?.customer?.kyc?.loanstatus ===
+                        loanStatusEnum.completed
+                          ? "text-success"
+                          : "text-warning"
+                      }
+                    >
+                      {capitalizeEachWord(loan.loanstatus)}
+                    </td>
+                    <td>
+                      <div>
+                        <button
+                          onClick={() => handleShow(loan._id)}
+                          className="btn btn-info text-white"
+                        >
+                          Details
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })
+            )}
+          </tbody>
         </Table>
       </div>
       {/* <NextPreBtn /> */}

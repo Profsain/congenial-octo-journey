@@ -50,8 +50,17 @@ button:disabled {
   cursor: not-allowed;
 }
 
+/* typography */
+
 .capitalize {
   text-transform: capitalize;
+}
+
+.smallText{
+  font-size: .8rem !important;
+}
+.mediumText{
+  font-size: 1rem !important;
 }
 
 .table > :not(caption) > * > * {
@@ -113,7 +122,22 @@ button:disabled {
   font-size: 14px;
 }
 
+.PCont {
 
+  display: grid;
+  gap: 2rem;
+}
+
+.gold__gradientBtn{
+
+  display: grid;
+  place-content: center;
+  background: #ea8209;
+  border: 0;
+  border-radius: 2rem;
+  color: white;
+  background: linear-gradient(0deg, #ea8209, #f4d2a2);
+}
 
 @media screen and (max-width: 600px) {
   .Welcome {
@@ -569,5 +593,15 @@ button:disabled {
 @media screen and (max-width: 400px) {
   .TopCard {
     margin-right: 0;
+  
+  }
+}
+
+
+@media print {
+
+  
+  div {
+    page-break-after: auto; /* Add page breaks if necessary */
   }
 }

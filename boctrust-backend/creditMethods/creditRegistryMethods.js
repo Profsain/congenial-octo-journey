@@ -23,6 +23,7 @@ const getCreditRegistrySessionCode = async () => {
         }
 
         const result = await response.json();
+        console.log("result", result);
         return result;
     } catch (error) {
         throw new Error(error);
@@ -30,4 +31,3 @@ const getCreditRegistrySessionCode = async () => {
 };
 
 module.exports = getCreditRegistrySessionCode;
-

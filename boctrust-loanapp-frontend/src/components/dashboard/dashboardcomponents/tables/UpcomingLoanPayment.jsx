@@ -1,18 +1,16 @@
 import PropTypes from "prop-types";
-import { useEffect, useState } from "react";
-import BocButton from "../../shared/BocButton";
+import { useEffect } from "react";
 import DashboardHeadline from "../../shared/DashboardHeadline";
 import Table from "react-bootstrap/Table";
 import { fetchLoanRepaymentSchedule } from "../../../../redux/reducers/loanReducer";
 import { useDispatch, useSelector } from "react-redux";
 import PageLoader from "../../shared/PageLoader";
 import { format } from "date-fns";
+import TableStyles from "./TableStyles.module.css";
+import { calcDaysDiffFromNow } from "../../../../../utilities/calcDaysDiff";
 
 const UpcomingLoanPayment = ({ user }) => {
   const styles = {
-    table: {
-      marginLeft: "2rem",
-    },
     head: { color: "#145098", fontWeight: "bold", fontSize: "1.2rem" },
   };
 
@@ -35,7 +33,7 @@ const UpcomingLoanPayment = ({ user }) => {
   }, []);
 
   return (
-    <div>
+    <div className={TableStyles.table__wrapper}>
       <DashboardHeadline>Upcoming Loan Payment</DashboardHeadline>
       <Table
         borderless
@@ -55,14 +53,14 @@ const UpcomingLoanPayment = ({ user }) => {
         </thead>
         <tbody>
           {!activeLoanRepaymentSchedule || status === "loading" ? (
-            <tr>
+            <tr className={TableStyles.row}>
               <td colSpan="5">
                 <PageLoader width="70px" />
               </td>
             </tr>
           ) : activeLoanRepaymentSchedule &&
             activeLoanRepaymentSchedule.length === 0 ? (
-            <tr>
+            <tr className={TableStyles.row}>
               <td colSpan="5" style={{ textAlign: "center" }}>
                 No upcoming loan payment
               </td>
@@ -70,10 +68,21 @@ const UpcomingLoanPayment = ({ user }) => {
           ) : (
             activeLoanRepaymentSchedule &&
             activeLoanRepaymentSchedule.map((loan) => (
-              <tr key={loan.Id}>
+              <tr key={loan.Id} className={TableStyles.row}>
                 <td>{loan.Id}</td>
-                <td>{  loan.PaymentDueDate && format(loan.PaymentDueDate, "dd/LL/yyyy, hh:mm aaa")} </td>
-                <td></td>
+                <td>
+                  {loan.PaymentDueDate &&
+                    format(loan.PaymentDueDate, "dd/LL/yyyy, hh:mm aaa")}
+                </td>
+                <td>
+                  <button
+                    className={
+                   `btn ${ calcDaysDiffFromNow(loan.PaymentDueDate) >= 0 ? "btn-danger" : "btn-secondary"}`
+                    }
+                  >
+                   { calcDaysDiffFromNow(loan.PaymentDueDate) >= 0 ? "Due" : "Not Due"}
+                  </button>
+                </td>
                 <td>
                   <div className="d-flex">
                     <img src="/images/naira.png" alt="" width={15} />
@@ -81,7 +90,11 @@ const UpcomingLoanPayment = ({ user }) => {
                   </div>
                 </td>
                 <td>
-                  <button className="btn btn-primary">Pay</button>
+                  <button
+                    className={`${TableStyles.gold_btn} gold__gradientBtn`}
+                  >
+                    Pay Now
+                  </button>
                 </td>
               </tr>
             ))

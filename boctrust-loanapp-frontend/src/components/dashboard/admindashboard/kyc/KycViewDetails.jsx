@@ -5,7 +5,7 @@ import { IoArrowBackOutline } from "react-icons/io5";
 import { filterBank } from "../../../loanapplication/loanform/fetchBanks";
 import { useEffect, useState } from "react";
 
-const KycViewDetails = ({ customer, setShowInfo }) => {
+const KycViewDetails = ({ customer, loan, setShowInfo }) => {
   return (
     <div>
       <div className="ConfirmationContainer">
@@ -183,14 +183,14 @@ const KycViewDetails = ({ customer, setShowInfo }) => {
               name="Loan Amount"
               type="text"
               disabled
-              value={customer?.loan?.loanamount || ""}
+              value={loan?.loanamount || ""}
             />
             <div className="Space"></div>
             <KycInput
               name="Monthly Repayment"
               type="text"
               disabled
-              value={customer?.loan?.monthlyrepayment || ""}
+              value={loan?.monthlyrepayment || ""}
             />
           </div>
           <div className="InputRow">
@@ -198,14 +198,14 @@ const KycViewDetails = ({ customer, setShowInfo }) => {
               name="Total Repayment"
               type="text"
               disabled
-              value={customer?.loan?.loantotalrepayment || ""}
+              value={loan?.loantotalrepayment || ""}
             />
             <div className="Space"></div>
             <KycInput
               name="No. of Month"
               type="text"
               disabled
-              value={customer?.loan?.numberofmonth || ""}
+              value={loan?.numberofmonth || ""}
             />
           </div>
         </div>

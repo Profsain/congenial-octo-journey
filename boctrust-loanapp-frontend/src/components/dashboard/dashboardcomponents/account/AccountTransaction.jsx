@@ -1,103 +1,136 @@
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import Table from "react-bootstrap/Table";
 import BocButton from "../../shared/BocButton";
 import "../../Dashboard.css";
+import { useEffect, useState } from "react";
+import TableStyles from "../tables/TableStyles.module.css";
+import { fetchUserTransactions } from "../../../../redux/reducers/transactionReducer";
+import PageLoader from "../../shared/PageLoader";
+import { nigerianCurrencyFormat } from "../../../../../utilities/formatToNiaraCurrency";
+import TransactionModal from "./TransactionModal";
+import { format } from "date-fns";
 import DashboardHeadline from "../../shared/DashboardHeadline";
 
 const AccountTransaction = () => {
   const styles = {
-    table: {
-      margin: "0 2.9rem 0 0rem",
-    },
-    head: {
-      color: "#fff",
+    th: {
+      color: "#ffffff",
+      fontWeight: "bold",
       fontSize: "1.2rem",
-    },
-    booked: {
-      color: "#145098",
     },
     completed: {
       color: "#5cc51c",
     },
-    withcredit: {
-      color: "#f64f4f",
-    },
-    withdisbursement: {
-      color: "#ecaa00",
-    },
   };
 
-  // current user
+  const [selectedTransaction, setSelectedTransaction] = useState(null);
+
+  const { userTransactions, status } = useSelector(
+    (state) => state.transactionReducer
+  );
+
   const user = useSelector((state) => state.adminAuth.user);
 
-  const transactions = user?.transactions || [];
+  const dispatch = useDispatch(0);
+
+  useEffect(() => {
+    const getData = async () => {
+      if (!user) return;
+
+      try {
+        await dispatch(
+          fetchUserTransactions(user.banking?.accountDetails?.AccountNumber)
+        );
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    getData();
+  }, [user]);
 
   return (
-    <div className=" SecCon">
+    <div className={TableStyles.table__wrapper}>
       <DashboardHeadline
-        height="46px"
-        mspacer="2rem 4rem -2.55rem -1.5rem"
+        height="52px"
+        mspacer="2rem 0 -3.2rem -1rem"
         bgcolor="#145098"
       ></DashboardHeadline>
-      <div style={styles.table}>
-        <Table borderless hover responsive="sm">
-          <thead style={styles.head}>
-            <tr>
-              <th>Date</th>
-              <th>Acc Number</th>
-              <th>Amount</th>
-              <th>Dr/Cr</th>
-              <th>Type</th>
-              <th>Status</th>
-              <th>Details</th>
+      <Table
+        borderless
+        hover
+        responsive="sm"
+        style={styles.table}
+        className="RBox"
+      >
+        <thead>
+          <tr style={styles.th}>
+            <th>Date</th>
+            <th>AC Number</th>
+            <th>Amount</th>
+            <th>Dr/Cr</th>
+            <th>Type</th>
+            <th>Status</th>
+            <th>Details</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          {!userTransactions || status === "loading" ? (
+            <tr className={TableStyles.row}>
+              <td colSpan="7">
+                <PageLoader width="70px" />
+              </td>
             </tr>
-          </thead>
-          <tbody>
-            {transactions.length === 0 ? (
-              <tr>
-                <td colSpan="7" style={{ textAlign: "center" }}>
-                  No transactions record
-                </td>
-              </tr>
-            ) : (
-              transactions.map((transaction, index) => (
-                <tr key={index}>
-                  <td>{transaction.date}</td>
-                  <td>{transaction.accountNumber}</td>
-                  <td>{transaction.amount}</td>
-                  <td>{transaction.drCr}</td>
-                  <td>{transaction.type}</td>
-                  <td
-                    style={
-                      transaction.status === "Booked"
-                        ? styles.booked
-                        : transaction.status === "Completed"
-                        ? styles.completed
-                        : transaction.status === "With Credit"
-                        ? styles.withcredit
-                        : transaction.status === "With Disbursement"
-                        ? styles.withdisbursement
-                        : ""
-                    }
-                  >
-                    {transaction.status}
+          ) : userTransactions.length === 0 ? (
+            <tr className={TableStyles.row}>
+              <td colSpan="7" style={{ textAlign: "center" }}>
+                No recent transactions
+              </td>
+            </tr>
+          ) : (
+            userTransactions &&
+            userTransactions.slice(0, 5).map((transaction, index) => {
+              return (
+                <tr key={index} className={TableStyles.row}>
+                  <td>
+                    {transaction?.CurrentDate
+                      ? format(
+                          transaction?.CurrentDate,
+                          "dd/LL/yyyy, hh:mm aaa"
+                        )
+                      : ""}
                   </td>
+                  <td>{transaction?.AccountNumber || "NIL"}</td>
+                  <td>
+                    {nigerianCurrencyFormat.format(transaction?.Amount / 100)}
+                  </td>
+                  <td>{transaction?.RecordType}</td>
+                  <td>{transaction?.PostingType} </td>
+                  <td style={styles.completed}>{transaction?.status}</td>
                   <td>
                     <BocButton
+                      func={() => setSelectedTransaction(transaction)}
                       cursor="pointer"
                       bgcolor="#145098"
-                      fontSize="1.6rem"
-                      padding="0.5rem 1rem"
+                      bradius="18px"
                     >
                       View
                     </BocButton>
                   </td>
                 </tr>
-              ))
-            )}
-          </tbody>
-        </Table>
-      </div>
+              );
+            })
+          )}
+        </tbody>
+      </Table>
+
+      {selectedTransaction ? (
+        <TransactionModal
+          selectedTransaction={selectedTransaction}
+          handleClose={() => setSelectedTransaction(null)}
+        />
+      ) : null}
     </div>
   );
 };

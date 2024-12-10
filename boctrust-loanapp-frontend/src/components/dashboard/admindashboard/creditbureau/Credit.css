@@ -16,6 +16,10 @@
 
 .reportRow {
   border-bottom: 3px solid #ffd;
+  padding-bottom: 0.8rem;
+}
+.reportRow label {
+  font-size: 1rem !important;
 }
 
 .moreBox {

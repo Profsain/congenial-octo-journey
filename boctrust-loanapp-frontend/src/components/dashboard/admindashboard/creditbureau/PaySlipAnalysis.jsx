@@ -12,6 +12,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { fetchSingleCustomer } from "../../../../redux/reducers/customerReducer";
 import CheckPaylsipFileUpload from "./molecules/CheckPaySlipInput";
 import apiClient from "../../../../lib/axios";
+import { fetchSingleCreditAnalysis } from "../../../../redux/reducers/creditAnalysisReducer";
 
 
 const employerGroup = {
@@ -24,13 +25,13 @@ const lenderInit = {
   deductions: 0,
 };
 const PaySlipAnalysis = ({
-  customerId,
+  recordId,
   formState,
   reportConfirmation,
   setReportConfirmation,
   setFormState,
 }) => {
-  // const [customerId, setCustomerId] = useState("64fecbd663898c27692bea4c");
+  // const [recordId, setCustomerId] = useState("64fecbd663898c27692bea4c");
   const [isLoading, setIsLoading] = useState(false);
 
   const [employerGroupings, setEmployerGroupings] = useState(null);
@@ -39,8 +40,9 @@ const PaySlipAnalysis = ({
     employerGroupings?.other
   );
 
-  const selectedCustomer = useSelector(
-    (state) => state.customerReducer.selectedCustomer
+
+  const { selectedCreditAnalysis } = useSelector(
+    (state) => state.creditAnalysis
   );
 
   const dispatch = useDispatch();
@@ -48,7 +50,7 @@ const PaySlipAnalysis = ({
   useEffect(() => {
     const getData = async () => {
       try {
-        await dispatch(fetchSingleCustomer(customerId));
+        await dispatch(fetchSingleCreditAnalysis(recordId));
       } catch (error) {
         console.log(error);
       }
@@ -138,7 +140,7 @@ const PaySlipAnalysis = ({
     setIsLoading(true);
     try {
       await apiClient.put(
-        `/updatecustomer/activate-buyover/${customerId}`
+        `/credit-analysis/activate-buyover/${recordId}`
       );
 
       toast.success("Buyover Loan Activation Success", {
@@ -191,7 +193,7 @@ const PaySlipAnalysis = ({
             </div>
           </div>
         </div>
-        <CheckPaylsipFileUpload selectedCustomer={selectedCustomer} />
+        <CheckPaylsipFileUpload selectedCreditAnalysis={selectedCreditAnalysis} />
 
         {/* step 1 */}
         <div>
@@ -412,7 +414,7 @@ const PaySlipAnalysis = ({
               </div>
 
               {selectedEmployerGroup.name === employerGroup.police && (
-                <div className="row reportRow mb-5">
+                <div className="row reportRow ">
                   <div className="col-sm-8 col-md-8">
                     <label
                       className="form-check-label"
@@ -466,7 +468,7 @@ const PaySlipAnalysis = ({
               <h6 className="creditTitle">Report Confirmation</h6>
 
               {selectedEmployerGroup?.name === employerGroup.police && (
-                <div className="row reportRow mb-5">
+                <div className="row reportRow ">
                   <div className="col-sm-8 col-md-8">
                     <label
                       className="form-check-label"
@@ -495,7 +497,7 @@ const PaySlipAnalysis = ({
                 </div>
               )}
 
-              <div className="row reportRow mb-5">
+              <div className="row reportRow  ">
                 <div className="col-sm-8 col-md-8">
                   <label
                     className="form-check-label"
@@ -525,10 +527,10 @@ const PaySlipAnalysis = ({
               </div>
 
               {selectedEmployerGroup?.name === employerGroup.police && (
-                <div className="row reportRow mb-5">
-                  <div className="col-sm-8 col-md-8">
+                <div className="row reportRow  ">
+                  <div className="col-sm-8 col-md-8 ">
                     <label
-                      className="form-check-label"
+                      className="form-check-label "
                       htmlFor="flexSwitchCheckChecked"
                     >
                       Customer Take home not less than 20% of Gross Pay
@@ -553,7 +555,7 @@ const PaySlipAnalysis = ({
                   </div>
                 </div>
               )}
-              <div className="row reportRow mb-5">
+              <div className="row reportRow ">
                 <div className="col-sm-8 col-md-8">
                   <label
                     className="form-check-label"
@@ -582,7 +584,7 @@ const PaySlipAnalysis = ({
                 </div>
               </div>
 
-              <div className="row reportRow mb-5">
+              <div className="row reportRow ">
                 <div className="col-sm-8 col-md-8">
                   <label
                     className="form-check-label"
@@ -612,7 +614,7 @@ const PaySlipAnalysis = ({
                 </div>
               </div>
 
-              {selectedCustomer?.buyoverloan?.toLowerCase() == "yes" && (
+              {selectedCreditAnalysis?.buyoverloan?.toLowerCase() == "yes" && (
                 <div className="row mx-5 align-items-center">
                   <button
                     onClick={handleActivateBuyOver}
@@ -643,7 +645,7 @@ PaySlipAnalysis.propTypes = {
   setFormState: PropTypes.func,
   setReportConfirmation: PropTypes.func,
   reportConfirmation: PropTypes.object,
-  customerId: PropTypes.string,
+  recordId: PropTypes.string,
 };
 
 export default PaySlipAnalysis;

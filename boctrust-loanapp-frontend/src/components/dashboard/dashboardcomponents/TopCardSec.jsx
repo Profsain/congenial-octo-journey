@@ -58,16 +58,17 @@ const TopCardSec = ({ user }) => {
 
   useEffect(() => {
     if (activeLoanRepaymentSchedule) {
-      const payment = activeLoanRepaymentSchedule.find(
+      const payment = activeLoanRepaymentSchedule?.find(
         (item) => calcDaysDiffFromNow(item.PaymentDueDate) <= 0
       );
       setUpcomingPayments(payment?.Total);
     }
 
-    if (loansAccountBalance) {
-      const currLoan = Array.isArray(loansAccountBalance)?loansAccountBalance.find(
+    if (loansAccountBalance && typeof loansAccountBalance != "string") {
+     
+      const currLoan = loansAccountBalance?.find(
         (loan) => loan.LoanAccountNo == user?.activeLoan?.Number
-      ):null;
+      );
       setUserBalance({
         totalPaid: currLoan?.TotalAmountPaidTillDate || "0.00",
         balance: currLoan?.TotalOutstandingAmount || 0,

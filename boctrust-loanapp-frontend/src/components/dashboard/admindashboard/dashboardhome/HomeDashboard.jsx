@@ -16,6 +16,7 @@ import {
 } from "./dashboradfunc";
 import PageLoader from "../../shared/PageLoader";
 import { fetchAllLoans } from "../../../../redux/reducers/loanReducer";
+import { fetchAllCustomer } from "../../../../redux/reducers/customerReducer";
 
 const HomeDashboard = () => {
   const [customerAnalytics, setCustomerAnalytics] = useState({
@@ -30,21 +31,29 @@ const HomeDashboard = () => {
   const dispatch = useDispatch();
 
   const { allLoans } = useSelector((state) => state.loanReducer);
+  const { customer: customers } = useSelector(
+    (state) => state.customerReducer.customers
+  );
+
+
 
   useEffect(() => {
     dispatch(fetchAllLoans()).catch((error) =>
       console.error("Error fetching Loans:", error)
     );
+    dispatch(fetchAllCustomer()).catch((error) =>
+      console.error("Error fetching Customer:", error)
+    );
   }, [dispatch]);
 
   useEffect(() => {
-    if (allLoans) {
+    if (allLoans && customers) {
       setCustomerAnalytics({
         ...customerAnalytics,
         booked: allLoans?.filter((loan) => loan?.loanstatus === "booked") || [],
         kycCompleted:
-          allLoans?.filter(
-            (loan) => loan?.customer?.kyc?.isKycApproved === true
+          customers?.filter(
+            (customer) => customer?.kyc?.isKycApproved === true
           ) || [],
         withCoo:
           allLoans?.filter(
@@ -52,7 +61,11 @@ const HomeDashboard = () => {
               loan?.loanstatus === "with coo" || loan?.loanstatus === "unbooked"
           ) || [],
         withCredit:
-          allLoans?.filter((loan) => loan?.loanstatus === "with credit"  &&  loan?.customer?.kyc?.isKycApproved === true ) || [],
+          allLoans?.filter(
+            (loan) =>
+              loan?.loanstatus === "with credit" &&
+              loan?.customer?.kyc?.isKycApproved === true
+          ) || [],
 
         withOperations:
           allLoans?.filter((loan) => loan?.loanstatus === "with operations") ||
@@ -62,8 +75,7 @@ const HomeDashboard = () => {
           allLoans?.filter((loan) => loan?.loanstatus === "completed") || [],
       });
     }
-  }, [allLoans]);
-
+  }, [allLoans, customers]);
 
   // check
   return (
@@ -80,7 +92,7 @@ const HomeDashboard = () => {
           <img className="CardIcon" src="/images/eyes.png" alt="icon" />
           <p>Total Customers</p>
         </FigCard>
-        <div  className="Spacer"></div>
+        <div className="Spacer"></div>
         <FigCard>
           {customerAnalytics.completed ? (
             <h4 className="Title">
@@ -173,7 +185,7 @@ const HomeDashboard = () => {
             align="left"
             text="Disbursement"
           />
-          <div className="InlineCard collections" >
+          <div className="InlineCard collections">
             <StatCard
               day="Today"
               date={getCurrentDateFormatted()}

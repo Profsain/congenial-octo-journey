@@ -2,7 +2,6 @@ import { useState } from "react";
 import DashboardHeadline from "../../shared/DashboardHeadline";
 import "./Customer.css";
 import CustomersList from "./CustomersList";
-import NextPreBtn from "../../shared/NextPreBtn";
 
 // custom hook
 import usePagination from "../../../../customHooks/usePagination";

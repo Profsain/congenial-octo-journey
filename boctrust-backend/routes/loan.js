@@ -4,9 +4,61 @@ const Loan = require("../models/Loan"); // Import Loan model
 const Customer = require("../models/Customer");
 const {
   handleInterBankTransfer,
+  getLoanAccountStatement,
 } = require("../services/bankoneOperationsServices");
 const { generateTransactionRef } = require("../utils/generateTransactionRef");
 const Employer = require("../models/EmployersManager");
+const { default: axios } = require("axios");
+const CreditAnalysis = require("../models/CreditAnalysis");
+
+router.post("/", async (req, res) => {
+  try {
+    const {
+      loanamount,
+      monthlyrepayment,
+      loanproduct,
+      numberofmonth,
+      loantotalrepayment,
+      loanpurpose,
+      deductions,
+    } = req.body;
+
+    if (
+      !req.user ||
+      !loanamount ||
+      !monthlyrepayment ||
+      !loanproduct ||
+      !numberofmonth ||
+      !loantotalrepayment ||
+      !loanpurpose
+    ) {
+      return res.status(400).json({ error: "Please Provide All Details" });
+    }
+
+    const newLoan = await Loan.create({
+      customer: req.user._id,
+      loanstatus: "with credit",
+      loanproduct: loanproduct,
+      loanamount: loanamount,
+      monthlyrepayment: monthlyrepayment,
+      numberofmonth: numberofmonth,
+      loantotalrepayment: loantotalrepayment,
+      loanpurpose: loanpurpose,
+      deductions: deductions,
+    });
+    
+    await CreditAnalysis.create({
+      customer: req.user._id,
+      loan: newLoan._id,
+    });
+
+    return res
+      .status(201)
+      .json({ message: "Loan Application Submitted Successfully" });
+  } catch (e) {
+    return res.status(500).json({ error: e.message });
+  }
+});
 
 // Get all loan
 router.get("/", async (req, res) => {
@@ -54,10 +106,41 @@ router.get("/all", async (req, res) => {
 // Get all loan
 router.get("/my/:customerId", async (req, res) => {
   const { customerId } = req.params;
+
+  const bankOneBaseUrl = process.env.BANKONE_BASE_URL;
+  const token = process.env.BANKONE_TOKEN;
+  const mfbcode = "100579";
+
   try {
-    const loans = await Loan.find({
+    let loans = await Loan.find({
       customer: customerId,
-    }).populate("customer");
+    })
+      .populate("customer")
+      .populate("loanproduct");
+
+    if (loans.length > 0) {
+      const acccountBalUrl = `${bankOneBaseUrl}/BankOneWebAPI/api/LoanAccount/LoanAccountBalance2/2?authToken=${token}&customerIDInString=${loans[0]?.customer?.banking?.accountDetails?.CustomerID}`;
+      const getLoanUrl = `${bankOneBaseUrl}/BankOneWebAPI/api/Loan/GetLoansByCustomerId/2?authToken=${token}&institutionCode=${mfbcode}&CustomerID=${loans[0]?.customer?.banking?.accountDetails?.CustomerID}`;
+
+      const { data: accountsBalance } = await axios.get(acccountBalUrl);
+      const { data: loansInfo } = await axios.get(getLoanUrl);
+
+      loans = loans.map((loan) => {
+        const balance = accountsBalance?.Message?.find(
+          (bal) => bal.LoanAccountNo == loan.loanAccountNumber
+        );
+        const loanInfo = loansInfo?.Message?.find(
+          (loanD) => loanD.Number == loan.loanAccountNumber
+        );
+
+        return {
+          ...loan.toJSON(),
+          accountBalance: balance,
+          loanInfo,
+        };
+      });
+    }
+
     return res.status(200).json(loans);
   } catch (error) {
     return res.status(500).json({ error: error.message });
@@ -113,6 +196,108 @@ router.get("/disbursed", async (req, res) => {
 
     return res.status(200).json(loans);
   } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+});
+
+const calcDaysDiffFromNow = (refDate) => {
+  let Difference_In_Time = new Date().getTime() - new Date(refDate).getTime();
+
+  // Calculating the no. of days between
+  // two dates
+  let Difference_In_Days = Math.round(Difference_In_Time / (1000 * 3600 * 24));
+
+  return Difference_In_Days;
+};
+
+router.get("/overdue", async (req, res) => {
+  const token = process.env.BANKONE_TOKEN;
+  const { search, dateFilter, sort = "latest" } = req.query;
+
+  try {
+    const loans = await Loan.find().populate("customer");
+
+    let overdueLoans = [];
+
+    await Promise.all(
+      loans.map(async (loan) => {
+        if (loan?.loanAccountNumber) {
+          const { data: repaymentSchedule } = await axios.get(
+            `${process.env.BANKONE_BASE_URL}/BankOneWebAPI/api/loan/GetLoanRepaymentSchedule/2?authToken=${token}&loanAccountNumber=${loan.loanAccountNumber}`
+          );
+
+          const loanRepaymentSchedule = [];
+
+          repaymentSchedule.forEach((schedule) => {
+            if (calcDaysDiffFromNow(schedule.PaymentDueDate) >= 0) {
+              const hasbeenPaidRecord = loan.paymentRecord.find(
+                (record) => record.bankoneRecordId !== schedule.Id
+              );
+              if (!hasbeenPaidRecord) {
+                if (dateFilter) {
+                  const startOfToday = new Date();
+                  startOfToday.setHours(0, 0, 0, 0);
+                  const endOfToday = new Date();
+                  endOfToday.setHours(23, 59, 59, 999);
+
+                  const targetDate = new Date(schedule.PaymentDueDate);
+
+                  if (targetDate >= startOfToday && targetDate <= endOfToday) {
+                    loanRepaymentSchedule.push(schedule);
+                  }
+                } else {
+                  loanRepaymentSchedule.push(schedule);
+                }
+              }
+            }
+          });
+
+          if (loanRepaymentSchedule.length > 0) {
+            const requestUrl = `${process.env.BANKONE_BASE_URL}/BankOneWebAPI/api/LoanAccount/LoanAccountBalance2/2?authToken=${token}&customerIDInString=${loan.customer?.banking?.accountDetails?.CustomerID}`;
+            const { data } = await axios.get(requestUrl);
+            let accountBalance = data.Message.find(
+              (item) => item.LoanAccountNo === loan.loanAccountNumber
+            );
+
+            const reqUrl = `${process.env.BANKONE_BASE_URL}/BankOneWebAPI/api/Loan/GetLoansByCustomerId/2?authToken=${token}&institutionCode=${process.env.BANKONE_MFB_CODE}&CustomerID=${loan.customer?.banking?.accountDetails?.CustomerID}`;
+            const { data: loanInfoRes } = await axios.get(reqUrl);
+
+            let loanInfo = loanInfoRes.Message.find(
+              (item) => item.Number === loan.loanAccountNumber
+            );
+
+            const payload = {
+              ...loan.toJSON(),
+              repaymentSchedule: loanRepaymentSchedule,
+              accountBalance,
+              dateCreated: loanInfo.DateCreated,
+              disbursedAmount: loanInfo.LoanAmount,
+            };
+
+            overdueLoans.push(payload);
+          }
+        }
+      })
+    );
+    if (search) {
+      const searchRegex = new RegExp(search, "i"); // Case-insensitive search
+
+      overdueLoans = overdueLoans.filter((loan) => {
+        const { customer } = loan;
+        if (!customer) return false;
+
+        return (
+          searchRegex.test(customer.firstname) ||
+          searchRegex.test(customer.lastname) ||
+          searchRegex.test(customer.username) ||
+          searchRegex.test(customer.email)
+        );
+      });
+    }
+
+    return res.status(200).json(overdueLoans);
+  } catch (error) {
+    console.log(error);
     return res.status(500).json({ error: error.message });
   }
 });
@@ -179,11 +364,15 @@ router.put("/status/:id", async (req, res) => {
       {
         new: true,
       }
-    );
+    ).populate("customer");
 
     if (!updatedLoan) {
       return res.status(404).json({ error: "Loan not found" });
     }
+
+
+
+  
 
     return res
       .status(200)

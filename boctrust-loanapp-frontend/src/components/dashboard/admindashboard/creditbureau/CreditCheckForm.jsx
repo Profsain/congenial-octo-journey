@@ -11,6 +11,7 @@ import FirstCentralPdfReport from "./firstCentralPdfReport";
 import FirstCentralCommercialPdf from "./FirstCentralCommercialPdf";
 import CRCBasicReportPDF from "./CRCBasicReportPDF";
 import CRCCooporateReport from "./CRCCooporateReport";
+import ReportUpload from "./ReportUpload";
 import { toast, ToastContainer } from "react-toastify";
 
 // toast styles
@@ -28,6 +29,7 @@ import ReportReasonSelect from "./atoms/ReportReasonSelect";
 import CheckFileUploadsNotice from "./molecules/CheckFileUploadsNotice";
 import { customerApprovalEnum } from "../../../../lib/userRelated";
 import apiClient from "../../../../lib/axios";
+import { fetchSingleCreditAnalysis } from "../../../../redux/reducers/creditAnalysisReducer";
 
 const creditBureauOptions = [
   { value: "first_central", label: "First Central" },
@@ -36,6 +38,8 @@ const creditBureauOptions = [
   // Add more options as needed
 ];
 
+const apiUrl = import.meta.env.VITE_BASE_URL;
+
 const searchTypes = [
   { value: "defaulters", label: "Defaulters" },
   { value: "request", label: "Request" },
@@ -43,6 +47,7 @@ const searchTypes = [
   // Add more options as needed
 ];
 
+// file report object
 const bureauFileReportInit = {
   firstUpload: {
     bureauSearchReport: "",
@@ -60,7 +65,7 @@ const bureauFileReportInit = {
 
 const CreditCheckhtmlForm = ({
   setShowCreditCheckForm,
-  customerId,
+  recordId,
   initFormStep,
 }) => {
   const [reportOptions, setReportOptions] = useState([
@@ -90,14 +95,8 @@ const CreditCheckhtmlForm = ({
   const [isUpdateLoading, setIsUpdateLoading] = useState(false);
   const [didUploadAny, setDidUploadAny] = useState(false);
 
-  // credit bureau check logic
-  const [bureauData, setBureauData] = useState({
-    bureauName: "",
-    bvnNo: "",
-    reportType: "",
-    reportReason: "",
-    bureauDate: "",
-  });
+  // check if bureau report uploaded state
+  const [isReportUploaded, setIsReportUploaded] = useState(false);
 
   // PaySlip form state
   const [formState, setFormState] = useState({
@@ -107,7 +106,7 @@ const CreditCheckhtmlForm = ({
     monthlyLoanRepayment: 0,
     dateOfBirth: "",
     dateOfAppointment: "",
-    uploadPaySlip: null,
+    uploadPaySlip: "",
     benchmark: 0,
   });
 
@@ -127,12 +126,14 @@ const CreditCheckhtmlForm = ({
 
   const dispatch = useDispatch();
 
-  const { selectedCustomer } = useSelector((state) => state.customerReducer);
+  const { selectedCreditAnalysis } = useSelector(
+    (state) => state.creditAnalysis
+  );
 
   useEffect(() => {
     const getData = async () => {
       try {
-        await dispatch(fetchSingleCustomer(customerId));
+        await dispatch(fetchSingleCreditAnalysis(recordId));
       } catch (error) {
         console.log(error);
       }
@@ -142,58 +143,65 @@ const CreditCheckhtmlForm = ({
   }, []);
 
   useEffect(() => {
-    if (selectedCustomer) {
+    if (selectedCreditAnalysis) {
       setReportConfirmation({
         isApplicantCivilianPolice:
-          selectedCustomer?.creditCheck?.paySlipAnalysis
+          selectedCreditAnalysis?.creditCheck?.paySlipAnalysis
             ?.isApplicantCivilianPolice || false,
         isPaySlipContainsMoreThenFiveLenders:
-          selectedCustomer?.creditCheck?.paySlipAnalysis
+          selectedCreditAnalysis?.creditCheck?.paySlipAnalysis
             ?.isPaySlipContainsMoreThenFiveLenders || false,
         monthlyDeductionBelowPercentageBenchmark:
-          selectedCustomer?.creditCheck?.paySlipAnalysis
+          selectedCreditAnalysis?.creditCheck?.paySlipAnalysis
             ?.monthlyDeductionBelowPercentageBenchmark || false,
         netPayNotLessThanBenchmark:
-          selectedCustomer?.creditCheck?.paySlipAnalysis
+          selectedCreditAnalysis?.creditCheck?.paySlipAnalysis
             ?.netPayNotLessThanBenchmark || false,
         takeHomePayNotLessThan20PercentGross:
-          selectedCustomer?.creditCheck?.paySlipAnalysis
+          selectedCreditAnalysis?.creditCheck?.paySlipAnalysis
             ?.takeHomePayNotLessThan20PercentGross || false,
         takeHomePayNotLessThanBenchmark:
-          selectedCustomer?.creditCheck?.paySlipAnalysis
+          selectedCreditAnalysis?.creditCheck?.paySlipAnalysis
             ?.takeHomePayNotLessThanBenchmark || false,
       });
 
       setFormState({
-        netPay: selectedCustomer?.creditCheck?.paySlipAnalysis?.netPay || "",
+        netPay:
+          selectedCreditAnalysis?.creditCheck?.paySlipAnalysis?.netPay || "",
         numOfExtraLenders:
-          selectedCustomer?.creditCheck?.paySlipAnalysis?.numOfExtraLenders ||
-          0,
+          selectedCreditAnalysis?.creditCheck?.paySlipAnalysis
+            ?.numOfExtraLenders || 0,
         extraLenders:
-          selectedCustomer?.creditCheck?.paySlipAnalysis?.extraLenders || [],
+          selectedCreditAnalysis?.creditCheck?.paySlipAnalysis?.extraLenders ||
+          [],
         monthlyLoanRepayment:
-          selectedCustomer?.creditCheck?.paySlipAnalysis
+          selectedCreditAnalysis?.creditCheck?.paySlipAnalysis
             ?.monthlyLoanRepayment || 0,
         dateOfBirth:
-          selectedCustomer?.creditCheck?.paySlipAnalysis?.dateOfBirth || "",
-        dateOfAppointment:
-          selectedCustomer?.creditCheck?.paySlipAnalysis?.dateOfAppointment ||
+          selectedCreditAnalysis?.creditCheck?.paySlipAnalysis?.dateOfBirth ||
           "",
+        dateOfAppointment:
+          selectedCreditAnalysis?.creditCheck?.paySlipAnalysis
+            ?.dateOfAppointment || "",
         uploadPaySlip:
-          selectedCustomer?.creditCheck?.paySlipAnalysis?.uploadPaySlip || "",
+          selectedCreditAnalysis?.creditCheck?.paySlipAnalysis?.uploadPaySlip ||
+          "",
         benchmark:
-          selectedCustomer?.creditCheck?.paySlipAnalysis?.benchmark || 0,
+          selectedCreditAnalysis?.creditCheck?.paySlipAnalysis?.benchmark || 0,
       });
 
       setDbSearchReport(
-        selectedCustomer?.creditCheck?.creditDbSearch?.dbSearchReport || ""
+        selectedCreditAnalysis?.creditCheck?.creditDbSearch?.dbSearchReport ||
+          ""
       );
       setDeductSearchReport(
-        selectedCustomer?.creditCheck?.deductCheck?.deductSearchReport || ""
+        selectedCreditAnalysis?.creditCheck?.deductCheck?.deductSearchReport ||
+          ""
       );
 
-      if (selectedCustomer?.creditCheck?.creditBureauSearch?.length > 0) {
-        const bureauSearch = selectedCustomer?.creditCheck?.creditBureauSearch;
+      if (selectedCreditAnalysis?.creditCheck?.creditBureauSearch?.length > 0) {
+        const bureauSearch =
+          selectedCreditAnalysis?.creditCheck?.creditBureauSearch;
         setBureauReportUpload({
           firstUpload: {
             bureauSearchReport: bureauSearch[0]?.bureauSearchReport || "",
@@ -210,7 +218,7 @@ const CreditCheckhtmlForm = ({
         });
       }
     }
-  }, [selectedCustomer]);
+  }, [selectedCreditAnalysis]);
 
   const handleChange = () => {
     setIsCreditDbCheck(!isCreditDbCheck);
@@ -234,7 +242,7 @@ const CreditCheckhtmlForm = ({
     if (isCreditDbCheck) {
       formData.append("dbSearchReport", dbSearchReport);
       await apiClient.put(
-        `/updatecustomer/creditDbSearch/${customerId}`,
+        `/credit-analysis/creditDbSearch/${recordId}`,
         formData,
         {
           headers: {
@@ -247,10 +255,11 @@ const CreditCheckhtmlForm = ({
       setDbSearchReport("");
       setIsCreditDbCheck(false);
     }
+
     if (isDeductCheck) {
       formData.append("deductSearchReport", deductSearchReport);
       await apiClient.put(
-        `/updatecustomer/deductcheck/${customerId}`,
+        `/credit-analysis/deductcheck/${recordId}`,
         formData,
         {
           headers: {
@@ -273,7 +282,7 @@ const CreditCheckhtmlForm = ({
       });
 
       await apiClient.put(
-        `/updatecustomer/creditBureauSearch/${customerId}/fileupload`,
+        `/credit-analysis/creditBureauSearch/${recordId}/fileupload`,
         formData,
         {
           headers: {
@@ -284,6 +293,7 @@ const CreditCheckhtmlForm = ({
 
       setDidUploadAny(true);
     }
+
     if (
       bureauReportUpload.secondUpload.bureauSearchReport &&
       typeof bureauReportUpload.secondUpload.bureauSearchReport !== "string"
@@ -294,7 +304,7 @@ const CreditCheckhtmlForm = ({
       });
 
       await apiClient.put(
-        `/updatecustomer/creditBureauSearch/${customerId}/fileupload`,
+        `/credit-analysis/creditBureauSearch/${recordId}/fileupload`,
         formData,
         {
           headers: {
@@ -305,12 +315,13 @@ const CreditCheckhtmlForm = ({
 
       setDidUploadAny(true);
     }
+
     if (
-      !bureauReportUpload.firstUpload.bureauSearchReport &&
+      !bureauReportUpload.firstUpload.bureauSearchReport ||
       !bureauReportUpload.secondUpload.bureauSearchReport
     ) {
       setDidUploadAny(false);
-      notify("Please Provide at Least one Bureau search report");
+      notify("Please Provide at Least two Bureau search report");
     }
 
     setBureauReportUpload(bureauFileReportInit);
@@ -326,6 +337,7 @@ const CreditCheckhtmlForm = ({
 
     setCrcCooporateReport("");
   };
+
   // clear form fields
   const clearForm = () => {
     setSearchType("");
@@ -365,7 +377,7 @@ const CreditCheckhtmlForm = ({
 
       // send update to backend
       await apiClient.put(
-        `/updatecustomer/creditDbSearch/${customerId}`,
+        `/credit-analysis/creditDbSearch/${recordId}`,
         searchReport
       );
 
@@ -403,7 +415,7 @@ const CreditCheckhtmlForm = ({
 
       // send update to backend
       await apiClient.put(
-        `/updatecustomer/deductcheck/${customerId}`,
+        `/credit-analysis/deductcheck/${recordId}`,
         searchReport
       );
 
@@ -417,6 +429,15 @@ const CreditCheckhtmlForm = ({
       console.log(error);
     }
   };
+
+  // credit bureau check logic
+  const [bureauData, setBureauData] = useState({
+    bureauName: "",
+    bvnNo: "",
+    reportType: "",
+    reportReason: "",
+    bureauDate: "",
+  });
 
   const handleBureauDataChange = (e) => {
     const { name, value } = e.target;
@@ -456,43 +477,6 @@ const CreditCheckhtmlForm = ({
   const [PDFContent, setPDFContent] = useState("");
 
   const [successMsg, setSuccessMsg] = useState("");
-  const [noDetailsFound, setNoDetailsFound] = useState(false);
-
-  // update report type options
-  // useEffect(() => {
-  //   if (
-  //     bureauData.bureauName === "first_central" ||
-  //     bureauReportUpload.firstUpload.bureauName === "first_central" ||
-  //     bureauReportUpload.secondUpload.bureauName === "first_central"
-  //   ) {
-  //     setReportOptions([
-  //       { value: "consumer_report", label: "Consumer Report" },
-  //       { value: "commercial_report", label: "Commercial Report" },
-  //     ]);
-  //   } else if (
-  //     bureauData.bureauName === "crc_bureau" ||
-  //     bureauReportUpload.firstUpload.bureauName === "crc_bureau" ||
-  //     bureauReportUpload.secondUpload.bureauName === "crc_bureau"
-  //   ) {
-  //     setReportOptions([
-  //       { value: "consumer_basic", label: "Consumer Basic Report" },
-  //       { value: "consumer_classic", label: "Consumer Classic Report" },
-  //       { value: "corporate_classic", label: "Corporate Classic Report" },
-  //     ]);
-  //   } else if (
-  //     bureauData.bureauName === "credit_register" ||
-  //     bureauReportUpload.firstUpload.bureauName === "credit_register" ||
-  //     bureauReportUpload.secondUpload.bureauName === "credit_register"
-  //   ) {
-  //     setReportOptions([
-  //       { value: "consumer_report", label: "Consumer Report" },
-  //     ]);
-  //   }
-  // }, [
-  //   bureauData.bureauName,
-  //   bureauReportUpload.firstUpload.bureauName,
-  //   bureauReportUpload.secondUpload.bureauName,
-  // ]);
 
   // fix update report type options
   useEffect(() => {
@@ -513,47 +497,8 @@ const CreditCheckhtmlForm = ({
       ]);
     }
   }, [bureauData.bureauName]);
-  useEffect(() => {
-    if (bureauReportUpload.firstUpload.bureauName === "first_central") {
-      setReportOptions([
-        { value: "consumer_report", label: "Consumer Report" },
-        { value: "commercial_report", label: "Commercial Report" },
-      ]);
-    } else if (bureauReportUpload.firstUpload.bureauName === "crc_bureau") {
-      setReportOptions([
-        { value: "consumer_basic", label: "Consumer Basic Report" },
-        { value: "consumer_classic", label: "Consumer Classic Report" },
-        { value: "corporate_classic", label: "Corporate Classic Report" },
-      ]);
-    } else if (
-      bureauReportUpload.firstUpload.bureauName === "credit_register"
-    ) {
-      setReportOptions([
-        { value: "consumer_report", label: "Consumer Report" },
-      ]);
-    }
-  }, [bureauReportUpload.firstUpload.bureauName]);
-  useEffect(() => {
-    if (bureauReportUpload.secondUpload.bureauName === "first_central") {
-      setReportOptions([
-        { value: "consumer_report", label: "Consumer Report" },
-        { value: "commercial_report", label: "Commercial Report" },
-      ]);
-    } else if (bureauReportUpload.secondUpload.bureauName === "crc_bureau") {
-      setReportOptions([
-        { value: "consumer_basic", label: "Consumer Basic Report" },
-        { value: "consumer_classic", label: "Consumer Classic Report" },
-        { value: "corporate_classic", label: "Corporate Classic Report" },
-      ]);
-    } else if (
-      bureauReportUpload.secondUpload.bureauName === "credit_register"
-    ) {
-      setReportOptions([
-        { value: "consumer_report", label: "Consumer Report" },
-      ]);
-    }
-  }, [bureauReportUpload.secondUpload.bureauName]);
 
+  // handle bureau report generate
   const handleBureauCheck = async (e) => {
     e.preventDefault();
     setBureauLoading(true);
@@ -563,11 +508,11 @@ const CreditCheckhtmlForm = ({
       const reportType = bureauData.reportType;
       const apiEndpoint =
         reportType === "consumer_report"
-          ? `/firstcentral/firstcentralreport`
-          : `/firstcentral/firstcentralCommercialReport`;
+          ? `${apiUrl}/api/firstcentral/firstcentralreport`
+          : `${apiUrl}/api/firstcentral/firstcentralCommercialReport`;
       try {
         const bvn = bureauData.bvnNo;
-        const { data } = await apiClient.post(`${apiEndpoint}`, { bvn });
+        const { data } = await apiClient.post(apiEndpoint, { bvn });
 
         setBureauLoading(false);
         // set first central report
@@ -594,21 +539,14 @@ const CreditCheckhtmlForm = ({
       const reportType = bureauData.reportType;
       const apiEndpoint =
         reportType === "consumer_basic"
-          ? `/crc/getcrc`
+          ? `${apiUrl}/api/crc/getcrc`
           : reportType === "consumer_classic"
-          ? `/crc/getcrcclassic`
-          : `/crc/getcrccooporate`;
+          ? `${apiUrl}/api/crc/getcrcclassic`
+          : `${apiUrl}/api/crc/getcrccooporate`;
 
       try {
         const bvn = bureauData.bvnNo;
         const { data } = await apiClient.post(apiEndpoint, { bvn });
-
-        if (data.data.ConsumerNoHitResponse) {
-          setNoDetailsFound(true);
-          setTimeout(() => {
-            setNoDetailsFound(false);
-          }, 2000);
-        }
 
         // set  report
         if (reportType === "consumer_basic") {
@@ -629,6 +567,7 @@ const CreditCheckhtmlForm = ({
         setBureauLoading(false);
         // updateBureauLoading("success");
       } catch (error) {
+        console.log(error, "error");
         setBureauLoading(false);
         setNoCRC(false);
         return toast.error(error.message);
@@ -639,12 +578,14 @@ const CreditCheckhtmlForm = ({
       clearReport();
       try {
         const bvn = bureauData.bvnNo;
-        const { data } = await apiClient.post(`/creditregistry/getreport`, {
-          bvn,
-        });
+        const { data } = await apiClient.post(
+          `${apiUrl}/api/creditregistry/getreport`,
+          { bvn }
+        );
 
         // set  report
         setPDFContent(data.data.Reports[0].PDFContent);
+        console.log("credit register", data.data);
 
         // set bureau loading
         setBureauLoading(false);
@@ -657,13 +598,14 @@ const CreditCheckhtmlForm = ({
         }, 5000);
       } catch (error) {
         setBureauLoading(false);
+        console.log("credit register error", error);
         return toast.error(error.message);
       }
     }
 
     try {
       await apiClient.put(
-        `/updatecustomer/creditBureauSearch/${customerId}`,
+        `/credit-analysis/creditBureauSearch/${recordId}`,
         bureauData
       );
     } catch (error) {
@@ -675,10 +617,10 @@ const CreditCheckhtmlForm = ({
   const uploadPaySlipAnalysis = async () => {
     setIsUpdateLoading(true);
 
-    if (!selectedCustomer) return;
+    if (!selectedCreditAnalysis) return;
 
-    const actualNetPay = selectedCustomer?.buyoverloanactivated
-      ? selectedCustomer?.liquidationbalance + formState.netPay
+    const actualNetPay = selectedCreditAnalysis?.buyoverloanactivated
+      ? selectedCreditAnalysis?.liquidationbalance + formState.netPay
       : formState.netPay;
 
     const formData = new FormData(); // create a new FormData object
@@ -725,7 +667,7 @@ const CreditCheckhtmlForm = ({
 
     // send formData object to backend
     await apiClient.put(
-      `/updatecustomer/paySlipAnalysis/${customerId}`,
+      `/credit-analysis/paySlipAnalysis/${recordId}`,
       formData,
       {
         headers: {
@@ -742,20 +684,21 @@ const CreditCheckhtmlForm = ({
       monthlyLoanRepayment: 0,
       dateOfBirth: "",
       dateOfAppointment: "",
-      uploadPaySlip: null,
+      uploadPaySlip: "",
       benchmark: 0,
     });
   };
 
   // handle next prev form step start
   const [formStep, setFormStep] = useState(initFormStep || 1);
+
   const handleNext = async () => {
     if (formStep === 1) {
       if (
-        !bureauReportUpload.firstUpload.bureauSearchReport &&
+        !bureauReportUpload.firstUpload.bureauSearchReport ||
         !bureauReportUpload.secondUpload.bureauSearchReport
       ) {
-        return notify("Please Provide at Least one Bureau search report");
+        return notify("Please Provide at Least two Bureau search report");
       }
       try {
         setIsUpdateLoading(true);
@@ -763,12 +706,12 @@ const CreditCheckhtmlForm = ({
         didUploadAny && toast.success("File(s) Upload Success");
         setFormStep(2);
       } catch (error) {
-        toast.error(error?.response?.data?.error || error?.message);
+        toast.error(error?.message);
       } finally {
         setIsUpdateLoading(false);
       }
     } else if (formStep === 2) {
-      if (formState.uploadPaySlip===null) {
+      if (!formState.uploadPaySlip) {
         return notify("Please Provide a Payslip");
       }
       if (!formState.netPay || !formState.monthlyLoanRepayment) {
@@ -817,8 +760,10 @@ const CreditCheckhtmlForm = ({
     <>
       {formStep === 1 && (
         <div className="TransContainer RBox">
-          {selectedCustomer && (
-            <CheckFileUploadsNotice selectedCustomer={selectedCustomer} />
+          {isReportUploaded && (
+            <CheckFileUploadsNotice
+              selectedCreditAnalysis={selectedCreditAnalysis}
+            />
           )}
           {/* step 1 */}
           <div className="row">
@@ -1044,79 +989,66 @@ const CreditCheckhtmlForm = ({
           </div>
 
           {/* first centra render */}
-          {Object.keys(firstCentralCommercialReport).length > 0 ||
-            (firstCentralReport?.length > 0 && (
-              <div className="row m-5">
-                {noReport && <h4>No First Central Report</h4>}
-                {/* generated pdf report component */}
+          <div className="row m-5">
+            {noReport && <h4>No First Central Report</h4>}
+            {/* generated pdf report component */}
 
-                {firstCentralReport?.length > 0 && (
-                  <FirstCentralPdfReport report={firstCentralReport} />
-                )}
-                {Object.keys(firstCentralCommercialReport).length > 0 && (
-                  <FirstCentralCommercialPdf
-                    report={firstCentralCommercialReport}
-                  />
-                )}
-              </div>
-            ))}
+            {firstCentralReport?.length > 0 && (
+              <FirstCentralPdfReport report={firstCentralReport} />
+            )}
+            {Object.keys(firstCentralCommercialReport).length > 0 && (
+              <FirstCentralCommercialPdf
+                report={firstCentralCommercialReport}
+              />
+            )}
+          </div>
 
           {/* crc render report */}
-          {bureauReport ||
-            (crcCooporateReport && (
-              <div className="row m-5">
-                {noCRC && <h4>No CRC Report</h4>}
-                {/* generated pdf report component */}
-                {bureauReport && (
-                  <CRCBasicReportPDF
-                    report={bureauReport}
-                    formData={bureauData}
-                    title={crcTitle}
-                  />
-                )}
+          <div className="row m-5">
+            {noCRC && <h4>No CRC Report</h4>}
+            {/* generated pdf report component */}
+            {bureauReport && (
+              <CRCBasicReportPDF
+                report={bureauReport}
+                formData={bureauData}
+                title={crcTitle}
+              />
+            )}
 
-                {crcCooporateReport && (
-                  <CRCCooporateReport
-                    report={crcCooporateReport}
-                    formData={bureauData}
-                  />
-                )}
-              </div>
-            ))}
+            {crcCooporateReport && (
+              <CRCCooporateReport
+                report={crcCooporateReport}
+                formData={bureauData}
+              />
+            )}
+          </div>
 
           {/* credit registry report */}
-          {PDFContent ||
-            (noDetailsFound && (
-              <div
-                className="row"
-                style={{ width: "100%", marginBottom: "5rem" }}
-              >
-                {PDFContent ? (
-                  <div style={{ width: "80%", height: "100vh" }}>
-                    <h3>Credit Registry Report</h3>
-                    <embed
-                      src={`data:application/pdf;base64,${PDFContent}`}
-                      style={{ width: "100%", height: "100%" }}
-                    />
-                  </div>
-                ) : noDetailsFound ? (
-                  <h4
-                    style={{
-                      width: "100%",
-                      display: "grid",
-                      placeContent: "center",
-                    }}
-                  >
-                    Customer Details not Found
-                  </h4>
-                ) : null}
+          <div className="row" style={{ width: "100%", marginTop: "-198px" }}>
+            {PDFContent ? (
+              <div style={{ height: "100vh" }}>
+                <h3>Credit Registry Report</h3>
+                <embed
+                  src={`data:application/pdf;base64,${PDFContent}`}
+                  style={{ width: "100%", height: "100%" }}
+                />
               </div>
-            ))}
+            ) : (
+              <h4
+                style={{
+                  color: "gray",
+                  paddingBottom: "3rem",
+                  textAlign: "center",
+                }}
+              ></h4>
+            )}
+          </div>
 
           {/* attach report */}
-          <div className="row">
+          <div className="row" style={{ marginTop: "130px" }}>
             <h4>Upload Reports</h4>
             <form encType="multipart/form-data">
+              {/* credit report section */}
               <div className="row reportRow">
                 <div className="col-sm-8 col-md-4">
                   <label
@@ -1150,6 +1082,7 @@ const CreditCheckhtmlForm = ({
                 </div>
               </div>
 
+              {/* deduct report */}
               <div className="row reportRow">
                 <div className="col-sm-8 col-md-4">
                   <label
@@ -1183,6 +1116,7 @@ const CreditCheckhtmlForm = ({
                 </div>
               </div>
 
+              {/* credit bureau report upload section */}
               <div className=" reportRow ">
                 <div className=" mt-2 ">
                   <div className="">
@@ -1297,26 +1231,11 @@ const CreditCheckhtmlForm = ({
                   </div>
                 </div>
               </div>
-
-              {/* <div className="row mx-5 align-items-center">
-                <div className="col-sm-12 col-md-3"></div>
-                {isUpdateLoading ? (
-                  <PageLoader width="34px" />
-                ) : (
-                  <button
-                    type="submit"
-                    className="btn btn-warning mt-3 col-sm-12 col-md-6"
-                  >
-                    Update Report
-                  </button>
-                )}
-
-                <div className="col-sm-12 col-md-3"></div>
-              </div> */}
             </form>
           </div>
         </div>
       )}
+
       {/* pay slip analysis component */}
       {formStep === 2 && (
         <PaySlipAnalysis
@@ -1327,18 +1246,18 @@ const CreditCheckhtmlForm = ({
           setReportConfirmation={setReportConfirmation}
         />
       )}
-      {/* decision summary */}{" "}
+      {/* decision summary */}
       {formStep === 3 && <DecisionSummary customerId={customerId} />}
       {/* next prev button */}
       <div className="row d-flex justify-content-center">
-        {selectedCustomer?.creditCheck.decisionSummary
-          .creditOfficerApprovalStatus === customerApprovalEnum.pending && (
+        {selectedCreditAnalysis?.decisionSummary.creditOfficerApprovalStatus ===
+          customerApprovalEnum.pending && (
           <button className="btn btn-warning btn-prev" onClick={handlePrev}>
             Prev
           </button>
         )}
-        {selectedCustomer?.creditCheck.decisionSummary
-          .creditOfficerApprovalStatus === customerApprovalEnum.pending ? (
+        {selectedCreditAnalysis?.decisionSummary.creditOfficerApprovalStatus ===
+        customerApprovalEnum.pending ? (
           <button className="btn btn-primary btn-next" onClick={handleNext}>
             {isUpdateLoading ? <PageLoader width="16px" /> : "Next"}
           </button>

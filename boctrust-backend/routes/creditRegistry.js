@@ -5,8 +5,6 @@ const getCreditRegistrySessionCode = require("../creditMethods/creditRegistryMet
 const getCustomerId = require("../creditMethods/creditRegistryIDMethod");
 
 
-
-
 // create endpoint to call credit registry api
 router.post('/getreport', async (req, res) => {
    // get credit registry session code
@@ -14,11 +12,16 @@ router.post('/getreport', async (req, res) => {
     const sessionCodeValue = sessionCode.SessionCode;
     const bvn = req.body.bvn;
 
+    console.log(sessionCodeValue, "sessionCodeValue")
+   
+
     // get customer id
     let customerId;
     if (sessionCode) {
         customerId = await getCustomerId(sessionCodeValue, bvn);
     }
+
+   
     
     // check if customerId.SearchResult is empty
     if ( !customerId?.SearchResult || customerId?.SearchResult?.length === 0) {
@@ -69,4 +72,3 @@ router.post('/getreport', async (req, res) => {
 
 // export router
 module.exports = router;
-

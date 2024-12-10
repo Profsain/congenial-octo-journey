@@ -25,6 +25,7 @@ import directors from "../reducers/boardDirectorReducer";
 import frontPageProductReducer from "../reducers/frontPageProductsReducer";
 import loanReducer from "../reducers/loanReducer";
 import transactionReducer from "../reducers/transactionReducer";
+import creditAnalysisReducer from "../reducers/creditAnalysisReducer";
 
 // create a store
 const store = configureStore({
@@ -50,6 +51,7 @@ const store = configureStore({
     mandateRuleReducer,
     statementRuleReducer,
     user: userSlice,
+    creditAnalysis: creditAnalysisReducer,
     adminAuth: authReducer,
     settingReducer,
     onboarding: onboardingReducer,
