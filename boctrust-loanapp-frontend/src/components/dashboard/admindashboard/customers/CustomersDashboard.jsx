@@ -10,9 +10,6 @@ const CustomersDashboard = () => {
   // handle search
   const [showCount, setShowCount] = useState(10);
   const [searchTerms, setSearchTerms] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
-
-  
 
   const [totalPages, setTotalPages] = useState(1);
 
@@ -51,7 +48,6 @@ const CustomersDashboard = () => {
         {/* customers list  */}
         <div className="ListSec">
           <CustomersList
-<<<<<<< HEAD
             count={showCount}
             searchTerms={searchTerms}
             setTotalPages={setTotalPages}
@@ -65,15 +61,6 @@ const CustomersDashboard = () => {
           goToNextPage={goToNextPage}
           goToPreviousPage={goToPreviousPage}
         />
-=======
-            showCount={showCount}
-            currentPage={currentPage}
-            setCurrentPage={setCurrentPage}
-            searchTerms={searchTerms}
-          />
-        </div>
-       
->>>>>>> user-area
       </div>
     </div>
   );

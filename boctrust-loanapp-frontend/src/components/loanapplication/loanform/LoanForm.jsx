@@ -81,17 +81,17 @@ const LoanForm = React.memo(function LoanFormComponent() {
     const urlSearchParams = new URLSearchParams(window.location.search);
     const code = urlSearchParams.get("code");
 
-    setFirstStepData(JSON.parse(sessionStorage.getItem("loanFirstInfo")));
+    // setFirstStepData(JSON.parse(sessionStorage.getItem("loanFirstInfo")));
 
     if (code) {
-      // const { bvn } = await getBvnDetails(code); // Call this function if there's an authorization code in the URL
-      // const firstDataResponse = await axios.get(
-      //   `${import.meta.env.VITE_BASE_URL}/api/tempdata/tempdata/${bvn}`
-      // );
-      // setFirstStepData(firstDataResponse.data.data);
-      // await axios.delete(
-      //   `${import.meta.env.VITE_BASE_URL}/api/tempdata/tempdata/${bvn}`
-      // );
+      const { bvn } = await getBvnDetails(code); // Call this function if there's an authorization code in the URL
+      const firstDataResponse = await axios.get(
+        `${import.meta.env.VITE_BASE_URL}/api/tempdata/tempdata/${bvn}`
+      );
+      setFirstStepData(firstDataResponse.data.data);
+      await axios.delete(
+        `${import.meta.env.VITE_BASE_URL}/api/tempdata/tempdata/${bvn}`
+      );
     } else {
       // Optionally, handle other initialization tasks here
       console.log("No authorization code found. Proceed with the normal flow.");
@@ -231,7 +231,7 @@ const LoanForm = React.memo(function LoanFormComponent() {
       ref.current?.setFieldValue("uploadbankstatement", bankStatements);
     }
     if (employmentLetter) {
-      ref.current?.setFieldValue("employmentLetter", employmentLetter);
+      ref.current?.setFieldValue("employmentletter", employmentLetter);
     }
     if (signature) {
       ref.current?.setFieldValue("signature", signature);
@@ -352,7 +352,8 @@ const LoanForm = React.memo(function LoanFormComponent() {
       if (ref.current.values) {
         let formValues;
         ref.current?.values;
-        if (onboardData?.salaryaccountname !== null) {
+        
+        if (onboardData?.salaryaccountname) {
           formValues = onboardData;
           formValues.email = ref.current?.values?.email;
           formValues.username = ref.current?.values?.username;
@@ -555,7 +556,7 @@ const LoanForm = React.memo(function LoanFormComponent() {
 
   useEffect(() => {
     setOnBoardData(JSON.parse(localStorage.getItem("onboardData")));
-  }, []);
+  }, [step]);
 
   useEffect(() => {
     if (onboardData) {
@@ -1209,7 +1210,7 @@ const LoanForm = React.memo(function LoanFormComponent() {
                                           type="file"
                                           name="uploadbankstatement"
                                           onBlur={handleBlur}
-                                          accept="image/png, .svg, .jpg, .jpeg"
+                                          accept="image/png, .svg, .jpg, .jpeg, .pdf"
                                           className="UploadFile"
                                           onChange={(e) =>
                                             convertFile(e, setBankStatements)
@@ -1235,7 +1236,7 @@ const LoanForm = React.memo(function LoanFormComponent() {
                                         <input
                                           type="file"
                                           name="employmentletter"
-                                          accept="image/png, .svg, .jpg, .jpeg"
+                                          accept="image/png, .svg, .jpg, .jpeg, .pdf"
                                           className="UploadFile"
                                           onChange={(e) =>
                                             convertFile(e, setEmploymentLetter)
@@ -1755,7 +1756,7 @@ const LoanForm = React.memo(function LoanFormComponent() {
                                             options={loanOfficerOptions}
                                             value={agentCode} // Handle missing agentCode
                                             onChange={handleChangeAgentCode}
-                                            placeholder="Select Loan Officer"
+                                            placeholder="Search Loan Officer"
                                             isClearable
                                           />
                                         </div>

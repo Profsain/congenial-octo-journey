@@ -1,16 +1,13 @@
 import { useState, useEffect, useRef } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import {  fetchSelectedProduct } from "../../../../redux/reducers/productReducer";
+import { fetchSelectedProduct } from "../../../../redux/reducers/productReducer";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import DashboardHeadline from "../../shared/DashboardHeadline";
 import "../../dashboardcomponents/transferdashboard/Transfer.css";
-<<<<<<< HEAD
 import BocButton from "../../shared/BocButton";
 import axios from "axios";
-=======
 import { calculateSimpleInterest } from "../../../shared/calculatorfunc";
->>>>>>> user-area
 
 // Define validation schema using Yup
 const validationSchema = Yup.object().shape({
@@ -19,7 +16,6 @@ const validationSchema = Yup.object().shape({
   loanamount: Yup.number()
     .typeError("Amount must be a number")
     .required("Amount is required"),
- 
 });
 
 const initialValues = {
@@ -29,13 +25,10 @@ const initialValues = {
   loanamount: "",
   monthlyrepayment: "",
   loantotalrepayment: "",
-
 };
 
 const LoanCalculator = () => {
-
   const [choosenProduct, setChoosenProduct] = useState(null);
-  
 
   const ref = useRef();
 
@@ -55,42 +48,10 @@ const LoanCalculator = () => {
     ) {
       // const loanRate = choosenProduct?.interestRate;
 
-<<<<<<< HEAD
-  // loan products
-  const products = useSelector(
-    (state) => state.productReducer.products.products
-  );
-
-  // calculate loan repayment
-  const calculateRepayment = (amount, duration, rate) => {
-    const interest = (amount * duration * rate) / 100;
-    const total = Number(amount) + interest;
-    const monthly = total / duration;
-    setTotalRepayment(total);
-    setMonthlyRepayment(monthly.toFixed(2));
-  };
-
-  const handleSubmit = (values, { resetForm }) => {
-    // find single products by id
-    const product = products.find(
-      (product) => product._id === values.loanProduct
-    );
-    // loan product duration
-    const productDuration = product.maxTerm;
-    const productRate = product.interestRate;
-    const amount = values.amount;
-    const duration = values.duration;
-
-    // check loan duration
-    if (values.duration > productDuration) {
-      setErrorMessage(
-        "Number of month exceeds the maximum duration of the loan product"
-=======
       const { totalPayment, monthlyPayment } = calculateSimpleInterest(
         Number(ref.current?.values.loanamount),
         Number(ref.current?.values.interestRate),
         Number(ref.current?.values.numberofmonth)
->>>>>>> user-area
       );
 
       ref.current?.setFieldValue("monthlyrepayment", monthlyPayment);
@@ -98,7 +59,12 @@ const LoanCalculator = () => {
     }
   };
 
-<<<<<<< HEAD
+  useEffect(() => {
+    calculateRepayment();
+  }, [choosenProduct]);
+
+  const loanProducts = useSelector((state) => state.productReducer.products);
+
   const apiUrl = import.meta.env.VITE_BASE_URL;
 
   const [minLoanAmount, setMinLoanAmount] = useState("");
@@ -108,7 +74,7 @@ const LoanCalculator = () => {
     const fetchMinLoanAmount = async () => {
       try {
         const response = await axios.get(`${apiUrl}/api/settings/settings`);
-        console.log("PAPAPAPAP",response.data);
+        console.log("PAPAPAPAP", response.data);
         if (response.data && response.data.settings.minimumLoanAmount) {
           setMinLoanAmount(response.data.settings.minimumLoanAmount);
         }
@@ -127,9 +93,12 @@ const LoanCalculator = () => {
       return;
     }
     try {
-      const response = await axios.post(`${apiUrl}/api/settings/settings/minimumLoanAmount`, {
-        minLoanAmount: Number(minLoanAmount),
-      });
+      const response = await axios.post(
+        `${apiUrl}/api/settings/settings/minimumLoanAmount`,
+        {
+          minLoanAmount: Number(minLoanAmount),
+        }
+      );
       setMinLoanAmountMessage("Minimum Loan Amount updated successfully!");
       console.log("Response:", response.data);
     } catch (error) {
@@ -137,13 +106,8 @@ const LoanCalculator = () => {
       setMinLoanAmountMessage("Failed to update Minimum Loan Amount.");
     }
   };
-=======
-  useEffect(() => {
-    calculateRepayment();
-  }, [choosenProduct]);
 
-  const loanProducts = useSelector((state) => state.productReducer.products);
->>>>>>> user-area
+ 
 
   return (
     <div className="apply__forLoan">
@@ -220,59 +184,6 @@ const LoanCalculator = () => {
                 />
               </div>
             </div>
-<<<<<<< HEAD
-          </div>
-          <div className="ResultContainer">
-            <p>
-              Total Repayment: <span>N{totalRepayment}</span>
-            </p>
-            <p>
-              Repayment Duration: <span>{paymentDuration}</span>
-            </p>
-            <p>
-              Monthly Repayment: <span>N{monthlyRepayment}</span>
-            </p>
-          </div>
-          <div className="BtnContainer">
-            <BocButton
-              fontSize="1.6rem"
-              type="submit"
-              width="220px"
-              bgcolor="#ecaa00"
-              bradius="18px"
-            >
-              Calculate
-            </BocButton>
-          </div>
-        </Form>
-      </Formik>
-      <div className="MinLoanAmountContainer">
-        <h3>Set Minimum Loan Amount</h3>
-        <div className="FieldGroup">
-          <label htmlFor="minLoanAmountInput">Minimum Loan Amount</label>
-          <input
-            type="number"
-            id="minLoanAmountInput"
-            className="Input"
-            value={minLoanAmount}
-            onChange={(e) => setMinLoanAmount(e.target.value)}
-            min="1"
-          />
-        </div>
-        <button
-          className="BocButton"
-          style={{
-            fontSize: "1.6rem",
-            width: "420px",
-            backgroundColor: "#ecaa00",
-            borderRadius: "18px",
-          }}
-          onClick={handleMinLoanAmountSubmit}
-        >
-          Update Minimum Loan
-        </button>
-        {minLoanAmountMessage && <p>{minLoanAmountMessage}</p>}
-=======
             <div className="FieldRow">
               <div className="FieldGroup">
                 <label htmlFor="loanamount">Loan Amount</label>
@@ -326,7 +237,7 @@ const LoanCalculator = () => {
                 />
               </div>
             </div>
-            
+
             <div className="FieldRow autoFill">
               <div className="FieldGroup">
                 <label htmlFor="monthlyrepayment">Monthly Repayment</label>
@@ -362,7 +273,33 @@ const LoanCalculator = () => {
             </div>
           </Form>
         </Formik>
->>>>>>> user-area
+        <div className="MinLoanAmountContainer">
+          <h3>Set Minimum Loan Amount</h3>
+          <div className="FieldGroup">
+            <label htmlFor="minLoanAmountInput">Minimum Loan Amount</label>
+            <input
+              type="number"
+              id="minLoanAmountInput"
+              className="Input"
+              value={minLoanAmount}
+              onChange={(e) => setMinLoanAmount(e.target.value)}
+              min="1"
+            />
+          </div>
+          <button
+            className="BocButton"
+            style={{
+              fontSize: "1.6rem",
+              width: "420px",
+              backgroundColor: "#ecaa00",
+              borderRadius: "18px",
+            }}
+            onClick={handleMinLoanAmountSubmit}
+          >
+            Update Minimum Loan
+          </button>
+          {minLoanAmountMessage && <p>{minLoanAmountMessage}</p>}
+        </div>
       </div>
     </div>
   );

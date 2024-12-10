@@ -8,8 +8,6 @@ import { BsDownload } from "react-icons/bs";
 import { HiOutlineEye } from "react-icons/hi2";
 
 const OtherDocuments = ({ customerObj, setShowDocs }) => {
-  console.log(customerObj, "customerObj");
-
   return (
     <div>
       {/* table section */}

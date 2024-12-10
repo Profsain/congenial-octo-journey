@@ -27,6 +27,7 @@ const CreateAccount = ({
 
   const [modalShow, setModalShow] = useState(false);
 
+
   const handleInputChange = (fieldName, event) => {
     // Update the field value as the user types
     setFieldValue(fieldName, event.target.value);

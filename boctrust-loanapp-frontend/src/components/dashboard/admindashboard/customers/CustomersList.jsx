@@ -12,19 +12,10 @@ import searchList from "../../../../../utilities/searchListFunc";
 import sortByCreatedAt from "../../shared/sortedByDate";
 import NextPreBtn from "../../shared/NextPreBtn";
 
-<<<<<<< HEAD
 // custom hook
 import usePaginatedData from "../../../../customHooks/usePaginationData";
 
 const CustomersList = ({ count, setTotalPages, currentPage, searchTerms }) => {
-=======
-const CustomersList = ({
-  showCount,
-  currentPage,
-  setCurrentPage,
-  searchTerms,
-}) => {
->>>>>>> user-area
   const styles = {
     table: {
       // margin: "0 2rem 0 3rem",
@@ -75,11 +66,7 @@ const CustomersList = ({
       const filteredCustomer = paginatedCustomersList?.filter(
         (customer) => customer?.kyc.isKycApproved === true
       );
-<<<<<<< HEAD
-      setCustomerList(filteredCustomer?.slice(0, count));
-=======
       setCustomerList(filteredCustomer);
->>>>>>> user-area
     }
   }, [paginatedCustomersList]);
 
@@ -90,11 +77,7 @@ const CustomersList = ({
   // update customerList on search
   const handleSearch = () => {
     const currSearch = searchList(customers, searchTerms, `firstname`);
-<<<<<<< HEAD
-    setCustomerList(currSearch?.slice(0, count));
-=======
     setCustomerList(currSearch);
->>>>>>> user-area
   };
 
   useEffect(() => {

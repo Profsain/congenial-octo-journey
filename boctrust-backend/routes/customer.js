@@ -72,6 +72,7 @@ router.post("/customer", multipleUpload, async (req, res) => {
     req.body.marketerClientPic = req.files.marketerClientPic[0].filename;
   }
 
+
   // hash password
   // check if user already exist
   // Validate if user exist in our database
@@ -272,7 +273,7 @@ router.get("/customers", authenticateToken, async (req, res) => {
         photocaptureImg: customer.photocapture
           ? `${baseUrl}/public/filesUpload/${customer.photocapture}`
           : null,
-          marketerClientPic: customer.marketerClientPic
+        marketerClientPic: customer.marketerClientPic
           ? `${baseUrl}/public/filesUpload/${customer.marketerClientPic}`
           : null,
       };

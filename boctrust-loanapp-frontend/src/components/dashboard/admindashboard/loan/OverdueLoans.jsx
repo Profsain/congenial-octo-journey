@@ -17,6 +17,8 @@ import DisplayLoanProductName from "../../shared/DisplayLoanProductName";
 import { nigerianCurrencyFormat } from "../../../../../utilities/formatToNiaraCurrency";
 import { format } from "date-fns";
 import useSearchByDateRange from "../../../../../utilities/useSearchByDateRange";
+import usePagination from "@mui/material/usePagination/usePagination";
+import usePaginatedData from "../../../../customHooks/usePaginationData";
 
 const CompletedLoans = () => {
   const styles = {
@@ -63,7 +65,25 @@ const CompletedLoans = () => {
   const [overdueLoanEntries, setOverdueLoanEntries] = useState(null);
   const [searchTodayEntries, setSearchTodayEntries] = useState(false);
 
+
+  // Pagination State
+  const [totalPage, setTotalPage] = useState(1);
+  const [showCount, _] = useState(10);
+
+  const { currentPage, goToNextPage, goToPreviousPage, setPage } =
+    usePagination(1, totalPage);
+
+  const { paginatedData: paginatedOverdueLoans, totalPages } =
+    usePaginatedData(overdueLoanEntries, showCount, currentPage);
+
+
   const dispatch = useDispatch();
+
+  
+  useEffect(() => {
+    setTotalPage(totalPages);
+  }, [totalPages]);
+
 
   useEffect(() => {
     setCanUserManage(currentUser?.userRole?.can.includes("loanManagement"));
@@ -202,16 +222,16 @@ const CompletedLoans = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {!overdueLoanEntries || status === "loading" ? (
+                  {!paginatedOverdueLoans || status === "loading" ? (
                     <td colSpan="8">
                       <PageLoader />
                     </td>
-                  ) : overdueLoanEntries && overdueLoanEntries?.length === 0 ? (
+                  ) : paginatedOverdueLoans && paginatedOverdueLoans?.length === 0 ? (
                     <td colSpan="8">
                       <NoResult name="Overdue Loans" />
                     </td>
                   ) : (
-                    overdueLoanEntries?.map((overdueLoan) => {
+                    paginatedOverdueLoans?.map((overdueLoan) => {
                       return (
                         <tr key={overdueLoan._id}>
                           <td>{`${overdueLoan?.customer?.firstname} ${overdueLoan?.customer?.lastname}`}</td>
@@ -269,7 +289,12 @@ const CompletedLoans = () => {
                 </tbody>
               </Table>
             </div>
-            <NextPreBtn />
+            <NextPreBtn
+              currentPage={currentPage}
+              totalPages={totalPage}
+              goToNextPage={goToNextPage}
+              goToPreviousPage={goToPreviousPage}
+            />
           </div>
         </div>
       </div>

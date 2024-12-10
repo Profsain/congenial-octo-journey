@@ -7,6 +7,17 @@
   padding-left: 3rem;
 }
 
+.KSection .IdCard > div:first-child {
+  width: 80%;
+  border: 1px solid #ccc;
+  display: grid;
+  place-content: center;
+}
+
+.KSection .IdCard > div:first-child img {
+  max-width: 100%;
+}
+
 .FaceCapture {
   width: auto;
   height: 210px;
@@ -54,7 +65,7 @@
   height: 20px;
 }
 
-.MatchCon .Match label{
+.MatchCon .Match label {
   margin-top: 0px !important;
 }
 
