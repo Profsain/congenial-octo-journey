@@ -498,6 +498,48 @@ const CreditCheckhtmlForm = ({
     }
   }, [bureauData.bureauName]);
 
+
+  useEffect(() => {
+    if (bureauReportUpload.firstUpload.bureauName === "first_central") {
+      setReportOptions([
+        { value: "consumer_report", label: "Consumer Report" },
+        { value: "commercial_report", label: "Commercial Report" },
+      ]);
+    } else if (bureauReportUpload.firstUpload.bureauName === "crc_bureau") {
+      setReportOptions([
+        { value: "consumer_basic", label: "Consumer Basic Report" },
+        { value: "consumer_classic", label: "Consumer Classic Report" },
+        { value: "corporate_classic", label: "Corporate Classic Report" },
+      ]);
+    } else if (
+      bureauReportUpload.firstUpload.bureauName === "credit_register"
+    ) {
+      setReportOptions([
+        { value: "consumer_report", label: "Consumer Report" },
+      ]);
+    }
+  }, [bureauReportUpload.firstUpload.bureauName]);
+  useEffect(() => {
+    if (bureauReportUpload.secondUpload.bureauName === "first_central") {
+      setReportOptions([
+        { value: "consumer_report", label: "Consumer Report" },
+        { value: "commercial_report", label: "Commercial Report" },
+      ]);
+    } else if (bureauReportUpload.secondUpload.bureauName === "crc_bureau") {
+      setReportOptions([
+        { value: "consumer_basic", label: "Consumer Basic Report" },
+        { value: "consumer_classic", label: "Consumer Classic Report" },
+        { value: "corporate_classic", label: "Corporate Classic Report" },
+      ]);
+    } else if (
+      bureauReportUpload.secondUpload.bureauName === "credit_register"
+    ) {
+      setReportOptions([
+        { value: "consumer_report", label: "Consumer Report" },
+      ]);
+    }
+  }, [bureauReportUpload.secondUpload.bureauName]);
+
   // handle bureau report generate
   const handleBureauCheck = async (e) => {
     e.preventDefault();
@@ -1239,7 +1281,7 @@ const CreditCheckhtmlForm = ({
       {/* pay slip analysis component */}
       {formStep === 2 && (
         <PaySlipAnalysis
-          customerId={customerId}
+        recordId={recordId}
           formState={formState}
           setFormState={setFormState}
           reportConfirmation={reportConfirmation}
