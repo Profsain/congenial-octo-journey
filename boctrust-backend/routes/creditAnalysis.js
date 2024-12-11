@@ -231,6 +231,8 @@ router.put(
 
       const { bureauName, reportType, reportReason } = req.body;
 
+      console.log(req.files, "req.files")
+      
       if (req.files?.bureauSearchReport) {
         req.body.bureauSearchReport = `${baseUrl}/public/filesUpload/${req.files.bureauSearchReport[0].filename}`;
       } else {

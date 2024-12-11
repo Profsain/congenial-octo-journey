@@ -798,6 +798,8 @@ const CreditCheckhtmlForm = ({
     window.scrollTo(0, 0);
   }, [formStep]);
 
+  console.log(selectedCreditAnalysis, "selectedCreditAnalysis")
+
   return (
     <>
       {formStep === 1 && (
@@ -1289,7 +1291,7 @@ const CreditCheckhtmlForm = ({
         />
       )}
       {/* decision summary */}
-      {formStep === 3 && <DecisionSummary customerId={customerId} />}
+      {formStep === 3 && <DecisionSummary recordId={recordId} />}
       {/* next prev button */}
       <div className="row d-flex justify-content-center">
         {selectedCreditAnalysis?.decisionSummary.creditOfficerApprovalStatus ===
