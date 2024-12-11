@@ -583,6 +583,7 @@ router.post(
       }-${new Date().getMilliseconds()}`,
       Token: token,
     };
+    
     handleInterBankTransfer(transferRequestPayload)
       .then((data) => {
         if (data.IsSuccessFul) {

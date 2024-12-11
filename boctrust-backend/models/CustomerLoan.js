@@ -1,3 +1,4 @@
+const e = require('express');
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
@@ -58,7 +59,10 @@ const LoanSchema = new Schema({
         type: Boolean,
         default: false,
         required: true
-    }
+    },
+    isTopUpLoan: { type: Boolean, default: false },
+    isTopUpLoanSent: { type: Boolean, default: false },
+    currentLoanTerminationStatus: { type: String, enum: ["pending", "initiated", "completed"], default: "pending" },
 });
 
 module.exports = mongoose.model('CustomerLoan', LoanSchema);

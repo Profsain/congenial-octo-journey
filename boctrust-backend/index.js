@@ -59,6 +59,17 @@ const termiiOTPRoute = require("./routes/termii");
 // refresh token
 const refreshTokenRoutes = require("./routes/refreshToken");
 
+// nibss direct debit 
+const directDebitRoutes = require("./routes/directDebitOperation");
+
+//top-up route
+const topupLoanRoute = require("./routes/topupLoanRoute");
+
+// top-up eligibility 
+const cron = require("node-cron");
+const updateTopUpEligibility = require("./cronworkers/updateTopUpEligibility");
+const updateMonthsSinceLastLoan = require("./cronworkers/updateMonthSinceLastLoan");
+ 
 const {
   authenticateToken,
   authenticateStaffToken,
@@ -98,6 +109,18 @@ mongoose
       })
       .catch((err) => console.log(err));
 
+    // Schedule the cron worker job to run at midnight daily
+    cron.schedule("0 0 * * *", async () => {
+        console.log("Running daily top-up eligibility update...");
+        await updateTopUpEligibility();
+    });
+
+    // Schedule the job to run daily at midnight
+cron.schedule("0 0 * * *", async () => {
+    console.log("Running monthly update for monthsSinceLastLoan...");
+    await updateMonthsSinceLastLoan();
+});
+
     // create new instance of express
     const app = express();
 
@@ -125,8 +148,9 @@ mongoose
     app.use("/public/filesUpload", express.static("public/filesUpload"));
 
     // Middleware
-    app.use(bodyParser.json());
-    app.use(bodyParser.urlencoded({ extended: true }));
+    // Increase the payload limit
+    app.use(bodyParser.json({ limit: '50mb' }));
+    // app.use(bodyParser.urlencoded({ extended: true }));
 
     // use routes
     app.use("/api/blog", blogRoutes);
@@ -195,6 +219,12 @@ mongoose
     app.use("/api/products-front-page", productsFrontPage);
     app.use("/api/otp", termiiOTPRoute);
     app.use("/api/sharedAuth", refreshTokenRoutes);
+
+    // nibss direct debit
+    app.use("/api/direct-debit", directDebitRoutes);
+
+    // top-up loan route
+    app.use("/api/top-up", topupLoanRoute);
 
     app.listen(process.env.PORT || 3030, () =>
       console.log("Server running on port 3030")
