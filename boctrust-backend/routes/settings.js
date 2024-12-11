@@ -28,36 +28,6 @@ router.put('/settings', async (req, res) => {
 });
 
 
-<<<<<<< HEAD
-// Update settings
-router.post('/settings/minimumLoanAmount', async (req, res) => {
-    console.log("Request Body:", req.body);
-    try {
-        const allSettings = await Settings.find();
-
-        if (allSettings.length === 0) {
-            // Create a new settings document if none exists
-            const newSettings = new Settings({ minimumLoanAmount: req.body.minLoanAmount });
-            await newSettings.save();
-            return res.json({ message: "New settings created", settings: newSettings });
-        }
-
-        // Update the existing settings
-        const updatedSettings = await Settings.findOneAndUpdate(
-            {},
-            { minimumLoanAmount: req.body.minLoanAmount },
-            { new: true } // Return the updated document
-        );
-        res.json({ message: "Settings updated", settings: updatedSettings });
-    } catch (err) {
-        console.error("Error:", err);
-        res.status(400).json({ message: err.message });
-    }
-});
-
-
-
-=======
 // Update top-up eligibility months here
 router.put("/set-month", async (req, res) => {
     const { topUpEligibilityMonths } = req.body;
@@ -65,5 +35,4 @@ router.put("/set-month", async (req, res) => {
     res.json(settings);
 });
 
->>>>>>> new-topup
 module.exports = router;

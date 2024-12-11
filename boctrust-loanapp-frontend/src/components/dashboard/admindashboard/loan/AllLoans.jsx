@@ -60,7 +60,7 @@ const AllLoans = ({ count, searchTerms, setTotalPages, currentPage }) => {
     getData();
   }, [dispatch, show]);
 
-  // update loansList to show 10 allLoans on page load
+  // update loansList to show 5 allLoans on page load
   // or on count changes
   // custom pagination update
   const { paginatedData: paginatedLoansList, totalPages } = usePaginatedData(
@@ -166,9 +166,19 @@ const AllLoans = ({ count, searchTerms, setTotalPages, currentPage }) => {
                     </td>
                     <td>
                       {loan.deductions === "remita" ? (
-                        <p>Remita</p>
+                        <p>
+                          Remita{" "}
+                          <span style={styles.topUp}>
+                            {loan.isTopUpLoan && "Top-up"}
+                          </span>
+                        </p>
                       ) : (
-                        <p>Nibss</p>
+                        <p>
+                          Nibss{" "}
+                          <span style={styles.topUp}>
+                            {loan.isTopUpLoan && "Top-up"}
+                          </span>
+                        </p>
                       )}
                     </td>
                     <td>
