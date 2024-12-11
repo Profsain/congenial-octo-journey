@@ -7,6 +7,7 @@ const User = require("../models/AdminUser");
 const express = require("express");
 const { authenticateStaffToken, verifyAdminInactivity } = require("../middleware/auth");
 const errorHandlerMiddleware = require("../utils/errorHandler");
+const SelectedLoanOfficers = require("../models/SelectedLoanOfficers");
 const router = express.Router();
 // const adminUserVerification = require('../middleware/AuthMiddleware');
 
@@ -402,5 +403,30 @@ router.put("/update/:id", authenticateStaffToken, async (req, res) => {
     return errorHandlerMiddleware(error, 500, res);
   }
 }); // update user logic ends here
+
+
+router.post("/updateSelectedLoanOfficers", async (req, res) => {
+  const curr = await SelectedLoanOfficers.findOne();
+  let dex = req.body.loanOfficers; // Access the loanOfficers array from the request body
+  console.log("AJAJAJ", dex);
+
+  if (curr === null) {
+    const newDat = new SelectedLoanOfficers({ SelectedLoanOfficers: dex });
+    const savedData = await newDat.save();
+    return res.status(200).json({ success: "Data updated successfully" });
+  }
+
+  await SelectedLoanOfficers.findByIdAndUpdate(
+    { _id: curr._id },
+    { SelectedLoanOfficers: dex }
+  );
+  return res.status(200).json({ success: "Data updated successfully" });
+});
+
+
+router.get("/getSelectedLoanOfficers",async(req,res)=>{
+  const curr = await SelectedLoanOfficers.findOne();
+  return res.status(200).json({ SelectedLoanOfficers: curr.SelectedLoanOfficers });
+})
 
 module.exports = router; // export router
