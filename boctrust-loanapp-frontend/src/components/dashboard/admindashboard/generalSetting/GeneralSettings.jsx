@@ -7,6 +7,9 @@ import "../../dashboardcomponents/transferdashboard/Transfer.css";
 import BocButton from "../../shared/BocButton";
 import PageLoader from "../../shared/PageLoader";
 import updateSettings from "./updateSetting";
+import { fetchAllLoanOfficers } from "../../../../redux/reducers/loanOfficerReducer";
+
+const apiUrl = import.meta.env.VITE_BASE_URL;
 
 // Define validation schema using Yup
 const validationSchema = Yup.object().shape({
@@ -23,11 +26,13 @@ const GeneralSettings = () => {
   const settings = useSelector(
     (state) => state?.settingReducer?.settings?.settings
   );
+  const { allLoanOfficers } = useSelector((state) => state.loanOfficerReducer);
   const status = useSelector((state) => state.settingReducer.status);
   const [settingData, setSettingData] = useState({});
 
   useEffect(() => {
     dispatch(fetchSetting());
+    dispatch(fetchAllLoanOfficers());
   }, [dispatch]);
 
   useEffect(() => {
@@ -87,6 +92,71 @@ const GeneralSettings = () => {
     } catch (error) {
       console.error("Error updating settings:", error);
     }
+  };
+
+
+  const [selectedLoanOfficer,setSelectedLoanOfficer] = useState([]);
+
+  const fetchSelectedLoanOfficers=async()=>{
+    const res = await fetch(`${apiUrl}/api/admin/getSelectedLoanOfficers`);
+    const result = await res.json();
+
+    setSelectedLoanOfficer(result.SelectedLoanOfficers);
+  }
+
+
+
+
+  useEffect(() => {
+    if (allLoanOfficers) {
+      setRows(allLoanOfficers)
+      fetchSelectedLoanOfficers();
+    }
+  }, [allLoanOfficers])
+
+  // Sample data for the table
+  const [rows, setRows] = useState(allLoanOfficers);
+
+  // Handle checkbox change for a specific row
+  const handleCheckboxChange = (Id) => {
+    setRows((prevRows) =>
+      prevRows.map((row) =>
+        row.Id === Id ? { ...row, selected: !row.selected } : row
+      )
+    );
+  };
+
+
+  
+
+  // Select or deselect all rows
+  const handleSelectAll = (e) => {
+    const isChecked = e.target.checked;
+    setRows((prevRows) =>
+      prevRows.map((row) => ({ ...row, selected: isChecked }))
+    );
+  };
+
+  const handleLoanOfficers = async () => {
+    const data = [];
+    for (let i = 0; i < rows.length; i++) {
+      if (rows[i].selected) {
+        data.push(rows[i].Name);
+      }
+    }
+  
+    console.log("APAPAP", data[0]);
+  
+    const res = await fetch(`${apiUrl}/api/admin/updateSelectedLoanOfficers`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json", // Inform the server that JSON data is being sent
+      },
+      body: JSON.stringify({ loanOfficers: data }), // Convert to JSON string
+    });
+  
+    const result = await res.json();
+    console.log(result);
   };
 
   return (
@@ -167,8 +237,8 @@ const GeneralSettings = () => {
             </div>
 
             <div className="BtnContainer">
-                <p>{successMsg}</p>
-                {processing && <PageLoader />}
+              <p>{successMsg}</p>
+              {processing && <PageLoader />}
               <BocButton
                 type="submit"
                 width="220px"
@@ -181,6 +251,66 @@ const GeneralSettings = () => {
           </Form>
         </Formik>
       )}
+
+      <div>
+        <h2 style={{ textAlign: "center", paddingTop: "50px", paddingBottom: "50px" }}>Loan Officers</h2>
+        <table border="1" style={{ width: '100%', textAlign: 'left' }}>
+          <thead>
+            <tr>
+              <th>
+                <input
+                  type="checkbox"
+                  onChange={handleSelectAll}
+                  checked={rows?.every((row) => row.selected)}
+                />
+              </th>
+              <th>ID</th>
+              <th>Code</th>
+              <th>Name</th>
+              <th>Branch</th>
+              <th>Email</th>
+              <th>Phone Number</th>
+            </tr>
+          </thead>
+          <tbody>
+            {rows?.map((row) => (
+              <tr key={row.Id}>
+                <td>
+                  <input
+                    type="checkbox"
+                    checked={row.selected}
+                    onChange={() => handleCheckboxChange(row.Id)}
+                  />
+                </td>
+                <td>{row.Id || ""}</td>
+                <td>{row.Code || ""}</td>
+                <td>{row.Name || ""}</td>
+                <td>{row.Branch || ""}</td>
+                <td>{row.Email || ""}</td>
+                <td>{row.PhoneNumber || ""}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+
+        <div style={{ marginTop: '10px' }}>
+          <strong>Selected Loan Officers:</strong>{' '}
+          {rows?.filter((row) => row.selected).map((row) => row.Name).join(', ') || 'None'}
+        </div>
+      </div>
+      <div className="BtnContainer">
+        <p>{successMsg}</p>
+        {processing && <PageLoader />}
+        <button
+          type="submit"
+          width="220px"
+          bgcolor="#ecaa00"
+          bradius="18px"
+          onClick={handleLoanOfficers}
+        >
+          Save Settings
+        </button>
+      </div>
     </div>
   );
 };
