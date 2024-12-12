@@ -494,7 +494,6 @@ const LoanForm = React.memo(function LoanFormComponent() {
 
         const responsePayload = await res.json();
 
-        console.log("MAGI", responsePayload);
 
         if (!res.ok) {
           throw new Error(responsePayload.error);
@@ -515,7 +514,6 @@ const LoanForm = React.memo(function LoanFormComponent() {
   const handleProceed = () => {
     const formContainer = document.querySelector(".FormContainer");
     formContainer.style.padding = "12px";
-    console.log("MAAAAL", ref.current?.values);
     localStorage.setItem("onboardData", JSON.stringify(ref?.current?.values));
     setShowForm(false);
   };
