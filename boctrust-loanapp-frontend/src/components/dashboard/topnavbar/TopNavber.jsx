@@ -22,23 +22,35 @@ const TopNavber = ({ title, user = "Femi Akinwade" }) => {
       <div>
         <h4 id="Title">{title}</h4>
       </div>
-      <button
-        onClick={logoutUserHandler}
-        className=""
-        style={{
-          backgroundColor: "#145098",
-          marginRight: "10px",
-          color: "white",
-          fontSize: "23px",
-          borderRadius: "5px",
-          paddingLeft: "20px",
-          paddingRight: "20px",
-          paddingTop: "6px",
-          paddingBottom: "6px",
-        }}
-      >
-        Log Out
-      </button>
+      <div style={{
+        display: "flex",
+        justifyContent:"center"
+      }}>
+        <div className="Inline Profile">
+          <img src="/images/notificationicon.png" alt="alert" />
+          <div className="Inline UserCard">
+            <p>{user}</p>
+            <img src="/images/smallavater.png" alt="user" />
+          </div>
+        </div>
+        <button
+          onClick={logoutUserHandler}
+          className=""
+          style={{
+            backgroundColor: "#145098",
+            marginRight: "10px",
+            color: "white",
+            fontSize: "23px",
+            borderRadius: "5px",
+            paddingLeft: "20px",
+            paddingRight: "20px",
+            paddingTop: "6px",
+            paddingBottom: "6px",
+          }}
+        >
+          Log Out
+        </button>
+      </div>
     </div>
   );
 };

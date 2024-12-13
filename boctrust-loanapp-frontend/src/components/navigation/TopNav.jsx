@@ -24,6 +24,12 @@ const TopNav = ({ settings }) => {
   // get current admin
   const currentUser = useSelector((state) => state.adminAuth.user);
 
+  useEffect(()=>{
+    if(currentUser){
+      console.log("PZPZPZP",currentUser)
+    }
+  },[currentUser])
+
   // change navbar color on scroll
   useEffect(() => {
     const handleScroll = () => {
