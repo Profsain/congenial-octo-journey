@@ -12,7 +12,7 @@ const Branches = () => {
   const [admin, setAdmin] = useState("");
   const [adminRoles, setAdminRoles] = useState([]);
 
-  const [openAddBranch, setOpenAddBranch] = useState(true);
+  const [openAddBranch, setOpenAddBranch] = useState(false);
   // open add branch component
   const openAddBranches = () => setOpenAddBranch(true);
 
