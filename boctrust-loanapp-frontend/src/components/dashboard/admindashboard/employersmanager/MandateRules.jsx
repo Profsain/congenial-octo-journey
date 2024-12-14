@@ -9,7 +9,6 @@ import MandateRuleList from "./molecules/MandateRuleList";
 import MandateRuleForm from "./molecules/MandateRuleForm";
 import { fetchMandateRules } from "../../../../redux/reducers/mandateRuleReducer";
 import { useDispatch } from "react-redux";
-import apiClient from "../../../../lib/axios";
 
 const MandateRules = () => {
   const [message, setMessage] = useState(null);
@@ -22,7 +21,13 @@ const MandateRules = () => {
       setIsLoading(true);
       const apiUrl = import.meta.env.VITE_BASE_URL;
       // Handle form submission logic here
-      await apiClient.post(`/mandate-rule`, values);
+      await fetch(`${apiUrl}/api/mandate-rule`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(values),
+      });
       await dispatch(fetchMandateRules());
     } catch (error) {
       console.log(error);

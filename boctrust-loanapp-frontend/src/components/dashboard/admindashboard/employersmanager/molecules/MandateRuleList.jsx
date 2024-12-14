@@ -14,7 +14,10 @@ import { FcCancel } from "react-icons/fc";
 import { fetchMandateRules } from "../../../../../redux/reducers/mandateRuleReducer";
 import EditMandateRule from "./editRule/EditMandateRule";
 import { toast } from "react-toastify";
-import apiClient from "../../../../../lib/axios";
+
+// custom hook
+import usePagination from "../../../../../customHooks/usePagination";
+import usePaginatedData from "../../../../../customHooks/usePaginationData";
 
 const MandateRuleList = () => {
   const styles = {
@@ -45,7 +48,7 @@ const MandateRuleList = () => {
   const [selectedMandateRule, setSelectedMandateRule] = useState(null);
   const [show, setShow] = useState(false);
 
-  // fetch all Rules
+  // fetch all Loans
   const dispatch = useDispatch();
   const { mandateRules, status } = useSelector(
     (state) => state.mandateRuleReducer
@@ -62,16 +65,39 @@ const MandateRuleList = () => {
   // search mandateRule list
   const [mandateRuleList, setMandateRuleList] = useState(mandateRules);
 
+  // custom hook state pagination
+  const [showCount, setShowCount] = useState(5);
+  const [searchTerms, setSearchTerms] = useState("");
+  const [totalPage, setTotalPage] = useState(1);
+
+  // custom hook destructuring
+  const { currentPage, goToNextPage, goToPreviousPage, setPage } =
+    usePagination(1, totalPage);
+
+  const { paginatedData: paginatedMandateRulesList, totalPages } =
+    usePaginatedData(mandateRules, showCount, currentPage);
+
+  // update loansList to show 5 pendingLoans on page load
+  // or on count changes
   useEffect(() => {
-    setMandateRuleList(mandateRules);
-  }, [mandateRules]);
+    setMandateRuleList(paginatedMandateRulesList); // Update local state with paginated data
+  }, [paginatedMandateRulesList]);
+
+   useEffect(() => {
+     setTotalPage(totalPages); // Update total pages when it changes
+   }, [totalPages, setTotalPage]);
+
 
   const handleDeleteMandateRule = async (rule) => {
     try {
-      
       const apiUrl = import.meta.env.VITE_BASE_URL;
       // Handle form submission logic here
-      await apiClient.delete(`/mandate-rule/${rule._id}`);
+      await fetch(`${apiUrl}/api/mandate-rule/${rule._id}`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
 
       await dispatch(fetchMandateRules());
       toast.success("Mandate Deleted successfully");
@@ -170,7 +196,12 @@ const MandateRuleList = () => {
                 </tbody>
               </Table>
             </div>
-            <NextPreBtn />
+            <NextPreBtn
+              currentPage={currentPage}
+              totalPages={totalPage}
+              goToNextPage={goToNextPage}
+              goToPreviousPage={goToPreviousPage}
+            />
           </div>
         </div>
       </div>

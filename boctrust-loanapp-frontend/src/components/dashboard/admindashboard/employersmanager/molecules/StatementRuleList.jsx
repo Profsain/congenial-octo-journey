@@ -13,7 +13,10 @@ import { FcCancel } from "react-icons/fc";
 import { toast } from "react-toastify";
 import { fetchStatementRules } from "../../../../../redux/reducers/statementRuleReducer";
 import EditStatementRule from "./editRule/EditStatementRule";
-import apiClient from "../../../../../lib/axios";
+
+// custom hook
+import usePagination from "../../../../../customHooks/usePagination";
+import usePaginatedData from "../../../../../customHooks/usePaginationData";
 
 const StatementRuleList = () => {
   const styles = {
@@ -61,15 +64,40 @@ const StatementRuleList = () => {
   // search statementRule list
   const [mandateRuleList, setMandateRuleList] = useState(statementRules);
 
+  // custom hook state pagination
+  const [showCount, setShowCount] = useState(5);
+  const [searchTerms, setSearchTerms] = useState("");
+  const [totalPage, setTotalPage] = useState(1);
+
+  // custom hook destructuring
+  const { currentPage, goToNextPage, goToPreviousPage, setPage } =
+    usePagination(1, totalPage);
+
+  const { paginatedData: paginatedStatementRulesList, totalPages } =
+    usePaginatedData(statementRules, showCount, currentPage);
+
+  // update loansList to show 5 pendingLoans on page load
+  // or on count changes
   useEffect(() => {
-    setMandateRuleList(statementRules);
-  }, [statementRules]);
+    setMandateRuleList(paginatedStatementRulesList); // Update local state with paginated data
+  }, [paginatedStatementRulesList]);
+
+   useEffect(() => {
+     setTotalPage(totalPages); // Update total pages when it changes
+   }, [totalPages, setTotalPage]);
+
 
   const handleDeleteMandateRule = async (rule) => {
     try {
+    
       const apiUrl = import.meta.env.VITE_BASE_URL;
       // Handle form submission logic here
-      await apiClient.delete(`/statement-rule/${rule._id}`);
+      await fetch(`${apiUrl}/api/statement-rule/${rule._id}`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
 
       await dispatch(fetchStatementRules());
       toast.success("Statement Rule Deleted successfully");
@@ -165,7 +193,12 @@ const StatementRuleList = () => {
                 </tbody>
               </Table>
             </div>
-            <NextPreBtn />
+            <NextPreBtn
+              currentPage={currentPage}
+              totalPages={totalPage}
+              goToNextPage={goToNextPage}
+              goToPreviousPage={goToPreviousPage}
+            />
           </div>
         </div>
       </div>
