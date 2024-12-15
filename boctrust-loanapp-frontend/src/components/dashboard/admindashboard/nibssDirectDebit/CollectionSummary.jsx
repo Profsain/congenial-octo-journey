@@ -16,6 +16,10 @@ import getNextMonthDate from "../../../../../utilities/getNextMonthDate";
 import "./debit.css";
 import BocButton from "../../shared/BocButton.jsx";
 
+// custom hook
+import usePagination from "../../../../customHooks/usePagination";
+import usePaginatedData from "../../../../customHooks/usePaginationData";
+
 const CollectionSummary = () => {
   const styles = {
     btnBox: {
@@ -50,33 +54,34 @@ const CollectionSummary = () => {
     },
   };
 
-  // fetch all customer
-  const dispatch = useDispatch();
-  const customers = useSelector(
-    (state) => state.customerReducer.customers.customer
+  const [allLoansCustomers, setAllLoansCustomer] = useState([]);
+  // handle search
+  const [showCount, setShowCount] = useState(5);
+  const [searchTerms, setSearchTerms] = useState("");
+  const [totalPages, setTotalPages] = useState(1);
+
+  // custom hook destructuring
+  const { currentPage, goToNextPage, goToPreviousPage, setPage } =
+    usePagination(1, totalPages);
+  const { paginatedData: paginatedDirectDebitCustomer } = usePaginatedData(
+    allLoansCustomers,
+    showCount,
+    currentPage
   );
 
-  const status = useSelector((state) => state.customerReducer.status);
+  // update loansList to show 5 pendingLoans on page load
+  // or on count changes
+  useEffect(() => {
+    setAllLoansCustomer(paginatedDirectDebitCustomer); // Update local state with paginated data
+  }, [paginatedDirectDebitCustomer]);
 
   useEffect(() => {
-    dispatch(fetchAllCustomer());
-  }, [dispatch]);
-
-  // filter customer by remitaStatus
-  const [remitaCustomers, setRemitaCustomers] = useState([]);
-  // check if customer is not empty and filter by remitaStatus
-  useEffect(() => {
-    if (customers?.length > 0) {
-      const result = customers.filter(
-        (customer) => customer?.remita.loanStatus === "approved"
-      );
-      setRemitaCustomers(result);
-    }
-  }, [customers]);
+    setTotalPages(totalPages); // Update total pages when it changes
+  }, [totalPages, setTotalPages]);
 
   // handle search by
   const { searchTerm, setSearchTerm, filteredData } = useSearch(
-    remitaCustomers,
+    allLoansCustomers,
     "firstname"
   );
 
@@ -86,13 +91,13 @@ const CollectionSummary = () => {
   });
 
   useEffect(() => {
-    setRemitaCustomers(filteredData);
+    setAllLoansCustomer(filteredData);
   }, [searchTerm, filteredData]);
 
   // handle search by date
-  const { filteredDateData } = useSearchByDate(remitaCustomers, "createdAt");
+  const { filteredDateData } = useSearchByDate(allLoansCustomers, "createdAt");
   const searchByDate = () => {
-    setRemitaCustomers(filteredDateData);
+    setAllLoansCustomer(filteredDateData);
   };
 
   // handle list reload
@@ -102,18 +107,18 @@ const CollectionSummary = () => {
       toDate: "",
     });
     dispatch(fetchAllCustomer());
-    setRemitaCustomers(remitaCustomers);
+    setAllLoansCustomer(remitaCustomers);
   };
 
   // handle search by date range
   const { searchData } = useSearchByDateRange(
-    remitaCustomers,
+    allLoansCustomers,
     dateRange,
     "createdAt"
   );
 
   useEffect(() => {
-    setRemitaCustomers(searchData);
+    setAllLoansCustomer(searchData);
   }, [searchData]);
 
   return (
@@ -127,7 +132,12 @@ const CollectionSummary = () => {
         searchDateFunc={searchByDate}
         handleReload={handleReload}
         printBtn={
-          <BocButton margin="8px 18px" bgcolor="#145098" bradius="25px" width="90px">
+          <BocButton
+            margin="8px 18px"
+            bgcolor="#145098"
+            bradius="25px"
+            width="90px"
+          >
             Print
           </BocButton>
         }
@@ -218,11 +228,15 @@ const CollectionSummary = () => {
                 <td style={styles.activeTxt}>01-05-2024</td>
                 <td style={styles.pendingTxt}>29-09-2024</td>
               </tr>
-             
             </tbody>
           </Table>
         </div>
-        <NextPreBtn />
+        <NextPreBtn
+          currentPage={currentPage}
+          totalPages={totalPages}
+          goToNextPage={goToNextPage}
+          goToPreviousPage={goToPreviousPage}
+        />
       </div>
     </div>
   );

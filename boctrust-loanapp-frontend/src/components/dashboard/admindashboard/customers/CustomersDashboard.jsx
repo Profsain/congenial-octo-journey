@@ -5,6 +5,7 @@ import CustomersList from "./CustomersList";
 
 // custom hook
 import usePagination from "../../../../customHooks/usePagination";
+import NextPreBtn from "../../shared/NextPreBtn";
 
 const CustomersDashboard = () => {
   // handle search

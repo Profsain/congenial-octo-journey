@@ -14,6 +14,7 @@ import NextPreBtn from "../../shared/NextPreBtn";
 
 // custom hook
 import usePaginatedData from "../../../../customHooks/usePaginationData";
+import BocButton from "../../shared/BocButton";
 
 const CustomersList = ({ count, setTotalPages, currentPage, searchTerms }) => {
   const styles = {
@@ -84,17 +85,9 @@ const CustomersList = ({ count, setTotalPages, currentPage, searchTerms }) => {
     handleSearch();
   }, [searchTerms]);
 
-  const handleGoNext = () => {
-    if (currentPage < Math.ceil((customerList?.length - 1) / showCount)) {
-      setCurrentPage((prev) => prev + 1);
-    }
-  };
-
-  const handleGoPrev = () => {
-    if (currentPage > 1) {
-      setCurrentPage((prev) => prev - 1);
-    }
-  };
+  useEffect(() => {
+    handleSearch();
+  }, [searchTerms]);
 
   return (
     <>
@@ -120,38 +113,30 @@ const CustomersList = ({ count, setTotalPages, currentPage, searchTerms }) => {
               </tr>
             </thead>
             <tbody>
-              {customerList?.length === 0 && (
-                <tr>
-                  <td colSpan="8">
-                    <NoResult name="customer" />
+              {customerList?.length === 0 && <NoResult name="customer" />}
+              {sortByCreatedAt(customerList)?.map((customer) => (
+                <tr key={customer._id}>
+                  <td>
+                    <img
+                      className="CustomerImg"
+                      src={
+                        customer?.photocaptureImg?.includes("undefined")
+                          ? "/images/avater.jpg"
+                          : customer.photocaptureImg
+                      }
+                      alt={customer.firstname}
+                    />
                   </td>
-                </tr>
-              )}
-              {sortByCreatedAt(customerList)
-                ?.slice((currentPage - 1) * showCount, currentPage * showCount)
-                ?.map((customer) => (
-                  <tr key={customer._id}>
-                    <td>
-                      <img
-                        className="CustomerImg"
-                        src={
-                          customer.photocaptureImg.includes("undefined")
-                            ? "/images/avater.jpg"
-                            : customer.photocaptureImg
-                        }
-                        alt={customer.firstname}
-                      />
-                    </td>
-                    <td>
-                      {/* {customer?.banking.accountDetails.Message.AccountNumber || "-"} */}
-                      {customer?.banking?.accountDetails?.AccountNumber || "-"}
-                    </td>
-                    <td>{customer.firstname}</td>
-                    <td>{customer.lastname}</td>
-                    <td>{customer.email}</td>
-                    <td>{customer.username}</td>
-                    <td>{capitalizeEachWord(customer.branch)}</td>
-                    {/* <td>
+                  <td>
+                    {/* {customer?.banking.accountDetails.Message.AccountNumber || "-"} */}
+                    {customer?.banking?.accountDetails?.AccountNumber || "-"}
+                  </td>
+                  <td>{customer.firstname}</td>
+                  <td>{customer.lastname}</td>
+                  <td>{customer.email}</td>
+                  <td>{customer.username}</td>
+                  <td>{capitalizeEachWord(customer.branch)}</td>
+                  <td>
                     <BocButton
                       func={() => handleShow(customer._id)}
                       bgcolor="#ecaa00"
@@ -159,21 +144,21 @@ const CustomersList = ({ count, setTotalPages, currentPage, searchTerms }) => {
                     >
                       View
                     </BocButton>
-                  </td> */}
-                  </tr>
-                ))}
+                  </td>
+                </tr>
+              ))}
             </tbody>
           </Table>
         </div>
       </div>
 
       {/* next and previous button  */}
-      <NextPreBtn
+      {/* <NextPreBtn
         nextFunc={handleGoNext}
         count={currentPage}
         numberOfPages={Math.ceil((customerList?.length - 1) / showCount)}
         prevFunc={handleGoPrev}
-      />
+      /> */}
 
       {/* show loan details model  */}
       {/* {show && (

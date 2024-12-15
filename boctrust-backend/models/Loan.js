@@ -95,7 +95,6 @@ const loanSchema = new mongoose.Schema(
     },
     moratorium: String,
     paymentRecord: [paymentRecordSchema],
-
     // top up loan update here    
     isTopUpLoan: { type: Boolean, default: false },
     isTopUpLoanSent: { type: Boolean, default: false },

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchAllCustomer } from "../../../../redux/reducers/customerReducer";
+import { fetchLoans } from "../../../../redux/reducers/loanReducer.js";
 import { Table } from "react-bootstrap";
 import DashboardHeadline from "../../shared/DashboardHeadline";
 import NextPreBtn from "../../shared/NextPreBtn";
@@ -12,7 +13,13 @@ import useSearch from "../../../../../utilities/useSearchName.js";
 import useSearchByDate from "../../../../../utilities/useSearchByDate.js";
 import useSearchByDateRange from "../../../../../utilities/useSearchByDateRange.js";
 import getNextMonthDate from "../../../../../utilities/getNextMonthDate";
+import ReviewDirectDebit from "./ReviewDirectDebit";
 import "./debit.css";
+
+// custom hook
+import usePagination from "../../../../customHooks/usePagination";
+import usePaginatedData from "../../../../customHooks/usePaginationData";
+
 
 const DebitTransactions = () => {
   const styles = {
@@ -48,72 +55,110 @@ const DebitTransactions = () => {
     },
   };
 
-  // fetch all customer
-  const dispatch = useDispatch();
-  const customers = useSelector(
-    (state) => state.customerReducer.customers.customer
-  );
+  const apiUrl = import.meta.env.VITE_BASE_URL;
 
-  const status = useSelector((state) => state.customerReducer.status);
-
-  useEffect(() => {
-    dispatch(fetchAllCustomer());
-  }, [dispatch]);
-
-  // filter customer by remitaStatus
-  const [remitaCustomers, setRemitaCustomers] = useState([]);
-  // check if customer is not empty and filter by remitaStatus
-  useEffect(() => {
-    if (customers?.length > 0) {
-      const result = customers.filter(
-        (customer) => customer?.remita.loanStatus === "approved"
-      );
-      setRemitaCustomers(result);
-    }
-  }, [customers]);
-
-  // handle search by
-  const { searchTerm, setSearchTerm, filteredData } = useSearch(
-    remitaCustomers,
-    "firstname"
-  );
+  const [allLoansCustomers, setAllLoansCustomer] = useState([]);
+  const [directDebitCustomers, setDirectDebitCustomers] = useState([]);
+  const [status, setStatus] = useState("loading");
+  const [showReviewModal, setShowReviewModal] = useState(false);
+  const [selectedCustomer, setSelectedCustomer] = useState(null);
 
   const [dateRange, setDateRange] = useState({
     fromDate: "",
     toDate: "",
   });
 
+  // Fetch all loans
+  const fetchAllLoans = async () => {
+    try {
+      setStatus("loading");
+      const response = await fetch(`${apiUrl}/api/loans/all`);
+      if (!response.ok) {
+        throw new Error(`Failed to fetch loans: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      setAllLoansCustomer(data);
+      setStatus("success");
+    } catch (error) {
+      console.error("Error fetching loans:", error.message);
+      setStatus("error");
+    }
+  };
+
+  // handle search
+  const [showCount, setShowCount] = useState(5);
+  const [searchTerms, setSearchTerms] = useState("");
+  const [totalPages, setTotalPages] = useState(1);
+
+  // custom hook destructuring
+  const { currentPage, goToNextPage, goToPreviousPage, setPage } =
+    usePagination(1, totalPages);
+  const { paginatedData: paginatedDirectDebitCustomer } = usePaginatedData(
+    allLoansCustomers,
+    showCount,
+    currentPage
+  );
+
+  // update loansList to show 5 pendingLoans on page load
+  // or on count changes
   useEffect(() => {
-    setRemitaCustomers(filteredData);
-  }, [searchTerm, filteredData]);
+    setDirectDebitCustomers(paginatedDirectDebitCustomer); // Update local state with paginated data
+  }, [paginatedDirectDebitCustomer]);
 
-  // handle search by date
-  const { filteredDateData } = useSearchByDate(remitaCustomers, "createdAt");
+  useEffect(() => {
+    setTotalPages(totalPages); // Update total pages when it changes
+  }, [totalPages, setTotalPages]);
+
+  // Filter customers for direct debit
+  useEffect(() => {
+    const filtered = allLoansCustomers.filter(
+      (customer) =>
+        customer?.deductions === "ippis" &&
+        customer?.customer?.directDebit?.isDebitProcessed === false
+    );
+    setDirectDebitCustomers(filtered);
+  }, [allLoansCustomers]);
+
+  // Fetch loans on component mount and modal close
+  useEffect(() => {
+    fetchAllLoans();
+  }, [showReviewModal]);
+
+  // Search by name
+  const { searchTerm, setSearchTerm, filteredData } = useSearch(
+    directDebitCustomers,
+    "firstname"
+  );
+
+  // Search by date
+  const { filteredDateData } = useSearchByDate(
+    directDebitCustomers,
+    "createdAt"
+  );
   const searchByDate = () => {
-    setRemitaCustomers(filteredDateData);
+    setDirectDebitCustomers(filteredDateData);
   };
 
-  // handle list reload
-  const handleReload = () => {
-    setDateRange({
-      fromDate: "",
-      toDate: "",
-    });
-    dispatch(fetchAllCustomer());
-    setRemitaCustomers(remitaCustomers);
-  };
-
-  // handle search by date range
+  // Search by date range
   const { searchData } = useSearchByDateRange(
-    remitaCustomers,
+    directDebitCustomers,
     dateRange,
     "createdAt"
   );
 
-  useEffect(() => {
-    setRemitaCustomers(searchData);
-  }, [searchData]);
+  // Handle list reload
+  const handleReload = () => {
+    setDateRange({ fromDate: "", toDate: "" });
+    setSearchTerm("");
+    fetchAllLoans();
+  };
 
+  // Open review modal
+  const handleReviewClick = (customer) => {
+    setSelectedCustomer(customer);
+    setShowReviewModal(true);
+  };
   return (
     <div>
       {/* view by section */}
@@ -150,70 +195,68 @@ const DebitTransactions = () => {
               </tr>
             </thead>
             <tbody>
-              {/* <tr>
+              <tr>
                 <td colSpan="10">
-                  {remitaCustomers?.length === 0 && (
+                  {directDebitCustomers?.length === 0 && (
                     <NoResult name="Customer" />
                   )}
                 </td>
-              </tr> */}
-              <tr>
-                <td>24-05-2-24</td>
-                <td>Tunji Adams</td>
-                <td>745787666</td>
-                <td>N54,900</td>
-                <td>Monthly</td>
-                <td style={styles.pendingTxt}>Pending</td>
-                <td>
-                  <button className="actionBtn" style={styles.approve}>
-                    Approve
-                  </button>
-                </td>
               </tr>
-              <tr>
-                <td>25-05-2-24</td>
-                <td>Tinuke Banky</td>
-                <td>745787777</td>
-                <td>N44,700</td>
-                <td>Weekly</td>
-                <td style={styles.pendingTxt}>Pending</td>
-                <td>
-                  <button className="actionBtn" style={styles.review}>
-                    Review
-                  </button>
-                </td>
-              </tr>
-              <tr>
-                <td>25-05-2-24</td>
-                <td>Jame Fred</td>
-                <td>745787699</td>
-                <td>N540,000</td>
-                <td>Quarterly</td>
-                <td style={styles.pendingTxt}>Pending</td>
-                <td>
-                  <button className="actionBtn" style={styles.pending}>
-                    Reject
-                  </button>
-                </td>
-              </tr>
-              <tr>
-                <td>26-05-2-24</td>
-                <td>Glory Joel</td>
-                <td>7457876456</td>
-                <td>N34,900</td>
-                <td>Annual</td>
-                <td style={styles.activeTxt}>Active</td>
-                <td>
-                  <button className="actionBtn" style={styles.approved}>
-                    Approved
-                  </button>
-                </td>
-              </tr>
+
+              {directDebitCustomers?.map((customer) => (
+                <tr key={customer?._id}>
+                  <td>{customer?.createdAt.slice(0, 10)}</td>
+                  <td>
+                    {customer?.customer.firstname} {customer?.customer.lastname}
+                  </td>
+                  <td>{customer?.customer.salaryaccountnumber}</td>
+                  <td>N{customer?.loantotalrepayment}</td>
+                  <td>Monthly</td>
+                  <td style={styles.pendingTxt}>
+                    {customer?.customer.directDebit.debitStatus}
+                  </td>
+                  <td>
+                    {customer?.customer.directDebit.debitStatus ===
+                    "approved" ? (
+                      <button className="actionBtn" style={styles.approve}>
+                        Approved
+                      </button>
+                    ) : customer?.customer.directDebit.debitStatus ===
+                      "declined" ? (
+                      <button className="actionBtn" style={styles.pending}>
+                        Rejected
+                      </button>
+                    ) : (
+                      <button
+                        className="actionBtn"
+                        style={styles.review}
+                        onClick={() => handleReviewClick(customer)}
+                      >
+                        Review
+                      </button>
+                    )}
+                  </td>
+                </tr>
+              ))}
             </tbody>
           </Table>
         </div>
-        <NextPreBtn />
+        <NextPreBtn
+          currentPage={currentPage}
+          totalPages={totalPages}
+          goToNextPage={goToNextPage}
+          goToPreviousPage={goToPreviousPage}
+        />
       </div>
+
+      {/* Review Direct Debit Modal */}
+      {selectedCustomer && (
+        <ReviewDirectDebit
+          show={showReviewModal}
+          handleClose={() => setShowReviewModal(false)}
+          customer={selectedCustomer}
+        />
+      )}
     </div>
   );
 };

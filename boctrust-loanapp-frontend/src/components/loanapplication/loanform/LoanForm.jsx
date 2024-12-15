@@ -353,7 +353,7 @@ const LoanForm = React.memo(function LoanFormComponent() {
         let formValues;
         ref.current?.values;
         
-        if (onboardData?.salaryaccountname) {
+        if (isLastStep!==null) {
           formValues = onboardData;
           formValues.email = ref.current?.values?.email;
           formValues.username = ref.current?.values?.username;
@@ -494,13 +494,13 @@ const LoanForm = React.memo(function LoanFormComponent() {
 
         const responsePayload = await res.json();
 
-        console.log("MAGI", responsePayload);
 
         if (!res.ok) {
           throw new Error(responsePayload.error);
         }
         toast.success("Customer Account Created!!!");
         deleteFromLocalStorage("onboardData");
+        deleteFromLocalStorage("loanStep");
         fileValues.map((item) => deleteFromLocalStorage(item));
       }
     } catch (error) {
@@ -515,8 +515,8 @@ const LoanForm = React.memo(function LoanFormComponent() {
   const handleProceed = () => {
     const formContainer = document.querySelector(".FormContainer");
     formContainer.style.padding = "12px";
-    console.log("MAAAAL", ref.current?.values);
     localStorage.setItem("onboardData", JSON.stringify(ref?.current?.values));
+    localStorage.setItem("loanStep", JSON.stringify({step:"last"}));
     setShowForm(false);
   };
 
@@ -553,9 +553,11 @@ const LoanForm = React.memo(function LoanFormComponent() {
   };
 
   const [onboardData, setOnBoardData] = useState(null);
+  const [isLastStep, setIsLastStep] = useState(null);
 
   useEffect(() => {
     setOnBoardData(JSON.parse(localStorage.getItem("onboardData")));
+    setIsLastStep(JSON.parse(localStorage.getItem("loanStep")));
   }, [step]);
 
   useEffect(() => {

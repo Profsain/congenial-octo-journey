@@ -259,7 +259,7 @@ const SideNavMain = ({ onMenuItemClick }) => {
       </div>
 
       {/* repayment menu */}
-      <div
+      {/* <div
         className={`link__wrap  ${
           checkSectionActive("repayment") ? "section__active" : ""
         }`}
@@ -278,7 +278,7 @@ const SideNavMain = ({ onMenuItemClick }) => {
           <img id="repayment" src="/images/dtransfer.png" alt="repayment" />
           <p id="repayment">Repayments</p>
         </NavLink>
-      </div>
+      </div> */}
 
       {/* account menu */}
       <div

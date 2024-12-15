@@ -1,20 +1,23 @@
-import apiClient from "../../../../lib/axios";
+const stopLoanFunc = async (loanId) => { 
+    const apiUrl = import.meta.env.VITE_BASE_URL;
+    
+    const stopLoanStatus = 'stopped';
 
-const stopLoanFunc = async (loanId) => {
-  const stopLoanStatus = "stopped";
-
-  await apiClient
-    .put(`/updatecustomer/remita/${loanId}/stoploan`, {
-      stopLoanStatus,
+    await fetch(`${apiUrl}/api/updatecustomer/remita/${loanId}/stoploan`, {
+    method: 'PUT',
+    headers: {
+        'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ stopLoanStatus }),
     })
-    .then((response) => {
-      if (!response.ok) {
+    .then(response => {
+        if (!response.ok) {
         throw new Error(`HTTP error! Status: ${response.status}`);
-      }
-      return response.json();
+        }
+        return response.json();
     })
-    .catch((error) => {
-      console.error("Error updating loan status:", error.message);
+    .catch(error => {
+        console.error('Error updating loan status:', error.message);
     });
 };
 

@@ -1,5 +1,5 @@
 import PropTypes from "prop-types";
-import { Row, Col } from "react-bootstrap";
+import { Row, Col, Spinner } from "react-bootstrap";
 import FigCard from "../shared/FigCard";
 import "../Dashboard.css";
 import { useEffect, useState } from "react";
@@ -17,7 +17,6 @@ import {
 } from "../../../../utilities/formatToNiaraCurrency";
 import { format } from "date-fns";
 
-import Spinner from "react-bootstrap/Spinner";
 import LoanTopUpModal from "./LoanTopUpModal";
 
 const BaseURL = import.meta.env.VITE_BASE_URL;
@@ -68,6 +67,7 @@ const TopCardSec = ({ user }) => {
     }
 
     if (loansAccountBalance && typeof loansAccountBalance != "string") {
+
       const currLoan = loansAccountBalance?.find(
         (loan) => loan.LoanAccountNo == user?.activeLoan?.Number
       );
@@ -98,6 +98,8 @@ const TopCardSec = ({ user }) => {
   const handleCloseTopUpModal = () => {
     setShowTopUpModal(false);
   };
+
+  
 
   return (
     <>
@@ -130,7 +132,31 @@ const TopCardSec = ({ user }) => {
               <p>Total Paid</p>
             </FigCard>
           </Col>
+          <Col xs={6} md={3}>
+            <FigCard classname="MobCard">
+              <img
+                width="28px"
+                height="28px"
+                src="/images/whitenaira.png"
+                alt="naira"
+              />
+              <h5 className="FigNum">{useBalance.totalPaid}</h5>
+              <p>Total Paid</p>
+            </FigCard>
+          </Col>
 
+          <Col xs={6} md={3}>
+            <FigCard classname="MobCard">
+              <img
+                width="28px"
+                height="28px"
+                src="/images/whitenaira.png"
+                alt="naira"
+              />
+              <h5 className="FigNum">{upcomingPayments}</h5>
+              <p>Upcoming Payments</p>
+            </FigCard>
+          </Col>
           <Col xs={6} md={3}>
             <FigCard classname="MobCard">
               <img
@@ -164,11 +190,10 @@ const TopCardSec = ({ user }) => {
                     <b>{recentTransaction.RecordType}</b>
                     <div>
                       <h5
-                        className={`recentTrscAmt ${
-                          recentTransaction.RecordType === "Credit"
+                        className={`recentTrscAmt ${recentTransaction.RecordType === "Credit"
                             ? "credit"
                             : "debit"
-                        }`}
+                          }`}
                       >
                         <span>
                           {recentTransaction.RecordType === "Credit" ? (
@@ -195,10 +220,11 @@ const TopCardSec = ({ user }) => {
               </FigCard>
             )}
           </Col>
-        </Row>
-      </div>
 
-      {/* loan top up modal */}
+        </Row>
+
+        {/* loan top up modal */}
+      </div>
       <LoanTopUpModal
         showModal={showTopUpModal}
         handleCloseModal={handleCloseTopUpModal}

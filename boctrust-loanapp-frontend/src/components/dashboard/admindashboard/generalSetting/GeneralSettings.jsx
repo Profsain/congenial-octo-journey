@@ -33,8 +33,10 @@ const GeneralSettings = () => {
   const { allLoanOfficers } = useSelector((state) => state.loanOfficerReducer);
   const status = useSelector((state) => state.settingReducer.status);
   const [settingData, setSettingData] = useState({});
+  const [rows, setRows] = useState([]);
   const [successMsg, setSuccessMsg] = useState("");
   const [processing, setProcessing] = useState(false);
+  const [selectedLoanOfficer, setSelectedLoanOfficer] = useState([]);
 
   useEffect(() => {
     dispatch(fetchSetting());
@@ -42,6 +44,7 @@ const GeneralSettings = () => {
   }, [dispatch]);
 
   useEffect(() => {
+    // Update settings state
     if (settings && settings.length > 0) {
       setSettingData(settings[0]);
     } else {
@@ -49,53 +52,75 @@ const GeneralSettings = () => {
     }
   }, [settings]);
 
+  useEffect(() => {
+    const initializeLoanOfficers = async () => {
+      // Fetch selected loan officers
+      const res = await fetch(`${apiUrl}/api/admin/getSelectedLoanOfficers`);
+      const result = await res.json();
+
+      const selectedLoanOfficers = result.SelectedLoanOfficers || [];
+
+      // Update rows with selected state
+      setRows(
+        allLoanOfficers?.map((row) => ({
+          ...row,
+          selected: selectedLoanOfficers.includes(row.Name),
+        })) || []
+      );
+
+      setSelectedLoanOfficer(selectedLoanOfficers);
+    };
+
+    if (allLoanOfficers) {
+      initializeLoanOfficers();
+    }
+  }, [allLoanOfficers]);
+
+  const {
+    siteTitle,
+    address,
+    phoneNumber1,
+    phoneNumber2,
+    email,
+    copyrightText,
+  } = settingData;
+
   const initialValues = {
-    siteTitle: settingData.siteTitle || "",
-    address: settingData.address || "",
-    phoneNumber1: settingData.phoneNumber1 || "",
-    phoneNumber2: settingData.phoneNumber2 || "",
-    email: settingData.email || "",
-    copyrightText: settingData.copyrightText || "",
+    siteTitle: siteTitle || "",
+    address: address || "",
+    phoneNumber1: phoneNumber1 || "",
+    phoneNumber2: phoneNumber2 || "",
+    email: email || "",
+    copyrightText: copyrightText || "",
     topUpEligibilityMonths: settingData.topUpEligibilityMonths || 6, // Default value
   };
 
   const handleSubmit = async (values) => {
     setProcessing(true);
+
     try {
-      const response = await updateSettings(values);
+      const data = {
+        siteTitle: values.siteTitle,
+        address: values.address,
+        phoneNumber1: values.phoneNumber1,
+        phoneNumber2: values.phoneNumber2,
+        email: values.email,
+        copyrightText: values.copyrightText,
+      };
+
+      const response = await updateSettings(data);
+
       if (response) {
         setSuccessMsg("Settings updated successfully");
+        setProcessing(false);
       } else {
         setSuccessMsg("Error updating settings");
+        setProcessing(false);
       }
     } catch (error) {
       console.error("Error updating settings:", error);
     }
-    setProcessing(false);
   };
-
-
-  const [selectedLoanOfficer,setSelectedLoanOfficer] = useState([]);
-
-  const fetchSelectedLoanOfficers=async()=>{
-    const res = await fetch(`${apiUrl}/api/admin/getSelectedLoanOfficers`);
-    const result = await res.json();
-
-    setSelectedLoanOfficer(result.SelectedLoanOfficers);
-  }
-
-
-
-
-  useEffect(() => {
-    if (allLoanOfficers) {
-      setRows(allLoanOfficers)
-      fetchSelectedLoanOfficers();
-    }
-  }, [allLoanOfficers])
-
-  // Sample data for the table
-  const [rows, setRows] = useState(allLoanOfficers);
 
   // Handle checkbox change for a specific row
   const handleCheckboxChange = (Id) => {
@@ -106,9 +131,6 @@ const GeneralSettings = () => {
     );
   };
 
-
-  
-
   // Select or deselect all rows
   const handleSelectAll = (e) => {
     const isChecked = e.target.checked;
@@ -118,23 +140,16 @@ const GeneralSettings = () => {
   };
 
   const handleLoanOfficers = async () => {
-    const data = [];
-    for (let i = 0; i < rows.length; i++) {
-      if (rows[i].selected) {
-        data.push(rows[i].Name);
-      }
-    }
-  
-    console.log("APAPAP", data[0]);
-  
+    const data = rows.filter((row) => row.selected).map((row) => row.Name);
+
     const res = await fetch(`${apiUrl}/api/admin/updateSelectedLoanOfficers`, {
       method: "POST",
       headers: {
-        "Content-Type": "application/json", // Inform the server that JSON data is being sent
+        "Content-Type": "application/json",
       },
-      body: JSON.stringify({ loanOfficers: data }), // Convert to JSON string
+      body: JSON.stringify({ loanOfficers: data }),
     });
-  
+
     const result = await res.json();
     console.log(result);
   };
@@ -153,22 +168,12 @@ const GeneralSettings = () => {
             <div className="FieldRow">
               <div className="FieldGroup">
                 <label htmlFor="siteTitle">Site Title</label>
-                <Field
-                  type="text"
-                  name="siteTitle"
-                  id="siteTitle"
-                  className="Input"
-                />
+                <Field type="text" name="siteTitle" id="siteTitle" className="Input" />
                 <ErrorMessage name="siteTitle" component="div" />
               </div>
               <div className="FieldGroup">
                 <label htmlFor="address">Address</label>
-                <Field
-                  type="text"
-                  name="address"
-                  id="address"
-                  className="Input"
-                />
+                <Field type="text" name="address" id="address" className="Input" />
                 <ErrorMessage name="address" component="div" />
               </div>
             </div>
@@ -198,7 +203,7 @@ const GeneralSettings = () => {
 
             <div className="FieldRow">
               <div className="FieldGroup">
-                <label htmlFor="email">Email</label>
+                <label htmlFor="email">Email Address</label>
                 <Field type="text" name="email" id="email" className="Input" />
                 <ErrorMessage name="email" component="div" />
               </div>
@@ -214,7 +219,7 @@ const GeneralSettings = () => {
               </div>
             </div>
 
-              {/* top up loan update */}
+            {/* top up loan update */}
             <div className="FieldRow">
               <div className="FieldGroup">
                 <label htmlFor="topUpEligibilityMonths">
@@ -247,8 +252,8 @@ const GeneralSettings = () => {
       )}
 
       <div>
-        <h2 style={{ textAlign: "center", paddingTop: "50px", paddingBottom: "50px" }}>Loan Officers</h2>
-        <table border="1" style={{ width: '100%', textAlign: 'left' }}>
+        <h2 style={{ textAlign: "center", padding: "50px 0" }}>Loan Officers</h2>
+        <table border="1" style={{ width: "100%", textAlign: "left" }}>
           <thead>
             <tr>
               <th>
@@ -287,22 +292,17 @@ const GeneralSettings = () => {
           </tbody>
         </table>
 
-        <div style={{ marginTop: '10px' }}>
-          <strong>Selected Loan Officers:</strong>{' '}
-          {rows?.filter((row) => row.selected).map((row) => row.Name).join(', ') || 'None'}
+        <div style={{ marginTop: "10px" }}>
+          <strong>Selected Loan Officers:</strong>{" "}
+          {rows?.filter((row) => row.selected).map((row) => row.Name).join(", ") || "None"}
         </div>
       </div>
       <div className="BtnContainer">
-        <p>{successMsg}</p>
-        {processing && <PageLoader />}
         <button
-          type="submit"
-          width="220px"
-          bgcolor="#ecaa00"
-          bradius="18px"
           onClick={handleLoanOfficers}
+          style={{ width: "220px", backgroundColor: "#ecaa00", borderRadius: "18px" }}
         >
-          Save Settings
+          Save Loan Officers
         </button>
       </div>
     </div>

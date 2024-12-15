@@ -5,28 +5,36 @@ import DashboardHeadline from "../../shared/DashboardHeadline";
 import "../customers/Customer.css";
 import BranchesList from "./BranchesList";
 import AddBranch from "./AddBranch";
+import NextPreBtn from "../../shared/NextPreBtn";
 import handleAdminRoles from "../../../../../utilities/getAdminRoles";
+
+// custom hook
+import usePagination from "../../../../customHooks/usePagination";
 
 const Branches = () => {
   const currentUser = useSelector((state) => state.adminAuth.user);
   const [admin, setAdmin] = useState("");
   const [adminRoles, setAdminRoles] = useState([]);
 
-  const [openAddBranch, setOpenAddBranch] = useState(true);
+  const [openAddBranch, setOpenAddBranch] = useState(false);
   // open add branch component
   const openAddBranches = () => setOpenAddBranch(true);
 
   // handle search
-  const [showCount, setShowCount] = useState(10);
+  const [showCount, setShowCount] = useState(5);
   const [searchTerms, setSearchTerms] = useState("");
+  const [totalPages, setTotalPages] = useState(1);
+
+  const { currentPage, goToNextPage, goToPreviousPage, setPage } =
+    usePagination(1, totalPages);
 
   useEffect(() => {
     if (currentUser) {
       if (currentUser.userType === "admin" || currentUser.userType === "md") {
-        setAdmin("admin")
+        setAdmin("admin");
       }
 
-      handleAdminRoles(currentUser, setAdminRoles)
+      handleAdminRoles(currentUser, setAdminRoles);
     }
   }, []);
 
@@ -55,8 +63,8 @@ const Branches = () => {
                   <input
                     name="showCount"
                     type="number"
-                    step={10}
-                    min={10}
+                    step={5}
+                    min={5}
                     value={showCount}
                     onChange={(e) => setShowCount(e.target.value)}
                   />
@@ -73,19 +81,25 @@ const Branches = () => {
               </div>
             </DashboardHeadline>
           </div>
-          <div className="AddBtn">
-              <BocButton
-                bgcolor="#ecaa00"
-                bradius="22px"
-                func={openAddBranches}
-              >
-                <span>+</span> Add New Branch
-              </BocButton>
-            </div>
           <div>
             {/* branches list  */}
             <div className="ListSec">
-              <BranchesList showCount={showCount} searchTerms={searchTerms} admin={admin} adminRoles={ adminRoles} />
+              <BranchesList
+                count={showCount}
+                searchTerms={searchTerms}
+                setTotalPages={setTotalPages}
+                currentPage={currentPage}
+                admin={admin}
+                adminRoles={adminRoles}
+              />
+
+              {/* next and previous button */}
+              <NextPreBtn
+                currentPage={currentPage}
+                totalPages={totalPages}
+                goToNextPage={goToNextPage}
+                goToPreviousPage={goToPreviousPage}
+              />
             </div>
           </div>
         </div>

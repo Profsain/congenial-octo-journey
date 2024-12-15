@@ -32,6 +32,7 @@ const ManageUserRole = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [newRoleInput, setNewRoleInput] = useState(roleInputInit);
 
+  const [totalPages, setTotalPages] = useState(5); 
 
   // from usePagination
   const { currentPage, goToNextPage, goToPreviousPage, setPage } =

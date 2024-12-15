@@ -11,6 +11,7 @@ const customerSchema = new mongoose.Schema(
       type: String,
       default: "",
     },
+    agentCode: String,
     customerId: String,
     firstname: String,
     lastname: String,
@@ -171,10 +172,10 @@ const customerSchema = new mongoose.Schema(
     },
     // top up loan update here
     topUpLoanEligibility: {
-        isEligible: { type: Boolean, default: false },
-        monthsSinceLastLoan: { type: Number, default: 0 },
-        notificationSent: { type: Boolean, default: false },
-    },
+      isEligible: { type: Boolean, default: false },
+      monthsSinceLastLoan: { type: Number, default: 0 },
+      notificationSent: { type: Boolean, default: false },
+  },
   },
   { timestamps: true }
 );

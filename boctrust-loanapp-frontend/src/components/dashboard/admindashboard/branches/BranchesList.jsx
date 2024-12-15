@@ -8,13 +8,22 @@ import PageLoader from "../../shared/PageLoader";
 import EditBranch from "./EditBranch";
 import ActionNotification from "../../shared/ActionNotification";
 import NoResult from "../../../shared/NoResult";
-import NextPreBtn from "../../shared/NextPreBtn";
+
 // function
 import searchList from "../../../../../utilities/searchListFunc";
 import sortByCreatedAt from "../../shared/sortedByDate";
-import apiClient from "../../../../lib/axios";
 
-const BranchesList = ({ showCount, searchTerms, admin, adminRoles }) => {
+// custom hook
+import usePaginatedData from "../../../../customHooks/usePaginationData";
+
+const BranchesList = ({
+  count,
+  searchTerms,
+  setTotalPages,
+  currentPage,
+  admin,
+  adminRoles,
+}) => {
   // styles
   const styles = {
     head: {
@@ -46,33 +55,37 @@ const BranchesList = ({ showCount, searchTerms, admin, adminRoles }) => {
     (state) => state.branchReducer.branches.branches
   );
 
+
   const [branchesList, setBranchesList] = useState(branches);
-  // update branchesList to show 10 branches on page load
-  // or when count changes
+
+  // custom pagination update
+  const { paginatedData: paginatedBranchesList, totalPages } = usePaginatedData(
+    branches,
+    count,
+    currentPage
+  );
+
+
   useEffect(() => {
-    setBranchesList(branches?.slice(0, showCount));
-  }, [branches, showCount]);
+    setBranchesList(paginatedBranchesList); // Update local state with paginated data
+  }, [paginatedBranchesList]);
+
+  useEffect(() => {
+    setTotalPages(totalPages); // Update total pages when it changes
+  }, [totalPages, setTotalPages]);
+
   const status = useSelector((state) => state.branchReducer.status);
 
   // update branchesList on search
   const handleSearch = () => {
     const currSearch = searchList(branches, searchTerms, "branchName");
-    setBranchesList(currSearch?.slice(0, showCount));
+    setBranchesList(currSearch?.slice(0, count));
   };
 
   useEffect(() => {
     handleSearch();
   }, [searchTerms]);
 
-  // handle next and previous button
-  const handleNextPreBtn = () => {
-    // handleNextPre(
-    //   e,
-    //   branchesList,
-    //   setBranchesList,
-    //   showCount,
-    // );
-  };
 
   // handle action selection
   const handleAction = (e) => {
@@ -93,10 +106,16 @@ const BranchesList = ({ showCount, searchTerms, admin, adminRoles }) => {
       setAction(true);
     }
   };
+
   // handle delete action
   const handleDelete = async () => {
     const apiUrl = import.meta.env.VITE_BASE_URL;
-    await apiClient.delete(`/branch/branches/${branchId}`);
+    await fetch(`${apiUrl}/api/branch/branches/${branchId}`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
 
     dispatch(fetchBranches());
     setAction(false);
@@ -120,13 +139,7 @@ const BranchesList = ({ showCount, searchTerms, admin, adminRoles }) => {
               </tr>
             </thead>
             <tbody>
-              {branchesList?.length === 0 && (
-                <tr>
-                  <td colSpan={6}>
-                    <NoResult name="branches" />
-                  </td>
-                </tr>
-              )}
+              {branchesList?.length === 0 && <NoResult name="branches" />}
               {branchesList?.map((branch) => (
                 <tr key={branch._id}>
                   <td>{branch.branchId}</td>
@@ -143,10 +156,12 @@ const BranchesList = ({ showCount, searchTerms, admin, adminRoles }) => {
                     >
                       <option value="">Action</option>
                       <option value="view">View</option>
-         
+                      {admin || adminRoles?.includes("manage_branch") ? (
+                        <>
                           <option value="edit">Edit</option>
                           <option value="delete">Delete</option>
-                        
+                        </>
+                      ) : null}
                     </select>
                   </td>
                 </tr>
@@ -156,11 +171,11 @@ const BranchesList = ({ showCount, searchTerms, admin, adminRoles }) => {
         </div>
       </div>
       {/* next and previous button */}
-      <NextPreBtn
+      {/* <NextPreBtn
         count={showCount}
         prevFunc={handleNextPreBtn}
         nextFunc={handleNextPreBtn}
-      />
+      /> */}
 
       {/* branch model */}
       <EditBranch

@@ -13,7 +13,10 @@ import { FcCancel } from "react-icons/fc";
 import { toast } from "react-toastify";
 import EditEmployerLetterRule from "./editRule/EditEmployerLetterRule";
 import { fetchEmployerLetterRules } from "../../../../../redux/reducers/employerLetterRuleReducer";
-import apiClient from "../../../../../lib/axios";
+
+// custom hook
+import usePagination from "../../../../../customHooks/usePagination";
+import usePaginatedData from "../../../../../customHooks/usePaginationData";
 
 const EmployerLetterRuleList = () => {
   const styles = {
@@ -61,15 +64,41 @@ const EmployerLetterRuleList = () => {
   // search employmentLetterRule list
   const [ruleList, setRuleList] = useState(employerLetterRules);
 
+  // custom hook state pagination
+  const [showCount, setShowCount] = useState(5);
+  const [searchTerms, setSearchTerms] = useState("");
+  const [totalPage, setTotalPage] = useState(1);
+
+  // custom hook destructuring
+  const { currentPage, goToNextPage, goToPreviousPage, setPage } =
+    usePagination(1, totalPage);
+
+  const { paginatedData: paginatedEmployerLetterRulesList, totalPages } =
+    usePaginatedData(employerLetterRules, showCount, currentPage);
+
+  // update loansList to show 5 pendingLoans on page load
+  // or on count changes
   useEffect(() => {
-    setRuleList(employerLetterRules);
-  }, [employerLetterRules]);
+    setRuleList(paginatedEmployerLetterRulesList); // Update local state with paginated data
+  }, [paginatedEmployerLetterRulesList]);
+
+   useEffect(() => {
+     setTotalPage(totalPages); // Update total pages when it changes
+   }, [totalPages, setTotalPage]);
+
+
+
 
   const handleDeleteMandateRule = async (rule) => {
     try {
       const apiUrl = import.meta.env.VITE_BASE_URL;
       // Handle form submission logic here
-      await apiClient.delete(`/employer-letter-rule/${rule._id}`);
+      await fetch(`${apiUrl}/api/employer-letter-rule/${rule._id}`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
 
       await dispatch(fetchEmployerLetterRules());
       toast.success("Employer Letter Rule Deleted successfully");
@@ -164,7 +193,12 @@ const EmployerLetterRuleList = () => {
                 </tbody>
               </Table>
             </div>
-            <NextPreBtn />
+            <NextPreBtn
+              currentPage={currentPage}
+              totalPages={totalPage}
+              goToNextPage={goToNextPage}
+              goToPreviousPage={goToPreviousPage}
+            />
           </div>
         </div>
       </div>
