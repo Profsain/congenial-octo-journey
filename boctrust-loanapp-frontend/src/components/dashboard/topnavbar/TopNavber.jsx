@@ -1,11 +1,9 @@
 import { useState, useEffect } from "react";
-import { useSelector } from "react-redux";
 import PropTypes from "prop-types";
 import "./TopNavbar.css";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom"; // Import useNavigate
 import { performLogout } from "../../../redux/reducers/adminAuthReducer";
-import { useState } from "react";
 import LoanTopUpModal from "../dashboardcomponents/LoanTopUpModal";
 
 const TopNavber = ({ title, user = "Femi Akinwade" }) => {

@@ -17,7 +17,9 @@ import DisplayLoanProductName from "../../shared/DisplayLoanProductName";
 import { nigerianCurrencyFormat } from "../../../../../utilities/formatToNiaraCurrency";
 import { format } from "date-fns";
 import useSearchByDateRange from "../../../../../utilities/useSearchByDateRange";
-import usePagination from "@mui/material/usePagination/usePagination";
+
+
+import usePagination from "../../../../customHooks/usePagination";
 import usePaginatedData from "../../../../customHooks/usePaginationData";
 
 const CompletedLoans = () => {
@@ -68,7 +70,7 @@ const CompletedLoans = () => {
 
   // Pagination State
   const [totalPage, setTotalPage] = useState(1);
-  const [showCount, _] = useState(10);
+  const [showCount, setShowCount] = useState(5);
 
   const { currentPage, goToNextPage, goToPreviousPage, setPage } =
     usePagination(1, totalPage);
@@ -78,6 +80,10 @@ const CompletedLoans = () => {
 
 
   const dispatch = useDispatch();
+
+  useEffect(() => {
+    setOverdueLoanEntries(paginatedOverdueLoans); // Update local state with paginated data
+  }, [paginatedOverdueLoans]);
 
   
   useEffect(() => {

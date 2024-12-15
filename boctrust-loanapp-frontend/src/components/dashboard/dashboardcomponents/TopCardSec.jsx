@@ -17,7 +17,6 @@ import {
 } from "../../../../utilities/formatToNiaraCurrency";
 import { format } from "date-fns";
 
-import Spinner from "react-bootstrap/Spinner";
 import LoanTopUpModal from "./LoanTopUpModal";
 
 const BaseURL = import.meta.env.VITE_BASE_URL;

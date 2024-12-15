@@ -11,6 +11,7 @@ const customerSchema = new mongoose.Schema(
       type: String,
       default: "",
     },
+    agentCode: String,
     customerId: String,
     firstname: String,
     lastname: String,

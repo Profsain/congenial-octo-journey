@@ -174,7 +174,7 @@ const AllLoans = ({ count, searchTerms, setTotalPages, currentPage }) => {
                         </p>
                       ) : (
                         <p>
-                          Nibss{" "}
+                          IPPIS{" "}
                           <span style={styles.topUp}>
                             {loan.isTopUpLoan && "Top-up"}
                           </span>

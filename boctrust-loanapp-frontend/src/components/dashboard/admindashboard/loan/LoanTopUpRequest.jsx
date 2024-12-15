@@ -8,20 +8,19 @@ import DashboardHeadline from "../../shared/DashboardHeadline";
 import NextPreBtn from "../../shared/NextPreBtn";
 import PageLoader from "../../shared/PageLoader";
 import getDateOnly from "../../../../../utilities/getDate";
-import capitalizeEachWord from "../../../../../utilities/capitalizeFirstLetter";
 import searchList from "../../../../../utilities/searchListFunc";
-import LoanDetails from "./LoanDetails";
 import NoResult from "../../../shared/NoResult";
 import sortByCreatedAt from "../../shared/sortedByDate";
-import { loanStatusEnum } from "../../../../lib/userRelated";
-import { fetchLoans } from "../../../../redux/reducers/loanReducer";
 import DisplayLoanProductName from "../../shared/DisplayLoanProductName";
+// custom hook
+import usePagination from "../../../../customHooks/usePagination";
+import usePaginatedData from "../../../../customHooks/usePaginationData";
 
 import { toast, ToastContainer } from "react-toastify";
 // toast styles
 import "react-toastify/dist/ReactToastify.css";
 
-const LoanTopUpRequest = () => {
+const loansList = () => {
   const styles = {
     table: {
       //   margin: "0 2rem 0 3rem",
@@ -44,29 +43,13 @@ const LoanTopUpRequest = () => {
 
   // current login user
   const { user: currentUser } = useSelector((state) => state.adminAuth);
-  // console.log("currentUser", currentUser);
-  const [canUserSendTopUp, setCanUserSendTopUp] = useState(false);
-  const [canUserStartTerminate, setCanUserStartTerminate] = useState(false);
-  const [canUserApproveTerminate, setCanUserApproveTerminate] = useState(false);
-
-  // update user role
-  useEffect(() => {
-    setCanUserSendTopUp(currentUser?.userRole?.can.includes("sendTopUp"));
-    setCanUserStartTerminate(
-      currentUser?.userRole?.can.includes("initiateLoanTerminate")
-    );
-    setCanUserApproveTerminate(
-      currentUser?.userRole?.can.includes("approveLoanTerminate")
-    );
-  }, [currentUser]);
 
   const apiUrl = import.meta.env.VITE_BASE_URL;
   // handle search
-  const [showCount, setShowCount] = useState(10);
+  const [showCount, setShowCount] = useState(5);
   const [searchTerms, setSearchTerms] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
-  const [show, setShow] = useState(false);
-  const [loanObj, setLoanObj] = useState({});
+  const [totalPages, setTotalPages] = useState(1);
+
   // search Loans list
   const [loansList, setLoansList] = useState(null);
   const [status, setStatus] = useState("loading");
@@ -99,6 +82,15 @@ const LoanTopUpRequest = () => {
   useEffect(() => {
     fetchTopUpLoans();
   }, []);
+
+  // custom hook destructuring
+  const { currentPage, goToNextPage, goToPreviousPage, setPage } =
+    usePagination(1, totalPages);
+  const { paginatedData: paginatedLoansList } = usePaginatedData(
+    loansList,
+    showCount,
+    currentPage
+  );
 
   // termination operation
   const [isTerminating, setIsTerminating] = useState(false);
@@ -169,47 +161,18 @@ const LoanTopUpRequest = () => {
     }
   };
 
-  // handle close loan details
-  const handleClose = () => {
-    setLoanObj({});
-    setShow(false);
-  };
-
-  // handle show loan details
-  const handleShow = (id) => {
-    const loan = loansList && loansList.find((loan) => loan._id === id);
-    setLoanObj(loan);
-    setShow(true);
-  };
+  // update loansList to show 10 pendingLoans on page load
+  // or on count changes
+  useEffect(() => {
+    if (loansList) setLoansList(paginatedLoansList);
+  }, [paginatedLoansList]);
 
   // update loansList on search
-  const handleSearch = () => {
-    if (!LoanTopUpRequest) {
-      return;
-    }
-    const currSearch = searchList(
-      LoanTopUpRequest,
-      searchTerms,
-      "agreefullname"
-    );
-    setLoansList(currSearch);
-  };
-
-  useEffect(() => {
-    handleSearch();
-  }, [searchTerms]);
-
-  const handleGoNext = () => {
-    if (currentPage < Math.ceil((loansList?.length - 1) / showCount)) {
-      setCurrentPage((prev) => prev + 1);
-    }
-  };
-
-  const handleGoPrev = () => {
-    if (currentPage > 1) {
-      setCurrentPage((prev) => prev - 1);
-    }
-  };
+  // Filter loans dynamically
+  const filteredLoans = searchTerms
+    ? searchList(paginatedLoansList, searchTerms, "firstname")
+    : paginatedLoansList;
+  
 
   // top up loan functionality
   // handle update isTopUpLoanSent
@@ -254,8 +217,8 @@ const LoanTopUpRequest = () => {
               <input
                 name="showCount"
                 type="number"
-                step={10}
-                min={10}
+                step={5}
+                min={5}
                 value={showCount}
                 onChange={(e) => setShowCount(e.target.value)}
               />
@@ -293,188 +256,124 @@ const LoanTopUpRequest = () => {
               </tr>
             </thead>
             <tbody>
-              {!loansList || status === "loading" ? (
+              {status === "loading" ? (
                 <tr>
                   <td colSpan="9">
                     <PageLoader />
                   </td>
                 </tr>
-              ) : loansList && loansList?.length === 0 ? (
+              ) : filteredLoans?.length === 0 ? (
                 <NoResult name="Loan" />
               ) : (
-                loansList &&
-                sortByCreatedAt(loansList)
-                  ?.slice(
-                    (currentPage - 1) * showCount,
-                    currentPage * showCount
-                  )
-                  ?.map((loan) => {
-                    return (
-                      <tr key={loan._id}>
-                        <td>
-                          {loan?.customer?.banking?.accountDetails?.CustomerID}
-                        </td>
-                        <td>
-                          <DisplayLoanProductName loan={loan} />
-                        </td>
-                        <td>
-                          {loan?.customer?.banking?.accountDetails
-                            ?.CustomerName ??
-                            `${loan?.customer?.firstname} ${loan?.customer?.lastname}`}
-                        </td>
-                        <td>N{loan?.loanamount}</td>
-                        <td>{loan?.numberofmonth} Months</td>
-                        <td>{getDateOnly(loan?.createdAt)}</td>
-                        <td>
-                          <div>
-                            {loan?.isTopUpLoanSent ? (
-                              <button
-                                className="btn btn-danger text-white"
-                                disabled
-                              >
-                                Sent
-                              </button>
-                            ) : (
-                              <div>
-                                {sendingRequest ? (
-                                  <PageLoader width="12px" />
-                                ) : (
-                                  <button
-                                    className="btn btn-success text-white"
-                                    onClick={() => handleSentRequest(loan?._id)}
-                                  >
-                                    Send
-                                  </button>
-                                )}
-                              </div>
-                            )}
-                          </div>
-                        </td>
-                        <td>
-                          {loan?.loanstatus === "with credit" ? (
-                            <div>
-                              {isTerminating && <PageLoader width="12px" />}
-                              {loan?.currentLoanTerminationStatus ===
-                              "pending" ? (
-                                <button
-                                  className="btn btn-info text-white"
-                                  onClick={() =>
-                                    handleStartTermination(loan?._id)
-                                  }
-                                >
-                                  Start
-                                </button>
-                              ) : loan?.currentLoanTerminationStatus ===
-                                "initiated" ? (
-                                <button
-                                  className="btn btn-warning text-white"
-                                  onClick={() =>
-                                    handleApproveTermination(loan?.customer._id)
-                                  }
-                                >
-                                  Initiated
-                                </button>
-                              ) : (
-                                <button
-                                  className="btn btn-danger text-white"
-                                  disabled
-                                >
-                                  Terminated
-                                </button>
-                              )}
-                            </div>
-                          ) : (
+                filteredLoans &&
+                sortByCreatedAt(filteredLoans)?.map((loan) => {
+                  return (
+                    <tr key={loan._id}>
+                      <td>
+                        {loan?.customer?.banking?.accountDetails?.CustomerID}
+                      </td>
+                      <td>
+                        <DisplayLoanProductName loan={loan} />
+                      </td>
+                      <td>
+                        {loan?.customer?.banking?.accountDetails
+                          ?.CustomerName ??
+                          `${loan?.customer?.firstname} ${loan?.customer?.lastname}`}
+                      </td>
+                      <td>N{loan?.loanamount}</td>
+                      <td>{loan?.numberofmonth} Months</td>
+                      <td>{getDateOnly(loan?.createdAt)}</td>
+                      <td>
+                        <div>
+                          {loan?.isTopUpLoanSent ? (
                             <button
                               className="btn btn-danger text-white"
                               disabled
                             >
-                              Not Booked
+                              Sent
                             </button>
+                          ) : (
+                            <div>
+                              {sendingRequest ? (
+                                <PageLoader width="12px" />
+                              ) : (
+                                <button
+                                  className="btn btn-success text-white"
+                                  onClick={() => handleSentRequest(loan?._id)}
+                                >
+                                  Send
+                                </button>
+                              )}
+                            </div>
                           )}
-                        </td>
-                      </tr>
-                    );
-                  })
+                        </div>
+                      </td>
+                      <td>
+                        {loan?.loanstatus === "with credit" ? (
+                          <div>
+                            {isTerminating && <PageLoader width="12px" />}
+                            {loan?.currentLoanTerminationStatus ===
+                            "pending" ? (
+                              <button
+                                className="btn btn-info text-white"
+                                onClick={() =>
+                                  handleStartTermination(loan?._id)
+                                }
+                              >
+                                Start
+                              </button>
+                            ) : loan?.currentLoanTerminationStatus ===
+                              "initiated" ? (
+                              <button
+                                className="btn btn-warning text-white"
+                                onClick={() =>
+                                  handleApproveTermination(loan?.customer._id)
+                                }
+                              >
+                                Initiated
+                              </button>
+                            ) : (
+                              <button
+                                className="btn btn-danger text-white"
+                                disabled
+                              >
+                                Terminated
+                              </button>
+                            )}
+                          </div>
+                        ) : (
+                          <button
+                            className="btn btn-danger text-white"
+                            disabled
+                          >
+                            Not Booked
+                          </button>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })
               )}
             </tbody>
-            {/* <tbody>
-            <tr>
-              <td>12312</td>
-              <td>Term Loan</td>
-              <td>John Doe</td>
-              <td>N100,000</td>
-              <td>10 Months</td>
-              <td>2024-08-12</td>
-              <td>
-                <div>
-                  <button className="btn btn-success text-white">Send</button>
-                </div>
-              </td>
-              <td>
-                <div>
-                  <button className="btn btn-info text-white">Start</button>
-                </div>
-              </td>
-            </tr>
-            <tr>
-              <td>12343</td>
-              <td>Rosca Loan</td>
-              <td>Jane Liba</td>
-              <td>N300,000</td>
-              <td>14 Months</td>
-              <td>2024-12-02</td>
-              <td>
-                <div>
-                  <button className="btn btn-warning text-white">Sent</button>
-                </div>
-              </td>
-              <td>
-                <div>
-                  <button className="btn btn-danger text-white">
-                    Terminated
-                  </button>
-                </div>
-              </td>
-            </tr>
-            <tr>
-              <td>12356</td>
-              <td>Term Loan</td>
-              <td>Marry Good</td>
-              <td>N90,000</td>
-              <td>6 Months</td>
-              <td>2024-12-04</td>
-              <td>
-                <div>
-                  <button className="btn btn-warning text-white">Sent</button>
-                </div>
-              </td>
-              <td>
-                <div>
-                  <button className="btn btn-warning text-white">
-                    Initiated
-                  </button>
-                </div>
-              </td>
-            </tr>
-          </tbody> */}
           </Table>
         </div>
         <ToastContainer />
 
+        {/* next and previous button */}
         <NextPreBtn
-          nextFunc={handleGoNext}
-          numberOfPages={Math.ceil((loansList?.length - 1) / showCount)}
-          count={currentPage}
-          prevFunc={handleGoPrev}
+          currentPage={currentPage}
+          totalPages={totalPages}
+          goToNextPage={goToNextPage}
+          goToPreviousPage={goToPreviousPage}
         />
       </div>
     </div>
   );
 };
 
-LoanTopUpRequest.propTypes = {
+loansList.propTypes = {
   searchTerms: PropTypes.string,
   showCount: PropTypes.number,
 };
 
-export default LoanTopUpRequest;
+export default loansList;
