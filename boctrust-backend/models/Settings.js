@@ -16,7 +16,9 @@ const settingsSchema = new mongoose.Schema({
     smtpPort: Number,
     smtpUsername: String,
     smtpPassword: String,
-    minimumLoanAmount: Number
+    minimumLoanAmount: Number,
+    // top update here
+    topUpEligibilityMonths: { type: Number, default: 6 },
 }, { timestamps: true });
 
 const Settings = mongoose.model('Settings', settingsSchema);

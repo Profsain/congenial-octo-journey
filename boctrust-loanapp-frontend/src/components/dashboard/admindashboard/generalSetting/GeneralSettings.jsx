@@ -19,6 +19,10 @@ const validationSchema = Yup.object().shape({
   phoneNumber2: Yup.string().required("Phone number is required"),
   email: Yup.string().required("Email is required"),
   copyrightText: Yup.string().required("Copyright is required"),
+  // top up update
+  topUpEligibilityMonths: Yup.number()
+    .min(1, "Must be at least 1 month")
+    .required("Top-Up Eligibility Months is required"),
 });
 
 const GeneralSettings = () => {
@@ -88,6 +92,7 @@ const GeneralSettings = () => {
     phoneNumber2: phoneNumber2 || "",
     email: email || "",
     copyrightText: copyrightText || "",
+    topUpEligibilityMonths: settingData.topUpEligibilityMonths || 6, // Default value
   };
 
   const handleSubmit = async (values) => {
@@ -211,6 +216,22 @@ const GeneralSettings = () => {
                   className="Input"
                 />
                 <ErrorMessage name="copyrightText" component="div" />
+              </div>
+            </div>
+
+            {/* top up loan update */}
+            <div className="FieldRow">
+              <div className="FieldGroup">
+                <label htmlFor="topUpEligibilityMonths">
+                  Top-Up Eligibility (Months)
+                </label>
+                <Field
+                  type="number"
+                  name="topUpEligibilityMonths"
+                  id="topUpEligibilityMonths"
+                  className="Input"
+                />
+                <ErrorMessage name="topUpEligibilityMonths" component="div" />
               </div>
             </div>
 

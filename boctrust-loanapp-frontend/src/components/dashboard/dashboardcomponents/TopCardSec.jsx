@@ -1,5 +1,5 @@
 import PropTypes from "prop-types";
-import { Row, Col } from "react-bootstrap";
+import { Row, Col, Spinner } from "react-bootstrap";
 import FigCard from "../shared/FigCard";
 import "../Dashboard.css";
 import { useEffect, useState } from "react";
@@ -16,6 +16,7 @@ import {
   nigerianCurrencyFormat,
 } from "../../../../utilities/formatToNiaraCurrency";
 import { format } from "date-fns";
+import LoanTopUpModal from "./LoanTopUpModal";
 
 const BaseURL = import.meta.env.VITE_BASE_URL;
 
@@ -65,7 +66,7 @@ const TopCardSec = ({ user }) => {
     }
 
     if (loansAccountBalance && typeof loansAccountBalance != "string") {
-     
+
       const currLoan = loansAccountBalance?.find(
         (loan) => loan.LoanAccountNo == user?.activeLoan?.Number
       );
@@ -82,93 +83,127 @@ const TopCardSec = ({ user }) => {
     }
   }, [userTransactions]);
 
+  // check topup qualification and show topup card
+  const [isTopupQaulify, setIsTopUpQaulify] = useState(
+    !user.topUpLoanEligibility.isEligible
+  );
+  const [showTopUpModal, setShowTopUpModal] = useState(false);
+
+  // handle open top up
+  const handleOpenTopUp = () => {
+    setShowTopUpModal(true);
+  };
+
+  const handleCloseTopUpModal = () => {
+    setShowTopUpModal(false);
+  };
+
   return (
-    <div className="TopCard">
-      <Row>
-        <Col xs={6} md={3}>
-          <FigCard classname="MobCard">
-            <img
-              width="28px"
-              height="28px"
-              src="/images/whitenaira.png"
-              alt="naira"
-            />
-            <h5 className="FigNum">
-              {currencyFormat.format(useBalance.balance)}
-            </h5>
-            <p>Balance</p>
-          </FigCard>
-        </Col>
+    <>
+      <div className="TopCard">
+        <Row>
+          <Col xs={6} md={3}>
+            <FigCard classname="MobCard">
+              <img
+                width="28px"
+                height="28px"
+                src="/images/whitenaira.png"
+                alt="naira"
+              />
+              <h5 className="FigNum">
+                {currencyFormat.format(useBalance.balance)}
+              </h5>
+              <p>Balance</p>
+            </FigCard>
+          </Col>
 
-        <Col xs={6} md={3}>
-          <FigCard classname="MobCard">
-            <img
-              width="28px"
-              height="28px"
-              src="/images/whitenaira.png"
-              alt="naira"
-            />
-            <h5 className="FigNum">{useBalance.totalPaid}</h5>
-            <p>Total Paid</p>
-          </FigCard>
-        </Col>
+          <Col xs={6} md={3}>
+            <FigCard classname="MobCard">
+              <img
+                width="28px"
+                height="28px"
+                src="/images/whitenaira.png"
+                alt="naira"
+              />
+              <h5 className="FigNum">{useBalance.totalPaid}</h5>
+              <p>Total Paid</p>
+            </FigCard>
+          </Col>
 
-        <Col xs={6} md={3}>
-          <FigCard classname="MobCard">
-            <img
-              width="28px"
-              height="28px"
-              src="/images/whitenaira.png"
-              alt="naira"
-            />
-            <h5 className="FigNum">{upcomingPayments}</h5>
-            <p>Upcoming Payments</p>
-          </FigCard>
-        </Col>
+          <Col xs={6} md={3}>
+            <FigCard classname="MobCard">
+              <img
+                width="28px"
+                height="28px"
+                src="/images/whitenaira.png"
+                alt="naira"
+              />
+              <h5 className="FigNum">{upcomingPayments}</h5>
+              <p>Upcoming Payments</p>
+            </FigCard>
+          </Col>
 
-        <Col xs={6} md={3}>
-          <FigCard classname="YellowCard MobCard">
-            {!recentTransaction ? (
-              <div id="CardText">
-                <p>No recent transaction data available.</p>
-              </div>
+          <Col xs={6} md={3}>
+            {isTopupQaulify ? (
+              <FigCard classname="YellowCard MobCard" func={handleOpenTopUp}>
+                <Spinner animation="grow" variant="light" size="lg" />
+
+                <p id="topUpCta">
+                  Increase Your Loan, <br /> Reduce Your Stress – Top Up Today
+                </p>
+              </FigCard>
             ) : (
-              <div id="CardText">
-                <b>{recentTransaction.RecordType}</b>
-                <div>
-                  <h5
-                    className={`recentTrscAmt ${
-                      recentTransaction.RecordType === "Credit"
-                        ? "credit"
-                        : "debit"
-                    }`}
-                  >
-                    <span>
-                      {recentTransaction.RecordType === "Credit" ? (
-                        <IoMdAdd />
-                      ) : (
-                        <IoMdRemove color="#dc2626" />
-                      )}
-                    </span>
+              <FigCard classname="YellowCard MobCard">
+                {!recentTransaction ? (
+                  <div id="CardText">
+                    <p>No recent transaction data available.</p>
+                  </div>
+                ) : (
+                  <div id="CardText">
+                    <b>{recentTransaction.RecordType}</b>
+                    <div>
+                      <h5
+                        className={`recentTrscAmt ${recentTransaction.RecordType === "Credit"
+                            ? "credit"
+                            : "debit"
+                          }`}
+                      >
+                        <span>
+                          {recentTransaction.RecordType === "Credit" ? (
+                            <IoMdAdd />
+                          ) : (
+                            <IoMdRemove color="#dc2626" />
+                          )}
+                        </span>
 
-                    {nigerianCurrencyFormat.format(
-                      recentTransaction.Amount / 100
-                    )}
-                  </h5>
-                  <p>
-                    {format(
-                      recentTransaction.CurrentDate,
-                      "dd/LL/yyyy, hh:mm aaa"
-                    )}
-                  </p>
-                </div>
-                <p>Recent Transaction</p>
-              </div>
+                        {nigerianCurrencyFormat.format(
+                          recentTransaction.Amount / 100
+                        )}
+                      </h5>
+                      <p>
+                        {format(
+                          recentTransaction.CurrentDate,
+                          "dd/LL/yyyy, hh:mm aaa"
+                        )}
+                      </p>
+                    </div>
+                    <p>Recent Transaction</p>
+                  </div>
+                )}
+              </FigCard>
             )}
-          </FigCard>
-        </Col>
-      </Row>
-    </div>
+          </Col>
+
+        </Row>
+
+        {/* loan top up modal */}
+      </div>
+      <LoanTopUpModal
+        showModal={showTopUpModal}
+        handleCloseModal={handleCloseTopUpModal}
+        customerID={user?._id}
+      />
+    </>
   );
 };
 
