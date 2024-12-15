@@ -1,3 +1,5 @@
+import { useState, useEffect } from "react";
+import { useSelector } from "react-redux";
 import PropTypes from "prop-types";
 import "./TopNavbar.css";
 import { useDispatch, useSelector } from "react-redux";
@@ -7,6 +9,20 @@ import { useState } from "react";
 import LoanTopUpModal from "../dashboardcomponents/LoanTopUpModal";
 
 const TopNavber = ({ title, user = "Femi Akinwade" }) => {
+  // current login user
+
+
+  // notification animation
+  const [hasNewNotification, setHasNewNotification] = useState(false);
+
+  // Simulate a new notification after 3 seconds
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setHasNewNotification(true);
+    }, 3000);
+
+    return () => clearTimeout(timer);
+  }, []);
   // current login user
   const { user: currentUser } = useSelector((state) => state.adminAuth);
   const dispatch = useDispatch();

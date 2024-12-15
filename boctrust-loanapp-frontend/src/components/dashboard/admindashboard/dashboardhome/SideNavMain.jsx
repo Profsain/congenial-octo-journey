@@ -214,6 +214,16 @@ const SideNavMain = ({ onMenuItemClick }) => {
               </li>
               <li>
                 <NavLink
+                  id="loantopup"
+                  onClick={onMenuItemClick}
+                  to="/dashboard/loans/topup"
+                  className={({ isActive }) => (isActive ? "link_active" : "")}
+                >
+                  Top-up Requests
+                </NavLink>
+              </li>
+              <li>
+                <NavLink
                   id="loanproducts"
                   onClick={onMenuItemClick}
                   to="/dashboard/loans/products"

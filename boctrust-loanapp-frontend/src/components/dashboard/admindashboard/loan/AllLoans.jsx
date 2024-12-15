@@ -36,6 +36,10 @@ const AllLoans = ({ count, searchTerms, setTotalPages, currentPage }) => {
     padding: {
       color: "#ecaa00",
     },
+    topUp: {
+      color: "#ecaa00",
+      fontSize: "0.6rem",
+    }
   };
 
   const [show, setShow] = useState(false);
@@ -56,7 +60,7 @@ const AllLoans = ({ count, searchTerms, setTotalPages, currentPage }) => {
     getData();
   }, [dispatch, show]);
 
-  // update loansList to show 10 allLoans on page load
+  // update loansList to show 5 allLoans on page load
   // or on count changes
   // custom pagination update
   const { paginatedData: paginatedLoansList, totalPages } = usePaginatedData(
@@ -85,13 +89,36 @@ const AllLoans = ({ count, searchTerms, setTotalPages, currentPage }) => {
     setShow(true);
   };
 
-  // update loansList on search
+  // update loansList on search and filter them for top-up loans
   const handleSearch = () => {
     if (!allLoans) {
       return;
     }
     const currSearch = searchList(allLoans, searchTerms, "firstname");
     setLoansList(currSearch);
+
+    // Include loans where isTopUpLoan and isTopUpLoanSent are both true
+    const topUpLoans = currSearch.filter(
+      (loan) => loan.isTopUpLoan === true && loan.isTopUpLoanSent === true
+    );
+
+    // filter loans where isTopUpLoan is false
+    const nonTopUpLoans = currSearch.filter(
+      (loan) => loan.isTopUpLoan === false
+    );
+
+    // Merge and remove duplicates by loan ID
+    const mergedLoans = [...nonTopUpLoans, ...topUpLoans].reduce(
+      (acc, loan) => {
+        if (!acc.some((item) => item._id === loan._id)) {
+          acc.push(loan);
+        }
+        return acc;
+      },
+      []
+    );
+
+    setLoansList(mergedLoans);
   };
 
   useEffect(() => {
@@ -139,9 +166,19 @@ const AllLoans = ({ count, searchTerms, setTotalPages, currentPage }) => {
                     </td>
                     <td>
                       {loan.deductions === "remita" ? (
-                        <p>Remita</p>
+                        <p>
+                          Remita{" "}
+                          <span style={styles.topUp}>
+                            {loan.isTopUpLoan && "Top-up"}
+                          </span>
+                        </p>
                       ) : (
-                        <p>Nibss</p>
+                        <p>
+                          Nibss{" "}
+                          <span style={styles.topUp}>
+                            {loan.isTopUpLoan && "Top-up"}
+                          </span>
+                        </p>
                       )}
                     </td>
                     <td>

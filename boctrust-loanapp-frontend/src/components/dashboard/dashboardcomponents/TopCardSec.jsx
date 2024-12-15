@@ -16,6 +16,8 @@ import {
   nigerianCurrencyFormat,
 } from "../../../../utilities/formatToNiaraCurrency";
 import { format } from "date-fns";
+
+import Spinner from "react-bootstrap/Spinner";
 import LoanTopUpModal from "./LoanTopUpModal";
 
 const BaseURL = import.meta.env.VITE_BASE_URL;
@@ -98,6 +100,8 @@ const TopCardSec = ({ user }) => {
     setShowTopUpModal(false);
   };
 
+  
+
   return (
     <>
       <div className="TopCard">
@@ -129,7 +133,31 @@ const TopCardSec = ({ user }) => {
               <p>Total Paid</p>
             </FigCard>
           </Col>
+          <Col xs={6} md={3}>
+            <FigCard classname="MobCard">
+              <img
+                width="28px"
+                height="28px"
+                src="/images/whitenaira.png"
+                alt="naira"
+              />
+              <h5 className="FigNum">{useBalance.totalPaid}</h5>
+              <p>Total Paid</p>
+            </FigCard>
+          </Col>
 
+          <Col xs={6} md={3}>
+            <FigCard classname="MobCard">
+              <img
+                width="28px"
+                height="28px"
+                src="/images/whitenaira.png"
+                alt="naira"
+              />
+              <h5 className="FigNum">{upcomingPayments}</h5>
+              <p>Upcoming Payments</p>
+            </FigCard>
+          </Col>
           <Col xs={6} md={3}>
             <FigCard classname="MobCard">
               <img

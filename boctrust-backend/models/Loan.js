@@ -35,6 +35,7 @@ const loanSchema = new mongoose.Schema(
         "booked",
         "completed",
         "declined",
+        "terminated",
       ],
     },
     bookingInitiated: {
@@ -99,6 +100,7 @@ const loanSchema = new mongoose.Schema(
     isTopUpLoanSent: { type: Boolean, default: false },
     currentLoanTerminationStatus: { type: String, enum: ["pending", "initiated", "completed"], default: "pending" },
   },
+  
   { timestamps: true }
 );
 
