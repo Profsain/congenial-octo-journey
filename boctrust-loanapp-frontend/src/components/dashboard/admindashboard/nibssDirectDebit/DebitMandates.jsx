@@ -5,7 +5,6 @@ import * as Yup from "yup";
 import DashboardHeadline from "../../shared/DashboardHeadline";
 import "../../dashboardcomponents/transferdashboard/Transfer.css";
 import BocButton from "../../shared/BocButton";
-import apiClient from "../../../../lib/axios";
 
 // Define validation schema using Yup
 const validationSchema = Yup.object().shape({
@@ -23,10 +22,17 @@ const initialValues = {
 };
 
 const DebitMandates = ({ func }) => {
+  const apiUrl = import.meta.env.VITE_BASE_URL;
   const [message, setMessage] = useState("");
   const handleSubmit = async (values, { resetForm }) => {
     // Handle form submission logic here
-    await apiClient.post(`/`, values);
+    await fetch(`${apiUrl}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(values),
+    });
 
     // reset form
     resetForm();
@@ -36,16 +42,16 @@ const DebitMandates = ({ func }) => {
     setTimeout(() => {
       setMessage("");
     }, 3000);
-  };
-
-  const durations = [
-    { value: "daily", label: "Daily" },
-    { value: "weekly", label: "Weekly" },
-    { value: "monthly", label: "Monthly" },
-    { value: "quarterly", label: "Quarterly" },
-    { value: "biannually", label: "Biannually" },
-    { value: "annually", label: "Annually" },
-  ];
+    };
+    
+    const durations = [
+        { value: "daily", label: "Daily" },
+        { value: "weekly", label: "Weekly" },
+        { value: "monthly", label: "Monthly" },
+        { value: "quarterly", label: "Quarterly" },
+        { value: "biannually", label: "Biannually" },
+        { value: "annually", label: "Annually" },
+    ];
 
   return (
     <div className="TransContainer">

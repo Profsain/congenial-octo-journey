@@ -13,6 +13,10 @@ import useSearchByDate from "../../../../../utilities/useSearchByDate.js";
 import useSearchByDateRange from "../../../../../utilities/useSearchByDateRange.js";
 import getNextMonthDate from "../../../../../utilities/getNextMonthDate";
 
+// custom hook
+import usePagination from "../../../../customHooks/usePagination";
+import usePaginatedData from "../../../../customHooks/usePaginationData";
+
 const CollectionNotifications = () => {
   const styles = {
     btnBox: {
@@ -52,15 +56,37 @@ const CollectionNotifications = () => {
 
   // filter customer by remitaStatus
   const [remitaCustomers, setRemitaCustomers] = useState([]);
+  const [totalPages, setTotalPages] = useState(1);
+  const [showCount, setShowCount] = useState(5);
   // check if customer is not empty and filter by remitaStatus
+
+  // custom hook destructuring
+  const { currentPage, goToNextPage, goToPreviousPage, setPage } =
+    usePagination(1, totalPages);
+  const { paginatedData: paginatedAllLoans } = usePaginatedData(
+    customers,
+    showCount,
+    currentPage
+  );
+
+  // update loansList to show 5 pendingLoans on page load
+  // or on count changes
   useEffect(() => {
-    if (customers?.length > 0) {
-      const result = customers.filter(
+    setRemitaCustomers(paginatedAllLoans); // Update local state with paginated data
+  }, [paginatedAllLoans]);
+
+  useEffect(() => {
+    setTotalPages(totalPages); // Update total pages when it changes
+  }, [totalPages]);
+
+  useEffect(() => {
+    if (paginatedAllLoans?.length > 0) {
+      const result = paginatedAllLoans.filter(
         (customer) => customer?.remita.loanStatus === "approved"
       );
       setRemitaCustomers(result);
     }
-  }, [customers]);
+  }, [paginatedAllLoans]);
 
   // handle search by
   const { searchTerm, setSearchTerm, filteredData } = useSearch(
@@ -140,7 +166,7 @@ const CollectionNotifications = () => {
             </thead>
             <tbody>
               <tr>
-                <td colSpan="10">
+                <td colSpan={3}>
                   {remitaCustomers?.length === 0 && (
                     <NoResult name="Customer" />
                   )}
@@ -187,7 +213,12 @@ const CollectionNotifications = () => {
             </tbody>
           </Table>
         </div>
-        <NextPreBtn />
+        <NextPreBtn
+          currentPage={currentPage}
+          totalPages={totalPages}
+          goToNextPage={goToNextPage}
+          goToPreviousPage={goToPreviousPage}
+        />
       </div>
     </div>
   );

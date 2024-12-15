@@ -20,7 +20,10 @@ import useSearchByDateRange from "../../../../../utilities/useSearchByDateRange.
 import sortByCreatedAt from "../../shared/sortedByDate.js";
 import getDateOnly from "../../../../../utilities/getDate";
 import { fetchLoans } from "../../../../redux/reducers/loanReducer.js";
-import apiClient from "../../../../lib/axios.js";
+
+// custom hook
+import usePagination from "../../../../customHooks/usePagination";
+import usePaginatedData from "../../../../customHooks/usePaginationData";
 
 const CheckSalaryHistory = () => {
   const styles = {
@@ -47,6 +50,13 @@ const CheckSalaryHistory = () => {
   };
 
   const dispatch = useDispatch();
+  useEffect(() => {
+    const getData = () => {
+      dispatch(fetchLoans());
+    };
+    getData();
+  }, [dispatch]);
+
   const { allLoans, status } = useSelector((state) => state.loanReducer);
 
   const [customerObj, setCustomerObj] = useState({});
@@ -54,12 +64,37 @@ const CheckSalaryHistory = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [loanList, setLoanList] = useState([]);
 
+  // check if customer is kyc approved and deductions is remita
+  // Update `loanList` whenever `allLoans` updates
+  const [remitaLoans, setRemitaLoans] = useState([]);
+
+  // handle search
+  const [showCount, setShowCount] = useState(5);
+  const [searchTerms, setSearchTerms] = useState("");
+  const [totalPages, setTotalPages] = useState(1);
+
+  // custom hook destructuring
+  const { currentPage, goToNextPage, goToPreviousPage, setPage } =
+    usePagination(1, totalPages);
+  const { paginatedData: paginatedAllLoans } = usePaginatedData(
+    allLoans,
+    showCount,
+    currentPage
+  );
+
+  // update loansList to show 5 pendingLoans on page load
+  // or on count changes
   useEffect(() => {
-    const getData = async () => {
-      await dispatch(fetchLoans());
-    };
-    getData();
-  }, [dispatch]);
+    setLoanList(paginatedAllLoans); // Update local state with paginated data
+  }, [paginatedAllLoans]);
+
+  useEffect(() => {
+    setTotalPages(totalPages); // Update total pages when it changes
+  }, [totalPages, setTotalPages]);
+
+  const remLoans = allLoans.filter(
+    (loan) => loan.deductions === "remita" && loan.customer.kyc.isKycApproved
+  );
 
   const scrollToDetails = () => {
     if (openDetails) {
@@ -74,20 +109,31 @@ const CheckSalaryHistory = () => {
 
   const handleCheck = async (id) => {
     setIsLoading(true);
+    const apiUrl = import.meta.env.VITE_BASE_URL;
+    const loan = remLoans.find((loan) => loan.customer._id === id);
+
+    const customer = loan ? loan.customer : {};
+
     try {
-      const loan = allLoans.find((loan) => loan._id === id);
-      const customer = loan ? loan.customer : {};
-
-      const { data } = await apiClient.post(`/remita/get-salary-history`, {
-        authorisationCode: customer.bvnnumber,
-        firstName: customer.firstname,
-        lastName: customer.lastname,
-        accountNumber: customer.salaryaccountnumber,
-        bankCode: customer.bankcode,
-        bvn: customer.bvnnumber,
-        authorisationChannel: "WEB",
+      const response = await fetch(`${apiUrl}/api/remita/get-salary-history`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          authorisationCode: customer.bvnnumber,
+          firstName: customer.firstname,
+          lastName: customer.lastname,
+          accountNumber: customer.salaryaccountnumber,
+          bankCode: customer.bankcode,
+          bvn: customer.bvnnumber,
+          authorisationChannel: "WEB",
+        }),
       });
-
+      if (!response.ok) {
+        throw new Error("Failed to fetch salary history");
+      }
+      const data = await response.json();
       setCustomerObj(data);
       await updateSalaryHistory(customer._id, data);
       setIsLoading(false);
@@ -101,19 +147,24 @@ const CheckSalaryHistory = () => {
 
   const handleView = (id) => {
     scrollToDetails();
-    const loan = allLoans.find((loan) => loan._id === id);
+    const loan = allLoans.find((loan) => loan.customer._id === id);
 
     const customer = loan ? loan.customer : {};
     setCustomerObj(customer);
     setOpenDetails(true);
   };
 
+  const [updatedLoan, setUpdatedLoan] = useState({});
+
   const handleAction = async (e, id) => {
     e.preventDefault();
     const actionBtn = e.target.innerText;
-    const loan = allLoans.find((loan) => loan._id === id);
+
+    const loan = remLoans.find((loan) => loan.customer._id === id);
     const customer = loan ? loan.customer : {};
-    const data = customer.remita.remitaDetails;
+
+    const data = customer.remita;
+    // console.log("Data", data);
     try {
       if (actionBtn === "Process") {
         await updateSalaryHistory(id, data, "processed");
@@ -126,20 +177,8 @@ const CheckSalaryHistory = () => {
     }
   };
 
-  // check if customer is kyc approved and deductions is remita
-  useEffect(() => {
-    if (allLoans?.length > 0) {
-      const result = allLoans.filter(
-        (loan) =>
-          loan?.customer?.kyc.isKycApproved && loan.deductions === "remita"
-      );
-
-      setLoanList(result);
-    }
-  }, [allLoans]);
-
   const { searchTerm, setSearchTerm, filteredData } = useSearch(
-    loanList,
+    allLoans,
     "firstname"
   );
 
@@ -163,7 +202,7 @@ const CheckSalaryHistory = () => {
     setLoanList(loanList);
   };
 
-  // handle search by date range
+  // // handle search by date range
   const { searchData } = useSearchByDateRange(loanList, dateRange, "createdAt");
 
   useEffect(() => {
@@ -204,10 +243,10 @@ const CheckSalaryHistory = () => {
               </tr>
             </thead>
             <tbody>
-              {loanList?.length === 0 && (
+              {remLoans?.length === 0 && (
                 <NoResult name="Remita Loan Request" />
               )}
-              {sortByCreatedAt(loanList)?.map((loan) => (
+              {sortByCreatedAt(remLoans)?.map((loan) => (
                 <tr key={loan.customer._id}>
                   <td>{loan.customer.firstname}</td>
                   <td>{loan.customer.lastname}</td>
@@ -258,7 +297,7 @@ const CheckSalaryHistory = () => {
                         </BocButton>
                       </div>
                     )}
-                    {loan.customer.remita?.remitaStatus === "pending" && (
+                    {loan.customer?.remita?.remitaStatus === "pending" && (
                       <div>
                         <BocButton
                           bradius="12px"
@@ -288,7 +327,12 @@ const CheckSalaryHistory = () => {
             </tbody>
           </Table>
         </div>
-        <NextPreBtn />
+        <NextPreBtn
+          currentPage={currentPage}
+          totalPages={totalPages}
+          goToNextPage={goToNextPage}
+          goToPreviousPage={goToPreviousPage}
+        />
       </div>
 
       {/* details section */}

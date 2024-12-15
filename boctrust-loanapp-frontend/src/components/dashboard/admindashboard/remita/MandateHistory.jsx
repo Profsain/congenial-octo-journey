@@ -14,7 +14,10 @@ import useSearch from "../../../../../utilities/useSearchName.js";
 import useSearchByDate from "../../../../../utilities/useSearchByDate.js";
 import useSearchByDateRange from "../../../../../utilities/useSearchByDateRange.js";
 import getNextMonthDate from "../../../../../utilities/getNextMonthDate";
-import apiClient from "../../../../lib/axios.js";
+
+// custom hook
+import usePagination from "../../../../customHooks/usePagination";
+import usePaginatedData from "../../../../customHooks/usePaginationData";
 
 const MandateHistory = () => {
   const styles = {
@@ -53,20 +56,55 @@ const MandateHistory = () => {
     }
   }, [customers]);
 
+  // handle search
+  const [showCount, setShowCount] = useState(5);
+  const [searchTerms, setSearchTerms] = useState("");
+  const [totalPages, setTotalPages] = useState(1);
+
+  // custom hook destructuring
+  const { currentPage, goToNextPage, goToPreviousPage, setPage } =
+    usePagination(1, totalPages);
+  const { paginatedData: paginatedAllLoans } = usePaginatedData(
+    remitaCustomers,
+    showCount,
+    currentPage
+  );
+
+  // update loansList to show 5 pendingLoans on page load
+  // or on count changes
+  useEffect(() => {
+    setRemitaCustomers(paginatedAllLoans); // Update local state with paginated data
+  }, [paginatedAllLoans]);
+
+  useEffect(() => {
+    setTotalPages(totalPages); // Update total pages when it changes
+  }, [totalPages, setTotalPages]);
+
   // handle mandate view
   const [show, setShow] = useState(false);
   const [viewLoader, setViewLoader] = useState(false);
   const [mandateObj, setMandateObj] = useState({});
 
   const handleMandateView = async (id) => {
+    const apiUrl = import.meta.env.VITE_BASE_URL;
+
     setViewLoader(true);
     // find customer by id
     const customer = customers.find((customer) => customer._id === id);
 
     // call mandate history api
-    const { data } = await apiClient.post(`/remita/mandate-history`, {
-      customer: customer,
+    const response = await fetch(`${apiUrl}/api/remita/mandate-history`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+
+      // send customer details to remita
+      body: JSON.stringify({
+        customer: customer,
+      }),
     });
+    const data = await response.json();
 
     // update model object
     if (data.data.status === "success") {
@@ -211,7 +249,12 @@ const MandateHistory = () => {
             </tbody>
           </Table>
         </div>
-        <NextPreBtn />
+        <NextPreBtn
+          currentPage={currentPage}
+          totalPages={totalPages}
+          goToNextPage={goToNextPage}
+          goToPreviousPage={goToPreviousPage}
+        />
       </div>
 
       {/* mandate view model */}

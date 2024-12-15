@@ -16,6 +16,10 @@ import getNextMonthDate from "../../../../../utilities/getNextMonthDate";
 import "./debit.css";
 import BocButton from "../../shared/BocButton.jsx";
 
+// custom hook
+import usePagination from "../../../../customHooks/usePagination";
+import usePaginatedData from "../../../../customHooks/usePaginationData";
+
 const StopRestartCollections = () => {
   const styles = {
     btnBox: {
@@ -62,21 +66,34 @@ const StopRestartCollections = () => {
     dispatch(fetchAllCustomer());
   }, [dispatch]);
 
-  // filter customer by remitaStatus
-  const [remitaCustomers, setRemitaCustomers] = useState([]);
-  // check if customer is not empty and filter by remitaStatus
+  const [allLoansCustomers, setAllLoansCustomer] = useState([]);
+  // handle search
+  const [showCount, setShowCount] = useState(5);
+  const [searchTerms, setSearchTerms] = useState("");
+  const [totalPages, setTotalPages] = useState(1);
+
+  // custom hook destructuring
+  const { currentPage, goToNextPage, goToPreviousPage, setPage } =
+    usePagination(1, totalPages);
+  const { paginatedData: paginatedDirectDebitCustomer } = usePaginatedData(
+    allLoansCustomers,
+    showCount,
+    currentPage
+  );
+
+  // update loansList to show 5 pendingLoans on page load
+  // or on count changes
   useEffect(() => {
-    if (customers?.length > 0) {
-      const result = customers.filter(
-        (customer) => customer?.remita.loanStatus === "approved"
-      );
-      setRemitaCustomers(result);
-    }
-  }, [customers]);
+    setAllLoansCustomer(paginatedDirectDebitCustomer); // Update local state with paginated data
+  }, [paginatedDirectDebitCustomer]);
+
+  useEffect(() => {
+    setTotalPages(totalPages); // Update total pages when it changes
+  }, [totalPages, setTotalPages]);
 
   // handle search by
   const { searchTerm, setSearchTerm, filteredData } = useSearch(
-    remitaCustomers,
+    allLoansCustomers,
     "firstname"
   );
 
@@ -86,13 +103,13 @@ const StopRestartCollections = () => {
   });
 
   useEffect(() => {
-    setRemitaCustomers(filteredData);
+    setAllLoansCustomer(filteredData);
   }, [searchTerm, filteredData]);
 
   // handle search by date
-  const { filteredDateData } = useSearchByDate(remitaCustomers, "createdAt");
+  const { filteredDateData } = useSearchByDate(allLoansCustomers, "createdAt");
   const searchByDate = () => {
-    setRemitaCustomers(filteredDateData);
+    setAllLoansCustomer(filteredDateData);
   };
 
   // handle list reload
@@ -102,18 +119,18 @@ const StopRestartCollections = () => {
       toDate: "",
     });
     dispatch(fetchAllCustomer());
-    setRemitaCustomers(remitaCustomers);
+    setAllLoansCustomer(allLoansCustomers);
   };
 
   // handle search by date range
   const { searchData } = useSearchByDateRange(
-    remitaCustomers,
+    allLoansCustomers,
     dateRange,
     "createdAt"
   );
 
   useEffect(() => {
-    setRemitaCustomers(searchData);
+    setAllLoansCustomer(searchData);
   }, [searchData]);
 
   return (
@@ -153,7 +170,7 @@ const StopRestartCollections = () => {
             <tbody>
               {/* <tr>
                 <td colSpan="10">
-                  {remitaCustomers?.length === 0 && (
+                  {allLoansCustomers?.length === 0 && (
                     <NoResult name="Customer" />
                   )}
                 </td>
@@ -209,7 +226,12 @@ const StopRestartCollections = () => {
             </tbody>
           </Table>
         </div>
-        <NextPreBtn />
+        <NextPreBtn 
+          currentPage={currentPage}
+          totalPages={totalPages}
+          goToNextPage={goToNextPage}
+          goToPreviousPage={goToPreviousPage}
+        />
       </div>
     </div>
   );

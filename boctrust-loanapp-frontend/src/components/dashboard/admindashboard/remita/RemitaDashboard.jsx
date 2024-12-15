@@ -10,11 +10,11 @@ import LoanDetailModel from "./LoanDetailModel";
 import ViewBySection from "./ViewBySection.jsx";
 import NoResult from "../../../shared/NoResult.jsx";
 
-// import useSearch from "../../../../../utilities/useSearchName.js";
-// import useSearchByDate from "../../../../../utilities/useSearchByDate.js";
-// import useSearchByDateRange from "../../../../../utilities/useSearchByDateRange.js";
-
 import getDateOnly from "../../../../../utilities/getDate";
+
+// custom hook
+import usePagination from "../../../../customHooks/usePagination";
+import usePaginatedData from "../../../../customHooks/usePaginationData";
 
 const RemitaDashboard = () => {
   const styles = {
@@ -67,24 +67,48 @@ const RemitaDashboard = () => {
   const [customerList, setCustomerList] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
   const [filteredDateData, setFilteredDateData] = useState([]);
-  const [status, setStatus] = useState("loading");
 
   // Redux selectors
   const customers = useSelector(
     (state) => state.customerReducer.customers.customer
   );
+  const status = useSelector((state) => state.customerReducer.status);
   const currentUser = useSelector((state) => state.adminAuth.user);
   const userType = currentUser.userType;
 
   // Fetch all customers on component mount and when openModel changes
   useEffect(() => {
-    dispatch(fetchAllCustomer()).then(() => setStatus("idle"));
+    dispatch(fetchAllCustomer());
   }, [dispatch, openModel]);
 
   // Search by date function
   const searchByDate = () => {
     setCustomerList(filteredDateData);
   };
+
+  // handle search
+  const [showCount, setShowCount] = useState(5);
+  const [searchTerms, setSearchTerms] = useState("");
+  const [totalPages, setTotalPages] = useState(1);
+
+  // custom hook destructuring
+  const { currentPage, goToNextPage, goToPreviousPage, setPage } =
+    usePagination(1, totalPages);
+  const { paginatedData: paginatedAllLoans } = usePaginatedData(
+    customers,
+    showCount,
+    currentPage
+  );
+
+  // update loansList to show 5 pendingLoans on page load
+  // or on count changes
+  useEffect(() => {
+    setCustomerList(paginatedAllLoans); // Update local state with paginated data
+  }, [paginatedAllLoans]);
+
+  useEffect(() => {
+    setTotalPages(totalPages); // Update total pages when it changes
+  }, [totalPages, setTotalPages]);
 
   // Filter customers by remitaStatus
   const remitaCustomers = customers?.filter(
@@ -128,7 +152,7 @@ const RemitaDashboard = () => {
   // Handle list reload
   const handleReload = () => {
     setDateRange({ fromDate: "", toDate: "" });
-    setStatus("loading");
+    // setStatus("loading");
     dispatch(fetchAllCustomer());
   };
 
@@ -223,7 +247,12 @@ const RemitaDashboard = () => {
               </tbody>
             </Table>
           </div>
-          <NextPreBtn />
+          <NextPreBtn
+            currentPage={currentPage}
+            totalPages={totalPages}
+            goToNextPage={goToNextPage}
+            goToPreviousPage={goToPreviousPage}
+          />
         </div>
 
         {/* loan details model */}

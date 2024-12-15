@@ -11,7 +11,6 @@ import sendSMS from "../../../../../utilities/sendSms.js";
 import sendEmail from "../../../../../utilities/sendEmail.js";
 import EmailTemplate from "../../../shared/EmailTemplate.jsx";
 import ReactDOMServer from "react-dom/server";
-import apiClient from "../../../../lib/axios.js";
 
 const LoanDetailModel = (props) => {
   const customer = props.customer;
@@ -24,11 +23,12 @@ const LoanDetailModel = (props) => {
     props.onHide();
   };
 
+
   // send email notification
   const handleSendEmail = () => {
     const emailTemplateHtml = ReactDOMServer.renderToString(
       <EmailTemplate
-        firstName={customer.firstname}
+        firstName={customer.firstname }
         content=" Your loan application has been approved."
       />
     );
@@ -49,12 +49,22 @@ const LoanDetailModel = (props) => {
     setIsLoading(true);
 
     // get customer history from remita
-    const { data: disbursement } = await apiClient.post(
-      `/remita/loan-disbursement-notification`,
+    const response = await fetch(
+      `${apiUrl}/api/remita/loan-disbursement-notification`,
       {
-        customer: customer,
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+
+        // send customer details to remita
+        body: JSON.stringify({
+          customer: customer,
+        }),
       }
     );
+
+    const disbursement = await response.json();
 
     if (disbursement.data.status === "success") {
       // update customer loan approval status
@@ -90,6 +100,7 @@ const LoanDetailModel = (props) => {
       backdrop="static"
       keyboard={false}
     >
+      
       <Modal.Header>
         <Modal.Title id="contained-modal-title-vcenter">
           {customer.firstname} {customer.lastname} Loan Details
