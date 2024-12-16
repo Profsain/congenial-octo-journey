@@ -41,14 +41,12 @@ const loansList = () => {
     },
   };
 
-  // current login user
-  const { user: currentUser } = useSelector((state) => state.adminAuth);
 
   const apiUrl = import.meta.env.VITE_BASE_URL;
   // handle search
   const [showCount, setShowCount] = useState(5);
   const [searchTerms, setSearchTerms] = useState("");
-  const [totalPages, setTotalPages] = useState(1);
+  const [totalPage, setTotalPage] = useState(1);
 
   // search Loans list
   const [loansList, setLoansList] = useState(null);
@@ -67,7 +65,7 @@ const loansList = () => {
       if (response.ok) {
         const data = await response.json();
         setLoansList(data); // set loans list
-        console.log("Top-up loan request successful:", data);
+       
         setStatus("success");
       } else {
         const error = await response.json();
@@ -85,8 +83,8 @@ const loansList = () => {
 
   // custom hook destructuring
   const { currentPage, goToNextPage, goToPreviousPage, setPage } =
-    usePagination(1, totalPages);
-  const { paginatedData: paginatedLoansList } = usePaginatedData(
+    usePagination(1, totalPage);
+  const { paginatedData: paginatedLoansList, totalPages } = usePaginatedData(
     loansList,
     showCount,
     currentPage
@@ -163,9 +161,7 @@ const loansList = () => {
 
   // update loansList to show 10 pendingLoans on page load
   // or on count changes
-  useEffect(() => {
-    if (loansList) setLoansList(paginatedLoansList);
-  }, [paginatedLoansList]);
+
 
   // update loansList on search
   // Filter loans dynamically

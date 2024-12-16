@@ -5,8 +5,11 @@ import PropTypes from "prop-types";
 import {  fetchSelectedProduct } from "../../../redux/reducers/productReducer";
 
 const DisplayLoanProductName = ({ loan }) => {
+
   const dispatch = useDispatch();
+
   const loanProducts = useSelector((state) => state.productReducer.products);
+ 
   useEffect(() => {
     const getData = async () => {
       try {
@@ -17,6 +20,9 @@ const DisplayLoanProductName = ({ loan }) => {
     };
     getData();
   }, []);
+
+
+
   return (
     <>
       {loanProducts ? (

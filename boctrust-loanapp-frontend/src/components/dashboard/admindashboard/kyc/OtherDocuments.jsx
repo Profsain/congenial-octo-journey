@@ -76,21 +76,24 @@ const FileItem = ({ fileName, file }) => {
 
         <h5>
           {fileName}
-          {!file && (
+          {(!file || file?.includes("undefined")) && (
             <span className={styles.not__avialable}>Not Avialable</span>
           )}
         </h5>
       </div>
       <div>
         <button
-          disabled={!file}
+          disabled={!file || file?.includes("undefined")}
           onClick={downloadFile}
           className="btn btn-dark"
         >
           <BsDownload />
           Download
         </button>
-        <button disabled={!file} className="btn btn-outline-dark">
+        <button
+          disabled={!file || file?.includes("undefined")}
+          className="btn btn-outline-dark"
+        >
           <a href={file} target="_blank">
             <HiOutlineEye />
             View

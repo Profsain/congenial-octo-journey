@@ -189,7 +189,7 @@ const CRCBasicReportPDF = ({ report, formData, title }) => {
               <div style={styles.tbox}>
                 <Text style={styles.p}>Subscriber User Name:</Text>
                 <Text style={styles.p}>
-                  {report.BODY.SEARCHRESULTLIST[0].NAME || ""}
+                  {report?.BODY?.SEARCHRESULTLIST && report?.BODY?.SEARCHRESULTLIST[0].NAME || ""}
                 </Text>
               </div>
               <div style={styles.tbox}>

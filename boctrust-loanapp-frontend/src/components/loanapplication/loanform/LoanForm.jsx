@@ -352,8 +352,8 @@ const LoanForm = React.memo(function LoanFormComponent() {
       if (ref.current.values) {
         let formValues;
         ref.current?.values;
-        
-        if (isLastStep!==null) {
+
+        if (isLastStep !== null) {
           formValues = onboardData;
           formValues.email = ref.current?.values?.email;
           formValues.username = ref.current?.values?.username;
@@ -494,7 +494,6 @@ const LoanForm = React.memo(function LoanFormComponent() {
 
         const responsePayload = await res.json();
 
-
         if (!res.ok) {
           throw new Error(responsePayload.error);
         }
@@ -516,7 +515,7 @@ const LoanForm = React.memo(function LoanFormComponent() {
     const formContainer = document.querySelector(".FormContainer");
     formContainer.style.padding = "12px";
     localStorage.setItem("onboardData", JSON.stringify(ref?.current?.values));
-    localStorage.setItem("loanStep", JSON.stringify({step:"last"}));
+    localStorage.setItem("loanStep", JSON.stringify({ step: "last" }));
     setShowForm(false);
   };
 
@@ -684,7 +683,6 @@ const LoanForm = React.memo(function LoanFormComponent() {
   };
 
   const [isMarketer, setIsMarketer] = useState(null); // Track Yes/No selection
-
 
   return (
     <div className="container-fluid FormContainer">
@@ -1200,6 +1198,7 @@ const LoanForm = React.memo(function LoanFormComponent() {
                                   ) : null}
 
                                   {/* Bank Statement and Employement Letter fro government Employeee*/}
+
                                   <div className="d-flex gap-3">
                                     {showBankStatement ? (
                                       <div className="FileUploadBox ">
@@ -1212,7 +1211,7 @@ const LoanForm = React.memo(function LoanFormComponent() {
                                           type="file"
                                           name="uploadbankstatement"
                                           onBlur={handleBlur}
-                                          accept="image/png, .svg, .jpg, .jpeg, .pdf"
+                                          accept="image/png, .svg, .jpg, .jpeg"
                                           className="UploadFile"
                                           onChange={(e) =>
                                             convertFile(e, setBankStatements)
@@ -1238,7 +1237,7 @@ const LoanForm = React.memo(function LoanFormComponent() {
                                         <input
                                           type="file"
                                           name="employmentletter"
-                                          accept="image/png, .svg, .jpg, .jpeg, .pdf"
+                                          accept="image/png, .svg, .jpg, .jpeg"
                                           className="UploadFile"
                                           onChange={(e) =>
                                             convertFile(e, setEmploymentLetter)

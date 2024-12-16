@@ -12,12 +12,15 @@ import sortByCreatedAt from "../../shared/sortedByDate";
 import { fetchAllLoanOfficers } from "../../../../redux/reducers/loanOfficerReducer";
 import usePaginatedData from "../../../../customHooks/usePaginationData";
 
-const AccountList = ({ count, setTotalPages, currentPage, searchTerms }) => {
+const AccountList = ({ count, setTotalPage, currentPage, searchTerms }) => {
   const styles = {
     table: {},
     head: { color: "#fff", fontSize: "1.2rem" },
     completed: { color: "#5cc51c" },
   };
+
+  const [filteredCustomers, setFilteredCustomers] = useState(null);
+  const [customerList, setCustomerList] = useState(null);
 
   // Redux dispatch & selectors
   const dispatch = useDispatch();
@@ -29,6 +32,10 @@ const AccountList = ({ count, setTotalPages, currentPage, searchTerms }) => {
     (state) => state.loanOfficerReducer.allLoanOfficers
   );
 
+  // Custom pagination hook
+  const { paginatedData: paginatedCustomersList, totalPages } =
+    usePaginatedData(filteredCustomers, count, currentPage);
+
   // Fetch data on mount
   useEffect(() => {
     dispatch(fetchAllCustomer());
@@ -36,26 +43,29 @@ const AccountList = ({ count, setTotalPages, currentPage, searchTerms }) => {
   }, [dispatch]);
 
   // Filter customers by account creation
-  const filteredCustomers = customers?.filter(
-    (customer) => customer?.banking?.isAccountCreated === true
-  );
+  useEffect(() => {
+    setFilteredCustomers(
+      customers?.filter(
+        (customer) => customer?.banking?.isAccountCreated === true
+      )
+    );
+  }, [customers]);
 
-  // Custom pagination hook
-  const { paginatedData: paginatedCustomersList, totalPages } = usePaginatedData(
-    filteredCustomers,
-    count,
-    currentPage
-  );
+  useEffect(() => {
+    // Search customer list
+    setCustomerList(
+      searchTerms
+        ? searchList(filteredCustomers, searchTerms, "firstname")
+        : paginatedCustomersList
+    );
+  }, [searchTerms, filteredCustomers, paginatedCustomersList]);
 
   // Update total pages in parent component
   useEffect(() => {
-    setTotalPages(totalPages);
-  }, [totalPages, setTotalPages]);
+    setTotalPage(totalPages);
+  }, [totalPages]);
 
-  // Search customer list
-  const customerList = searchTerms
-    ? searchList(filteredCustomers, searchTerms, "firstname")
-    : paginatedCustomersList;
+  console.log(allLoanOfficers, "allLoanOfficers");
 
   const handleGetAgent = (agentcode) => {
     const agent = allLoanOfficers?.find(
@@ -85,25 +95,25 @@ const AccountList = ({ count, setTotalPages, currentPage, searchTerms }) => {
           </thead>
           <tbody>
             {customerList?.length === 0 && <NoResult name="customer" />}
-            {customerList
-              ? sortByCreatedAt(customerList)?.map((customer) => (
-                  <tr key={customer._id}>
-                    <td>
-                      {customer.banking?.accountDetails?.AccountNumber || "N/A"}
-                    </td>
-                    <td>
-                      {customer.banking?.accountDetails?.CustomerName || "N/A"}
-                    </td>
-                    <td>
-                      {customer.banking?.accountDetails?.CustomerID || "N/A"}
-                    </td>
-                    <td>{handleGetAgent(customer?.agentcode)}</td>
-                    <td style={styles.completed}>Active</td>
-                  </tr>
-                ))
-              : (
-                <PageLoader width="100px" />
-              )}
+            {customerList ? (
+              sortByCreatedAt(customerList)?.map((customer) => (
+                <tr key={customer._id}>
+                  <td>
+                    {customer.banking?.accountDetails?.AccountNumber || "N/A"}
+                  </td>
+                  <td>
+                    {customer.banking?.accountDetails?.CustomerName || "N/A"}
+                  </td>
+                  <td>
+                    {customer.banking?.accountDetails?.CustomerID || "N/A"}
+                  </td>
+                  <td>{handleGetAgent(customer?.agentcode)}</td>
+                  <td style={styles.completed}>Active</td>
+                </tr>
+              ))
+            ) : (
+              <PageLoader width="100px" />
+            )}
           </tbody>
         </Table>
       </div>

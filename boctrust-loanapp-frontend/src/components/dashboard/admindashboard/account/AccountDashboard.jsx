@@ -11,10 +11,10 @@ const AccountDashboard = () => {
   // handle search
   const [showCount, setShowCount] = useState(5);
   const [searchTerms, setSearchTerms] = useState("");
-  const [totalPages, setTotalPages] = useState(1);
+  const [totalPage, setTotalPage] = useState(1);
 
   const { currentPage, goToNextPage, goToPreviousPage, setPage } =
-    usePagination(1, totalPages);
+    usePagination(1, totalPage);
 
   return (
     <div className="MainBox">
@@ -49,13 +49,13 @@ const AccountDashboard = () => {
         <AccountList 
           count={showCount} 
           searchTerms={searchTerms} 
-          setTotalPages={setTotalPages}
+          setTotalPage={setTotalPage}
           currentPage={currentPage}
         />
         {/* next and previous button  */}
         <NextPreBtn 
           currentPage={currentPage}
-          totalPages={totalPages}
+          totalPage={totalPage}
           goToNextPage={goToNextPage}
           goToPreviousPage={goToPreviousPage}
         />

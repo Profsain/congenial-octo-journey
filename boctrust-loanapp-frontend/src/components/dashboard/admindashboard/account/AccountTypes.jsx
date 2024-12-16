@@ -15,6 +15,8 @@ import ActionNotification from "../../shared/ActionNotification";
 import EditAccount from "./EditAccount";
 import handleAdminRoles from "../../../../../utilities/getAdminRoles";
 import apiClient from "../../../../lib/axios";
+import usePagination from "../../../../customHooks/usePagination";
+import usePaginatedData from "../../../../customHooks/usePaginationData";
 
 const AccountTypes = () => {
   const [openAddAccountType, setOpenAddAccountType] = useState(false);
@@ -32,13 +34,30 @@ const AccountTypes = () => {
 
   // local account state
   const [accountsList, setAccountsList] = useState(accounts);
-  const [showCount, setShowCount] = useState(10);
+
   const [searchTerm, setSearchTerm] = useState("");
   // single account object
   const [accountObj, setAccountObj] = useState({});
   const [accountId, setAccountId] = useState("");
   const [action, setAction] = useState(false);
   const [openEditModel, setOpenEditModel] = useState(false);
+
+   // handle search
+   const [showCount, setShowCount] = useState(10);
+   const [totalPage, setTotalPage] = useState(1);
+ 
+   // custom hook destructuring
+   const { currentPage, goToNextPage, goToPreviousPage, setPage } =
+     usePagination(1, totalPage);
+   const { paginatedData: paginatedAccountTypes, totalPages } = usePaginatedData(
+     accountsList,
+     showCount,
+     currentPage
+   );
+
+   useEffect(() => {
+     setTotalPage(totalPages); // Update total pages when it changes
+   }, [totalPages, setTotalPage]);
 
   // update accountsList to show 10 accounts on page load
   // on count change
@@ -112,6 +131,8 @@ const AccountTypes = () => {
     },
   };
 
+   
+
   return (
     <>
       {!openAddAccountType ? (
@@ -173,10 +194,10 @@ const AccountTypes = () => {
                       </tr>
                     </thead>
                     <tbody>
-                      {accountsList?.length === 0 && (
+                      {paginatedAccountTypes?.length === 0 && (
                         <NoResult name="Account" />
                       )}
-                      {accountsList?.map((account) => (
+                      {paginatedAccountTypes?.map((account) => (
                         <tr key={account._id}>
                           <td>{account.accountName}</td>
                           <td>{account.interestRate.toFixed(2)}%</td>
@@ -210,7 +231,12 @@ const AccountTypes = () => {
             )}
 
             {/* next and previous button  */}
-            <NextPreBtn />
+            <NextPreBtn
+              currentPage={currentPage}
+              totalPages={totalPage}
+              goToNextPage={goToNextPage}
+              goToPreviousPage={goToPreviousPage}
+            />
           </div>
         </div>
       ) : (

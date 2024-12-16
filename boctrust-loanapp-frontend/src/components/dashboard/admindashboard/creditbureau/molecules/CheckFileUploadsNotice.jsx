@@ -3,6 +3,7 @@ import { GrStatusGood } from "react-icons/gr";
 import "../Credit.css";
 
 const CheckFileUploadsNotice = ({ selectedCreditAnalysis }) => {
+  console.log(selectedCreditAnalysis, "selectedCreditAnalysis");
   return (
     <div className="d-flex flex-column gap-2 mb-4 mt-2">
       {selectedCreditAnalysis?.creditDbSearch?.dbSearchReport && (
@@ -17,25 +18,18 @@ const CheckFileUploadsNotice = ({ selectedCreditAnalysis }) => {
           Report Uploaded
         </div>
       )}
-      {selectedCreditAnalysis?.creditBureauSearch?.[0]
-        ?.bureauSearchReport && (
-        <div className="upload__noticeItem">
-          <GrStatusGood size={22} color="rgb(16 185 129)" />{" "}
-          {selectedCreditAnalysis?.creditBureauSearch?.[0].bureauName
-            .split("_")
-            .join(" ")}{" "}
-          Report Uploaded
-        </div>
-      )}
-      {selectedCreditAnalysis?.creditBureauSearch?.[1]
-        ?.bureauSearchReport && (
-          <div className="upload__noticeItem">
-          <GrStatusGood size={22} color="rgb(16 185 129)" />{" "}
-          {selectedCreditAnalysis?.creditBureauSearch?.[1].bureauName
-            .split("_")
-            .join(" ")}{" "}
-          Report Uploaded
-        </div>
+      {selectedCreditAnalysis?.creditBureauSearch?.map(
+        (item) =>
+          item
+            ?.bureauSearchReport && (
+            <div className="upload__noticeItem">
+              <GrStatusGood size={22} color="rgb(16 185 129)" />{" "}
+              {item.bureauName
+                .split("_")
+                .join(" ")}{" "}
+              Report Uploaded
+            </div>
+          )
       )}
     </div>
   );

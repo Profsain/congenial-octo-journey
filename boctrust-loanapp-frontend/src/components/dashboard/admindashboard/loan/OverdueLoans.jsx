@@ -80,11 +80,6 @@ const CompletedLoans = () => {
 
 
   const dispatch = useDispatch();
-
-  useEffect(() => {
-    setOverdueLoanEntries(paginatedOverdueLoans); // Update local state with paginated data
-  }, [paginatedOverdueLoans]);
-
   
   useEffect(() => {
     setTotalPage(totalPages);

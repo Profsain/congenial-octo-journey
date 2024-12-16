@@ -4,6 +4,7 @@ const router = express.Router();
 const loginFirstCentral = require("../firstCentralMethods/loginFirstCentral");
 const consumerMatch = require("../firstCentralMethods/getConsumerMatch");
 const commercialMatch = require("../firstCentralMethods/getCommercialMatch");
+const { default: axios } = require("axios");
 
 router.post("/firstcentralreport", async (req, res) => {
   const { bvn } = req.body;
@@ -18,48 +19,30 @@ router.post("/firstcentralreport", async (req, res) => {
   }
 
   const { MatchingEngineID, EnquiryID, ConsumerID } = consumer[0];
-  console.log(
-    MatchingEngineID,
-    EnquiryID,
-    ConsumerID,
-    "MatchingEngineID, EnquiryID, ConsumerID"
-  );
-  const myHeaders = new Headers();
-  myHeaders.append("Content-Type", "application/json");
-
-  const raw = JSON.stringify({
-    DataTicket: dataTicket,
-    consumerID: ConsumerID,
-    EnquiryID: EnquiryID,
-    consumerMergeList: "",
-    SubscriberEnquiryEngineID: MatchingEngineID,
-  });
-
-  const requestOptions = {
-    method: "POST",
-    headers: myHeaders,
-    body: raw,
-    redirect: "follow",
-  };
 
   try {
-    const response = await fetch(
+    const response = await axios.post(
       "https://online.firstcentralcreditbureau.com/firstcentralrestv2/GetConsumerFullCreditReport",
-      requestOptions
+      {
+        DataTicket: dataTicket,
+        consumerID: ConsumerID,
+        EnquiryID: EnquiryID,
+        consumerMergeList: "",
+        SubscriberEnquiryEngineID: MatchingEngineID,
+      }
     );
 
-    if (!response) {
-      throw new Error(`HTTP error! Status: ${response.status}`);
-    }
+    const result = response.data;
 
-    const result = await response.json();
     res.status(200).json({
       message: "First central api called successfully",
       data: result,
     });
   } catch (error) {
     console.log(error, "firstcentralcreditbureau");
-    throw new Error(error);
+    res.status(500).json({
+      error: "Something went wrong",
+    });
   }
 });
 

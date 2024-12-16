@@ -217,6 +217,7 @@ router.put(
       res.json(creditAnalysis);
     } catch (err) {
       console.error(err);
+
       res.status(500).json({ error: "Failed to update creditBureauSearch" });
     }
   }
@@ -231,8 +232,8 @@ router.put(
 
       const { bureauName, reportType, reportReason } = req.body;
 
-      console.log(req.files, "req.files")
-      
+      console.log(req.files, "req.files");
+
       if (req.files?.bureauSearchReport) {
         req.body.bureauSearchReport = `${baseUrl}/public/filesUpload/${req.files.bureauSearchReport[0].filename}`;
       } else {
@@ -282,6 +283,7 @@ router.put(
 router.put("/paySlipAnalysis/:analysisId", multipleUpload, async (req, res) => {
   try {
     const analysisId = req.params.analysisId;
+
     if (req.files?.uploadPaySlip) {
       req.body.uploadPaySlip = `${baseUrl}/public/filesUpload/${req.files.uploadPaySlip[0].filename}`;
     }

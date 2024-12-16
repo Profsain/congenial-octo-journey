@@ -50,7 +50,7 @@ const UserManagerDashboard = () => {
                 />
               </div>
 
-              <div className="FormGroup SBox">
+              {/* <div className="FormGroup SBox">
                 <input
                   name="search"
                   placeholder="Search"
@@ -58,7 +58,7 @@ const UserManagerDashboard = () => {
                   onChange={(e) => setSearchTerms(e.target.value)}
                 />
                 <img src="/images/search.png" alt="search-icon" />
-              </div>
+              </div> */}
             </div>
           </DashboardHeadline>
         </div>

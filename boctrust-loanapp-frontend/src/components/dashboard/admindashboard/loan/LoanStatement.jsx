@@ -46,26 +46,23 @@ const LoanStatement = () => {
 
   useEffect(() => {
     dispatch(fetchCompletedLoan());
-  }, [dispatch]);
+  }, []);
 
   const [showCount, setShowCount] = useState(5);
   const [searchTerms, setSearchTerms] = useState("");
-  const [totalPages, setTotalPages] = useState(1);
+  const [totalPage, setTotalPage] = useState(1);
 
-    // search loan list
-    const [loanList, setLoanList] = useState(completedLoans);
+  // search loan list
+  const [loanList, setLoanList] = useState(completedLoans);
 
   // custom hook destructuring
   const { currentPage, goToNextPage, goToPreviousPage, setPage } =
-    usePagination(1, totalPages);
-  const { paginatedData: paginatedLoansList } = usePaginatedData(
-    loanList,
+    usePagination(1, totalPage);
+  const { paginatedData: paginatedLoansList, totalPages } = usePaginatedData(
+    completedLoans,
     showCount,
     currentPage
   );
-
-
-  
 
   // handle show loan details
   // const apiUrl = import.meta.env.VITE_BASE_URL;
@@ -75,19 +72,13 @@ const LoanStatement = () => {
 
   // update loansList to show 5 pendingLoans on page load
   // or on count changes
-   useEffect(() => {
-     setLoanList(paginatedLoansList); // Update local state with paginated data
-   }, [paginatedLoansList]);
-
-   useEffect(() => {
-     setTotalPages(totalPages); // Update total pages when it changes
-   }, [totalPages, setTotalPages]);
-  
-  // update loanList to show 10 customers on page load
-  // or on count changes
   useEffect(() => {
-    setLoanList(completedLoans);
-  }, [completedLoans, showCount]);
+    setLoanList(paginatedLoansList); // Update local state with paginated data
+  }, [paginatedLoansList]);
+
+  useEffect(() => {
+    setTotalPage(totalPages); // Update total pages when it changes
+  }, [totalPages]);
 
   // update loanList on search
   const handleSearch = () => {
@@ -100,8 +91,6 @@ const LoanStatement = () => {
   useEffect(() => {
     handleSearch();
   }, [searchTerms]);
-
-  
 
   return (
     <>
@@ -168,23 +157,23 @@ const LoanStatement = () => {
               ) : (
                 paginatedLoansList &&
                 paginatedLoansList?.map((loan) => {
-                    return (
-                      <React.Fragment key={loan._id}>
-                        <LoanStatementRecord
-                          setAccountStatement={setAccountStatement}
-                          setIsProcessing={setIsProcessing}
-                          loan={loan}
-                        />
-                      </React.Fragment>
-                    );
-                  })
+                  return (
+                    <React.Fragment key={loan._id}>
+                      <LoanStatementRecord
+                        setAccountStatement={setAccountStatement}
+                        setIsProcessing={setIsProcessing}
+                        loan={loan}
+                      />
+                    </React.Fragment>
+                  );
+                })
               )}
             </tbody>
           </Table>
         </div>
         <NextPreBtn
           currentPage={currentPage}
-          totalPages={totalPages}
+          totalPages={totalPage}
           goToNextPage={goToNextPage}
           goToPreviousPage={goToPreviousPage}
         />

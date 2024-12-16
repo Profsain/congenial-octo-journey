@@ -15,6 +15,7 @@ import apiClient from "../../../../lib/axios";
 
 // custom hook
 import usePaginatedData from "../../../../customHooks/usePaginationData";
+import {  useDebounce } from "../../../../../utilities/debounce";
 
 const UsersList = ({ count, searchTerms, setTotalPages, currentPage }) => {
   const styles = {
@@ -31,7 +32,9 @@ const UsersList = ({ count, searchTerms, setTotalPages, currentPage }) => {
   const status = useSelector((state) => state.adminUserReducer.status);
 
   const [usersList, setUsersList] = useState([]);
-  const [searchTerm, setSearchTerm] = useState(searchParams.get("search") || "");
+  const [searchTerm, setSearchTerm] = useState(
+    searchParams.get("search") || ""
+  );
   const [show, setShow] = useState(false);
   const [action, setAction] = useState(false);
   const [userId, setUserId] = useState("");
@@ -39,13 +42,26 @@ const UsersList = ({ count, searchTerms, setTotalPages, currentPage }) => {
   const [adminRoles, setAdminRoles] = useState([]);
   const [viewEdit, setViewEdit] = useState("edit");
 
+  const debouncedSearch = useDebounce(searchTerm, 3000);
+
+  
   // Fetch users on initial load
   useEffect(() => {
-    dispatch(fetchAdmins(searchTerm));
-  }, [dispatch, searchTerm]);
+    dispatch(fetchAdmins());
+  }, [dispatch]);
+
+  useEffect(() => {
+    if(debouncedSearch){
+      dispatch(fetchAdmins(debouncedSearch))
+    }
+  }, [dispatch, debouncedSearch]);
 
   // Update usersList based on the current page and count
-  const { paginatedData: paginatedUsersList, totalPages } = usePaginatedData(users, count, currentPage);
+  const { paginatedData: paginatedUsersList, totalPages } = usePaginatedData(
+    users,
+    count,
+    currentPage
+  );
 
   useEffect(() => {
     setUsersList(paginatedUsersList); // Update local state with paginated data
@@ -54,7 +70,6 @@ const UsersList = ({ count, searchTerms, setTotalPages, currentPage }) => {
   useEffect(() => {
     setTotalPages(totalPages); // Update total pages when it changes
   }, [totalPages, setTotalPages]);
-  
 
   // Update users list based on count
   useEffect(() => {

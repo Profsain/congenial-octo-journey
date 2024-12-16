@@ -11,18 +11,13 @@ import FirstCentralPdfReport from "./firstCentralPdfReport";
 import FirstCentralCommercialPdf from "./FirstCentralCommercialPdf";
 import CRCBasicReportPDF from "./CRCBasicReportPDF";
 import CRCCooporateReport from "./CRCCooporateReport";
-import ReportUpload from "./ReportUpload";
 import { toast, ToastContainer } from "react-toastify";
 
 // toast styles
 import "react-toastify/dist/ReactToastify.css";
 import { useDispatch, useSelector } from "react-redux";
 
-import {
-  fetchAllCustomer,
-  fetchSingleCustomer,
-} from "../../../../redux/reducers/customerReducer";
-import axios from "axios";
+import { fetchAllCustomer } from "../../../../redux/reducers/customerReducer";
 import ReportTypeSelect from "./atoms/ReportTypeSelect";
 import CreditBureauSelect from "./atoms/CreditBureauSelect";
 import ReportReasonSelect from "./atoms/ReportReasonSelect";
@@ -92,6 +87,7 @@ const CreditCheckhtmlForm = ({
     useState(bureauFileReportInit);
   const [noReport, setNoReport] = useState(false);
   const [noCRC, setNoCRC] = useState(false);
+  const [noCreditRegistry, setNoCreditRegistry] = useState(false);
   const [isUpdateLoading, setIsUpdateLoading] = useState(false);
   const [didUploadAny, setDidUploadAny] = useState(false);
 
@@ -146,62 +142,53 @@ const CreditCheckhtmlForm = ({
     if (selectedCreditAnalysis) {
       setReportConfirmation({
         isApplicantCivilianPolice:
-          selectedCreditAnalysis?.creditCheck?.paySlipAnalysis
-            ?.isApplicantCivilianPolice || false,
+          selectedCreditAnalysis?.paySlipAnalysis?.isApplicantCivilianPolice ||
+          false,
         isPaySlipContainsMoreThenFiveLenders:
-          selectedCreditAnalysis?.creditCheck?.paySlipAnalysis
+          selectedCreditAnalysis?.paySlipAnalysis
             ?.isPaySlipContainsMoreThenFiveLenders || false,
         monthlyDeductionBelowPercentageBenchmark:
-          selectedCreditAnalysis?.creditCheck?.paySlipAnalysis
+          selectedCreditAnalysis?.paySlipAnalysis
             ?.monthlyDeductionBelowPercentageBenchmark || false,
         netPayNotLessThanBenchmark:
-          selectedCreditAnalysis?.creditCheck?.paySlipAnalysis
-            ?.netPayNotLessThanBenchmark || false,
+          selectedCreditAnalysis?.paySlipAnalysis?.netPayNotLessThanBenchmark ||
+          false,
         takeHomePayNotLessThan20PercentGross:
-          selectedCreditAnalysis?.creditCheck?.paySlipAnalysis
+          selectedCreditAnalysis?.paySlipAnalysis
             ?.takeHomePayNotLessThan20PercentGross || false,
         takeHomePayNotLessThanBenchmark:
-          selectedCreditAnalysis?.creditCheck?.paySlipAnalysis
+          selectedCreditAnalysis?.paySlipAnalysis
             ?.takeHomePayNotLessThanBenchmark || false,
       });
 
       setFormState({
-        netPay:
-          selectedCreditAnalysis?.creditCheck?.paySlipAnalysis?.netPay || "",
+        netPay: selectedCreditAnalysis?.paySlipAnalysis?.netPay || "",
         numOfExtraLenders:
-          selectedCreditAnalysis?.creditCheck?.paySlipAnalysis
-            ?.numOfExtraLenders || 0,
+          selectedCreditAnalysis?.paySlipAnalysis?.numOfExtraLenders || 0,
         extraLenders:
-          selectedCreditAnalysis?.creditCheck?.paySlipAnalysis?.extraLenders ||
-          [],
+          selectedCreditAnalysis?.paySlipAnalysis?.extraLenders || [],
         monthlyLoanRepayment:
-          selectedCreditAnalysis?.creditCheck?.paySlipAnalysis
-            ?.monthlyLoanRepayment || 0,
-        dateOfBirth:
-          selectedCreditAnalysis?.creditCheck?.paySlipAnalysis?.dateOfBirth ||
-          "",
+          selectedCreditAnalysis?.paySlipAnalysis?.monthlyLoanRepayment || 0,
+        dateOfBirth: selectedCreditAnalysis?.paySlipAnalysis?.dateOfBirth || "",
         dateOfAppointment:
-          selectedCreditAnalysis?.creditCheck?.paySlipAnalysis
-            ?.dateOfAppointment || "",
+          selectedCreditAnalysis?.paySlipAnalysis?.dateOfAppointment || "",
         uploadPaySlip:
-          selectedCreditAnalysis?.creditCheck?.paySlipAnalysis?.uploadPaySlip ||
-          "",
-        benchmark:
-          selectedCreditAnalysis?.creditCheck?.paySlipAnalysis?.benchmark || 0,
+          selectedCreditAnalysis?.paySlipAnalysis?.uploadPaySlip || "",
+        benchmark: selectedCreditAnalysis?.paySlipAnalysis?.benchmark || 0,
       });
 
       setDbSearchReport(
-        selectedCreditAnalysis?.creditCheck?.creditDbSearch?.dbSearchReport ||
-          ""
+        selectedCreditAnalysis?.creditDbSearch?.dbSearchReport || ""
       );
       setDeductSearchReport(
-        selectedCreditAnalysis?.creditCheck?.deductCheck?.deductSearchReport ||
-          ""
+        selectedCreditAnalysis?.deductCheck?.deductSearchReport || ""
       );
 
-      if (selectedCreditAnalysis?.creditCheck?.creditBureauSearch?.length > 0) {
-        const bureauSearch =
-          selectedCreditAnalysis?.creditCheck?.creditBureauSearch;
+      if (selectedCreditAnalysis?.creditBureauSearch?.length > 0) {
+        const bureauSearch = selectedCreditAnalysis?.creditBureauSearch.filter(
+          (item) => item.bureauSearchReport != ""
+        );
+
         setBureauReportUpload({
           firstUpload: {
             bureauSearchReport: bureauSearch[0]?.bureauSearchReport || "",
@@ -217,6 +204,8 @@ const CreditCheckhtmlForm = ({
           },
         });
       }
+
+      setIsReportUploaded(true);
     }
   }, [selectedCreditAnalysis]);
 
@@ -305,7 +294,7 @@ const CreditCheckhtmlForm = ({
 
       await apiClient.put(
         `/credit-analysis/creditBureauSearch/${recordId}/fileupload`,
-        formData,
+        secondUploadFormData,
         {
           headers: {
             "Content-Type": "multipart/form-data",
@@ -498,7 +487,6 @@ const CreditCheckhtmlForm = ({
     }
   }, [bureauData.bureauName]);
 
-
   useEffect(() => {
     if (bureauReportUpload.firstUpload.bureauName === "first_central") {
       setReportOptions([
@@ -593,16 +581,25 @@ const CreditCheckhtmlForm = ({
         // set  report
         if (reportType === "consumer_basic") {
           clearReport();
-          setBureauReport(data.data.ConsumerSearchResultResponse);
+          setBureauReport(
+            data.data.ConsumerSearchResultResponse ||
+              data.data.ConsumerNoHitResponse
+          );
           setCrcTitle("Consumer Basic Report");
         } else if (reportType === "consumer_classic") {
           clearReport();
           // setCrcClassicReport(data.data.ConsumerSearchResultResponse);
-          setBureauReport(data.data.ConsumerSearchResultResponse);
+          setBureauReport(
+            data.data.ConsumerSearchResultResponse ||
+              data.data.ConsumerNoHitResponse
+          );
           setCrcTitle("Consumer Classic Report");
         } else {
           clearReport();
-          setCrcCooporateReport(data.data.CommercialSearchResultResponse);
+          setCrcCooporateReport(
+            data.data.CommercialSearchResultResponse ||
+              data.data.CommercialNoHitResponse
+          );
         }
 
         // set bureau loading
@@ -619,6 +616,7 @@ const CreditCheckhtmlForm = ({
     if (bureauData.bureauName === "credit_register") {
       clearReport();
       try {
+        setNoCreditRegistry(false);
         const bvn = bureauData.bvnNo;
         const { data } = await apiClient.post(
           `${apiUrl}/api/creditregistry/getreport`,
@@ -627,7 +625,6 @@ const CreditCheckhtmlForm = ({
 
         // set  report
         setPDFContent(data.data.Reports[0].PDFContent);
-        console.log("credit register", data.data);
 
         // set bureau loading
         setBureauLoading(false);
@@ -640,7 +637,10 @@ const CreditCheckhtmlForm = ({
         }, 5000);
       } catch (error) {
         setBureauLoading(false);
-        console.log("credit register error", error);
+
+        if (error.response.status === 404) {
+          setNoCreditRegistry(true);
+        }
         return toast.error(error.message);
       }
     }
@@ -798,7 +798,13 @@ const CreditCheckhtmlForm = ({
     window.scrollTo(0, 0);
   }, [formStep]);
 
-  console.log(selectedCreditAnalysis, "selectedCreditAnalysis")
+  useEffect(() => {
+    if (noCreditRegistry) {
+      setTimeout(() => {
+        setNoCreditRegistry(false);
+      }, 5000);
+    }
+  }, [noCreditRegistry]);
 
   return (
     <>
@@ -1077,15 +1083,20 @@ const CreditCheckhtmlForm = ({
                   style={{ width: "100%", height: "100%" }}
                 />
               </div>
-            ) : (
+            ) : noCreditRegistry ? (
               <h4
                 style={{
-                  color: "gray",
-                  paddingBottom: "3rem",
+                  color: "#000000",
+                  padding: "3rem",
                   textAlign: "center",
+                  backgroundColor: "#ffffff",
+                  display: "grid",
+                  placeContent: "center",
                 }}
-              ></h4>
-            )}
+              >
+                No CRedit Registry Report for Customer
+              </h4>
+            ) : null}
           </div>
 
           {/* attach report */}
@@ -1283,7 +1294,7 @@ const CreditCheckhtmlForm = ({
       {/* pay slip analysis component */}
       {formStep === 2 && (
         <PaySlipAnalysis
-        recordId={recordId}
+          recordId={recordId}
           formState={formState}
           setFormState={setFormState}
           reportConfirmation={reportConfirmation}
